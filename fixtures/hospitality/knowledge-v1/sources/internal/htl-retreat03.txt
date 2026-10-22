@@ -1,0 +1,13 @@
+TÀI LIỆU MẪU INTERNAL — Pine Ridge Demo
+Nguồn gốc: nội dung hư cấu do tác giả bộ dữ liệu viết; không trích xuất từ khách sạn thật, không phải dữ liệu vận hành.
+Mã cơ sở: HTL-RETREAT03 | Phiên bản: 1.0 | Hiệu lực: 2026-10-01 đến 2027-09-30
+Mọi số lượng, giá, địa chỉ và tuyến đường đều là tham chiếu giả lập. Không dùng làm chỉ dẫn khẩn cấp.
+
+## Ghi chú nội bộ
+[F-HTL-RETREAT03-004] identity / property.coordinates: {"lat": 12.0003, "lon": 108.0003}
+  Điều kiện: {"note": "Tọa độ giả lập, không dùng để dẫn đường."}
+[F-HTL-RETREAT03-037] internal / operations.escalation_queue: "Chuyển yêu cầu chưa được giải quyết cho trưởng ca; không hiển thị tên nhân viên hoặc ghi chú vận hành cho khách."
+[F-HTL-RETREAT03-038] internal / operations.demo_contact: "https://ops.example.invalid/HTL-RETREAT03/queue (NONFUNCTIONAL sample URL)"
+[F-HTL-RETREAT03-039] internal / operations.capacity_caveat: "Số lượng phòng và chỗ trong bộ dữ liệu là tham chiếu tĩnh; không phản ánh tồn phòng/chỗ theo thời gian thực."
+[F-HTL-RETREAT03-052] internal / operations.rate_note: "Giá phòng trong catalog là giá tham chiếu mẫu, đã gồm thuế giả lập; không phải báo giá hoặc tồn phòng."
+[F-HTL-RETREAT03-102] contact / service.contact_web_sample: "https://guest.example.invalid/HTL-RETREAT03/contact (NONFUNCTIONAL sample URL; not a working contact endpoint)"

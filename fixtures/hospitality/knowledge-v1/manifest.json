@@ -1,0 +1,62 @@
+{
+  "active_fact_count": 345,
+  "currency": "VND",
+  "files": [
+    "facts.json",
+    "sources.json",
+    "properties.json",
+    "lifecycle_scenarios.json",
+    "sources/",
+    "README.md",
+    "generate_knowledge.py",
+    "validate_knowledge.py"
+  ],
+  "languages": [
+    "vi",
+    "en"
+  ],
+  "lifecycle_scenario_count": 7,
+  "media_linkage": {
+    "authority": "media assets illustrate appearance only; they are not authority for capacity, price, policy, accessibility, or availability",
+    "expected_pattern": "media/hotels/HTL-ID/",
+    "ownership_note": "media/ is authored separately"
+  },
+  "pack_id": "staylead-hospitality-knowledge-v1",
+  "properties": [
+    {
+      "active_fact_count": 115,
+      "hotel_id": "HTL-CITY01",
+      "name": "Harbor City Demo",
+      "provider_count": 4,
+      "rate_count": 3,
+      "room_type_count": 3,
+      "route_count": 19,
+      "venue_count": 8
+    },
+    {
+      "active_fact_count": 114,
+      "hotel_id": "HTL-BEACH02",
+      "name": "Lagoon Family Demo",
+      "provider_count": 4,
+      "rate_count": 3,
+      "room_type_count": 3,
+      "route_count": 19,
+      "venue_count": 8
+    },
+    {
+      "active_fact_count": 116,
+      "hotel_id": "HTL-RETREAT03",
+      "name": "Pine Ridge Demo",
+      "provider_count": 4,
+      "rate_count": 3,
+      "room_type_count": 3,
+      "route_count": 19,
+      "venue_count": 8
+    }
+  ],
+  "reference_date": "2026-10-22",
+  "source_count": 48,
+  "synthetic": true,
+  "timezone": "Asia/Ho_Chi_Minh",
+  "version": "1.0"
+}

@@ -1,0 +1,16 @@
+{
+  "transcript_id": "HTL-RETREAT03-TOUR-SCRIPT",
+  "media_id": "HTL-RETREAT03-SYNTHETIC-TOUR",
+  "language": "en",
+  "transcript_type": "authored_script_for_caption_fixture",
+  "audio_present": false,
+  "asr_output": false,
+  "script_text": [
+    "Pine Ridge Demo. Synthetic sample lobby directory.",
+    "Illustrative room layout: bed, desk, bath, and entry.",
+    "Example information board. Ask reception to confirm services."
+  ],
+  "script_path": "hotels/HTL-RETREAT03/synthetic-tour-transcript.json",
+  "captions_path": "hotels/HTL-RETREAT03/synthetic-tour.vtt",
+  "note": "The MP4 is silent. This is authored text shown as timed captions, not a transcript of recorded or generated audio."
+}

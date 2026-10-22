@@ -1,0 +1,914 @@
+[
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Tổng quan",
+    "source_id": "SRC-HTL-CITY01-OVERVIEW",
+    "synthetic": true,
+    "title": "Hướng dẫn tổng quan — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Nhận và trả phòng",
+    "source_id": "SRC-HTL-CITY01-STAY",
+    "synthetic": true,
+    "title": "Hướng dẫn nhận và trả phòng — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Hành lý",
+    "source_id": "SRC-HTL-CITY01-LUGGAGE",
+    "synthetic": true,
+    "title": "Hướng dẫn hành lý — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Đặt phòng và thanh toán",
+    "source_id": "SRC-HTL-CITY01-PAY",
+    "synthetic": true,
+    "title": "Hướng dẫn đặt phòng và thanh toán — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Phòng và lưu trú",
+    "source_id": "SRC-HTL-CITY01-ROOM",
+    "synthetic": true,
+    "title": "Hướng dẫn phòng và lưu trú — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Tiếp cận",
+    "source_id": "SRC-HTL-CITY01-ACCESS",
+    "synthetic": true,
+    "title": "Hướng dẫn tiếp cận — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Tiện ích",
+    "source_id": "SRC-HTL-CITY01-AMENITY",
+    "synthetic": true,
+    "title": "Hướng dẫn tiện ích — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Quy định lưu trú",
+    "source_id": "SRC-HTL-CITY01-POLICY",
+    "synthetic": true,
+    "title": "Hướng dẫn quy định lưu trú — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "An toàn và riêng tư",
+    "source_id": "SRC-HTL-CITY01-SAFETY",
+    "synthetic": true,
+    "title": "Hướng dẫn an toàn và riêng tư — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Hỗ trợ trong kỳ nghỉ",
+    "source_id": "SRC-HTL-CITY01-SUPPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn hỗ trợ trong kỳ nghỉ — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Liên hệ và hỗ trợ",
+    "source_id": "SRC-HTL-CITY01-CONTACT",
+    "synthetic": true,
+    "title": "Hướng dẫn liên hệ và hỗ trợ — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Khu vực và di chuyển",
+    "source_id": "SRC-HTL-CITY01-LOCAL",
+    "synthetic": true,
+    "title": "Hướng dẫn khu vực và di chuyển — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Ăn uống và dị ứng",
+    "source_id": "SRC-HTL-CITY01-FOOD",
+    "synthetic": true,
+    "title": "Hướng dẫn ăn uống và dị ứng — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Đỗ xe và di chuyển",
+    "source_id": "SRC-HTL-CITY01-TRANSPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn đỗ xe và di chuyển — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": false,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/internal/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Ghi chú nội bộ",
+    "source_id": "SRC-HTL-CITY01-INTERNAL",
+    "synthetic": true,
+    "title": "Hướng dẫn ghi chú nội bộ — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-CITY01",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/catalog/htl-city01.txt",
+    "scope": "hotel-specific",
+    "section": "Danh mục tham khảo",
+    "source_id": "SRC-HTL-CITY01-CATALOG",
+    "synthetic": true,
+    "title": "Danh mục phòng, giá tham khảo, địa điểm và tuyến mẫu — Harbor City Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Tổng quan",
+    "source_id": "SRC-HTL-BEACH02-OVERVIEW",
+    "synthetic": true,
+    "title": "Hướng dẫn tổng quan — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Nhận và trả phòng",
+    "source_id": "SRC-HTL-BEACH02-STAY",
+    "synthetic": true,
+    "title": "Hướng dẫn nhận và trả phòng — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Hành lý",
+    "source_id": "SRC-HTL-BEACH02-LUGGAGE",
+    "synthetic": true,
+    "title": "Hướng dẫn hành lý — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Đặt phòng và thanh toán",
+    "source_id": "SRC-HTL-BEACH02-PAY",
+    "synthetic": true,
+    "title": "Hướng dẫn đặt phòng và thanh toán — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Phòng và lưu trú",
+    "source_id": "SRC-HTL-BEACH02-ROOM",
+    "synthetic": true,
+    "title": "Hướng dẫn phòng và lưu trú — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Tiếp cận",
+    "source_id": "SRC-HTL-BEACH02-ACCESS",
+    "synthetic": true,
+    "title": "Hướng dẫn tiếp cận — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Tiện ích",
+    "source_id": "SRC-HTL-BEACH02-AMENITY",
+    "synthetic": true,
+    "title": "Hướng dẫn tiện ích — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Quy định lưu trú",
+    "source_id": "SRC-HTL-BEACH02-POLICY",
+    "synthetic": true,
+    "title": "Hướng dẫn quy định lưu trú — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "An toàn và riêng tư",
+    "source_id": "SRC-HTL-BEACH02-SAFETY",
+    "synthetic": true,
+    "title": "Hướng dẫn an toàn và riêng tư — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Hỗ trợ trong kỳ nghỉ",
+    "source_id": "SRC-HTL-BEACH02-SUPPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn hỗ trợ trong kỳ nghỉ — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Liên hệ và hỗ trợ",
+    "source_id": "SRC-HTL-BEACH02-CONTACT",
+    "synthetic": true,
+    "title": "Hướng dẫn liên hệ và hỗ trợ — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Khu vực và di chuyển",
+    "source_id": "SRC-HTL-BEACH02-LOCAL",
+    "synthetic": true,
+    "title": "Hướng dẫn khu vực và di chuyển — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Ăn uống và dị ứng",
+    "source_id": "SRC-HTL-BEACH02-FOOD",
+    "synthetic": true,
+    "title": "Hướng dẫn ăn uống và dị ứng — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Đỗ xe và di chuyển",
+    "source_id": "SRC-HTL-BEACH02-TRANSPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn đỗ xe và di chuyển — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": false,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/internal/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Ghi chú nội bộ",
+    "source_id": "SRC-HTL-BEACH02-INTERNAL",
+    "synthetic": true,
+    "title": "Hướng dẫn ghi chú nội bộ — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-BEACH02",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/catalog/htl-beach02.txt",
+    "scope": "hotel-specific",
+    "section": "Danh mục tham khảo",
+    "source_id": "SRC-HTL-BEACH02-CATALOG",
+    "synthetic": true,
+    "title": "Danh mục phòng, giá tham khảo, địa điểm và tuyến mẫu — Lagoon Family Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Tổng quan",
+    "source_id": "SRC-HTL-RETREAT03-OVERVIEW",
+    "synthetic": true,
+    "title": "Hướng dẫn tổng quan — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Nhận và trả phòng",
+    "source_id": "SRC-HTL-RETREAT03-STAY",
+    "synthetic": true,
+    "title": "Hướng dẫn nhận và trả phòng — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Hành lý",
+    "source_id": "SRC-HTL-RETREAT03-LUGGAGE",
+    "synthetic": true,
+    "title": "Hướng dẫn hành lý — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Đặt phòng và thanh toán",
+    "source_id": "SRC-HTL-RETREAT03-PAY",
+    "synthetic": true,
+    "title": "Hướng dẫn đặt phòng và thanh toán — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Phòng và lưu trú",
+    "source_id": "SRC-HTL-RETREAT03-ROOM",
+    "synthetic": true,
+    "title": "Hướng dẫn phòng và lưu trú — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Tiếp cận",
+    "source_id": "SRC-HTL-RETREAT03-ACCESS",
+    "synthetic": true,
+    "title": "Hướng dẫn tiếp cận — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Tiện ích",
+    "source_id": "SRC-HTL-RETREAT03-AMENITY",
+    "synthetic": true,
+    "title": "Hướng dẫn tiện ích — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Quy định lưu trú",
+    "source_id": "SRC-HTL-RETREAT03-POLICY",
+    "synthetic": true,
+    "title": "Hướng dẫn quy định lưu trú — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "An toàn và riêng tư",
+    "source_id": "SRC-HTL-RETREAT03-SAFETY",
+    "synthetic": true,
+    "title": "Hướng dẫn an toàn và riêng tư — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Hỗ trợ trong kỳ nghỉ",
+    "source_id": "SRC-HTL-RETREAT03-SUPPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn hỗ trợ trong kỳ nghỉ — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Liên hệ và hỗ trợ",
+    "source_id": "SRC-HTL-RETREAT03-CONTACT",
+    "synthetic": true,
+    "title": "Hướng dẫn liên hệ và hỗ trợ — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Khu vực và di chuyển",
+    "source_id": "SRC-HTL-RETREAT03-LOCAL",
+    "synthetic": true,
+    "title": "Hướng dẫn khu vực và di chuyển — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Ăn uống và dị ứng",
+    "source_id": "SRC-HTL-RETREAT03-FOOD",
+    "synthetic": true,
+    "title": "Hướng dẫn ăn uống và dị ứng — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/guest/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Đỗ xe và di chuyển",
+    "source_id": "SRC-HTL-RETREAT03-TRANSPORT",
+    "synthetic": true,
+    "title": "Hướng dẫn đỗ xe và di chuyển — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": false,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/internal/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Ghi chú nội bộ",
+    "source_id": "SRC-HTL-RETREAT03-INTERNAL",
+    "synthetic": true,
+    "title": "Hướng dẫn ghi chú nội bộ — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  },
+  {
+    "authoring_origin": "synthetic author-authored source of truth; not extracted from a real property or model",
+    "guest_approved": true,
+    "hotel_id": "HTL-RETREAT03",
+    "languages": [
+      "vi",
+      "en"
+    ],
+    "media_type": "text",
+    "path": "sources/catalog/htl-retreat03.txt",
+    "scope": "hotel-specific",
+    "section": "Danh mục tham khảo",
+    "source_id": "SRC-HTL-RETREAT03-CATALOG",
+    "synthetic": true,
+    "title": "Danh mục phòng, giá tham khảo, địa điểm và tuyến mẫu — Pine Ridge Demo",
+    "valid_from": "2026-10-01",
+    "valid_to": "2027-09-30",
+    "version": "1.0"
+  }
+]

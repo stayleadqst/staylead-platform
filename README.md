@@ -41,9 +41,12 @@ There is no conversation endpoint, AI pipeline, chat/session state, knowledge in
 retrieval, room allocator, itinerary planner, catalog, business policy, authentication, database
 schema or migrations, cloud resource, deployment, CI workflow, or working AI provider transport.
 The three current tests cover the health response, unsupported domain selection, and the
-shared-platform import boundary. Business behavior, end-to-end journeys, and eval cases are
-not implemented; the remaining `tests`, `evals`, `fixtures`, `pilot`, and deployment locations
-are placeholders. No market or language is enabled by folder presence alone.
+shared-platform import boundary. Business behavior, end-to-end execution, and evaluation
+runners are not implemented; the `evals`, `pilot`, and deployment locations are placeholders.
+The hospitality fixtures include an authored synthetic knowledge pack with prepared oracle
+cases for QA; it is not a production knowledge source or live hotel data
+([pack documentation](fixtures/hospitality/knowledge-v1/README.md)). No market or language is
+enabled by folder presence alone.
 
 ## Local development
 

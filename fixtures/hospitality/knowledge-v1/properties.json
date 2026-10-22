@@ -1,0 +1,4483 @@
+{
+  "properties": [
+    {
+      "address": "18 Pho May Street, fictional Harbor Ward, fictional An Hai City, Vietnam",
+      "coordinates": {
+        "lat": 10.0001,
+        "lon": 106.0001
+      },
+      "currency": "VND",
+      "description": "Khách sạn thành phố hư cấu dành cho khách công tác; địa chỉ và tọa độ chỉ là dữ liệu minh họa.",
+      "hotel_id": "HTL-CITY01",
+      "kind": "business city hotel",
+      "name": "Harbor City Demo",
+      "timezone": "Asia/Ho_Chi_Minh"
+    },
+    {
+      "address": "6 Con So Lane, fictional Blue Lagoon Ward, fictional Nam Duong City, Vietnam",
+      "coordinates": {
+        "lat": 11.0002,
+        "lon": 107.0002
+      },
+      "currency": "VND",
+      "description": "Khu nghỉ dưỡng biển hư cấu dành cho gia đình; địa chỉ và tọa độ chỉ là dữ liệu minh họa.",
+      "hotel_id": "HTL-BEACH02",
+      "kind": "family beach hotel",
+      "name": "Lagoon Family Demo",
+      "timezone": "Asia/Ho_Chi_Minh"
+    },
+    {
+      "address": "42 Suong Thong Road, fictional Pine Ridge Commune, fictional Lam Son Province, Vietnam",
+      "coordinates": {
+        "lat": 12.0003,
+        "lon": 108.0003
+      },
+      "currency": "VND",
+      "description": "Nơi nghỉ dưỡng núi hư cấu, ưu tiên không gian yên tĩnh; địa chỉ và tọa độ chỉ là dữ liệu minh họa.",
+      "hotel_id": "HTL-RETREAT03",
+      "kind": "quiet mountain retreat",
+      "name": "Pine Ridge Demo",
+      "timezone": "Asia/Ho_Chi_Minh"
+    }
+  ],
+  "reference_date": "2026-10-22",
+  "room_rates_reference": [
+    {
+      "amount": 1800000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-CITY01",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-CITY-STD-REF",
+      "room_type_id": "CITY-STD",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-CITY01-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 1950000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-CITY01",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-CITY-TWN-REF",
+      "room_type_id": "CITY-TWN",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-CITY01-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 2900000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-CITY01",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-CITY-FAM-REF",
+      "room_type_id": "CITY-FAM",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-CITY01-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 2600000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-BEACH02",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-BEACH-GDN-REF",
+      "room_type_id": "BEACH-GDN",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-BEACH02-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 3800000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-BEACH02",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-BEACH-FAM-REF",
+      "room_type_id": "BEACH-FAM",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-BEACH02-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 4500000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-BEACH02",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-BEACH-POOL-REF",
+      "room_type_id": "BEACH-POOL",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-BEACH02-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 2200000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-RETREAT03",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-PINE-LOFT-REF",
+      "room_type_id": "PINE-LOFT",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 2500000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-RETREAT03",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-PINE-GARDEN-REF",
+      "room_type_id": "PINE-GARDEN",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    },
+    {
+      "amount": 4100000,
+      "amount_minor_unit": "VND whole dong",
+      "child_charge_amount": null,
+      "child_charge_basis": "per child per room night",
+      "child_charge_currency": "VND",
+      "child_charge_status": "unknown; rate plan dependent; confirm booking terms",
+      "currency": "VND",
+      "extra_adult_charge_amount": null,
+      "extra_adult_charge_basis": "per adult per room night",
+      "extra_adult_charge_currency": "VND",
+      "extra_adult_charge_status": "unknown; confirm before quoting",
+      "extra_bed_fee_amount": null,
+      "extra_bed_fee_basis": "per extra bed per night",
+      "extra_bed_fee_currency": "VND",
+      "extra_bed_fee_status": "unknown; do not quote without confirmation",
+      "hotel_id": "HTL-RETREAT03",
+      "includes": [
+        "breakfast for registered guests"
+      ],
+      "inclusion_scope": "Breakfast inclusion applies at this hotel's designated breakfast venue for eligible registered guests; do not add that venue's reference breakfast price for those covered guests. Other venues and unregistered guests are excluded.",
+      "is_live_availability": false,
+      "is_quote": false,
+      "price_basis": {
+        "included_adults": 2,
+        "included_children": 0,
+        "included_occupants": 2,
+        "occupant_counting": "all registered persons, including children, count toward room maximum",
+        "unit": "room_night"
+      },
+      "rate_id": "RATE-PINE-CABIN-REF",
+      "room_type_id": "PINE-CABIN",
+      "source_refs": [
+        {
+          "section": "Danh mục tham khảo",
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "version": "1.0"
+        }
+      ],
+      "status": "reference_only",
+      "synthetic": true,
+      "tax": "included (synthetic reference assumption)",
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30"
+    }
+  ],
+  "room_types": {
+    "HTL-BEACH02": [
+      {
+        "accessible": "Lối vào bậc thấp; phòng tắm chưa xác nhận xe lăn.",
+        "age_and_sharing": "Trẻ dưới 6 tuổi ở chung giường miễn phí; ghế sofa dùng cho 1 người lớn/trẻ đủ tuổi.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          },
+          {
+            "count": 1,
+            "occupant_capacity": 1,
+            "type": "sofa_bed",
+            "width_cm": 110
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Nôi miễn phí, tối đa 1, xác nhận trước.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": 0,
+          "fee_basis": "included",
+          "fee_currency": "VND",
+          "limit": 1,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Trẻ dưới 18 tuổi phải ở cùng người giám hộ.",
+        "max_adults": 3,
+        "max_children": 1,
+        "max_occupancy": 3,
+        "name": "Phòng Vườn",
+        "quantity_reference": 20,
+        "room_type_id": "BEACH-GDN",
+        "sleeping_positions": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Chưa xác nhận.",
+        "age_and_sharing": "Tối đa 3 trẻ; trẻ dưới 6 tuổi ở chung giường miễn phí, không vượt sức chứa.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 2,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          },
+          {
+            "count": 1,
+            "occupant_capacity": 1,
+            "type": "sofa_bed",
+            "width_cm": 110
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Nôi miễn phí theo tình trạng, tối đa 1.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": 0,
+          "fee_basis": "included",
+          "fee_currency": "VND",
+          "limit": 1,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Trẻ dưới 18 tuổi phải ở cùng người giám hộ.",
+        "max_adults": 5,
+        "max_children": 3,
+        "max_occupancy": 5,
+        "name": "Phòng Gia đình Biển",
+        "quantity_reference": 16,
+        "room_type_id": "BEACH-FAM",
+        "sleeping_positions": 5,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Có bậc ra hiên; không đề xuất như phòng không bậc.",
+        "age_and_sharing": "Tối đa 1 trẻ ở ghế sofa; trẻ dưới 6 tuổi ở chung giường miễn phí.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "king",
+            "width_cm": 180
+          },
+          {
+            "count": 1,
+            "occupant_capacity": 1,
+            "type": "sofa_bed",
+            "width_cm": 110
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Nôi có phí 150000 VND/đêm, xác nhận trước.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": 150000,
+          "fee_basis": "per cot per night",
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Trẻ dưới 18 tuổi phải ở cùng người giám hộ.",
+        "max_adults": 3,
+        "max_children": 1,
+        "max_occupancy": 3,
+        "name": "Phòng Hiên Hồ bơi",
+        "quantity_reference": 8,
+        "room_type_id": "BEACH-POOL",
+        "sleeping_positions": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ],
+    "HTL-CITY01": [
+      {
+        "accessible": "1 phòng có tay vịn phòng tắm theo yêu cầu; cần xác nhận còn bố trí được.",
+        "age_and_sharing": "Trẻ dưới 6 tuổi ở chung giường hiện có miễn phí, tối đa 1 trẻ/phòng.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Không có nôi em bé.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": null,
+          "fee_basis": null,
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Người dưới 18 tuổi phải ở cùng người giám hộ trưởng thành.",
+        "max_adults": 2,
+        "max_children": 1,
+        "max_occupancy": 2,
+        "name": "Phòng Tiêu chuẩn",
+        "quantity_reference": 24,
+        "room_type_id": "CITY-STD",
+        "sleeping_positions": 2,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Chưa xác nhận phòng tiếp cận xe lăn.",
+        "age_and_sharing": "Trẻ dưới 6 tuổi ở chung giường hiện có miễn phí, tối đa 1 trẻ/phòng.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 2,
+            "occupant_capacity": 1,
+            "type": "single",
+            "width_cm": 100
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Không có nôi em bé.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": null,
+          "fee_basis": null,
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Người dưới 18 tuổi phải ở cùng người giám hộ trưởng thành.",
+        "max_adults": 2,
+        "max_children": 1,
+        "max_occupancy": 2,
+        "name": "Phòng Hai giường",
+        "quantity_reference": 18,
+        "room_type_id": "CITY-TWN",
+        "sleeping_positions": 2,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Chưa xác nhận.",
+        "age_and_sharing": "Tối đa 2 trẻ dưới 12 tuổi; không vượt sức chứa tối đa.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "may share existing bed at no room charge; cot is separately governed",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          },
+          {
+            "count": 2,
+            "occupant_capacity": 1,
+            "type": "single",
+            "width_cm": 100
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Nôi gấp giới hạn 1 chiếc/phòng, miễn phí, phải xác nhận.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": 0,
+          "fee_basis": "included",
+          "fee_currency": "VND",
+          "limit": 1,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Người dưới 18 tuổi phải ở cùng người giám hộ trưởng thành.",
+        "max_adults": 4,
+        "max_children": 2,
+        "max_occupancy": 4,
+        "name": "Phòng Gia đình",
+        "quantity_reference": 6,
+        "room_type_id": "CITY-FAM",
+        "sleeping_positions": 4,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ],
+    "HTL-RETREAT03": [
+      {
+        "accessible": "Không phù hợp xe lăn: có cầu thang.",
+        "age_and_sharing": "Trẻ từ 8 tuổi được nhận; trẻ nhỏ hơn không phù hợp do cầu thang dốc.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 8
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 8,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Không có nôi.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": null,
+          "fee_basis": null,
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Người dưới 18 tuổi ở cùng người giám hộ; trẻ dưới 8 tuổi không nhận ở loại phòng này.",
+        "max_adults": 2,
+        "max_children": 2,
+        "max_occupancy": 2,
+        "name": "Phòng Gác Mái",
+        "quantity_reference": 12,
+        "room_type_id": "PINE-LOFT",
+        "sleeping_positions": 2,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Đường đi lát phẳng một phần; phòng tắm có ngưỡng, chưa xác nhận xe lăn.",
+        "age_and_sharing": "Trẻ từ 8 tuổi; không kê giường phụ.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "room type not eligible below age 8",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": false
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 8
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 8,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Không có nôi.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": null,
+          "fee_basis": null,
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": false,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "not_offered"
+        },
+        "guardian": "Người dưới 18 tuổi ở cùng người giám hộ; trẻ dưới 8 tuổi không nhận.",
+        "max_adults": 2,
+        "max_children": 2,
+        "max_occupancy": 2,
+        "name": "Phòng Vườn",
+        "quantity_reference": 10,
+        "room_type_id": "PINE-GARDEN",
+        "sleeping_positions": 2,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Có 2 bậc vào nhà; không phải phòng không bậc.",
+        "age_and_sharing": "Giường tầng trên chỉ dành cho khách từ 6 tuổi; sức chứa tối đa 4.",
+        "age_policy": {
+          "boundary_cases": [
+            {
+              "age_years": 0,
+              "bedding_rule": "allowed only with guardian; no upper bunk",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 5,
+              "bedding_rule": "allowed only with guardian; no upper bunk",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 6,
+              "bedding_rule": "allowed with guardian; upper bunk prohibited",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 11,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "child_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 12,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 17,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": true,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            },
+            {
+              "age_years": 18,
+              "bedding_rule": "no free child-sharing rule; use available bed and count toward occupancy",
+              "counts_toward_max_occupancy": true,
+              "guardian_required": false,
+              "guest_class": "adult_rate_age",
+              "room_eligible": true
+            }
+          ],
+          "child_rate_age_max_exclusive": 12,
+          "child_rate_age_min_inclusive": 0,
+          "guardian_min_age_inclusive": 18,
+          "guardian_required_below_age_exclusive": 18,
+          "room_max_age_exclusive": null,
+          "room_min_age_inclusive": 0
+        },
+        "beds": [
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "queen",
+            "width_cm": 160
+          },
+          {
+            "count": 1,
+            "occupant_capacity": 2,
+            "type": "bunk",
+            "width_cm": 90
+          }
+        ],
+        "child_max_age_exclusive": 12,
+        "child_min_age_inclusive": 0,
+        "children_count_toward_max_occupancy": true,
+        "cot": "Nôi gấp 200000 VND/đêm, cần xác nhận trước.",
+        "cot_rule": {
+          "allowed": false,
+          "fee_amount": 200000,
+          "fee_basis": "per cot per night",
+          "fee_currency": "VND",
+          "limit": 0,
+          "status": "confirmed"
+        },
+        "extra_bed": {
+          "allowed": null,
+          "fee_amount": null,
+          "fee_basis": "per extra bed per night",
+          "fee_currency": "VND",
+          "limit": null,
+          "status": "unknown; confirm before quoting"
+        },
+        "guardian": "Người dưới 18 tuổi ở cùng người giám hộ; trẻ dưới 6 tuổi không dùng giường tầng trên.",
+        "max_adults": 4,
+        "max_children": 2,
+        "max_occupancy": 4,
+        "name": "Nhà Gỗ Gia đình",
+        "quantity_reference": 5,
+        "room_type_id": "PINE-CABIN",
+        "sleeping_positions": 4,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ]
+  },
+  "routes": {
+    "HTL-BEACH02": [
+      {
+        "accessible": "Không xác nhận xe lăn",
+        "buffer_minutes": 30,
+        "child_seat": "Yêu cầu riêng; cần xác nhận trước",
+        "distance_km": 28,
+        "duration_minutes": 50,
+        "fare_reference_vnd": 500000,
+        "from": "Sân bay Mẫu Nam",
+        "legs": [
+          {
+            "minutes": 50,
+            "mode": "car"
+          }
+        ],
+        "luggage": "2 vali cỡ vừa",
+        "provider": "Xe Cồn Cát (hư cấu)",
+        "route_id": "BEACH-AIRPORT",
+        "seats_excluding_driver": 4,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Không xác nhận xe lăn",
+        "buffer_minutes": 45,
+        "child_seat": "Yêu cầu riêng",
+        "distance_km": 28,
+        "duration_minutes": 50,
+        "fare_reference_vnd": 500000,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 50,
+            "mode": "car"
+          }
+        ],
+        "luggage": "2 vali cỡ vừa",
+        "provider": "Xe Cồn Cát (hư cấu)",
+        "route_id": "BEACH-AIRPORT-RETURN",
+        "seats_excluding_driver": 4,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Sân bay Mẫu Nam",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Chưa xác nhận",
+        "buffer_minutes": 20,
+        "child_seat": "Yêu cầu riêng",
+        "distance_km": 3.5,
+        "duration_minutes": 12,
+        "fare_reference_vnd": 120000,
+        "from": "Bến Thuyền Mẫu",
+        "legs": [
+          {
+            "minutes": 12,
+            "mode": "car"
+          }
+        ],
+        "luggage": "Tối đa 2 túi du lịch",
+        "provider": "Xe Cồn Cát (hư cấu)",
+        "route_id": "BEACH-PIER-TO-RESORT",
+        "seats_excluding_driver": 4,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 4,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 4,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-VINH-NHO-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Vịnh Nhỏ",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 5,
+        "fare_reference_vnd": 0,
+        "from": "Vịnh Nhỏ",
+        "legs": [
+          {
+            "minutes": 5,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-VINH-NHO-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 6,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 6,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-SONG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Sóng Êm",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 7,
+        "fare_reference_vnd": 0,
+        "from": "Sóng Êm",
+        "legs": [
+          {
+            "minutes": 7,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-SONG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 8,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 8,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-BEP-CAT-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bếp Cát",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 9,
+        "fare_reference_vnd": 0,
+        "from": "Bếp Cát",
+        "legs": [
+          {
+            "minutes": 9,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-BEP-CAT-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.4,
+        "duration_minutes": 7,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 7,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-NUOC-DUA-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Nước Dừa Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.4,
+        "duration_minutes": 8,
+        "fare_reference_vnd": 0,
+        "from": "Nước Dừa Mẫu",
+        "legs": [
+          {
+            "minutes": 8,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-NUOC-DUA-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 10,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 10,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-KEM-CAT-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Kem Cát Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 11,
+        "fare_reference_vnd": 0,
+        "from": "Kem Cát Mẫu",
+        "legs": [
+          {
+            "minutes": 11,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-KEM-CAT-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.7,
+        "duration_minutes": 11,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 11,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-NHA-BIEN-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Nhà Biển Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.7,
+        "duration_minutes": 12,
+        "fare_reference_vnd": 0,
+        "from": "Nhà Biển Mẫu",
+        "legs": [
+          {
+            "minutes": 12,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-NHA-BIEN-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.0,
+        "duration_minutes": 16,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 16,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-CULTURE-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Trưng bày Văn hóa Đầm Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.0,
+        "duration_minutes": 18,
+        "fare_reference_vnd": 0,
+        "from": "Trưng bày Văn hóa Đầm Mẫu",
+        "legs": [
+          {
+            "minutes": 18,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-CULTURE-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.9,
+        "duration_minutes": 14,
+        "fare_reference_vnd": 0,
+        "from": "Lagoon Family Demo",
+        "legs": [
+          {
+            "minutes": 14,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-PROMENADE-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lối dạo Ven Đầm Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.9,
+        "duration_minutes": 16,
+        "fare_reference_vnd": 0,
+        "from": "Lối dạo Ven Đầm Mẫu",
+        "legs": [
+          {
+            "minutes": 16,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-BEACH02-VENUE-BEACH-PROMENADE-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Lagoon Family Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ],
+    "HTL-CITY01": [
+      {
+        "accessible": "Xe tiêu chuẩn, không xác nhận xe lăn",
+        "buffer_minutes": 25,
+        "child_seat": "Yêu cầu và xác nhận riêng",
+        "distance_km": 18,
+        "duration_minutes": 35,
+        "fare_reference_vnd": 350000,
+        "from": "Sân bay Mẫu Đông",
+        "legs": [
+          {
+            "minutes": 35,
+            "mode": "car"
+          }
+        ],
+        "luggage": "3 vali cỡ vừa; không có ghế trẻ em mặc định",
+        "provider": "Xe Bến Mẫu (hư cấu)",
+        "route_id": "CITY-AIRPORT",
+        "seats_excluding_driver": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Xe tiêu chuẩn, không xác nhận xe lăn",
+        "buffer_minutes": 35,
+        "child_seat": "Yêu cầu riêng",
+        "distance_km": 18,
+        "duration_minutes": 35,
+        "fare_reference_vnd": 350000,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 35,
+            "mode": "car"
+          }
+        ],
+        "luggage": "3 vali cỡ vừa",
+        "provider": "Xe Bến Mẫu (hư cấu)",
+        "route_id": "CITY-AIRPORT-RETURN",
+        "seats_excluding_driver": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Sân bay Mẫu Đông",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Vỉa hè tuyến mẫu chưa được xác nhận",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.8,
+        "duration_minutes": 12,
+        "fare_reference_vnd": 0,
+        "from": "Quảng trường Hải Đăng giả lập",
+        "legs": [
+          {
+            "minutes": 12,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến đi bộ mẫu",
+        "route_id": "CITY-PLAZA-TO-BEN-GIO",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bến Gió",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 3,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 3,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BEN-GIO-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bến Gió",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 4,
+        "fare_reference_vnd": 0,
+        "from": "Bến Gió",
+        "legs": [
+          {
+            "minutes": 4,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BEN-GIO-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 2,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 2,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-MAY-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Quầy Mây",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 3,
+        "fare_reference_vnd": 0,
+        "from": "Quầy Mây",
+        "legs": [
+          {
+            "minutes": 3,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-MAY-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 4,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 4,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BEP-MAU-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bếp Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 5,
+        "fare_reference_vnd": 0,
+        "from": "Bếp Mẫu",
+        "legs": [
+          {
+            "minutes": 5,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BEP-MAU-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 5,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 5,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-TRA-MAY-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Trà Mây",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 6,
+        "fare_reference_vnd": 0,
+        "from": "Trà Mây",
+        "legs": [
+          {
+            "minutes": 6,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-TRA-MAY-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 8,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 8,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BANH-MAY-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bánh Mây",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.5,
+        "duration_minutes": 9,
+        "fare_reference_vnd": 0,
+        "from": "Bánh Mây",
+        "legs": [
+          {
+            "minutes": 9,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-BANH-MAY-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.8,
+        "duration_minutes": 12,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 12,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-DEM-SONG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Đêm Sông",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.8,
+        "duration_minutes": 14,
+        "fare_reference_vnd": 0,
+        "from": "Đêm Sông",
+        "legs": [
+          {
+            "minutes": 14,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-DEM-SONG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.1,
+        "duration_minutes": 18,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 18,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-MUSEUM-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bảo tàng Cảng Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 1.1,
+        "duration_minutes": 20,
+        "fare_reference_vnd": 0,
+        "from": "Bảo tàng Cảng Mẫu",
+        "legs": [
+          {
+            "minutes": 20,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-MUSEUM-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.8,
+        "duration_minutes": 14,
+        "fare_reference_vnd": 0,
+        "from": "Harbor City Demo",
+        "legs": [
+          {
+            "minutes": 14,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-GARDEN-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Vườn Công Cộng Hải Đăng Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.8,
+        "duration_minutes": 16,
+        "fare_reference_vnd": 0,
+        "from": "Vườn Công Cộng Hải Đăng Mẫu",
+        "legs": [
+          {
+            "minutes": 16,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-CITY01-VENUE-CITY-GARDEN-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Harbor City Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ],
+    "HTL-RETREAT03": [
+      {
+        "accessible": "Xe tiêu chuẩn, không xác nhận xe lăn",
+        "buffer_minutes": 40,
+        "child_seat": "Yêu cầu riêng; không mặc định có",
+        "distance_km": 42,
+        "duration_minutes": 85,
+        "fare_reference_vnd": 700000,
+        "from": "Sân bay Mẫu Cao Nguyên",
+        "legs": [
+          {
+            "minutes": 85,
+            "mode": "car"
+          }
+        ],
+        "luggage": "2 vali nhỏ",
+        "provider": "Xe Đèo Thông (hư cấu)",
+        "route_id": "PINE-AIRPORT",
+        "seats_excluding_driver": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Xe tiêu chuẩn, không xác nhận xe lăn",
+        "buffer_minutes": 55,
+        "child_seat": "Yêu cầu riêng",
+        "distance_km": 42,
+        "duration_minutes": 85,
+        "fare_reference_vnd": 700000,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 85,
+            "mode": "car"
+          }
+        ],
+        "luggage": "2 vali nhỏ",
+        "provider": "Xe Đèo Thông (hư cấu)",
+        "route_id": "PINE-AIRPORT-RETURN",
+        "seats_excluding_driver": 3,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Sân bay Mẫu Cao Nguyên",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến dốc/bậc; xác nhận trong ngày",
+        "buffer_minutes": 15,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.7,
+        "duration_minutes": 14,
+        "fare_reference_vnd": 0,
+        "from": "Vườn Mây giả lập",
+        "legs": [
+          {
+            "minutes": 14,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến đi bộ mẫu",
+        "route_id": "PINE-GARDEN-TO-TEA",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Trà Bên Hiên",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 3,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 3,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-THONG-SUONG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Thông Sương",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 4,
+        "fare_reference_vnd": 0,
+        "from": "Thông Sương",
+        "legs": [
+          {
+            "minutes": 4,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-THONG-SUONG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 5,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 5,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-TRA-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Trà Bên Hiên",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 6,
+        "fare_reference_vnd": 0,
+        "from": "Trà Bên Hiên",
+        "legs": [
+          {
+            "minutes": 6,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-TRA-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 4,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 4,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-BEP-RUNG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Bếp Rừng",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.1,
+        "duration_minutes": 5,
+        "fare_reference_vnd": 0,
+        "from": "Bếp Rừng",
+        "legs": [
+          {
+            "minutes": 5,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-BEP-RUNG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 6,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 6,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-CA-PHE-SUONG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Cà phê Sương",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.2,
+        "duration_minutes": 7,
+        "fare_reference_vnd": 0,
+        "from": "Cà phê Sương",
+        "legs": [
+          {
+            "minutes": 7,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-CA-PHE-SUONG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 5,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 7,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 7,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-COM-THONG-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Cơm Thông Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.3,
+        "duration_minutes": 8,
+        "fare_reference_vnd": 0,
+        "from": "Cơm Thông Mẫu",
+        "legs": [
+          {
+            "minutes": 8,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-COM-THONG-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.6,
+        "duration_minutes": 12,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 12,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-SUOI-AM-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Suối Ấm Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.6,
+        "duration_minutes": 13,
+        "fare_reference_vnd": 0,
+        "from": "Suối Ấm Mẫu",
+        "legs": [
+          {
+            "minutes": 13,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-SUOI-AM-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.8,
+        "duration_minutes": 16,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 16,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-CRAFT-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Trưng bày Nghề Thủ công Thông Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.8,
+        "duration_minutes": 18,
+        "fare_reference_vnd": 0,
+        "from": "Trưng bày Nghề Thủ công Thông Mẫu",
+        "legs": [
+          {
+            "minutes": 18,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-CRAFT-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.7,
+        "duration_minutes": 14,
+        "fare_reference_vnd": 0,
+        "from": "Pine Ridge Demo",
+        "legs": [
+          {
+            "minutes": 14,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-GARDEN-OUT",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Vườn Công Cộng Mây Mẫu",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      },
+      {
+        "accessible": "Tuyến đi bộ giả lập; xác nhận điều kiện mặt đường tại chỗ",
+        "buffer_minutes": 10,
+        "child_seat": "Không áp dụng",
+        "distance_km": 0.7,
+        "duration_minutes": 15,
+        "fare_reference_vnd": 0,
+        "from": "Vườn Công Cộng Mây Mẫu",
+        "legs": [
+          {
+            "minutes": 15,
+            "mode": "walk"
+          }
+        ],
+        "luggage": "Không áp dụng",
+        "provider": "Tuyến nội khu mẫu",
+        "route_id": "HTL-RETREAT03-VENUE-PINE-GARDEN-RETURN",
+        "seats_excluding_driver": 0,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "to": "Pine Ridge Demo",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30"
+      }
+    ]
+  },
+  "service_providers": {
+    "HTL-BEACH02": [
+      {
+        "advance_hours": 12,
+        "capacity_excludes": "driver",
+        "capacity_reference": 4,
+        "closed_days": [],
+        "fee_amount": 500000,
+        "fee_basis": "per one-way vehicle trip",
+        "fee_currency": "VND",
+        "name": "Xe Cồn Cát (hư cấu)",
+        "provider_id": "BEACH-PROV-CAR",
+        "service": "airport transfer",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "reference_only",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "05:00-23:00"
+      },
+      {
+        "advance_hours": 6,
+        "capacity_excludes": "driver; boat seats not included",
+        "capacity_reference": 4,
+        "closed_days": [
+          "Thursday"
+        ],
+        "fee_amount": 120000,
+        "fee_basis": "per one-way car trip to pier",
+        "fee_currency": "VND",
+        "name": "Thuyền Bến Mẫu (hư cấu)",
+        "provider_id": "BEACH-PROV-BOAT",
+        "service": "pier shuttle connection",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "reference_only",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "07:00-17:00"
+      },
+      {
+        "advance_hours": 2,
+        "capacity_excludes": "staff",
+        "capacity_reference": 6,
+        "closed_days": [
+          "Wednesday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per service; amount unknown",
+        "fee_currency": "VND",
+        "name": "Chăm Sóc Vịnh Mẫu (hư cấu)",
+        "provider_id": "BEACH-PROV-SPA",
+        "service": "spa appointment",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "10:00-20:00"
+      },
+      {
+        "advance_hours": 2,
+        "capacity_excludes": "guardian",
+        "capacity_reference": 12,
+        "closed_days": [
+          "Monday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per session; amount unknown",
+        "fee_currency": "VND",
+        "name": "Hoạt Động Bãi Mẫu (hư cấu)",
+        "provider_id": "BEACH-PROV-ACTIVITY",
+        "service": "family activity session",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "09:00-17:00"
+      }
+    ],
+    "HTL-CITY01": [
+      {
+        "advance_hours": 12,
+        "capacity_excludes": "driver",
+        "capacity_reference": 3,
+        "closed_days": [],
+        "fee_amount": 350000,
+        "fee_basis": "per one-way vehicle trip",
+        "fee_currency": "VND",
+        "name": "Xe Bến Mẫu (hư cấu)",
+        "provider_id": "CITY-PROV-CAR",
+        "service": "airport transfer",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "reference_only",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "05:00-23:00"
+      },
+      {
+        "advance_hours": 0,
+        "capacity_excludes": "not applicable",
+        "capacity_reference": null,
+        "closed_days": [
+          "Sunday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per bag; amount unknown",
+        "fee_currency": "VND",
+        "name": "Giặt Mẫu Phố (hư cấu)",
+        "provider_id": "CITY-PROV-LAUNDRY",
+        "service": "laundry intake",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "08:00-18:00"
+      },
+      {
+        "advance_hours": 24,
+        "capacity_excludes": "host/staff",
+        "capacity_reference": 10,
+        "closed_days": [],
+        "fee_amount": null,
+        "fee_basis": "per hour; amount unknown",
+        "fee_currency": "VND",
+        "name": "Phòng Họp Mẫu (hư cấu)",
+        "provider_id": "CITY-PROV-MEETING",
+        "service": "meeting room",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "08:00-21:00"
+      },
+      {
+        "advance_hours": 0,
+        "capacity_excludes": "not applicable",
+        "capacity_reference": null,
+        "closed_days": [],
+        "fee_amount": 0,
+        "fee_basis": "per person",
+        "fee_currency": "VND",
+        "name": "Tuyến Hải Đăng Mẫu",
+        "provider_id": "CITY-PROV-WALK",
+        "service": "self-guided walking route",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "reference_only",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "06:00-20:00"
+      }
+    ],
+    "HTL-RETREAT03": [
+      {
+        "advance_hours": 12,
+        "capacity_excludes": "driver",
+        "capacity_reference": 3,
+        "closed_days": [],
+        "fee_amount": 700000,
+        "fee_basis": "per one-way vehicle trip",
+        "fee_currency": "VND",
+        "name": "Xe Đèo Thông (hư cấu)",
+        "provider_id": "PINE-PROV-CAR",
+        "service": "airport transfer",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "reference_only",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "05:00-20:00"
+      },
+      {
+        "advance_hours": 24,
+        "capacity_excludes": "guide",
+        "capacity_reference": 6,
+        "closed_days": [
+          "Monday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per group; amount unknown",
+        "fee_currency": "VND",
+        "name": "Dẫn Lối Thông Mẫu (hư cấu)",
+        "provider_id": "PINE-PROV-GUIDE",
+        "service": "guided walk request",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "07:00-17:00"
+      },
+      {
+        "advance_hours": 0,
+        "capacity_excludes": "not applicable",
+        "capacity_reference": null,
+        "closed_days": [
+          "Monday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per bag; amount unknown",
+        "fee_currency": "VND",
+        "name": "Giặt Sương Mẫu (hư cấu)",
+        "provider_id": "PINE-PROV-LAUNDRY",
+        "service": "laundry intake",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "08:00-18:00"
+      },
+      {
+        "advance_hours": 0,
+        "capacity_excludes": "staff",
+        "capacity_reference": 16,
+        "closed_days": [
+          "Tuesday"
+        ],
+        "fee_amount": null,
+        "fee_basis": "per order; amount unknown",
+        "fee_currency": "VND",
+        "name": "Trà Bên Hiên (hư cấu)",
+        "provider_id": "PINE-PROV-TEA",
+        "service": "tea service",
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "status": "amount_unknown",
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "window": "14:00-19:00"
+      }
+    ]
+  },
+  "venues": {
+    "HTL-BEACH02": [
+      {
+        "capacity_excludes": "staff and high chairs",
+        "closed_days": [],
+        "duration_minutes": 50,
+        "kind": "restaurant",
+        "location": "nhà chính",
+        "name": "Vịnh Nhỏ",
+        "reference_cost": {
+          "amount": 145000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "suất sáng mẫu cho khách mua lẻ; khách đã có quyền lợi sáng trong giá phòng không cộng lại khoản này"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 90,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-VINH-NHO",
+        "window": "06:30-10:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Tuesday"
+        ],
+        "duration_minutes": 30,
+        "kind": "snack bar",
+        "location": "cạnh hồ bơi",
+        "name": "Sóng Êm",
+        "reference_cost": {
+          "amount": 65000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_order",
+          "currency": "VND",
+          "inclusions": [
+            "một món ăn nhẹ mẫu; đồ uống riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 32,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-SONG",
+        "window": "11:00-18:00"
+      },
+      {
+        "capacity_excludes": "staff and high chairs",
+        "closed_days": [
+          "Wednesday"
+        ],
+        "duration_minutes": 60,
+        "kind": "restaurant",
+        "location": "nhà biển phía tây",
+        "name": "Bếp Cát",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "giá bữa tối chưa được ghi nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 58,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-BEP-CAT",
+        "window": "17:00-21:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [],
+        "duration_minutes": 15,
+        "kind": "juice bar",
+        "location": "lối vườn ra biển",
+        "name": "Nước Dừa Mẫu",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "không thu phí vào lối vườn công cộng giả lập; đồ uống mua riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 22,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-NUOC-DUA",
+        "window": "10:00-17:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Wednesday"
+        ],
+        "duration_minutes": 15,
+        "kind": "dessert kiosk",
+        "location": "cổng bãi giả lập",
+        "name": "Kem Cát Mẫu",
+        "reference_cost": {
+          "amount": 40000,
+          "amount_unit": "whole VND",
+          "basis": "per_item",
+          "currency": "VND",
+          "inclusions": [
+            "một phần tráng miệng mẫu"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 12,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-KEM-CAT",
+        "window": "12:00-18:00"
+      },
+      {
+        "capacity_excludes": "staff and high chairs",
+        "closed_days": [
+          "Thursday"
+        ],
+        "duration_minutes": 65,
+        "kind": "restaurant",
+        "location": "đường ven đầm giả lập, cách nhà chính 0.7 km",
+        "name": "Nhà Biển Mẫu",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "giá bữa tối chưa được ghi nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 48,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-NHA-BIEN",
+        "window": "17:00-21:30"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 60,
+        "kind": "fictional cultural exhibit",
+        "location": "nhà trưng bày giả lập, cách khu chính 1.0 km",
+        "name": "Trưng bày Văn hóa Đầm Mẫu",
+        "reference_cost": {
+          "amount": 80000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "vé tham quan người lớn mẫu; hoạt động bổ sung không bao gồm"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 30,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-CULTURE",
+        "window": "09:00-16:00"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [],
+        "duration_minutes": 45,
+        "kind": "fictional public waterfront walk",
+        "location": "lối dạo công cộng giả lập, cách khu chính 0.9 km",
+        "name": "Lối dạo Ven Đầm Mẫu",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "miễn phí sử dụng lối dạo công cộng giả lập; thời tiết và điều kiện tiếp cận trong ngày chưa xác nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "same_day_access_safety_status": "unknown",
+        "same_day_weather_status": "unknown",
+        "seats_reference": 16,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-BEACH02-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "BEACH-PROMENADE",
+        "window": "07:00-18:00"
+      }
+    ],
+    "HTL-CITY01": [
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [],
+        "duration_minutes": 45,
+        "kind": "restaurant",
+        "location": "tầng 1",
+        "name": "Bến Gió",
+        "reference_cost": {
+          "amount": 120000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "suất sáng gọi món cho khách mua lẻ; đồ uống tính riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 64,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-BEN-GIO",
+        "window": "06:30-09:30"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Sunday"
+        ],
+        "duration_minutes": 20,
+        "kind": "coffee",
+        "location": "sảnh",
+        "name": "Quầy Mây",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_order",
+          "currency": "VND",
+          "inclusions": [
+            "không có giá mẫu; hỏi quầy trước khi gọi"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 18,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-MAY",
+        "window": "07:00-18:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Sunday"
+        ],
+        "duration_minutes": 55,
+        "kind": "restaurant",
+        "location": "tầng 1",
+        "name": "Bếp Mẫu",
+        "reference_cost": {
+          "amount": 185000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "một suất trưa mẫu; đồ uống tính riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 42,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-BEP-MAU",
+        "window": "11:30-14:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [],
+        "duration_minutes": 25,
+        "kind": "tea room",
+        "location": "tầng lửng",
+        "name": "Trà Mây",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "không thu phí vào khu vực; trà và món gọi thêm không bao gồm"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 20,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-TRA-MAY",
+        "window": "14:00-20:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Sunday"
+        ],
+        "duration_minutes": 15,
+        "kind": "bakery",
+        "location": "phố giả lập, cách sảnh 0.5 km",
+        "name": "Bánh Mây",
+        "reference_cost": {
+          "amount": 45000,
+          "amount_unit": "whole VND",
+          "basis": "per_item",
+          "currency": "VND",
+          "inclusions": [
+            "một món bánh mẫu"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 10,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-BANH-MAY",
+        "window": "07:00-16:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 70,
+        "kind": "restaurant",
+        "location": "khu bờ kè giả lập, cách sảnh 1.8 km",
+        "name": "Đêm Sông",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "giá bữa tối chưa được ghi nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 36,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-DEM-SONG",
+        "window": "17:30-21:30"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 60,
+        "kind": "fictional museum",
+        "location": "khu văn hóa giả lập, cách sảnh 1.1 km",
+        "name": "Bảo tàng Cảng Mẫu",
+        "reference_cost": {
+          "amount": 80000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "vé vào cửa người lớn mẫu; triển lãm đặc biệt không bao gồm"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 40,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-MUSEUM",
+        "window": "09:00-16:00"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [],
+        "duration_minutes": 45,
+        "kind": "fictional public garden",
+        "location": "vườn công cộng giả lập, cách sảnh 0.8 km",
+        "name": "Vườn Công Cộng Hải Đăng Mẫu",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "miễn phí vé vào vườn công cộng giả lập"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 20,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-CITY01-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "CITY-GARDEN",
+        "window": "07:00-18:00"
+      }
+    ],
+    "HTL-RETREAT03": [
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 55,
+        "kind": "restaurant",
+        "location": "nhà gỗ trung tâm",
+        "name": "Thông Sương",
+        "reference_cost": {
+          "amount": 130000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "suất sáng mẫu cho khách mua lẻ; khách đã có quyền lợi sáng trong giá phòng không cộng lại khoản này"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 34,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-THONG-SUONG",
+        "window": "07:00-09:30"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Tuesday"
+        ],
+        "duration_minutes": 25,
+        "kind": "tea room",
+        "location": "hiên phía đông",
+        "name": "Trà Bên Hiên",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "không thu phí vào hiên; đồ uống và món gọi thêm không bao gồm"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 16,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-TRA",
+        "window": "14:00-19:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 65,
+        "kind": "restaurant",
+        "location": "nhà gỗ trung tâm",
+        "name": "Bếp Rừng",
+        "reference_cost": {
+          "amount": 210000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "một suất tối mẫu; đồ uống tính riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 28,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-BEP-RUNG",
+        "window": "17:30-20:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Tuesday"
+        ],
+        "duration_minutes": 25,
+        "kind": "coffee",
+        "location": "hiên phía đông",
+        "name": "Cà phê Sương",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_order",
+          "currency": "VND",
+          "inclusions": [
+            "giá cà phê chưa được ghi nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 12,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-CA-PHE-SUONG",
+        "window": "08:00-12:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 55,
+        "kind": "restaurant",
+        "location": "nhà gỗ trung tâm",
+        "name": "Cơm Thông Mẫu",
+        "reference_cost": {
+          "amount": 190000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_meal",
+          "currency": "VND",
+          "inclusions": [
+            "một suất trưa mẫu; đồ uống tính riêng"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 24,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-COM-THONG",
+        "window": "11:30-14:00"
+      },
+      {
+        "capacity_excludes": "staff",
+        "closed_days": [
+          "Tuesday"
+        ],
+        "duration_minutes": 30,
+        "kind": "tea room",
+        "location": "lối vườn giả lập",
+        "name": "Suối Ấm Mẫu",
+        "reference_cost": {
+          "amount": null,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_order",
+          "currency": "VND",
+          "inclusions": [
+            "giá trà chưa được ghi nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "unknown",
+          "synthetic": true
+        },
+        "seats_reference": 10,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-SUOI-AM",
+        "window": "10:00-16:00"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [
+          "Monday"
+        ],
+        "duration_minutes": 60,
+        "kind": "fictional craft exhibition",
+        "location": "nhà trưng bày giả lập, cách nhà gỗ trung tâm 0.8 km",
+        "name": "Trưng bày Nghề Thủ công Thông Mẫu",
+        "reference_cost": {
+          "amount": 80000,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "vé tham quan người lớn mẫu; lớp trải nghiệm không bao gồm"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "seats_reference": 24,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-CRAFT",
+        "window": "09:00-16:00"
+      },
+      {
+        "capacity_excludes": "staff; seating is a reference only, not visitor limit",
+        "closed_days": [],
+        "duration_minutes": 45,
+        "kind": "fictional public garden",
+        "location": "vườn công cộng giả lập, cách nhà gỗ trung tâm 0.7 km",
+        "name": "Vườn Công Cộng Mây Mẫu",
+        "reference_cost": {
+          "amount": 0,
+          "amount_unit": "whole VND",
+          "basis": "per_person_per_visit",
+          "currency": "VND",
+          "inclusions": [
+            "miễn phí vé vào vườn công cộng giả lập; thời tiết và điều kiện tiếp cận trong ngày chưa xác nhận"
+          ],
+          "is_quote": false,
+          "note": "Author-authored synthetic budget reference; not a real-world price or live quote.",
+          "reference_date": "2026-10-22",
+          "status": "known_reference",
+          "synthetic": true
+        },
+        "same_day_access_safety_status": "unknown",
+        "same_day_weather_status": "unknown",
+        "seats_reference": 18,
+        "source_refs": [
+          {
+            "section": "Danh mục tham khảo",
+            "source_id": "SRC-HTL-RETREAT03-CATALOG",
+            "version": "1.0"
+          }
+        ],
+        "synthetic": true,
+        "timezone": "Asia/Ho_Chi_Minh",
+        "valid_from": "2026-10-01",
+        "valid_to": "2027-09-30",
+        "venue_id": "PINE-GARDEN",
+        "window": "07:00-18:00"
+      }
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+TÀI LIỆU MẪU GUEST — Pine Ridge Demo
+Nguồn gốc: nội dung hư cấu do tác giả bộ dữ liệu viết; không trích xuất từ khách sạn thật, không phải dữ liệu vận hành.
+Mã cơ sở: HTL-RETREAT03 | Phiên bản: 1.0 | Hiệu lực: 2026-10-01 đến 2027-09-30
+Mọi số lượng, giá, địa chỉ và tuyến đường đều là tham chiếu giả lập. Không dùng làm chỉ dẫn khẩn cấp.
+
+## Tổng quan
+[F-HTL-RETREAT03-001] identity / property.name: "Pine Ridge Demo"
+[F-HTL-RETREAT03-002] identity / property.address: "42 Suong Thong Road, fictional Pine Ridge Commune, fictional Lam Son Province, Vietnam"
+[F-HTL-RETREAT03-003] identity / property.property_type: "quiet mountain retreat"
+
+## Nhận và trả phòng
+[F-HTL-RETREAT03-005] checkin / stay.check_in_window: {"start": "15:00", "end": "23:00"}
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-006] checkout / stay.check_out_time: "11:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-007] checkin / stay.early_check_in: "Theo tình trạng phòng trong ngày; yêu cầu không đồng nghĩa với xác nhận."
+[F-HTL-RETREAT03-008] checkout / stay.late_checkout: "Cần được lễ tân xác nhận; không mặc định được gia hạn."
+[F-HTL-RETREAT03-060] checkin / stay.arrival_after_staffed_hours: "Arrival outside staffed hours must be arranged and confirmed in advance; no self check-in is promised."
+[F-HTL-RETREAT03-061] checkin / stay.identity_check: "The arriving adult presents an accepted identity document at the desk; exact document rules depend on applicable requirements."
+[F-HTL-RETREAT03-062] checkout / stay.checkout_key_return: "Return room key cards at the desk or use the marked return box when the desk is unattended."
+
+## Hành lý
+[F-HTL-RETREAT03-009] luggage / stay.luggage_storage: "Có thể gửi hành lý tại quầy trong giờ có nhân viên."
+  Điều kiện: {"hours": "06:00-23:00"}
+[F-HTL-RETREAT03-063] luggage / stay.luggage_claim: "Keep the claim tag when provided; staff may ask for a description and booking name before release."
+[F-HTL-RETREAT03-064] luggage / stay.luggage_after_checkout: "Post-checkout storage is available only during staffed hours and must be collected the same day."
+
+## Liên hệ và hỗ trợ
+[F-HTL-RETREAT03-010] reception / service.staffed_hours: "06:00-23:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-032] language / service.languages: "Tiếng Việt; tiếng Anh cơ bản theo ca trực."
+[F-HTL-RETREAT03-033] contact / service.contact_channel: "Quầy lễ tân trong giờ có nhân viên hoặc kênh nhắn tin ghi trên xác nhận đặt phòng."
+
+## Đặt phòng và thanh toán
+[F-HTL-RETREAT03-011] booking / reservation.booking_changes: "Thay đổi đặt phòng chỉ có hiệu lực sau khi được xác nhận bằng kênh đặt ban đầu."
+[F-HTL-RETREAT03-012] cancel / reservation.cancellation: "Điều kiện hủy phụ thuộc giá/phương án đã chọn; xem xác nhận đặt phòng."
+[F-HTL-RETREAT03-013] deposit / payment.deposit: "Khoản bảo đảm 500000 VND/phòng/lưu trú; hoàn theo đối soát sau trả phòng."
+  Điều kiện: {"basis": "per room per stay", "currency": "VND"}
+[F-HTL-RETREAT03-014] payments / payment.accepted_methods: ["tiền mặt VND", "thẻ ngân hàng nội địa tại quầy"]
+[F-HTL-RETREAT03-015] invoice / payment.invoice_request: "Yêu cầu hóa đơn tại quầy hoặc qua kênh đặt phòng; cung cấp thông tin xuất hóa đơn trước khi thanh toán."
+[F-HTL-RETREAT03-053] booking / reservation.booking_reference: "Keep the booking reference available when asking staff to locate a reservation."
+[F-HTL-RETREAT03-054] booking / reservation.name_mismatch: "If the booking name differs from the arriving guest, ask the booking channel to update it before arrival."
+[F-HTL-RETREAT03-055] booking / reservation.walk_in: "Walk-in rooms are subject to same-day confirmation; reference room counts do not show availability."
+[F-HTL-RETREAT03-056] cancel / reservation.refund_timing: "Refund timing depends on the booking channel and payment provider; no fixed processing time is promised."
+[F-HTL-RETREAT03-057] payments / payment.currency: "On-property reference amounts are in Vietnamese dong (VND)."
+  Điều kiện: {"currency": "VND"}
+[F-HTL-RETREAT03-058] payments / payment.card_authorization: "A deposit or payment hold may appear separately from a completed charge; ask the payment provider about posting times."
+[F-HTL-RETREAT03-059] invoice / payment.invoice_correction: "Invoice corrections require the receipt and booking reference; staff will confirm feasibility before changing records."
+[F-HTL-RETREAT03-107] booking / reservation.minimum_stay: "Some weekend dates may use a two-night minimum; the applicable dates are not listed in this pack."
+
+## Phòng và lưu trú
+[F-HTL-RETREAT03-016] rooms / room.quiet_hours: "22:00-07:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-017] occupancy / room.extra_person: "Tối đa 1 khách thêm nếu loại phòng cho phép; xác nhận trước khi đến."
+[F-HTL-RETREAT03-018] child / room.child_age_definition: "Trẻ em: dưới 12 tuổi tại ngày nhận phòng."
+[F-HTL-RETREAT03-019] guardian / room.minor_guardian: "Khách dưới 18 tuổi cần người giám hộ trưởng thành đi cùng."
+[F-HTL-RETREAT03-065] child / room.child_rate: "Child charges, meals, and bedding vary by rate plan; check the booking confirmation before arrival."
+[F-HTL-RETREAT03-066] child / room.child_supervision: "Children must remain under their accompanying adult's supervision in shared facilities."
+[F-HTL-RETREAT03-067] occupancy / room.occupancy_rule: "Registered guests only may stay overnight; disclose all occupants before check-in."
+[F-HTL-RETREAT03-068] beds / room.bed_preference: "Bed preferences are requests and depend on room assignment; they are not guaranteed until confirmed."
+[F-HTL-RETREAT03-108] child / room.child_age_suitability: "The property is designed for a quiet adult-oriented stay; children are accepted only in room types whose rules allow them."
+[F-HTL-RETREAT03-112] room / room.connecting_rooms: "No connecting rooms in the reference catalog."
+
+## Tiếp cận
+[F-HTL-RETREAT03-020] access / property.step_free_access: "Lối vào chính có đường dốc; chưa xác nhận khả năng tiếp cận cho mọi khu vực."
+[F-HTL-RETREAT03-069] access / property.access_request: "Describe the specific access need and route; staff can confirm known features but cannot certify suitability from this pack."
+[F-HTL-RETREAT03-070] access / room.accessible_room_availability: "Accessible-room availability is not tracked in this reference pack; confirm with the property before booking."
+
+## Tiện ích
+[F-HTL-RETREAT03-021] wifi / amenity.wifi: "Wi-Fi miễn phí trong khu vực khách; tên mạng và mật khẩu nhận tại quầy."
+[F-HTL-RETREAT03-022] laundry / service.laundry: "Dịch vụ giặt theo túi, nhận trước 09:00, trả dự kiến sau 18:00 cùng ngày; không phục vụ ngày đóng cửa."
+[F-HTL-RETREAT03-043] pool / amenity.pool: "Không có hồ bơi."
+[F-HTL-RETREAT03-044] spa / amenity.spa: "Phòng trị liệu 09:00-18:00, đóng cửa thứ Ba; đặt trước tối thiểu 2 giờ."
+  Điều kiện: {"window": "09:00-18:00", "closed_days": ["Tuesday"]}
+[F-HTL-RETREAT03-045] gym / amenity.gym: "Không có phòng tập; có tuyến đi bộ trong khuôn viên theo bản đồ giấy tại quầy."
+[F-HTL-RETREAT03-047] workspace / amenity.workspace: "Không gian đọc yên tĩnh 07:00-21:00; cuộc gọi cần thực hiện tại phòng."
+[F-HTL-RETREAT03-074] amenities / amenity.amenity_hours: "Facility hours in this pack are local property time and should be reconfirmed on the day."
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-075] wifi / amenity.wifi_help: "If Wi-Fi does not connect, ask the desk to verify the network name and current access instructions."
+[F-HTL-RETREAT03-076] laundry / service.laundry_delicates: "Delicate, high-value, or hand-wash-only items are not accepted under standard bag laundry service."
+[F-HTL-RETREAT03-077] laundry / service.laundry_claim: "Check the item count at handover and retain the service slip until collection."
+[F-HTL-RETREAT03-087] workspace / amenity.meeting_room: "Meeting-room requests require date, time, attendee count, and confirmation; no live calendar is included."
+[F-HTL-RETREAT03-113] workspace / amenity.cellular_signal: "Mobile signal strength varies by carrier and weather; no coverage guarantee is available."
+[F-HTL-RETREAT03-114] laundry / service.laundry_service_days: "Laundry is accepted Tuesday through Sunday only."
+  Điều kiện: {"closed_days": ["Monday"]}
+
+## Quy định lưu trú
+[F-HTL-RETREAT03-023] pets / policy.pets: "Không nhận vật nuôi, ngoại trừ trường hợp hỗ trợ đã được xác nhận trước."
+[F-HTL-RETREAT03-024] smoking / policy.smoking: "Cấm hút thuốc trong phòng và không gian trong nhà; khu vực ngoài trời được chỉ dẫn tại chỗ."
+[F-HTL-RETREAT03-051] noise / policy.quiet_hours: "Giờ yên tĩnh 21:00-08:00; không tổ chức sự kiện có khuếch đại âm thanh."
+[F-HTL-RETREAT03-084] pets / policy.assistance_animal_request: "Contact the property before arrival about an assistance animal so staff can confirm arrangements."
+[F-HTL-RETREAT03-085] smoking / policy.smoking_fee: "Any cleaning charge for a smoking violation must be explained and confirmed by staff; no amount is listed here."
+[F-HTL-RETREAT03-086] noise / policy.noise_report: "Report repeated noise to the desk with location and time; staff will acknowledge and state the next update."
+[F-HTL-RETREAT03-115] pets / policy.pet_policy_scope: "Pets are not accepted in the retreat buildings or dining room."
+[F-HTL-RETREAT03-116] noise / policy.quiet_retreat_events: "No weddings or amplified group events are hosted on site during the active data period."
+
+## An toàn và riêng tư
+[F-HTL-RETREAT03-025] safety / safety.emergency_contact: "Khi có nguy cơ tức thời, báo nhân viên trực tiếp tại quầy hoặc dùng số liên lạc ghi trên xác nhận lưu trú; bộ dữ liệu không chứa số khẩn cấp."
+[F-HTL-RETREAT03-026] security / safety.key_control: "Thẻ phòng chỉ cấp cho người có tên trong đặt phòng sau kiểm tra tại quầy."
+[F-HTL-RETREAT03-027] privacy / privacy.guest_data: "Thông tin khách chỉ dùng để xử lý lưu trú và yêu cầu liên quan; yêu cầu quyền riêng tư gửi qua kênh đặt phòng."
+[F-HTL-RETREAT03-088] safety / safety.immediate_hazard: "For an immediate hazard, alert on-site staff in person as soon as it is safe to do so; this pack does not provide emergency numbers or medical instructions."
+[F-HTL-RETREAT03-089] safety / safety.fire_route: "Follow posted on-site evacuation signage and staff direction; floor plans in this pack are not an emergency guide."
+[F-HTL-RETREAT03-090] security / safety.visitor_access: "Visitors must register at the desk and may be asked to leave shared guest areas by quiet hours."
+[F-HTL-RETREAT03-091] security / safety.cash_valuables: "Use the in-room safe if provided; the presence and size of a safe is room-specific and should be confirmed."
+[F-HTL-RETREAT03-092] privacy / privacy.data_correction: "For a correction to personal booking details, use the original booking channel or speak to desk staff after identity verification."
+[F-HTL-RETREAT03-093] privacy / privacy.photo_consent: "Ask permission before photographing or recording other guests or staff in a non-public interaction."
+
+## Hỗ trợ trong kỳ nghỉ
+[F-HTL-RETREAT03-028] lostfound / service.lost_found: "Báo lễ tân với mô tả vật dụng và khu vực/thời điểm nghi thất lạc; không gửi giấy tờ nhạy cảm qua tin nhắn mở."
+[F-HTL-RETREAT03-029] housekeeping / service.housekeeping: "Dọn phòng hằng ngày theo yêu cầu treo bảng trước 12:00."
+[F-HTL-RETREAT03-030] maintenance / service.maintenance: "Báo lỗi thiết bị tại quầy; nhân viên sẽ ghi nhận và phản hồi thời gian xử lý dự kiến."
+[F-HTL-RETREAT03-031] complaints / service.complaint: "Nhân viên ghi nhận vấn đề, xác nhận đã tiếp nhận và báo thời điểm cập nhật tiếp theo; tiếp nhận không đồng nghĩa đã giải quyết."
+[F-HTL-RETREAT03-034] outage / service.outage_updates: "Khi tiện ích gián đoạn, quầy sẽ cập nhật phạm vi và mốc thông tin tiếp theo nếu đã biết."
+[F-HTL-RETREAT03-094] lostfound / service.lost_found_tracking: "A report is acknowledged with a reference when available; locating or returning an item is not guaranteed."
+[F-HTL-RETREAT03-095] housekeeping / service.housekeeping_optout: "Use the door sign or tell the desk before 10:00 to skip routine housekeeping that day."
+[F-HTL-RETREAT03-096] housekeeping / service.linen_request: "Extra linen requests are subject to current stock and must be acknowledged by staff."
+[F-HTL-RETREAT03-097] maintenance / service.maintenance_priority: "Tell staff if a reported fault affects room access or an essential fixture so they can prioritize review."
+[F-HTL-RETREAT03-098] maintenance / service.repair_entry: "Staff should state the repair purpose before entering an occupied room; guests may ask to agree a time."
+[F-HTL-RETREAT03-099] complaints / service.support_acknowledgement: "A request is received only when staff or the approved booking channel acknowledges it; sending a message alone is not proof of receipt."
+[F-HTL-RETREAT03-100] complaints / service.support_priority: "Tell staff promptly if an issue affects immediate access, security, or a basic room function; the pack makes no response-time guarantee."
+[F-HTL-RETREAT03-101] complaints / service.support_followup: "If no update arrives by the time staff gave, reply with the existing request reference rather than opening duplicate cases."
+[F-HTL-RETREAT03-103] outage / service.outage_unknown_eta: "When restoration time is unknown, staff should say it is unknown and give the next update time if available."
+[F-HTL-RETREAT03-104] unavailability / service.alternative_request: "If a service is unavailable, ask staff for an available alternative; the pack does not guarantee a substitute."
+
+## Khu vực và di chuyển
+[F-HTL-RETREAT03-035] weather / local.weather: "Điều kiện thời tiết thay đổi; kiểm tra dự báo chính thức trước hoạt động ngoài trời."
+[F-HTL-RETREAT03-036] unavailability / service.unavailable_service: "Giờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng."
+[F-HTL-RETREAT03-049] weather / local.outdoor_trails: "Đường mòn có thể đóng khi mưa lớn; hỏi quầy trong ngày. Không dùng pack này để đánh giá điều kiện an toàn hiện tại."
+[F-HTL-RETREAT03-050] localguide / local.nearby: "Vườn Mây giả lập cách 2.1 km theo tuyến mẫu; độ dốc và thời tiết có thể làm thay đổi thời gian."
+  Điều kiện: {"distance_km": 2.1}
+[F-HTL-RETREAT03-105] localguide / local.directions_scope: "Distances and routes are fictional references and do not replace current navigation or local access checks."
+[F-HTL-RETREAT03-106] weather / local.weather_activity_check: "Check local weather and closure notices before outdoor activities; conditions are not monitored by this pack."
+[F-HTL-RETREAT03-111] localguide / local.quiet_garden: "The Pine Quiet Garden sample path is open 07:00-18:00; no lighting after closing."
+  Điều kiện: {"window": "07:00-18:00"}
+
+## Ăn uống và dị ứng
+[F-HTL-RETREAT03-040] food / dining.breakfast: "Bữa sáng gọi món tại Thông Sương, 07:00-09:30; đóng cửa thứ Hai."
+  Điều kiện: {"window": "07:00-09:30", "closed_days": ["Monday"], "timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-RETREAT03-041] dietary / dining.dietary_requests: "Có thể chuẩn bị món chay nếu báo trước 24 giờ; chưa xác nhận món thuần chay."
+[F-HTL-RETREAT03-042] allergies / dining.allergy_handling: "Bếp nhỏ dùng chung dụng cụ; không bảo đảm tách biệt dị nguyên. Hãy trao đổi trước khi đặt món."
+[F-HTL-RETREAT03-071] food / dining.outside_food: "Ask the venue before bringing outside food into a dining area; food storage is not guaranteed."
+[F-HTL-RETREAT03-072] dietary / dining.dietary_notice: "Share dietary restrictions before ordering; a request is not confirmation that a meal can be prepared."
+[F-HTL-RETREAT03-073] allergies / dining.allergen_escalation: "For a severe allergy concern, do not rely on this data pack; speak directly with venue staff before ordering."
+[F-HTL-RETREAT03-109] food / dining.packed_breakfast: "A packed breakfast may be requested by 18:00 the prior day when the restaurant is open; confirmation required."
+
+## Đỗ xe và di chuyển
+[F-HTL-RETREAT03-046] parking / transport.parking: "Bãi xe 18 chỗ tham chiếu, miễn phí; đường vào hẹp, xe trên 16 chỗ cần xác nhận."
+  Điều kiện: {"unit": "vehicle space; static reference quantity"}
+[F-HTL-RETREAT03-048] transport / transport.airport_transfer: "Xe đối tác tối đa 3 khách, 2 vali nhỏ; giá mẫu 700000 VND/chuyến một chiều. Đường đèo có thể ảnh hưởng thời gian."
+  Điều kiện: {"capacity_excludes_driver": true, "luggage": "2 small suitcases", "currency": "VND", "unit": "per one-way trip"}
+[F-HTL-RETREAT03-078] parking / transport.parking_vehicle_limit: "Parking is for one registered vehicle per booking unless staff confirm otherwise."
+[F-HTL-RETREAT03-079] parking / transport.parking_clearance: "Vehicle height/clearance limits are not recorded in this pack; confirm with the desk before entering covered parking."
+[F-HTL-RETREAT03-080] transport / transport.transfer_booking_cutoff: "Request partner transport at least 12 hours ahead; a ride is confirmed only after provider acceptance."
+[F-HTL-RETREAT03-081] transport / transport.transfer_fare_status: "Sample route fares are planning references, not live quotes; reconfirm fare and pickup point before booking."
+[F-HTL-RETREAT03-082] transport / transport.child_seat_confirmation: "Child seats are not assumed to be available; state the child age and seat need when requesting a vehicle."
+[F-HTL-RETREAT03-083] transport / transport.route_accessibility: "Vehicle and walking-route accessibility is unverified unless the route entry explicitly states otherwise."
+[F-HTL-RETREAT03-110] transport / transport.airport_pickup_point: "Meet provider at Sample Highlands Airport's signed pickup bay; driver details follow confirmed booking."

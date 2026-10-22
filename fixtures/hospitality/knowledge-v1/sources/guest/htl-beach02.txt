@@ -1,0 +1,158 @@
+TÀI LIỆU MẪU GUEST — Lagoon Family Demo
+Nguồn gốc: nội dung hư cấu do tác giả bộ dữ liệu viết; không trích xuất từ khách sạn thật, không phải dữ liệu vận hành.
+Mã cơ sở: HTL-BEACH02 | Phiên bản: 1.0 | Hiệu lực: 2026-10-01 đến 2027-09-30
+Mọi số lượng, giá, địa chỉ và tuyến đường đều là tham chiếu giả lập. Không dùng làm chỉ dẫn khẩn cấp.
+
+## Tổng quan
+[F-HTL-BEACH02-001] identity / property.name: "Lagoon Family Demo"
+[F-HTL-BEACH02-002] identity / property.address: "6 Con So Lane, fictional Blue Lagoon Ward, fictional Nam Duong City, Vietnam"
+[F-HTL-BEACH02-003] identity / property.property_type: "family beach hotel"
+
+## Nhận và trả phòng
+[F-HTL-BEACH02-005] checkin / stay.check_in_window: {"start": "15:00", "end": "23:00"}
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-006] checkout / stay.check_out_time: "11:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-007] checkin / stay.early_check_in: "Theo tình trạng phòng trong ngày; yêu cầu không đồng nghĩa với xác nhận."
+[F-HTL-BEACH02-008] checkout / stay.late_checkout: "Cần được lễ tân xác nhận; không mặc định được gia hạn."
+[F-HTL-BEACH02-058] checkin / stay.arrival_after_staffed_hours: "Arrival outside staffed hours must be arranged and confirmed in advance; no self check-in is promised."
+[F-HTL-BEACH02-059] checkin / stay.identity_check: "The arriving adult presents an accepted identity document at the desk; exact document rules depend on applicable requirements."
+[F-HTL-BEACH02-060] checkout / stay.checkout_key_return: "Return room key cards at the desk or use the marked return box when the desk is unattended."
+
+## Hành lý
+[F-HTL-BEACH02-009] luggage / stay.luggage_storage: "Có thể gửi hành lý tại quầy trong giờ có nhân viên."
+  Điều kiện: {"hours": "06:00-23:00"}
+[F-HTL-BEACH02-061] luggage / stay.luggage_claim: "Keep the claim tag when provided; staff may ask for a description and booking name before release."
+[F-HTL-BEACH02-062] luggage / stay.luggage_after_checkout: "Post-checkout storage is available only during staffed hours and must be collected the same day."
+
+## Liên hệ và hỗ trợ
+[F-HTL-BEACH02-010] reception / service.staffed_hours: "06:00-23:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-032] language / service.languages: "Tiếng Việt; tiếng Anh cơ bản theo ca trực."
+[F-HTL-BEACH02-033] contact / service.contact_channel: "Quầy lễ tân trong giờ có nhân viên hoặc kênh nhắn tin ghi trên xác nhận đặt phòng."
+
+## Đặt phòng và thanh toán
+[F-HTL-BEACH02-011] booking / reservation.booking_changes: "Thay đổi đặt phòng chỉ có hiệu lực sau khi được xác nhận bằng kênh đặt ban đầu."
+[F-HTL-BEACH02-012] cancel / reservation.cancellation: "Điều kiện hủy phụ thuộc giá/phương án đã chọn; xem xác nhận đặt phòng."
+[F-HTL-BEACH02-013] deposit / payment.deposit: "Khoản bảo đảm 500000 VND/phòng/lưu trú; hoàn theo đối soát sau trả phòng."
+  Điều kiện: {"basis": "per room per stay", "currency": "VND"}
+[F-HTL-BEACH02-014] payments / payment.accepted_methods: ["tiền mặt VND", "thẻ ngân hàng nội địa tại quầy"]
+[F-HTL-BEACH02-015] invoice / payment.invoice_request: "Yêu cầu hóa đơn tại quầy hoặc qua kênh đặt phòng; cung cấp thông tin xuất hóa đơn trước khi thanh toán."
+[F-HTL-BEACH02-051] booking / reservation.booking_reference: "Keep the booking reference available when asking staff to locate a reservation."
+[F-HTL-BEACH02-052] booking / reservation.name_mismatch: "If the booking name differs from the arriving guest, ask the booking channel to update it before arrival."
+[F-HTL-BEACH02-053] booking / reservation.walk_in: "Walk-in rooms are subject to same-day confirmation; reference room counts do not show availability."
+[F-HTL-BEACH02-054] cancel / reservation.refund_timing: "Refund timing depends on the booking channel and payment provider; no fixed processing time is promised."
+[F-HTL-BEACH02-055] payments / payment.currency: "On-property reference amounts are in Vietnamese dong (VND)."
+  Điều kiện: {"currency": "VND"}
+[F-HTL-BEACH02-056] payments / payment.card_authorization: "A deposit or payment hold may appear separately from a completed charge; ask the payment provider about posting times."
+[F-HTL-BEACH02-057] invoice / payment.invoice_correction: "Invoice corrections require the receipt and booking reference; staff will confirm feasibility before changing records."
+[F-HTL-BEACH02-105] booking / reservation.family_room_request: "Request adjoining rooms with the booking reference; adjoining placement is not guaranteed until confirmed."
+
+## Phòng và lưu trú
+[F-HTL-BEACH02-016] rooms / room.quiet_hours: "22:00-07:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-017] occupancy / room.extra_person: "Tối đa 1 khách thêm nếu loại phòng cho phép; xác nhận trước khi đến."
+[F-HTL-BEACH02-018] child / room.child_age_definition: "Trẻ em: dưới 12 tuổi tại ngày nhận phòng."
+[F-HTL-BEACH02-019] guardian / room.minor_guardian: "Khách dưới 18 tuổi cần người giám hộ trưởng thành đi cùng."
+[F-HTL-BEACH02-063] child / room.child_rate: "Child charges, meals, and bedding vary by rate plan; check the booking confirmation before arrival."
+[F-HTL-BEACH02-064] child / room.child_supervision: "Children must remain under their accompanying adult's supervision in shared facilities."
+[F-HTL-BEACH02-065] occupancy / room.occupancy_rule: "Registered guests only may stay overnight; disclose all occupants before check-in."
+[F-HTL-BEACH02-066] beds / room.bed_preference: "Bed preferences are requests and depend on room assignment; they are not guaranteed until confirmed."
+[F-HTL-BEACH02-111] room / room.connecting_rooms: "Two family room pairs are designated adjoining reference units; availability must be confirmed."
+  Điều kiện: {"quantity_reference": 2}
+
+## Tiếp cận
+[F-HTL-BEACH02-020] access / property.step_free_access: "Lối vào chính có đường dốc; chưa xác nhận khả năng tiếp cận cho mọi khu vực."
+[F-HTL-BEACH02-067] access / property.access_request: "Describe the specific access need and route; staff can confirm known features but cannot certify suitability from this pack."
+[F-HTL-BEACH02-068] access / room.accessible_room_availability: "Accessible-room availability is not tracked in this reference pack; confirm with the property before booking."
+
+## Tiện ích
+[F-HTL-BEACH02-021] wifi / amenity.wifi: "Wi-Fi miễn phí trong khu vực khách; tên mạng và mật khẩu nhận tại quầy."
+[F-HTL-BEACH02-022] laundry / service.laundry: "Dịch vụ giặt theo túi, nhận trước 09:00, trả dự kiến sau 18:00 cùng ngày; không phục vụ ngày đóng cửa."
+[F-HTL-BEACH02-043] pool / amenity.pool: "Hồ bơi gia đình 07:00-19:00; trẻ dưới 12 tuổi phải có người lớn giám sát trực tiếp."
+[F-HTL-BEACH02-044] spa / amenity.spa: "Spa 10:00-20:00, đóng cửa thứ Tư; dịch vụ cần đặt trước."
+  Điều kiện: {"window": "10:00-20:00", "closed_days": ["Wednesday"]}
+[F-HTL-BEACH02-045] gym / amenity.gym: "Phòng tập nhỏ 06:00-21:00; khách từ 16 tuổi."
+[F-HTL-BEACH02-072] amenities / amenity.amenity_hours: "Facility hours in this pack are local property time and should be reconfirmed on the day."
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-073] wifi / amenity.wifi_help: "If Wi-Fi does not connect, ask the desk to verify the network name and current access instructions."
+[F-HTL-BEACH02-074] laundry / service.laundry_delicates: "Delicate, high-value, or hand-wash-only items are not accepted under standard bag laundry service."
+[F-HTL-BEACH02-075] laundry / service.laundry_claim: "Check the item count at handover and retain the service slip until collection."
+[F-HTL-BEACH02-085] workspace / amenity.meeting_room: "Meeting-room requests require date, time, attendee count, and confirmation; no live calendar is included."
+[F-HTL-BEACH02-106] child / amenity.kids_club: "Children's activity room 09:00-17:00, closed Monday; adult must register and remain on property."
+  Điều kiện: {"window": "09:00-17:00", "closed_days": ["Monday"]}
+[F-HTL-BEACH02-107] child / amenity.kids_club_age: "Supervised activity sessions accept ages 4-10 only after guardian registration; no medical care is provided."
+  Điều kiện: {"min_age": 4, "max_age": 10}
+[F-HTL-BEACH02-112] amenity / amenity.pool_towel: "Pool towels are issued at the pool desk and should be returned there."
+
+## Quy định lưu trú
+[F-HTL-BEACH02-023] pets / policy.pets: "Có thể nhận một chó nhỏ tối đa 8 kg tại một số hạng phòng, phụ phí 300000 VND/đêm; phải được xác nhận trước."
+  Điều kiện: {"unit": "VND per pet per night"}
+[F-HTL-BEACH02-024] smoking / policy.smoking: "Khu vực hút thuốc ngoài trời cạnh cổng phụ; không hút thuốc trên ban công phòng."
+[F-HTL-BEACH02-049] noise / policy.quiet_zone: "Khu vui chơi trẻ em đóng 21:00; giờ yên tĩnh tại phòng 22:00-07:00."
+[F-HTL-BEACH02-082] pets / policy.assistance_animal_request: "Contact the property before arrival about an assistance animal so staff can confirm arrangements."
+[F-HTL-BEACH02-083] smoking / policy.smoking_fee: "Any cleaning charge for a smoking violation must be explained and confirmed by staff; no amount is listed here."
+[F-HTL-BEACH02-084] noise / policy.noise_report: "Report repeated noise to the desk with location and time; staff will acknowledge and state the next update."
+[F-HTL-BEACH02-113] pets / policy.pet_room_scope: "Pet requests apply only to selected Garden rooms; pool-porch rooms are not pet-approved."
+[F-HTL-BEACH02-114] noise / policy.beach_event_noise: "Beach event sound ends by 21:00; event schedule is not provided here and should be confirmed on the day."
+
+## An toàn và riêng tư
+[F-HTL-BEACH02-025] safety / safety.emergency_contact: "Khi có nguy cơ tức thời, báo nhân viên trực tiếp tại quầy hoặc dùng số liên lạc ghi trên xác nhận lưu trú; bộ dữ liệu không chứa số khẩn cấp."
+[F-HTL-BEACH02-026] security / safety.key_control: "Thẻ phòng chỉ cấp cho người có tên trong đặt phòng sau kiểm tra tại quầy."
+[F-HTL-BEACH02-027] privacy / privacy.guest_data: "Thông tin khách chỉ dùng để xử lý lưu trú và yêu cầu liên quan; yêu cầu quyền riêng tư gửi qua kênh đặt phòng."
+[F-HTL-BEACH02-086] safety / safety.immediate_hazard: "For an immediate hazard, alert on-site staff in person as soon as it is safe to do so; this pack does not provide emergency numbers or medical instructions."
+[F-HTL-BEACH02-087] safety / safety.fire_route: "Follow posted on-site evacuation signage and staff direction; floor plans in this pack are not an emergency guide."
+[F-HTL-BEACH02-088] security / safety.visitor_access: "Visitors must register at the desk and may be asked to leave shared guest areas by quiet hours."
+[F-HTL-BEACH02-089] security / safety.cash_valuables: "Use the in-room safe if provided; the presence and size of a safe is room-specific and should be confirmed."
+[F-HTL-BEACH02-090] privacy / privacy.data_correction: "For a correction to personal booking details, use the original booking channel or speak to desk staff after identity verification."
+[F-HTL-BEACH02-091] privacy / privacy.photo_consent: "Ask permission before photographing or recording other guests or staff in a non-public interaction."
+
+## Hỗ trợ trong kỳ nghỉ
+[F-HTL-BEACH02-028] lostfound / service.lost_found: "Báo lễ tân với mô tả vật dụng và khu vực/thời điểm nghi thất lạc; không gửi giấy tờ nhạy cảm qua tin nhắn mở."
+[F-HTL-BEACH02-029] housekeeping / service.housekeeping: "Dọn phòng hằng ngày theo yêu cầu treo bảng trước 12:00."
+[F-HTL-BEACH02-030] maintenance / service.maintenance: "Báo lỗi thiết bị tại quầy; nhân viên sẽ ghi nhận và phản hồi thời gian xử lý dự kiến."
+[F-HTL-BEACH02-031] complaints / service.complaint: "Nhân viên ghi nhận vấn đề, xác nhận đã tiếp nhận và báo thời điểm cập nhật tiếp theo; tiếp nhận không đồng nghĩa đã giải quyết."
+[F-HTL-BEACH02-034] outage / service.outage_updates: "Khi tiện ích gián đoạn, quầy sẽ cập nhật phạm vi và mốc thông tin tiếp theo nếu đã biết."
+[F-HTL-BEACH02-092] lostfound / service.lost_found_tracking: "A report is acknowledged with a reference when available; locating or returning an item is not guaranteed."
+[F-HTL-BEACH02-093] housekeeping / service.housekeeping_optout: "Use the door sign or tell the desk before 10:00 to skip routine housekeeping that day."
+[F-HTL-BEACH02-094] housekeeping / service.linen_request: "Extra linen requests are subject to current stock and must be acknowledged by staff."
+[F-HTL-BEACH02-095] maintenance / service.maintenance_priority: "Tell staff if a reported fault affects room access or an essential fixture so they can prioritize review."
+[F-HTL-BEACH02-096] maintenance / service.repair_entry: "Staff should state the repair purpose before entering an occupied room; guests may ask to agree a time."
+[F-HTL-BEACH02-097] complaints / service.support_acknowledgement: "A request is received only when staff or the approved booking channel acknowledges it; sending a message alone is not proof of receipt."
+[F-HTL-BEACH02-098] complaints / service.support_priority: "Tell staff promptly if an issue affects immediate access, security, or a basic room function; the pack makes no response-time guarantee."
+[F-HTL-BEACH02-099] complaints / service.support_followup: "If no update arrives by the time staff gave, reply with the existing request reference rather than opening duplicate cases."
+[F-HTL-BEACH02-101] outage / service.outage_unknown_eta: "When restoration time is unknown, staff should say it is unknown and give the next update time if available."
+[F-HTL-BEACH02-102] unavailability / service.alternative_request: "If a service is unavailable, ask staff for an available alternative; the pack does not guarantee a substitute."
+
+## Khu vực và di chuyển
+[F-HTL-BEACH02-035] weather / local.weather: "Điều kiện thời tiết thay đổi; kiểm tra dự báo chính thức trước hoạt động ngoài trời."
+[F-HTL-BEACH02-036] unavailability / service.unavailable_service: "Giờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng."
+[F-HTL-BEACH02-048] localguide / local.nearby: "Bãi Cát Trăng giả lập cách 0.4 km; lối tiếp cận qua cổng resort, giờ thủy triều không được cung cấp trong pack."
+  Điều kiện: {"distance_km": 0.4}
+[F-HTL-BEACH02-103] localguide / local.directions_scope: "Distances and routes are fictional references and do not replace current navigation or local access checks."
+[F-HTL-BEACH02-104] weather / local.weather_activity_check: "Check local weather and closure notices before outdoor activities; conditions are not monitored by this pack."
+[F-HTL-BEACH02-110] localguide / local.beach_access: "The sample beach gate is open 06:00-20:00; shoreline conditions and tide are not covered by this pack."
+  Điều kiện: {"window": "06:00-20:00"}
+
+## Ăn uống và dị ứng
+[F-HTL-BEACH02-040] food / dining.breakfast: "Bữa sáng tại Vịnh Nhỏ, 06:30-10:00; có ghế ăn trẻ em theo tình trạng."
+  Điều kiện: {"window": "06:30-10:00", "closed_days": [], "timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-BEACH02-041] dietary / dining.dietary_requests: "Có lựa chọn chay và thực đơn trẻ em; hỏi nhân viên về thành phần từng món."
+[F-HTL-BEACH02-042] allergies / dining.allergy_handling: "Bếp ghi nhận dị ứng nhưng dùng chung khu sơ chế; không thể bảo đảm không nhiễm chéo."
+[F-HTL-BEACH02-069] food / dining.outside_food: "Ask the venue before bringing outside food into a dining area; food storage is not guaranteed."
+[F-HTL-BEACH02-070] dietary / dining.dietary_notice: "Share dietary restrictions before ordering; a request is not confirmation that a meal can be prepared."
+[F-HTL-BEACH02-071] allergies / dining.allergen_escalation: "For a severe allergy concern, do not rely on this data pack; speak directly with venue staff before ordering."
+[F-HTL-BEACH02-108] food / dining.high_chair: "High chairs are available at Vịnh Nhỏ subject to current stock."
+
+## Đỗ xe và di chuyển
+[F-HTL-BEACH02-046] parking / transport.parking: "Bãi ngoài trời 55 chỗ tham chiếu; miễn phí cho khách lưu trú, không bảo lưu."
+  Điều kiện: {"unit": "vehicle space; static reference quantity"}
+[F-HTL-BEACH02-047] transport / transport.airport_transfer: "Xe đối tác theo yêu cầu, tối đa 4 khách và 2 vali cỡ vừa; giá mẫu 500000 VND/chuyến một chiều."
+  Điều kiện: {"capacity_excludes_driver": true, "luggage": "2 medium suitcases", "currency": "VND", "unit": "per one-way trip"}
+[F-HTL-BEACH02-076] parking / transport.parking_vehicle_limit: "Parking is for one registered vehicle per booking unless staff confirm otherwise."
+[F-HTL-BEACH02-077] parking / transport.parking_clearance: "Vehicle height/clearance limits are not recorded in this pack; confirm with the desk before entering covered parking."
+[F-HTL-BEACH02-078] transport / transport.transfer_booking_cutoff: "Request partner transport at least 12 hours ahead; a ride is confirmed only after provider acceptance."
+[F-HTL-BEACH02-079] transport / transport.transfer_fare_status: "Sample route fares are planning references, not live quotes; reconfirm fare and pickup point before booking."
+[F-HTL-BEACH02-080] transport / transport.child_seat_confirmation: "Child seats are not assumed to be available; state the child age and seat need when requesting a vehicle."
+[F-HTL-BEACH02-081] transport / transport.route_accessibility: "Vehicle and walking-route accessibility is unverified unless the route entry explicitly states otherwise."
+[F-HTL-BEACH02-109] transport / transport.airport_pickup_point: "Pickup point is the signed Sample South Airport arrivals lane; provider sends details after confirmation."

@@ -1,0 +1,155 @@
+TÀI LIỆU MẪU GUEST — Harbor City Demo
+Nguồn gốc: nội dung hư cấu do tác giả bộ dữ liệu viết; không trích xuất từ khách sạn thật, không phải dữ liệu vận hành.
+Mã cơ sở: HTL-CITY01 | Phiên bản: 1.0 | Hiệu lực: 2026-10-01 đến 2027-09-30
+Mọi số lượng, giá, địa chỉ và tuyến đường đều là tham chiếu giả lập. Không dùng làm chỉ dẫn khẩn cấp.
+
+## Tổng quan
+[F-HTL-CITY01-001] identity / property.name: "Harbor City Demo"
+[F-HTL-CITY01-002] identity / property.address: "18 Pho May Street, fictional Harbor Ward, fictional An Hai City, Vietnam"
+[F-HTL-CITY01-003] identity / property.property_type: "business city hotel"
+
+## Nhận và trả phòng
+[F-HTL-CITY01-005] checkin / stay.check_in_window: {"start": "15:00", "end": "23:00"}
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-006] checkout / stay.check_out_time: "11:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-007] checkin / stay.early_check_in: "Theo tình trạng phòng trong ngày; yêu cầu không đồng nghĩa với xác nhận."
+[F-HTL-CITY01-008] checkout / stay.late_checkout: "Cần được lễ tân xác nhận; không mặc định được gia hạn."
+[F-HTL-CITY01-059] checkin / stay.arrival_after_staffed_hours: "Arrival outside staffed hours must be arranged and confirmed in advance; no self check-in is promised."
+[F-HTL-CITY01-060] checkin / stay.identity_check: "The arriving adult presents an accepted identity document at the desk; exact document rules depend on applicable requirements."
+[F-HTL-CITY01-061] checkout / stay.checkout_key_return: "Return room key cards at the desk or use the marked return box when the desk is unattended."
+
+## Hành lý
+[F-HTL-CITY01-009] luggage / stay.luggage_storage: "Có thể gửi hành lý tại quầy trong giờ có nhân viên."
+  Điều kiện: {"hours": "06:00-23:00"}
+[F-HTL-CITY01-062] luggage / stay.luggage_claim: "Keep the claim tag when provided; staff may ask for a description and booking name before release."
+[F-HTL-CITY01-063] luggage / stay.luggage_after_checkout: "Post-checkout storage is available only during staffed hours and must be collected the same day."
+
+## Liên hệ và hỗ trợ
+[F-HTL-CITY01-010] reception / service.staffed_hours: "06:00-23:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-032] language / service.languages: "Tiếng Việt; tiếng Anh cơ bản theo ca trực."
+[F-HTL-CITY01-033] contact / service.contact_channel: "Quầy lễ tân trong giờ có nhân viên hoặc kênh nhắn tin ghi trên xác nhận đặt phòng."
+
+## Đặt phòng và thanh toán
+[F-HTL-CITY01-011] booking / reservation.booking_changes: "Thay đổi đặt phòng chỉ có hiệu lực sau khi được xác nhận bằng kênh đặt ban đầu."
+[F-HTL-CITY01-012] cancel / reservation.cancellation: "Điều kiện hủy phụ thuộc giá/phương án đã chọn; xem xác nhận đặt phòng."
+[F-HTL-CITY01-013] deposit / payment.deposit: "Khoản bảo đảm 500000 VND/phòng/lưu trú; hoàn theo đối soát sau trả phòng."
+  Điều kiện: {"basis": "per room per stay", "currency": "VND"}
+[F-HTL-CITY01-014] payments / payment.accepted_methods: ["tiền mặt VND", "thẻ ngân hàng nội địa tại quầy"]
+[F-HTL-CITY01-015] invoice / payment.invoice_request: "Yêu cầu hóa đơn tại quầy hoặc qua kênh đặt phòng; cung cấp thông tin xuất hóa đơn trước khi thanh toán."
+[F-HTL-CITY01-052] booking / reservation.booking_reference: "Keep the booking reference available when asking staff to locate a reservation."
+[F-HTL-CITY01-053] booking / reservation.name_mismatch: "If the booking name differs from the arriving guest, ask the booking channel to update it before arrival."
+[F-HTL-CITY01-054] booking / reservation.walk_in: "Walk-in rooms are subject to same-day confirmation; reference room counts do not show availability."
+[F-HTL-CITY01-055] cancel / reservation.refund_timing: "Refund timing depends on the booking channel and payment provider; no fixed processing time is promised."
+[F-HTL-CITY01-056] payments / payment.currency: "On-property reference amounts are in Vietnamese dong (VND)."
+  Điều kiện: {"currency": "VND"}
+[F-HTL-CITY01-057] payments / payment.card_authorization: "A deposit or payment hold may appear separately from a completed charge; ask the payment provider about posting times."
+[F-HTL-CITY01-058] invoice / payment.invoice_correction: "Invoice corrections require the receipt and booking reference; staff will confirm feasibility before changing records."
+[F-HTL-CITY01-106] booking / reservation.corporate_rate: "Corporate rates require a valid company arrangement at booking; no company rate is quoted in this pack."
+
+## Phòng và lưu trú
+[F-HTL-CITY01-016] rooms / room.quiet_hours: "22:00-07:00"
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-017] occupancy / room.extra_person: "Tối đa 1 khách thêm nếu loại phòng cho phép; xác nhận trước khi đến."
+[F-HTL-CITY01-018] child / room.child_age_definition: "Trẻ em: dưới 12 tuổi tại ngày nhận phòng."
+[F-HTL-CITY01-019] guardian / room.minor_guardian: "Khách dưới 18 tuổi cần người giám hộ trưởng thành đi cùng."
+[F-HTL-CITY01-064] child / room.child_rate: "Child charges, meals, and bedding vary by rate plan; check the booking confirmation before arrival."
+[F-HTL-CITY01-065] child / room.child_supervision: "Children must remain under their accompanying adult's supervision in shared facilities."
+[F-HTL-CITY01-066] occupancy / room.occupancy_rule: "Registered guests only may stay overnight; disclose all occupants before check-in."
+[F-HTL-CITY01-067] beds / room.bed_preference: "Bed preferences are requests and depend on room assignment; they are not guaranteed until confirmed."
+[F-HTL-CITY01-111] room / room.connecting_rooms: "Connecting rooms are not offered in this reference catalog."
+
+## Tiếp cận
+[F-HTL-CITY01-020] access / property.step_free_access: "Lối vào chính có đường dốc; chưa xác nhận khả năng tiếp cận cho mọi khu vực."
+[F-HTL-CITY01-068] access / property.access_request: "Describe the specific access need and route; staff can confirm known features but cannot certify suitability from this pack."
+[F-HTL-CITY01-069] access / room.accessible_room_availability: "Accessible-room availability is not tracked in this reference pack; confirm with the property before booking."
+
+## Tiện ích
+[F-HTL-CITY01-021] wifi / amenity.wifi: "Wi-Fi miễn phí trong khu vực khách; tên mạng và mật khẩu nhận tại quầy."
+[F-HTL-CITY01-022] laundry / service.laundry: "Dịch vụ giặt theo túi, nhận trước 09:00, trả dự kiến sau 18:00 cùng ngày; không phục vụ ngày đóng cửa."
+[F-HTL-CITY01-043] gym / amenity.gym: "Phòng tập tầng 2, 06:00-22:00; chỉ dành cho khách từ 16 tuổi."
+[F-HTL-CITY01-044] pool / amenity.pool: "Không có hồ bơi tại khách sạn."
+[F-HTL-CITY01-045] spa / amenity.spa: "Không có spa tại khách sạn."
+[F-HTL-CITY01-047] workspace / amenity.workspace: "Bàn làm việc và ổ cắm tại mọi phòng; phòng họp đặt riêng theo giờ."
+[F-HTL-CITY01-073] amenities / amenity.amenity_hours: "Facility hours in this pack are local property time and should be reconfirmed on the day."
+  Điều kiện: {"timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-074] wifi / amenity.wifi_help: "If Wi-Fi does not connect, ask the desk to verify the network name and current access instructions."
+[F-HTL-CITY01-075] laundry / service.laundry_delicates: "Delicate, high-value, or hand-wash-only items are not accepted under standard bag laundry service."
+[F-HTL-CITY01-076] laundry / service.laundry_claim: "Check the item count at handover and retain the service slip until collection."
+[F-HTL-CITY01-086] workspace / amenity.meeting_room: "Meeting-room requests require date, time, attendee count, and confirmation; no live calendar is included."
+[F-HTL-CITY01-107] workspace / amenity.meeting_room_capacity: "Meeting room has 10 seats reference capacity; layout or equipment must be confirmed."
+  Điều kiện: {"capacity_reference": 10}
+[F-HTL-CITY01-112] wifi / amenity.meeting_wifi: "Meeting-room Wi-Fi access must be requested from the desk; guest room credentials may not work there."
+
+## Quy định lưu trú
+[F-HTL-CITY01-023] pets / policy.pets: "Không nhận vật nuôi, ngoại trừ trường hợp hỗ trợ đã được xác nhận trước."
+[F-HTL-CITY01-024] smoking / policy.smoking: "Cấm hút thuốc trong phòng và không gian trong nhà; khu vực ngoài trời được chỉ dẫn tại chỗ."
+[F-HTL-CITY01-049] noise / policy.construction_noise: "Không có hoạt động xây dựng theo lịch trong thời hạn dữ liệu; đây không phải bảo đảm tình trạng tức thời."
+[F-HTL-CITY01-083] pets / policy.assistance_animal_request: "Contact the property before arrival about an assistance animal so staff can confirm arrangements."
+[F-HTL-CITY01-084] smoking / policy.smoking_fee: "Any cleaning charge for a smoking violation must be explained and confirmed by staff; no amount is listed here."
+[F-HTL-CITY01-085] noise / policy.noise_report: "Report repeated noise to the desk with location and time; staff will acknowledge and state the next update."
+[F-HTL-CITY01-115] noise / policy.meeting_event: "Private meetings must end by 21:00 and may not use amplified sound."
+
+## An toàn và riêng tư
+[F-HTL-CITY01-025] safety / safety.emergency_contact: "Khi có nguy cơ tức thời, báo nhân viên trực tiếp tại quầy hoặc dùng số liên lạc ghi trên xác nhận lưu trú; bộ dữ liệu không chứa số khẩn cấp."
+[F-HTL-CITY01-026] security / safety.key_control: "Thẻ phòng chỉ cấp cho người có tên trong đặt phòng sau kiểm tra tại quầy."
+[F-HTL-CITY01-027] privacy / privacy.guest_data: "Thông tin khách chỉ dùng để xử lý lưu trú và yêu cầu liên quan; yêu cầu quyền riêng tư gửi qua kênh đặt phòng."
+[F-HTL-CITY01-087] safety / safety.immediate_hazard: "For an immediate hazard, alert on-site staff in person as soon as it is safe to do so; this pack does not provide emergency numbers or medical instructions."
+[F-HTL-CITY01-088] safety / safety.fire_route: "Follow posted on-site evacuation signage and staff direction; floor plans in this pack are not an emergency guide."
+[F-HTL-CITY01-089] security / safety.visitor_access: "Visitors must register at the desk and may be asked to leave shared guest areas by quiet hours."
+[F-HTL-CITY01-090] security / safety.cash_valuables: "Use the in-room safe if provided; the presence and size of a safe is room-specific and should be confirmed."
+[F-HTL-CITY01-091] privacy / privacy.data_correction: "For a correction to personal booking details, use the original booking channel or speak to desk staff after identity verification."
+[F-HTL-CITY01-092] privacy / privacy.photo_consent: "Ask permission before photographing or recording other guests or staff in a non-public interaction."
+
+## Hỗ trợ trong kỳ nghỉ
+[F-HTL-CITY01-028] lostfound / service.lost_found: "Báo lễ tân với mô tả vật dụng và khu vực/thời điểm nghi thất lạc; không gửi giấy tờ nhạy cảm qua tin nhắn mở."
+[F-HTL-CITY01-029] housekeeping / service.housekeeping: "Dọn phòng hằng ngày theo yêu cầu treo bảng trước 12:00."
+[F-HTL-CITY01-030] maintenance / service.maintenance: "Báo lỗi thiết bị tại quầy; nhân viên sẽ ghi nhận và phản hồi thời gian xử lý dự kiến."
+[F-HTL-CITY01-031] complaints / service.complaint: "Nhân viên ghi nhận vấn đề, xác nhận đã tiếp nhận và báo thời điểm cập nhật tiếp theo; tiếp nhận không đồng nghĩa đã giải quyết."
+[F-HTL-CITY01-034] outage / service.outage_updates: "Khi tiện ích gián đoạn, quầy sẽ cập nhật phạm vi và mốc thông tin tiếp theo nếu đã biết."
+[F-HTL-CITY01-093] lostfound / service.lost_found_tracking: "A report is acknowledged with a reference when available; locating or returning an item is not guaranteed."
+[F-HTL-CITY01-094] housekeeping / service.housekeeping_optout: "Use the door sign or tell the desk before 10:00 to skip routine housekeeping that day."
+[F-HTL-CITY01-095] housekeeping / service.linen_request: "Extra linen requests are subject to current stock and must be acknowledged by staff."
+[F-HTL-CITY01-096] maintenance / service.maintenance_priority: "Tell staff if a reported fault affects room access or an essential fixture so they can prioritize review."
+[F-HTL-CITY01-097] maintenance / service.repair_entry: "Staff should state the repair purpose before entering an occupied room; guests may ask to agree a time."
+[F-HTL-CITY01-098] complaints / service.support_acknowledgement: "A request is received only when staff or the approved booking channel acknowledges it; sending a message alone is not proof of receipt."
+[F-HTL-CITY01-099] complaints / service.support_priority: "Tell staff promptly if an issue affects immediate access, security, or a basic room function; the pack makes no response-time guarantee."
+[F-HTL-CITY01-100] complaints / service.support_followup: "If no update arrives by the time staff gave, reply with the existing request reference rather than opening duplicate cases."
+[F-HTL-CITY01-102] outage / service.outage_unknown_eta: "When restoration time is unknown, staff should say it is unknown and give the next update time if available."
+[F-HTL-CITY01-103] unavailability / service.alternative_request: "If a service is unavailable, ask staff for an available alternative; the pack does not guarantee a substitute."
+[F-HTL-CITY01-113] support / service.business_printing: "Black-and-white printing up to 10 pages per stay is available at the desk subject to staff availability."
+
+## Khu vực và di chuyển
+[F-HTL-CITY01-035] weather / local.weather: "Điều kiện thời tiết thay đổi; kiểm tra dự báo chính thức trước hoạt động ngoài trời."
+[F-HTL-CITY01-036] unavailability / service.unavailable_service: "Giờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng."
+[F-HTL-CITY01-050] localguide / local.nearby: "Quảng trường Hải Đăng giả lập cách 1.2 km theo tuyến mẫu; thời gian di chuyển thực tế thay đổi."
+  Điều kiện: {"distance_km": 1.2}
+[F-HTL-CITY01-104] localguide / local.directions_scope: "Distances and routes are fictional references and do not replace current navigation or local access checks."
+[F-HTL-CITY01-105] weather / local.weather_activity_check: "Check local weather and closure notices before outdoor activities; conditions are not monitored by this pack."
+[F-HTL-CITY01-110] localguide / local.business_district: "Khu Văn phòng Hư cấu is a 10-minute sample walk from the lobby; actual route may change."
+  Điều kiện: {"duration_minutes": 10}
+
+## Ăn uống và dị ứng
+[F-HTL-CITY01-040] food / dining.breakfast: "Bữa sáng tự chọn tại Bến Gió, tầng 1."
+  Điều kiện: {"window": "06:30-09:30", "closed_days": [], "timezone": "Asia/Ho_Chi_Minh"}
+[F-HTL-CITY01-041] dietary / dining.dietary_requests: "Có thể ghi nhận yêu cầu ăn chay; cần xác nhận khả năng đáp ứng trước khi phục vụ."
+[F-HTL-CITY01-042] allergies / dining.allergy_handling: "Thông báo dị ứng trực tiếp cho nhân viên; bếp không cam kết môi trường không có dị nguyên."
+[F-HTL-CITY01-070] food / dining.outside_food: "Ask the venue before bringing outside food into a dining area; food storage is not guaranteed."
+[F-HTL-CITY01-071] dietary / dining.dietary_notice: "Share dietary restrictions before ordering; a request is not confirmation that a meal can be prepared."
+[F-HTL-CITY01-072] allergies / dining.allergen_escalation: "For a severe allergy concern, do not rely on this data pack; speak directly with venue staff before ordering."
+[F-HTL-CITY01-108] food / dining.breakfast_child: "Children under 5 may share a registered adult's breakfast at no extra charge; confirm rate plan."
+
+## Đỗ xe và di chuyển
+[F-HTL-CITY01-046] parking / transport.parking: "Bãi xe có mái che, 40 chỗ tham chiếu; phí 100000 VND/xe/đêm, không bảo lưu chỗ."
+  Điều kiện: {"unit": "VND per vehicle per night"}
+[F-HTL-CITY01-048] transport / transport.airport_transfer: "Xe đối tác theo yêu cầu, giá tham khảo 350000 VND/chuyến/xe tối đa 3 khách; xác nhận giờ và giá trước khi đặt."
+  Điều kiện: {"currency": "VND", "unit": "per one-way vehicle trip", "capacity_excludes_driver": true}
+[F-HTL-CITY01-077] parking / transport.parking_vehicle_limit: "Parking is for one registered vehicle per booking unless staff confirm otherwise."
+[F-HTL-CITY01-078] parking / transport.parking_clearance: "Vehicle height/clearance limits are not recorded in this pack; confirm with the desk before entering covered parking."
+[F-HTL-CITY01-079] transport / transport.transfer_booking_cutoff: "Request partner transport at least 12 hours ahead; a ride is confirmed only after provider acceptance."
+[F-HTL-CITY01-080] transport / transport.transfer_fare_status: "Sample route fares are planning references, not live quotes; reconfirm fare and pickup point before booking."
+[F-HTL-CITY01-081] transport / transport.child_seat_confirmation: "Child seats are not assumed to be available; state the child age and seat need when requesting a vehicle."
+[F-HTL-CITY01-082] transport / transport.route_accessibility: "Vehicle and walking-route accessibility is unverified unless the route entry explicitly states otherwise."
+[F-HTL-CITY01-109] transport / transport.airport_pickup_point: "Pickup point is the signed Sample East Airport arrivals curb; driver details are supplied only after confirmation."
+[F-HTL-CITY01-114] parking / transport.ev_charging: "EV charging is not listed as available; ask staff before arrival."
