@@ -2,6 +2,7 @@
 
 Áp dụng cho sprint planning, implementation, review và sửa lỗi; cho coordinator và mọi agent.
 Yêu cầu kiến trúc bắt buộc nằm trong [AI_ARCHITECTURE.md](architecture/AI_ARCHITECTURE.md).
+Đọc và áp dụng thêm [AGENT_EXECUTION.md](execution/AGENT_EXECUTION.md) và [Not_Overthinking.md](execution/Not_Overthinking.md), được lưu nguyên bản theo yêu cầu của Hieu.
 Đây là quy tắc làm việc, không phải bằng chứng tính năng đã triển khai.
 
 ## 1. Làm đúng mục tiêu và backlog

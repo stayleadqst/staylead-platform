@@ -1,6 +1,5 @@
 import pytest
 from fastapi.testclient import TestClient
-
 from staylead_platform.composition.startup.domain_profile import (
     UnsupportedDomainError,
     select_domain_profile,

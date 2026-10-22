@@ -1,0 +1,652 @@
+{
+  "evidence_level": "local HTTP API + real isolated PostgreSQL + real Azure Foundry Grok; all hotel data synthetic",
+  "final_product_tree": "56f5dfe3f9c8f75828c1d3200255888e157ea46c",
+  "version_sha256": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "19b5ab77548bdff11435d5bcb2d7891fe932108109f25d00792a0e42331c9125",
+    "apps/api/src/staylead_platform/composition/configuration/settings.py": "f8b52ec760e482e4c8702d0a1f10e828d82e60c77de2cc70adce10bec79384cd",
+    "fixtures/hospitality/knowledge-v1/manifest.json": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2",
+    "fixtures/hospitality/knowledge-v1/facts.json": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0",
+    "fixtures/hospitality/knowledge-v1/sources.json": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f"
+  },
+  "paid_guest_turn_attempts": 11,
+  "successful_turns": 8,
+  "observed_successful_model_calls": 10,
+  "observed_successful_usage": {
+    "input_tokens": 21466,
+    "output_tokens": 1284,
+    "total_tokens": 30745
+  },
+  "failed_turn_calls_and_usage": "unknown; excluded from measured successful totals, never assumed zero",
+  "monetary_cost": "unavailable",
+  "failed_attempts": [
+    {
+      "scenario": "first_city_smoke",
+      "outcome": "502 invalid_model_output: redundant inline citation requirement rejected typed IDs; fixed R4",
+      "usage": null
+    },
+    {
+      "scenario": "seeded_conflict_attempt_1",
+      "outcome": "504 provider_timeout, no automatic retry",
+      "usage": null
+    },
+    {
+      "scenario": "seeded_conflict_attempt_2",
+      "outcome": "502 invalid_model_output: unknown/conflict reference prose protocol mismatch; prompt clarified and final affected case passed",
+      "usage": null
+    }
+  ],
+  "observations": [
+    {
+      "scenario": "city_vi_breakfast_parking_followup",
+      "turn": 1,
+      "candidate_tree": "7165e86784b76b6055d5ee30b0056ca5cde7f2b0",
+      "question": "Bữa sáng ở đâu và mấy giờ? Có chỗ đỗ xe không, phí bao nhiêu?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-046"
+      ],
+      "answer": "Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30-09:30. [F-HTL-CITY01-040]\nBãi xe có mái che, 40 chỗ tham chiếu; phí 100000 VND/xe/đêm, không bảo lưu chỗ. [F-HTL-CITY01-046]\nGiờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng. [F-HTL-CITY01-036]",
+      "unknowns": [],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-TRANSPORT",
+          "source_version": "1.0",
+          "section": "Đỗ xe và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-LOCAL",
+          "source_version": "1.0",
+          "section": "Khu vực và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "cfd41d61-9a29-48ef-ba63-e081d0661df8",
+        "provider_request_ids": [
+          "cfd41d61-9a29-48ef-ba63-e081d0661df8"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 3443,
+          "output_tokens": 134,
+          "total_tokens": 4072
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-046",
+          "F-HTL-CITY01-040",
+          "F-HTL-CITY01-024",
+          "F-HTL-CITY01-048",
+          "F-HTL-CITY01-036",
+          "F-HTL-CITY01-021",
+          "F-HTL-CITY01-009",
+          "F-HTL-CITY01-047",
+          "F-HTL-CITY01-045",
+          "F-HTL-CITY01-044",
+          "F-HTL-CITY01-033",
+          "F-HTL-CITY01-042",
+          "F-HTL-CITY01-049",
+          "F-HTL-CITY01-028",
+          "F-HTL-CITY01-031",
+          "F-HTL-CITY01-025",
+          "F-HTL-CITY01-008",
+          "F-HTL-CITY01-030",
+          "F-HTL-CITY01-023",
+          "F-HTL-CITY01-034"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "city_vi_breakfast_parking_followup",
+      "turn": 2,
+      "candidate_tree": "7165e86784b76b6055d5ee30b0056ca5cde7f2b0",
+      "question": "Nhà hàng bữa sáng đó nằm ở tầng mấy?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "answer": "Nhà hàng bữa sáng Bến Gió nằm ở tầng 1. [F-HTL-CITY01-040]\nGiờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng. [F-HTL-CITY01-036]",
+      "unknowns": [],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-LOCAL",
+          "source_version": "1.0",
+          "section": "Khu vực và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "6211b5c2-47f7-428c-9eed-4bd56df13eb6",
+        "provider_request_ids": [
+          "6211b5c2-47f7-428c-9eed-4bd56df13eb6"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 3572,
+          "output_tokens": 81,
+          "total_tokens": 3988
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-046",
+          "F-HTL-CITY01-036",
+          "F-HTL-CITY01-040",
+          "F-HTL-CITY01-024",
+          "F-HTL-CITY01-009",
+          "F-HTL-CITY01-048",
+          "F-HTL-CITY01-022",
+          "F-HTL-CITY01-021",
+          "F-HTL-CITY01-033",
+          "F-HTL-CITY01-025",
+          "F-HTL-CITY01-043",
+          "F-HTL-CITY01-045",
+          "F-HTL-CITY01-047",
+          "F-HTL-CITY01-044",
+          "F-HTL-CITY01-014",
+          "F-HTL-CITY01-041",
+          "F-HTL-CITY01-049",
+          "F-HTL-CITY01-007",
+          "F-HTL-CITY01-011",
+          "F-HTL-CITY01-028"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "city_vi_breakfast_parking_followup",
+      "turn": 1,
+      "candidate_tree": "799ac1b5fbd31566e1e1b4a079534842003f59cc",
+      "question": "Bữa sáng ở đâu và mấy giờ? Có chỗ đỗ xe không, phí bao nhiêu?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-046"
+      ],
+      "answer": "Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30-09:30 (giờ Asia/Ho_Chi_Minh). [F-HTL-CITY01-040]\nCó bãi xe có mái che, 40 chỗ tham chiếu; phí 100000 VND/xe/đêm, không bảo lưu chỗ. [F-HTL-CITY01-046]\nGiờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng. [F-HTL-CITY01-036]",
+      "unknowns": [],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-TRANSPORT",
+          "source_version": "1.0",
+          "section": "Đỗ xe và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-LOCAL",
+          "source_version": "1.0",
+          "section": "Khu vực và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "d2f2c3b0-bd04-40ac-b1b7-c72f38584657",
+        "provider_request_ids": [
+          "d2f2c3b0-bd04-40ac-b1b7-c72f38584657"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 1630,
+          "output_tokens": 147,
+          "total_tokens": 2388
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-046",
+          "F-HTL-CITY01-040",
+          "F-HTL-CITY01-024",
+          "F-HTL-CITY01-048",
+          "F-HTL-CITY01-036",
+          "F-HTL-CITY01-021",
+          "F-HTL-CITY01-009",
+          "F-HTL-CITY01-047",
+          "F-HTL-CITY01-045",
+          "F-HTL-CITY01-044",
+          "F-HTL-CITY01-033",
+          "F-HTL-CITY01-042",
+          "F-HTL-CITY01-049",
+          "F-HTL-CITY01-028",
+          "F-HTL-CITY01-031",
+          "F-HTL-CITY01-025",
+          "F-HTL-CITY01-008",
+          "F-HTL-CITY01-030",
+          "F-HTL-CITY01-023",
+          "F-HTL-CITY01-034"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "beach_fr_breakfast_pool",
+      "turn": 1,
+      "candidate_tree": "799ac1b5fbd31566e1e1b4a079534842003f59cc",
+      "question": "À quelle heure sert-on le petit-déjeuner et quand la piscine est-elle ouverte ?",
+      "expected_fact_ids": [
+        "F-HTL-BEACH02-040",
+        "F-HTL-BEACH02-043"
+      ],
+      "answer": "Le petit-déjeuner est servi de 06:30 à 10:00 à Vịnh Nhỏ (fuseau horaire Asia/Ho_Chi_Minh). [F-HTL-BEACH02-040]\nLa piscine familiale est ouverte de 07:00 à 19:00. [F-HTL-BEACH02-043]",
+      "unknowns": [],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-BEACH02-040",
+          "hotel_id": "HTL-BEACH02",
+          "source_id": "SRC-HTL-BEACH02-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-BEACH02-043",
+          "hotel_id": "HTL-BEACH02",
+          "source_id": "SRC-HTL-BEACH02-AMENITY",
+          "source_version": "1.0",
+          "section": "Tiện ích",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "b79bf0d1-8d7b-4874-b9e7-215b15924914",
+        "provider_request_ids": [
+          "96d5ff6c-d68f-40cb-baa7-3b1531b3d855",
+          "b79bf0d1-8d7b-4874-b9e7-215b15924914"
+        ],
+        "calls": 2,
+        "usage": {
+          "input_tokens": 3826,
+          "output_tokens": 119,
+          "total_tokens": 5012
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-BEACH02-040",
+          "F-HTL-BEACH02-043"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "retreat_ja_breakfast_parking",
+      "turn": 1,
+      "candidate_tree": "799ac1b5fbd31566e1e1b4a079534842003f59cc",
+      "question": "朝食の時間と月曜日の営業状況を教えてください。駐車場は何台分ありますか？16人乗りを超えるバスでも入れますか？",
+      "expected_fact_ids": [
+        "F-HTL-RETREAT03-040",
+        "F-HTL-RETREAT03-046"
+      ],
+      "answer": "朝食はThông Sươngで07:00-09:30（Asia/Ho_Chi_Minh時間）、月曜日は閉店です。 [F-HTL-RETREAT03-040]\n駐車場は18台分（参考値）、無料です。 [F-HTL-RETREAT03-046]\n入口が狭いため、16人乗り超の車両は確認が必要です。 [F-HTL-RETREAT03-046]\n予約1件につき登録車両1台です。スタッフが別途確認しない限りです。 [F-HTL-RETREAT03-078]\n車両の高さ/クリアランス制限は記録されていません。覆い付き駐車場に入る前にデスクで確認してください。 [F-HTL-RETREAT03-079]\n駐車場は車両スペース18（静的参考数量）です。 [F-HTL-RETREAT03-046]\n16人乗り超のバスの具体的な入庫可否はスタッフ確認が必要です。\n車両高さ制限の詳細は不明です。",
+      "unknowns": [
+        "16人乗り超のバスの具体的な入庫可否はスタッフ確認が必要です。",
+        "車両高さ制限の詳細は不明です。"
+      ],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-RETREAT03-040",
+          "hotel_id": "HTL-RETREAT03",
+          "source_id": "SRC-HTL-RETREAT03-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-RETREAT03-046",
+          "hotel_id": "HTL-RETREAT03",
+          "source_id": "SRC-HTL-RETREAT03-TRANSPORT",
+          "source_version": "1.0",
+          "section": "Đỗ xe và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-RETREAT03-078",
+          "hotel_id": "HTL-RETREAT03",
+          "source_id": "SRC-HTL-RETREAT03-TRANSPORT",
+          "source_version": "1.0",
+          "section": "Đỗ xe và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-RETREAT03-079",
+          "hotel_id": "HTL-RETREAT03",
+          "source_id": "SRC-HTL-RETREAT03-TRANSPORT",
+          "source_version": "1.0",
+          "section": "Đỗ xe và di chuyển",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "eec4d4ef-4b66-4282-8242-cbab9cde3d35",
+        "provider_request_ids": [
+          "24e6027b-17c9-4d5e-bf32-89194dffcfa7",
+          "eec4d4ef-4b66-4282-8242-cbab9cde3d35"
+        ],
+        "calls": 2,
+        "usage": {
+          "input_tokens": 4140,
+          "output_tokens": 322,
+          "total_tokens": 6644
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-RETREAT03-040",
+          "F-HTL-RETREAT03-046",
+          "F-HTL-RETREAT03-078",
+          "F-HTL-RETREAT03-079"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "city_en_partial_supported_and_unknown",
+      "turn": 1,
+      "candidate_tree": "799ac1b5fbd31566e1e1b4a079534842003f59cc",
+      "question": "What time is breakfast, and does the hotel have a helipad?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "answer": "Breakfast is buffet style (bữa sáng tự chọn) at Bến Gió, tầng 1, from 06:30-09:30 local time (Asia/Ho_Chi_Minh). [F-HTL-CITY01-040]\nFacility hours should be reconfirmed on the day. [F-HTL-CITY01-073]\nChildren under 5 may share a registered adult's breakfast at no extra charge; confirm rate plan. [F-HTL-CITY01-108]\nWhether the hotel has a helipad.",
+      "unknowns": [
+        "Whether the hotel has a helipad."
+      ],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-AMENITY",
+          "source_version": "1.0",
+          "section": "Tiện ích",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "ecb51625-7f08-4f84-af27-262b60cc6d00",
+        "provider_request_ids": [
+          "ecb51625-7f08-4f84-af27-262b60cc6d00"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 1562,
+          "output_tokens": 141,
+          "total_tokens": 2428
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-102",
+          "F-HTL-CITY01-055",
+          "F-HTL-CITY01-074",
+          "F-HTL-CITY01-103",
+          "F-HTL-CITY01-003",
+          "F-HTL-CITY01-085",
+          "F-HTL-CITY01-086",
+          "F-HTL-CITY01-108",
+          "F-HTL-CITY01-090",
+          "F-HTL-CITY01-073",
+          "F-HTL-CITY01-082",
+          "F-HTL-CITY01-063",
+          "F-HTL-CITY01-087",
+          "F-HTL-CITY01-113",
+          "F-HTL-CITY01-100",
+          "F-HTL-CITY01-040",
+          "F-HTL-CITY01-097",
+          "F-HTL-CITY01-099",
+          "F-HTL-CITY01-061",
+          "F-HTL-CITY01-076"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "city_en_seeded_checkin_conflict",
+      "turn": 1,
+      "candidate_tree": "56f5dfe3f9c8f75828c1d3200255888e157ea46c",
+      "question": "What check-in hours should I use?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-005",
+        "F-HTL-CITY01-CONFLICT-005"
+      ],
+      "answer": "Check-in window is 15:00 to 23:00 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-005]\nConflicting check-in window is 17:00 to 22:00 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-CONFLICT-005]\nReception staffed hours are 06:00-23:00 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-010]\nArrival outside staffed hours must be arranged and confirmed in advance; no self check-in is promised. [F-HTL-CITY01-059]\nEarly check-in is subject to room availability on the day; requesting does not confirm it. [F-HTL-CITY01-007]\nConflicting check-in windows reported.",
+      "unknowns": [],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-STAY",
+          "source_version": "1.0",
+          "section": "Nhận và trả phòng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-CONFLICT-005",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-SPRINT1-CONFLICT-SEED",
+          "source_version": "sprint1-test-only",
+          "section": "Nhận và trả phòng",
+          "fact_version": "sprint1-conflict-seed",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-CONTACT",
+          "source_version": "1.0",
+          "section": "Liên hệ và hỗ trợ",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-STAY",
+          "source_version": "1.0",
+          "section": "Nhận và trả phòng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-STAY",
+          "source_version": "1.0",
+          "section": "Nhận và trả phòng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "0814c70f-be6e-4808-9f72-f8e1b0ca96dc",
+        "provider_request_ids": [
+          "0814c70f-be6e-4808-9f72-f8e1b0ca96dc"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 1651,
+          "output_tokens": 204,
+          "total_tokens": 3191
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-059",
+          "F-HTL-CITY01-073",
+          "F-HTL-CITY01-090",
+          "F-HTL-CITY01-005",
+          "F-HTL-CITY01-066",
+          "F-HTL-CITY01-CONFLICT-005",
+          "F-HTL-CITY01-007",
+          "F-HTL-CITY01-115",
+          "F-HTL-CITY01-105",
+          "F-HTL-CITY01-097",
+          "F-HTL-CITY01-010",
+          "F-HTL-CITY01-016",
+          "F-HTL-CITY01-102",
+          "F-HTL-CITY01-094",
+          "F-HTL-CITY01-061",
+          "F-HTL-CITY01-091",
+          "F-HTL-CITY01-006",
+          "F-HTL-CITY01-079",
+          "F-HTL-CITY01-054",
+          "F-HTL-CITY01-009"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    },
+    {
+      "scenario": "city_en_partial_supported_and_unknown",
+      "turn": 1,
+      "candidate_tree": "56f5dfe3f9c8f75828c1d3200255888e157ea46c",
+      "question": "What time is breakfast, and does the hotel have a helipad?",
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "answer": "Breakfast is a buffet (\"Bữa sáng tự chọn\") served at Bến Gió on tầng 1 (1st floor) from 06:30-09:30 local time (Asia/Ho_Chi_Minh). [F-HTL-CITY01-040] [F-HTL-CITY01-073]\nFacility hours in this pack are local property time (Asia/Ho_Chi_Minh) and should be reconfirmed on the day. [F-HTL-CITY01-073]\nWhether the hotel has a helipad.",
+      "unknowns": [
+        "Whether the hotel has a helipad."
+      ],
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-AMENITY",
+          "source_version": "1.0",
+          "section": "Tiện ích",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-22T22:41:48.620484+07:00"
+        }
+      ],
+      "trace": {
+        "provider": "foundry_grok",
+        "deployment": "cc-dev-grok-4-1-fast-reasoning",
+        "model": "grok-4-1-fast-reasoning",
+        "provider_request_id": "8c50f7da-9353-4d62-a114-b0bcf114395a",
+        "provider_request_ids": [
+          "8c50f7da-9353-4d62-a114-b0bcf114395a"
+        ],
+        "calls": 1,
+        "usage": {
+          "input_tokens": 1642,
+          "output_tokens": 136,
+          "total_tokens": 3022
+        },
+        "retrieved_fact_ids": [
+          "F-HTL-CITY01-102",
+          "F-HTL-CITY01-055",
+          "F-HTL-CITY01-074",
+          "F-HTL-CITY01-103",
+          "F-HTL-CITY01-003",
+          "F-HTL-CITY01-085",
+          "F-HTL-CITY01-086",
+          "F-HTL-CITY01-108",
+          "F-HTL-CITY01-090",
+          "F-HTL-CITY01-073",
+          "F-HTL-CITY01-082",
+          "F-HTL-CITY01-063",
+          "F-HTL-CITY01-087",
+          "F-HTL-CITY01-113",
+          "F-HTL-CITY01-100",
+          "F-HTL-CITY01-040",
+          "F-HTL-CITY01-097",
+          "F-HTL-CITY01-099",
+          "F-HTL-CITY01-061",
+          "F-HTL-CITY01-076"
+        ],
+        "failure_stage": null
+      },
+      "assessment": "PASS — independently compared with authored expected facts; this is not an LLM judge score"
+    }
+  ]
+}

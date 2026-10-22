@@ -1,0 +1,7 @@
+{
+  "private_projection": "PASS",
+  "invalid_config_atomicity": "PASS",
+  "unsupported_root": "PASS",
+  "server_owned_mapping": "PASS",
+  "restart_persistence": "PASS"
+}

@@ -1,0 +1,233 @@
+import asyncio
+import json
+
+import pytest
+from staylead_platform.domains.hospitality.prompts.grounded_qa import (
+    FACT_SELECTION_INSTRUCTIONS,
+    GROUNDED_QA_INSTRUCTIONS,
+)
+from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
+from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
+from staylead_platform.platform.contracts.ai_provider import (
+    GenerationRequest,
+    GenerationResult,
+    Usage,
+)
+from staylead_platform.platform.contracts.knowledge import KnowledgeFact
+from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
+    ConversationFailure,
+    GroundedQAOrchestrator,
+)
+from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
+
+
+class MemoryFacts:
+    def __init__(self) -> None:
+        self.facts = [
+            KnowledgeFact(
+                fact_id="F-HTL-CITY01-040", hotel_id="HTL-CITY01", topic="food",
+                subject="dining", field="breakfast",
+                value="Breakfast buffet at Ben Gio, floor 1, 06:30-09:30.",
+                conditions={"timezone": "Asia/Ho_Chi_Minh"}, status="confirmed",
+                valid_from="2026-10-01", valid_to="2027-09-30",
+                provenance={"source_id": "SRC-1", "source_version": "1", "section": "Food"},
+            ),
+            KnowledgeFact(
+                fact_id="F-HTL-BEACH02-040", hotel_id="HTL-BEACH02", topic="food",
+                subject="dining", field="breakfast", value="Breakfast from 07:00-10:00.",
+                conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+                provenance={"source_id": "SRC-2", "source_version": "1", "section": "Food"},
+            ),
+        ]
+
+    def list_guest_facts(
+        self, hotel_id: str, *, limit: int = 400, timeout_seconds: float | None = None,
+    ) -> list[KnowledgeFact]:
+        return [fact for fact in self.facts if fact.hotel_id == hotel_id][:limit]
+
+    def get_guest_facts(
+        self, hotel_id: str, fact_ids: set[str], *, timeout_seconds: float | None = None,
+    ) -> list[KnowledgeFact]:
+        return [fact for fact in self.facts if fact.hotel_id == hotel_id and fact.fact_id in fact_ids]
+
+
+class FakeProvider:
+    def __init__(self, *, selection_ids: list[str] | None = None, answer: dict | None = None) -> None:
+        self.calls: list[GenerationRequest] = []
+        self.selection_ids = selection_ids
+        self.answer_payload = answer
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        self.calls.append(request)
+        if request.instructions == FACT_SELECTION_INSTRUCTIONS:
+            candidate_index = json.loads(request.input_text)["candidate_index"]
+            ids = self.selection_ids or [item["fact_id"] for item in candidate_index]
+            content = json.dumps({"fact_ids": ids})
+        else:
+            facts = json.loads(request.input_text)["facts"]
+            fact_id = facts[0]["fact_id"] if facts else ""
+            response = self.answer_payload or {
+                "supported_claims": ([{"text": f"Breakfast is at 06:30 and ends at 09:30 [{fact_id}].", "fact_ids": [fact_id]}] if fact_id else []),
+                "unknowns": [], "conflicts": [],
+            }
+            content = json.dumps(response)
+        return GenerationResult(
+            text=content, provider="fake", deployment="test", model="recorded-fake",
+            request_id=f"fake-{len(self.calls)}", usage=Usage(input_tokens=20, output_tokens=10, total_tokens=30),
+        )
+
+
+def build(provider: FakeProvider, facts: MemoryFacts | None = None) -> GroundedQAOrchestrator:
+    return GroundedQAOrchestrator(
+        provider=provider,
+        retriever=KnowledgeRetriever(facts or MemoryFacts()),
+        instructions=GROUNDED_QA_INSTRUCTIONS,
+        response_schema=HospitalityGroundedAnswer,
+        selection_instructions=FACT_SELECTION_INSTRUCTIONS,
+        selection_schema=FactSelection,
+    )
+
+
+def test_low_overlap_multilingual_question_gets_scoped_semantic_selection() -> None:
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[],
+    ))
+
+    assert answer.calls == 2
+    assert answer.usage.total_tokens == 60
+    assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
+    assert "06:30" in answer.answer and "09:30" in answer.answer
+
+
+def test_lexical_supported_question_uses_one_call_and_never_crosses_hotel() -> None:
+    provider = FakeProvider()
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="breakfast", history=[],
+    ))
+
+    assert answer.calls == 1
+    assert all(item["hotel_id"] == "HTL-CITY01" for item in answer.citations)
+    assert "F-HTL-BEACH02-040" not in answer.retrieval_fact_ids
+
+
+def test_guest_question_number_cannot_authorize_unsupported_model_number() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "The deposit is 999999 VND [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(provider).answer(
+            hotel_id="HTL-CITY01", question="Is the deposit 999999 VND?", history=[],
+        ))
+
+
+def test_unknown_only_answer_is_allowed_without_irrelevant_citation() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": ["That detail is not recorded and needs confirmation."], "conflicts": [],
+    })
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="Do you have a helipad?", history=[],
+    ))
+    assert answer.citations == ()
+    assert "needs confirmation" in answer.answer
+
+
+@pytest.mark.parametrize("field", ["unknowns", "conflicts"])
+@pytest.mark.parametrize("text", [
+    "The fee is 999999 VND.",
+    "Pay at https://unapproved.invalid/pay.",
+    "This is [F-OTHER-HOTEL-999].",
+])
+def test_untrusted_answer_sections_reject_unsupported_literals_and_foreign_references(field: str, text: str) -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [],
+        "unknowns": [],
+        "conflicts": [],
+        field: [text],
+    })
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(provider).answer(
+            hotel_id="HTL-CITY01", question="Do you have a helipad?", history=[],
+        ))
+
+
+def test_partial_answer_preserves_a_helpful_uncited_unknown() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast is on floor 1 [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": ["The available records do not say whether the hotel has a helipad."],
+        "conflicts": [],
+    })
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="Where is breakfast, and is there a helipad?", history=[],
+    ))
+    assert "floor 1" in answer.answer
+    assert "helipad" in answer.answer
+    assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
+
+
+def test_claim_fact_ids_are_rendered_as_server_controlled_citations() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "The buffet is at floor 1 and runs from 06:30 to 09:30.",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="When and where is breakfast?", history=[],
+    ))
+    assert answer.answer.endswith("[F-HTL-CITY01-040]")
+    assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
+
+
+def test_answer_model_payload_projects_only_semantic_fact_fields() -> None:
+    memory = MemoryFacts()
+    memory.facts.append(KnowledgeFact(
+        fact_id="F-HTL-CITY01-099", hotel_id="HTL-CITY01", topic="amenity",
+        subject="property", field="helipad", value=None, conditions={"availability": "not recorded"},
+        status="unknown", valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-SECRET", "api_key": "must-not-be-sent", "imported_at": "2026-10-22T00:00:00Z"},
+    ))
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast details are available.",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": ["The helipad is not recorded."], "conflicts": [],
+    })
+    answer = asyncio.run(build(provider, memory).answer(
+        hotel_id="HTL-CITY01", question="breakfast and helipad", history=[],
+    ))
+    request = json.loads(provider.calls[-1].input_text)
+    assert request["hotel_id"] == "HTL-CITY01"
+    assert any(item["status"] == "unknown" and item["field"] == "helipad" for item in request["facts"])
+    assert all(set(item) == {"fact_id", "topic", "subject", "field", "value", "conditions", "status"}
+               for item in request["facts"])
+    assert "provenance" not in provider.calls[-1].input_text
+    assert "valid_from" not in provider.calls[-1].input_text
+    assert "valid_to" not in provider.calls[-1].input_text
+    assert "must-not-be-sent" not in provider.calls[-1].input_text
+    assert answer.citations[0]["provenance"]["source_id"] == "SRC-1"
+
+
+def test_generic_conflict_text_uses_typed_fact_ids_for_supported_details() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "The available records describe breakfast hours differently.",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [],
+        "conflicts": ["The records differ; please confirm the current hours with the property."],
+    })
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="The records disagree about breakfast hours.", history=[],
+    ))
+    assert "[F-HTL-CITY01-040]" in answer.answer
+    assert "please confirm" in answer.answer
