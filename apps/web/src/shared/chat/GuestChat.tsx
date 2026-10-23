@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
 import type { AnswerRendererProps, DomainTarget } from "@/composition/registration";
+import { formatMediaTime } from "@/shared/chat/media-format";
 import {
   canStartRequest,
   claimRequest,
@@ -18,7 +19,9 @@ import {
   ApiError,
   createGuestSession,
   GuestMessageResponse,
+  GuestMediaDescriptor,
   GuestSession,
+  fetchGuestMedia,
   sendGuestMessage,
 } from "@/shared/api/client";
 
@@ -191,7 +194,12 @@ export function GuestChat({
                   )}
                 </div>
               )}
-              {turn.answer && <AnswerCard response={turn.answer} AnswerRenderer={AnswerRenderer} />}
+              {turn.answer && <AnswerCard
+                response={turn.answer}
+                session={session}
+                target={target}
+                AnswerRenderer={AnswerRenderer}
+              />}
             </article>
           ))}
           {sessionError && (
@@ -237,14 +245,25 @@ export function GuestChat({
 
 function AnswerCard({
   response,
+  session,
+  target,
   AnswerRenderer,
 }: {
   response: GuestMessageResponse;
+  session: GuestSession | null;
+  target: DomainTarget;
   AnswerRenderer: ComponentType<AnswerRendererProps>;
 }) {
   return (
     <div className="message message-assistant">
       <AnswerRenderer answer={response.answer} />
+      {!!response.media?.length && session && (
+        <div className="answer-media" aria-label="Approved hotel media">
+          {response.media.map((media) => (
+            <GuestMedia key={`${session.session_id}-${media.media_id}`} media={media} session={session} target={target} />
+          ))}
+        </div>
+      )}
       {!!response.unknowns.length && (
         <div className="unknown-block">
           <h2>Could not confirm</h2>
@@ -266,5 +285,83 @@ function AnswerCard({
         </details>
       )}
     </div>
+  );
+}
+
+function GuestMedia({ media, session, target }: {
+  media: GuestMediaDescriptor;
+  session: GuestSession;
+  target: DomainTarget;
+}) {
+  const [src, setSrc] = useState("");
+  const [captionsSrc, setCaptionsSrc] = useState("");
+  const [error, setError] = useState("");
+  const video = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let live = true;
+    const objectUrls: string[] = [];
+    const load = async () => {
+      try {
+        const blob = await fetchGuestMedia({
+          sessionId: session.session_id,
+          mediaId: media.media_id,
+          accessToken: session.access_token,
+          target,
+          signal: controller.signal,
+        });
+        if (!live) return;
+        const mediaUrl = URL.createObjectURL(blob);
+        objectUrls.push(mediaUrl);
+        setSrc(mediaUrl);
+        if (media.captions_media_id) {
+          const captions = await fetchGuestMedia({
+            sessionId: session.session_id,
+            mediaId: media.captions_media_id,
+            accessToken: session.access_token,
+            target,
+            signal: controller.signal,
+          });
+          if (!live) return;
+          const captionsUrl = URL.createObjectURL(captions);
+          objectUrls.push(captionsUrl);
+          setCaptionsSrc(captionsUrl);
+        }
+      } catch {
+        if (live && !controller.signal.aborted) setError("Approved media is temporarily unavailable.");
+      }
+    };
+    void load();
+    return () => {
+      live = false;
+      controller.abort();
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [media.media_id, media.captions_media_id, session.session_id, session.access_token, target]);
+
+  const timeReference = media.start_seconds !== undefined
+    ? `${formatMediaTime(media.start_seconds)}${media.end_seconds !== undefined ? `–${formatMediaTime(media.end_seconds)}` : ""}`
+    : "";
+  return (
+    <figure className="media-evidence">
+      {media.kind === "image" && src && <img src={src} alt={media.alt_text} /> /* eslint-disable-line @next/next/no-img-element */}
+      {media.kind === "video" && src && (
+        <video ref={video} controls preload="metadata" aria-label={media.alt_text}>
+          <source src={src} type="video/mp4" />
+          {captionsSrc && <track kind="captions" src={captionsSrc} srcLang="en" label="Captions" default />}
+        </video>
+      )}
+      {error && <p role="status">{error}</p>}
+      <figcaption>
+        <span>{media.caption}</span>
+        {timeReference && <button type="button" className="text-button" onClick={() => {
+          if (video.current) {
+            video.current.currentTime = media.start_seconds ?? 0;
+            void video.current.play();
+          }
+        }}>Play from {timeReference}</button>}
+      </figcaption>
+    </figure>
   );
 }

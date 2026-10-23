@@ -216,6 +216,33 @@ def test_unknown_only_answer_is_allowed_without_irrelevant_citation() -> None:
     assert "needs confirmation" in answer.answer
 
 
+def test_media_request_keeps_answer_grounded_and_leaves_attachment_binding_to_server() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "The king room has a balcony.",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01",
+        question="Does the room have a balcony? Show its authored illustration.",
+        history=[],
+    ))
+    assert answer.calls == 2  # one semantic retrieval selection plus the grounded answer
+    assert len(provider.calls) == 2
+    answer_input = json.loads(provider.calls[-1].input_text)
+    assert "media" not in answer_input
+    assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
+    assert "server attaches approved image, video, and caption media" in GROUNDED_QA_INSTRUCTIONS
+    assert "do not claim that an attachment is or is not available" in GROUNDED_QA_INSTRUCTIONS
+    assert "repeat the display request in `unknowns`" in GROUNDED_QA_INSTRUCTIONS
+    assert "`unknowns` must contain only unresolved factual hotel information" in GROUNDED_QA_INSTRUCTIONS
+    assert "Never infer visual properties from authored captions or media metadata" in GROUNDED_QA_INSTRUCTIONS
+    assert "if a visual detail is unsupported" in GROUNDED_QA_INSTRUCTIONS
+    assert "keep it unknown" in GROUNDED_QA_INSTRUCTIONS
+
+
 @pytest.mark.parametrize("field", ["unknowns", "conflicts"])
 @pytest.mark.parametrize("text", [
     "The fee is 999999 VND.",

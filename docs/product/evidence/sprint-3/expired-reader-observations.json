@@ -1,0 +1,7 @@
+{
+  "mode": "real isolated PostgreSQL reader",
+  "expired_source_and_fact_time": "2036-01-01",
+  "asset_bytes_returned": false,
+  "descriptors": 0,
+  "pass": true
+}

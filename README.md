@@ -1,6 +1,6 @@
 # StayLead Platform
 
-This repository contains the new StayLead platform and the Sprint 1 read-only guest Q&A API. It preserves the original repository
+This repository contains the new StayLead platform, guest Q&A website/API and trusted local knowledge-pack importer. It preserves the original repository
 identity and starts a modular monolith with two application hosts: a Python/FastAPI API in
 `apps/api` and a Next.js web application in `apps/web`. Internal module boundaries are code
 organization seams, not separately published libraries or services.
@@ -35,21 +35,24 @@ Sprint 1 acceptance, supported limits and evidence are recorded in
 - The web forwards guest traffic through a fixed same-origin proxy. The upstream API URL is
   server-only configuration; the browser receives only public profile and contract metadata.
 - The PostgreSQL engine factory is lazy; app import and startup do not connect or create schema.
-- `POST /v1/guest/sessions` creates a hotel-bound anonymous session from the server bootstrapped
-  allowlist; `POST /v1/guest/sessions/{session_id}/messages` sends a bounded FAQ request.
+- `GET /v1/guest/hotels/{slug}` resolves a registered hotel from PostgreSQL. `POST /v1/guest/sessions`
+  creates a hotel-bound anonymous session; `POST /v1/guest/sessions/{session_id}/messages` sends a bounded FAQ request.
 - Guest Q&A uses a scoped M1 fixture retriever followed by one M3 grounded answer call. A bounded
   semantic fact selector adds one call only when lexical coverage is weak, such as a different
   guest/source language. The Foundry Grok adapter is opt-in and configured on the API server.
 - PostgreSQL migrations and fixture bootstrap are explicit commands; API startup never creates or
   upgrades schema. Sessions, request idempotency, messages, config and eligible facts persist in
   PostgreSQL.
+- Approved media is projected from final validated citations and served through authenticated
+  `GET /v1/guest/sessions/{session_id}/media/{media_id}` requests. The web proxy preserves exact
+  binary bytes/MIME with bounded reads and `no-store`; the browser uses temporary Blob URLs.
 - The Hospitality composition factory rejects unsupported domain names.
 
 ## Not implemented
 
 The Sprint 1 endpoint supports read-only knowledge Q&A only. It does not edit a trip brief or
 invoke room allocation, itinerary planning, booking, payment, or staff actions. Real hotel sources,
-operator authorization, frontend chat, and deployment remain outside this slice. The checked-in
+operator authorization and deployment remain outside this slice. The checked-in
 hospitality fixture is synthetic and must not be presented as live hotel information.
 The hospitality fixtures include an authored synthetic knowledge pack with prepared oracle
 cases for QA; it is not a production knowledge source or live hotel data
@@ -105,6 +108,33 @@ pytest or any default validation command; its expected fact IDs are evaluation-o
 loaded into serving knowledge.
 
 ## Local validation
+
+### Complete local hotel packs (Sprint 3)
+
+Pack schema v1 supports a single new synthetic hotel, approved facts and authored PNG/MP4/VTT evidence.
+Apply database schema v3 explicitly, then run the trusted CLI with an allowlisted parent directory:
+
+```sh
+cd apps/api
+python -m staylead_platform.infrastructure.migrations upgrade
+STAYLEAD_KNOWLEDGE_PACK_ROOT=../../fixtures/hospitality \
+  python -m staylead_platform.entrypoints.import_pack ../../fixtures/hospitality/media-pack-v1
+```
+
+Configure the private database URL separately as described above. Import validates the entire pack before
+one transaction publishes hotel config, sources, facts and verified media bytes. Identical content and
+asset hashes replay as a no-op; changed content/version for an existing hotel is rejected. This CLI
+does not refresh, append or revoke existing packs. The sample adds `garden-terrace-demo`; open
+`/hotels/garden-terrace-demo/chat` directly without adding a per-hotel route or registry entry.
+
+Limits: 400 guest facts, PNG 5 MiB, MP4 20 MiB, UTF-8 VTT 256 KiB, complete pack including manifest
+64 MiB. Each fact has one source version in schema v1. Media needs whole-file guest approval;
+segment approval alone is rejected. `ffmpeg` and `ffprobe` must be available for decoding and actual
+duration verification. Assets are synthetic illustrations and authored captions, not raw-media AI
+understanding or real-property approval. Guest media uses authenticated session-bound binary requests,
+with server-selected mappings from validated final citations; no bearer token or arbitrary media URL
+is included in a public descriptor. See the [Sprint 3 acceptance](docs/product/SPRINT_3_ACCEPTANCE.md)
+for exact evidence, versions and remaining limitations.
 
 After installing the API development dependencies, run the API smoke and architecture checks
 from `apps/api`:

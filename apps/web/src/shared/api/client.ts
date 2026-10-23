@@ -19,11 +19,38 @@ export type GuestEvidence = Readonly<{
   imported_at: string;
 }>;
 
+export type GuestMediaDescriptor = Readonly<{
+  media_id: string;
+  hotel_id: string;
+  fact_ids: readonly string[];
+  kind: "image" | "video";
+  mime_type: "image/png" | "video/mp4";
+  byte_size: number;
+  sha256: string;
+  caption: string;
+  alt_text: string;
+  source_id: string;
+  source_version: string;
+  start_seconds?: number;
+  end_seconds?: number;
+  duration_seconds?: number;
+  captions_media_id?: string;
+}>;
+
+export type GuestHotel = Readonly<{
+  hotel_id: string;
+  hotel_slug: string;
+  public_config: Record<string, unknown>;
+  config_version: string;
+  guest_contract_version: string;
+}>;
+
 export type GuestMessageResponse = Readonly<{
   request_id: string;
   status: "completed";
   answer: string;
   evidence: readonly GuestEvidence[];
+  media: readonly GuestMediaDescriptor[];
   unknowns: readonly string[];
   trace: Readonly<Record<string, unknown>>;
   config_version: string;
@@ -161,11 +188,26 @@ export async function createGuestSession(args: {
   target: DomainTarget;
 }): Promise<GuestSession> {
   await getGuestContract(args.target);
+  await getGuestHotel({ hotelSlug: args.hotelSlug, target: args.target });
   return request<GuestSession>(endpoint(args.target, "/sessions"), {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ hotel_slug: args.hotelSlug }),
   });
+}
+
+export async function getGuestHotel(args: { hotelSlug: string; target: DomainTarget }): Promise<GuestHotel> {
+  const slug = encodeURIComponent(args.hotelSlug);
+  const hotel = await request<GuestHotel>(endpoint(args.target, `/hotels/${slug}`));
+  if (hotel.hotel_slug !== args.hotelSlug || hotel.guest_contract_version !== args.target.guestContractVersion) {
+    throw new ApiError({
+      status: 409,
+      code: "hotel_contract_mismatch",
+      message: "This hotel is not available for the selected website.",
+      outcome: "rejected",
+    });
+  }
+  return hotel;
 }
 
 export async function sendGuestMessage(args: {
@@ -184,4 +226,34 @@ export async function sendGuestMessage(args: {
     },
     body: JSON.stringify({ request_id: args.requestId, question: args.question }),
   });
+}
+
+export async function fetchGuestMedia(args: {
+  sessionId: string;
+  mediaId: string;
+  accessToken: string;
+  target: DomainTarget;
+  signal: AbortSignal;
+}): Promise<Blob> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  const mediaId = encodeURIComponent(args.mediaId);
+  let response: Response;
+  try {
+    response = await fetch(endpoint(args.target, `/sessions/${sessionId}/media/${mediaId}`), {
+      method: "GET",
+      cache: "no-store",
+      signal: args.signal,
+      headers: { accept: "image/png, video/mp4, text/vtt", authorization: `Bearer ${args.accessToken}` },
+    });
+  } catch {
+    throw new ApiError({ status: 0, code: "media_unavailable", message: "Hotel media could not be loaded.", retryable: true, outcome: "unknown" });
+  }
+  if (!response.ok) {
+    throw new ApiError({ status: response.status, code: "media_unavailable", message: "Hotel media could not be loaded.", outcome: "rejected" });
+  }
+  const mime = response.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
+  if (!mime || !["image/png", "video/mp4", "text/vtt"].includes(mime)) {
+    throw new ApiError({ status: 502, code: "invalid_media_type", message: "Hotel media could not be displayed.", outcome: "rejected" });
+  }
+  return response.blob();
 }

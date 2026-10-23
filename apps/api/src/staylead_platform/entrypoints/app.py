@@ -3,7 +3,7 @@
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.engine import Engine
 
@@ -66,6 +66,10 @@ def create_app(
     async def open_guest_session(body: CreateSessionRequest) -> dict[str, Any]:
         return guest_chat.open_session(body.hotel_slug)
 
+    @app.get("/v1/guest/hotels/{hotel_slug}", tags=["guest chat"])
+    async def lookup_guest_hotel(hotel_slug: str) -> dict[str, Any]:
+        return guest_chat.lookup_hotel(hotel_slug)
+
     @app.post("/v1/guest/sessions/{session_id}/messages", tags=["guest chat"])
     async def send_message(
         session_id: str,
@@ -82,6 +86,21 @@ def create_app(
         return await guest_chat.send_message(
             session_id=session_id, token=authorization[7:],
             request_id=body.request_id, question=body.question,
+        )
+
+    @app.get("/v1/guest/sessions/{session_id}/media/{media_id}", tags=["guest media"])
+    def get_guest_media(
+        session_id: str,
+        media_id: str,
+        authorization: str | None = Header(default=None),
+    ) -> Response:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        asset = guest_chat.read_media(session_id=session_id, token=authorization[7:], media_id=media_id)
+        return Response(
+            content=asset.content,
+            media_type=asset.mime_type,
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
         )
 
     return app

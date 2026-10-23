@@ -1,0 +1,424 @@
+{
+  "model": "grok-4-1-fast-reasoning",
+  "deployment": "cc-dev-grok-4-1-fast-reasoning",
+  "candidate_source_sha256": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+  "guest_attempts": 5,
+  "observed_provider_calls": 10,
+  "usage_reported": {
+    "input_tokens": 6391,
+    "output_tokens": 323,
+    "total_tokens": 13899
+  },
+  "monetary_cost": "unknown",
+  "missing_usage_failures": false,
+  "notes": [
+    "First two image attempts ran earlier prompt versions and are retained as failures, including HTTP200 semantic failure.",
+    "Final three cases ran one fresh session on reviewed final prompt; no live cases repeated afterward.",
+    "Provider total is retained, not recomputed from input/output.",
+    "Only generated structured JSON retained; no hidden reasoning or LLM judge."
+  ],
+  "provider_observations": [
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "64dd7fcc-e233-43d9-8d11-f390abec3612",
+      "usage": {
+        "input_tokens": 409,
+        "output_tokens": 9,
+        "total_tokens": 853
+      },
+      "output_json": "{\"fact_ids\":[\"fact-room-balcony\"]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "9f6261a5-f957-440f-8f64-a84fb1d065a6",
+      "usage": {
+        "input_tokens": 617,
+        "output_tokens": 58,
+        "total_tokens": 1171
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"Yes, the king room has a balcony.\",\"fact_ids\":[\"fact-room-balcony\"]},{\"text\":\"No authored illustration is available in the approved room record.\",\"fact_ids\":[]}],\"unknowns\":[\"Unable to show the authored illustration.\"],\"conflicts\":[]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "a48b5272-2fa4-47d7-8d7d-6b50bf8e39fd",
+      "usage": {
+        "input_tokens": 409,
+        "output_tokens": 9,
+        "total_tokens": 698
+      },
+      "output_json": "{\"fact_ids\":[\"fact-room-balcony\"]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "a0c69ffd-2472-43ba-939d-122d430fafa1",
+      "usage": {
+        "input_tokens": 729,
+        "output_tokens": 61,
+        "total_tokens": 1609
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"Yes, according to the approved room record, the king room has a balcony.\",\"fact_ids\":[\"fact-room-balcony\"]},{\"text\":\"King room balcony.\",\"fact_ids\":[\"fact-room-balcony\"]}], \"unknowns\":[\"Authored illustration.\"], \"conflicts\":[]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "e61d3812-59c4-49ac-8d84-38939895bb64",
+      "usage": {
+        "input_tokens": 409,
+        "output_tokens": 9,
+        "total_tokens": 814
+      },
+      "output_json": "{\"fact_ids\":[\"fact-room-balcony\"]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "61502e0c-6e18-4f50-9653-20dac93120f7",
+      "usage": {
+        "input_tokens": 798,
+        "output_tokens": 57,
+        "total_tokens": 1351
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"Yes, according to the approved room record, the king room has a balcony.\",\"fact_ids\":[\"fact-room-balcony\"]},{\"text\":\"The king room has a balcony.\",\"fact_ids\":[\"fact-room-balcony\"]}],\"unknowns\":[],\"conflicts\":[]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "c07e6b8e-1eec-49af-8dd6-9cc9b8acdfb1",
+      "usage": {
+        "input_tokens": 484,
+        "output_tokens": 13,
+        "total_tokens": 938
+      },
+      "output_json": "{\"fact_ids\":[\"fact-pool-view\",\"fact-pool-clip-window\"]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "a83973fe-5a66-4689-b5e4-c2d67dbd9018",
+      "usage": {
+        "input_tokens": 941,
+        "output_tokens": 73,
+        "total_tokens": 2258
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"According to the authored records, the pool clip describes a garden-facing view.\",\"fact_ids\":[\"fact-pool-view\",\"fact-pool-clip-window\"]},{\"text\":\"The approved time reference for the pool clip spans 0.5 to 2.5 seconds.\",\"fact_ids\":[\"fact-pool-clip-window\"]}],\"unknowns\":[],\"conflicts\":[]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "79823a5b-96e4-42d5-933d-065afed1543b",
+      "usage": {
+        "input_tokens": 569,
+        "output_tokens": 13,
+        "total_tokens": 1698
+      },
+      "output_json": "{\"fact_ids\":[\"fact-visual-unknown\",\"fact-pool-clip-window\"]}"
+    },
+    {
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "1465f1a2-1036-490d-b4c1-82ac17bf176d",
+      "usage": {
+        "input_tokens": 1026,
+        "output_tokens": 21,
+        "total_tokens": 2509
+      },
+      "output_json": "{\"supported_claims\":[],\"unknowns\":[\"Whether the pool has step-free wheelchair access\"],\"conflicts\":[]}"
+    }
+  ],
+  "guest_observations": [
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/7b394643-c8ec-45e5-8da8-c356c79494ff/messages",
+      "status": 502,
+      "provider_mode": "live",
+      "question": "According to the approved room record, does the king room have a balcony? Show its authored illustration.",
+      "response": {
+        "error": {
+          "code": "invalid_model_output",
+          "message": "The model returned an invalid answer.",
+          "retryable": false
+        }
+      },
+      "assessment": "failed invalid uncited no-illustration assertion",
+      "version_identity": {
+        "source_fingerprint": "e001bf55e9d9845ae5d937c2e253de673ff18b3320fa0b47a691858e154b1451",
+        "prompt_sha256": "26e65ef27fb206856d29e0c7af259515e42c07adcf6c1a53a8d6cb8c8c764717"
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/7b394643-c8ec-45e5-8da8-c356c79494ff/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "According to the approved room record, does the king room have a balcony? Show its authored illustration.",
+      "response": {
+        "request_id": "a7d73f18-5fd4-441b-855c-ec0e7daa1566",
+        "answer": "Yes, according to the approved room record, the king room has a balcony. [fact-room-balcony]\nKing room balcony. [fact-room-balcony]\nAuthored illustration.",
+        "evidence": [
+          {
+            "fact_id": "fact-room-balcony",
+            "hotel_id": "HTL-S3-FOURTH",
+            "source_id": "source-hotel-guide",
+            "source_version": "1",
+            "section": "Rooms",
+            "fact_version": "1",
+            "imported_at": "2026-10-23T11:40:57.942092+07:00"
+          }
+        ],
+        "status": "completed",
+        "unknowns": [
+          "Authored illustration."
+        ],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "a0c69ffd-2472-43ba-939d-122d430fafa1",
+          "provider_request_ids": [
+            "a48b5272-2fa4-47d7-8d7d-6b50bf8e39fd",
+            "a0c69ffd-2472-43ba-939d-122d430fafa1"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1138,
+            "output_tokens": 70,
+            "total_tokens": 2307
+          },
+          "retrieved_fact_ids": [
+            "fact-room-balcony"
+          ],
+          "failure_stage": null
+        },
+        "media": [
+          {
+            "media_id": "media-room",
+            "hotel_id": "HTL-S3-FOURTH",
+            "fact_ids": [
+              "fact-room-balcony"
+            ],
+            "kind": "image",
+            "mime_type": "image/png",
+            "byte_size": 4899,
+            "sha256": "2f0febb4239e6f57023f0117f6c3eb1e5a3ccd53a550e040a48bf8a7a7008705",
+            "caption": "Authored illustrative caption: synthetic drawing of a guest room with a balcony.",
+            "alt_text": "Synthetic illustration of a guest room balcony; not a photograph.",
+            "source_id": "source-hotel-guide",
+            "source_version": "1"
+          }
+        ],
+        "config_version": "1",
+        "state_version": 1
+      },
+      "assessment": "failed semantic unknown presentation request despite correct attachment",
+      "version_identity": {
+        "source_fingerprint": "72666cb56115dba92a0aa769845a09ac0ce7ab138339a1d4d1b400927d273d82",
+        "prompt_sha256": "a4b0c6a22309d83cca02bf8ee5071e354ce159645c931928dbcc1fc675b224d5"
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/f1acd2a8-cf7c-49b6-b696-f98b00783c8b/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "According to the approved room record, does the king room have a balcony? Show its authored illustration.",
+      "response": {
+        "request_id": "5b11aa9c-f05d-49d8-ad36-041170462932",
+        "answer": "Yes, according to the approved room record, the king room has a balcony. [fact-room-balcony]\nThe king room has a balcony. [fact-room-balcony]",
+        "evidence": [
+          {
+            "fact_id": "fact-room-balcony",
+            "hotel_id": "HTL-S3-FOURTH",
+            "source_id": "source-hotel-guide",
+            "source_version": "1",
+            "section": "Rooms",
+            "fact_version": "1",
+            "imported_at": "2026-10-23T11:40:57.942092+07:00"
+          }
+        ],
+        "status": "completed",
+        "unknowns": [],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "61502e0c-6e18-4f50-9653-20dac93120f7",
+          "provider_request_ids": [
+            "e61d3812-59c4-49ac-8d84-38939895bb64",
+            "61502e0c-6e18-4f50-9653-20dac93120f7"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1207,
+            "output_tokens": 66,
+            "total_tokens": 2165
+          },
+          "retrieved_fact_ids": [
+            "fact-room-balcony"
+          ],
+          "failure_stage": null
+        },
+        "media": [
+          {
+            "media_id": "media-room",
+            "hotel_id": "HTL-S3-FOURTH",
+            "fact_ids": [
+              "fact-room-balcony"
+            ],
+            "kind": "image",
+            "mime_type": "image/png",
+            "byte_size": 4899,
+            "sha256": "2f0febb4239e6f57023f0117f6c3eb1e5a3ccd53a550e040a48bf8a7a7008705",
+            "caption": "Authored illustrative caption: synthetic drawing of a guest room with a balcony.",
+            "alt_text": "Synthetic illustration of a guest room balcony; not a photograph.",
+            "source_id": "source-hotel-guide",
+            "source_version": "1"
+          }
+        ],
+        "config_version": "1",
+        "state_version": 1
+      },
+      "assessment": "pass image fact and approved caption",
+      "version_identity": {
+        "source_fingerprint": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+        "prompt_sha256": "9a3408f09976478929fd1cf1d83cdeb3e8d844be9e6bfff254eb6f95b70cbffd"
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/f1acd2a8-cf7c-49b6-b696-f98b00783c8b/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "According to the authored records, what view does the pool clip describe and what is its approved time reference? Show the clip.",
+      "response": {
+        "request_id": "5158481b-44db-4f12-990b-c64852410bbd",
+        "answer": "According to the authored records, the pool clip describes a garden-facing view. [fact-pool-view] [fact-pool-clip-window]\nThe approved time reference for the pool clip spans 0.5 to 2.5 seconds. [fact-pool-clip-window]",
+        "evidence": [
+          {
+            "fact_id": "fact-pool-view",
+            "hotel_id": "HTL-S3-FOURTH",
+            "source_id": "source-hotel-guide",
+            "source_version": "1",
+            "section": "Facilities",
+            "fact_version": "1",
+            "imported_at": "2026-10-23T11:40:57.942092+07:00"
+          },
+          {
+            "fact_id": "fact-pool-clip-window",
+            "hotel_id": "HTL-S3-FOURTH",
+            "source_id": "source-hotel-guide",
+            "source_version": "1",
+            "section": "Facilities",
+            "fact_version": "1",
+            "imported_at": "2026-10-23T11:40:57.942092+07:00"
+          }
+        ],
+        "status": "completed",
+        "unknowns": [],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "a83973fe-5a66-4689-b5e4-c2d67dbd9018",
+          "provider_request_ids": [
+            "c07e6b8e-1eec-49af-8dd6-9cc9b8acdfb1",
+            "a83973fe-5a66-4689-b5e4-c2d67dbd9018"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1425,
+            "output_tokens": 86,
+            "total_tokens": 3196
+          },
+          "retrieved_fact_ids": [
+            "fact-pool-view",
+            "fact-pool-clip-window"
+          ],
+          "failure_stage": null
+        },
+        "media": [
+          {
+            "media_id": "media-pool-clip",
+            "hotel_id": "HTL-S3-FOURTH",
+            "fact_ids": [
+              "fact-pool-clip-window",
+              "fact-pool-view"
+            ],
+            "kind": "video",
+            "mime_type": "video/mp4",
+            "byte_size": 24867,
+            "sha256": "978d55b84cf3b487d0c347f98d5f0c2c9f4f80b28d64385c3e4486775b5247ca",
+            "caption": "Authored illustrative caption: synthetic garden-facing pool clip; not a recording of the property.",
+            "alt_text": "Synthetic colored animation used to demonstrate clip playback; not property footage.",
+            "source_id": "source-hotel-guide",
+            "source_version": "1",
+            "start_seconds": 0.5,
+            "end_seconds": 2.5,
+            "duration_seconds": 3.0,
+            "captions_media_id": "media-pool-vtt"
+          }
+        ],
+        "config_version": "1",
+        "state_version": 2
+      },
+      "assessment": "pass clip/caption and time reference",
+      "version_identity": {
+        "source_fingerprint": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+        "prompt_sha256": "9a3408f09976478929fd1cf1d83cdeb3e8d844be9e6bfff254eb6f95b70cbffd"
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/f1acd2a8-cf7c-49b6-b696-f98b00783c8b/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "Can you confirm from that illustration or video that the pool has step-free wheelchair access?",
+      "response": {
+        "request_id": "728564ab-91c7-4eac-bc6f-1ce13209ce41",
+        "answer": "Whether the pool has step-free wheelchair access",
+        "evidence": [],
+        "status": "completed",
+        "unknowns": [
+          "Whether the pool has step-free wheelchair access"
+        ],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "1465f1a2-1036-490d-b4c1-82ac17bf176d",
+          "provider_request_ids": [
+            "79823a5b-96e4-42d5-933d-065afed1543b",
+            "1465f1a2-1036-490d-b4c1-82ac17bf176d"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1595,
+            "output_tokens": 34,
+            "total_tokens": 4207
+          },
+          "retrieved_fact_ids": [
+            "fact-visual-unknown",
+            "fact-pool-clip-window"
+          ],
+          "failure_stage": null
+        },
+        "media": [],
+        "config_version": "1",
+        "state_version": 3
+      },
+      "assessment": "pass unsupported visual inference unknown",
+      "version_identity": {
+        "source_fingerprint": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+        "prompt_sha256": "9a3408f09976478929fd1cf1d83cdeb3e8d844be9e6bfff254eb6f95b70cbffd"
+      }
+    }
+  ]
+}

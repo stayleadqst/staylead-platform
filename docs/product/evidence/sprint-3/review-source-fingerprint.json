@@ -1,0 +1,768 @@
+{
+  "baseline": "21ef9a222236b9d46afd236310670c599c40dea4",
+  "scope": "all tracked and untracked files under apps/, tests/, fixtures/, plus AGENTS.md; ignored generated outputs excluded",
+  "file_count": 189,
+  "sha256": "5b7f71cba464767f9d73ce59fc352c0b32556477378d6b8bb0c46d4b430a4384",
+  "relation_to_live_candidate": {
+    "sha256": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+    "only_change": "tests/contracts/test_sprint3_media_api.py removes one trailing newline; product source identical"
+  },
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "dcd8aafd6abf3056e5ce68564e92323806f8fa18adcb258b0c7829d19a8aef95"
+    },
+    {
+      "path": "apps/api/.env.example",
+      "sha256": "2c1bba68132547d9cb8832ba7b6f372d54cdcc74122bbf2ba52ce5a248530466"
+    },
+    {
+      "path": "apps/api/pyproject.toml",
+      "sha256": "85268e368d8bfdefe923fb34de900ccb8d9689f59eba0401763ff295e3d182d4"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/__init__.py",
+      "sha256": "d3aa61f1e162cdfa69a1757c42026be3637d35d0108aad5c774ce4581e678965"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/configuration/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/configuration/settings.py",
+      "sha256": "f8b52ec760e482e4c8702d0a1f10e828d82e60c77de2cc70adce10bec79384cd"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/dependencies/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+      "sha256": "000fc66878ef680ef0272658493c9d9db978e67b18bd9dc6761e5e275f6160bd"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/domain_registry/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/startup/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/startup/domain_profile.py",
+      "sha256": "0c54f73361774edcae871772e997a6f7ddd95b06b8ad6ab409c6eb044014df1d"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/policies/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/prompts/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+      "sha256": "9a3408f09976478929fd1cf1d83cdeb3e8d844be9e6bfff254eb6f95b70cbffd"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/recommendations/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/registration/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/registration/fixture_pack.py",
+      "sha256": "3cbf29a6da0e1b5f11544c070929186f08df2d66e26e9f4f7c0b65b034f1cca0"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/registration/pack_schema.py",
+      "sha256": "240d7dca00017211311cb2d93966283ccc72e2b6583f9aab5efc7cf41fc49e50"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/rooms/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/schemas/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/schemas/fact_selection.py",
+      "sha256": "9fec998536d7e029a6c45931ff730a285adfb67460387b4eac5dee3f2fa335e3"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py",
+      "sha256": "9ddb1b319742cba4059ed495c09771a2e7d647f1d017b74373ef50ee8be01017"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/stay/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/domains/hospitality/tools/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/__main__.py",
+      "sha256": "64c56396ed7deedb2c170c016417659a9fd6c4bf048f546811f6f180ddb7b929"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/app.py",
+      "sha256": "8e4d345f438f0d6fa5d08c63456dc2e0efa12ea44f1812f07b84a8cbcfae2380"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/bootstrap_knowledge.py",
+      "sha256": "a21bb1cb6393a30e44438580fc1a06b79f38a6921ce448a699f2346c8c44529d"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/import_pack.py",
+      "sha256": "756c761ccef6effce7f93aa01fd29c7908c84bd301b8a5e3bd554f606cad8a2a"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/jobs/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/operator/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/entrypoints/public_chat/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/ai_provider.py",
+      "sha256": "444b06adf37077c9dc9472e3d2bf169843a737e08e09fde4ad700e02e27ff5aa"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/database.py",
+      "sha256": "f4a26793df4ee0374e2b09e4d2f21a9bfed54829e8a894a3e6680ca567eeb14b"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/identity/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/migrations/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/migrations/__main__.py",
+      "sha256": "1d5fcee7261b7f4ae2dca2923113c8daf16d055347e04893370eff0d601a0beb"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/observability/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/knowledge_repository.py",
+      "sha256": "f3a459d2e8b28a9f66a2f8d082604b5ebd9290b4fbe3e4aac2c81f10d14517c0"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/media_repository.py",
+      "sha256": "3f078e1d309704a12608e9608ec2bc9c18048f5c8e5442f02c8338c9f55717b3"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/pack_repository.py",
+      "sha256": "48959e9f397ca369863d41c9a0a386fa3b277633355aa7d439f9659e5d820cff"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "sha256": "beb97d77bdf6ab43dfd0df40b060c56e8e18e149f4661da0005f901c9f1d2695"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/search/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/source_connectors/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/source_connectors/hospitality_pack.py",
+      "sha256": "f339bc0c412724601768550621702ae9d00dd5379f9ac014d67bfecabe0584dc"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/source_connectors/knowledge_v1.py",
+      "sha256": "09f5979761beaa95331fdc2d7e8b89d39f2b0ad83d49c39400c15b0894f7c513"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/ai_runtime/execution/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/ai_runtime/providers/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/ai_runtime/structured_io/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/ai_runtime/usage/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/contracts/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/contracts/ai_provider.py",
+      "sha256": "2ae23047eb2e0751086e7c8936493e02edd11b3f455ef55610ba1c127726ff35"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/contracts/knowledge.py",
+      "sha256": "c39ac8f64172e593f4e803f33b617a958b1a13a015fb426decd6cba64a479ff9"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/contracts/state.py",
+      "sha256": "490683c581786c1556d941fa17ea55ae21a4c7b2333e940fe366cf53e04ed6b7"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/clarification/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/evidence/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/orchestrator/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py",
+      "sha256": "900025fa200dd61156c2c933f939b28ecc52120eb423a2573619cc8e7c05905c"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/responses/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/retrieval/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/tool_execution/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/conversation/understanding/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/guest_context/brief/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/guest_context/patches/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/guest_context/results/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/guest_context/sessions/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/guest_context/sessions/signing.py",
+      "sha256": "410e4fc3a49434d0187e0ae1e0b3925c563b31a060bcd42eb28e7c80975e1d94"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/knowledge/ingestion/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/knowledge/lifecycle/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/knowledge/provenance/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/knowledge/retrieval/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/api/src/staylead_platform/platform/knowledge/retrieval/retriever.py",
+      "sha256": "4c0d07cf15619a7aa6550736e008b7a31a44789426a547919888c2dfd4377699"
+    },
+    {
+      "path": "apps/web/.env.example",
+      "sha256": "fd4d329040fc25348004f9b56a39d002613a6c830042212ea861247404fb05b0"
+    },
+    {
+      "path": "apps/web/eslint.config.mjs",
+      "sha256": "927cc3e7a3599cc1d6386a5fa73a6db71be3bd5f0c0d0e5222366614c7d5f9e5"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "sha256": "ab4c61f6ee100ae43610a18512f1ebcec842bb2405431e1009266173f21cf772"
+    },
+    {
+      "path": "apps/web/package-lock.json",
+      "sha256": "ace50ea86d69ea9423e3a5fcccbf658124d39b1c75d56421822e8a9ba2bd1816"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "50eb7ce3e38f6e32445e998ba6c2ee922de86f2c84ab510dfa27f74bc9b3dc72"
+    },
+    {
+      "path": "apps/web/src/app/api/guest/[...path]/route.ts",
+      "sha256": "1fbdcee29a98daa4639446173fa6f97912627c8395ca3100aec2940a148fd89c"
+    },
+    {
+      "path": "apps/web/src/app/globals.css",
+      "sha256": "0d572c341cffff34fa1f4cdcdb817b31ab4c07aa4d03c385aa268d58924e346c"
+    },
+    {
+      "path": "apps/web/src/app/hotels/[hotelSlug]/chat/page.tsx",
+      "sha256": "4d77fcae106017f5a126dfe71ce404c28f520db294a7dea389e953ca582bad8e"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "sha256": "5f06ee301bddd694222531a6e1763f37abf34901cc525a0e88d7c437f7e9ce8b"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "sha256": "e6ac57f064a9cc0861783dc2334a695b84541497bf7cb73f0b793fb87ec84843"
+    },
+    {
+      "path": "apps/web/src/composition/GuestChatExperience.tsx",
+      "sha256": "455dc38401cc9b91da4ee46a71e4dcc117ed6639773fb8514f36901ab6362eae"
+    },
+    {
+      "path": "apps/web/src/composition/domain_registry.ts",
+      "sha256": "9e3870d03888716f9d7f85ee40e39e0c30b38bef99baf6c81a2c2ef35ba07d1e"
+    },
+    {
+      "path": "apps/web/src/composition/hospitality.tsx",
+      "sha256": "aa0cc3b38f85fa5c70aee4038f9a7571db8c5c5e44472ea6943c79859f04784e"
+    },
+    {
+      "path": "apps/web/src/composition/registration.tsx",
+      "sha256": "2a6cd4d97af8ec1cb4e73558d6c4e735047245652d36693cb8cfd9913bd15f67"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/assets/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/content/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/landing/HospitalityLanding.module.css",
+      "sha256": "4a351abbb74be619c9ca97fc02e462adf26467136b4c0fce5615dd4a2df0bfd2"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/landing/HospitalityLanding.tsx",
+      "sha256": "b22a6ddfed315bb32667d3eaf8532753ff347b7776e1abb29a49a7d271aa76e7"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/registration/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/registration/index.tsx",
+      "sha256": "6cca6bf3a4122483c5e26236714f0fe077fc9823d85f217c516f7f282e866e9b"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/result_views/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/domains/hospitality/theme/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/experiences/demo/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/experiences/guest/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/experiences/marketing/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/experiences/operator/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/api/client.ts",
+      "sha256": "858c629a7370a488387cd4840684413cfc11071b3efd5f51a2ff47a1c842fcf5"
+    },
+    {
+      "path": "apps/web/src/shared/api/proxy-url.ts",
+      "sha256": "59e5c9664c4bfd86cfed54467cf12ac3b041fd6a8a119234f298edbfeee5c093"
+    },
+    {
+      "path": "apps/web/src/shared/api_client/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/chat/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/chat/GuestChat.tsx",
+      "sha256": "dee18db6fd1fcff7f638375bc61a03c33227ab8509f01938a7a27654f5a12fd3"
+    },
+    {
+      "path": "apps/web/src/shared/chat/chat-state.ts",
+      "sha256": "28d6fe81d3e3ae0d3297c09c8d6f764ed9de7770180c552d8c3e60048682c3c1"
+    },
+    {
+      "path": "apps/web/src/shared/chat/media-format.ts",
+      "sha256": "e74846bd4c2926bd9bb3c74efd9cb8f816ef8db6fbfcd8da2d1c558482aee55c"
+    },
+    {
+      "path": "apps/web/src/shared/components/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/localization/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/rendering/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/src/shared/session/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/web/tests/api-client.test.mjs",
+      "sha256": "dcb09728586712a04f084c33fca02f4606f2b989576c5af571934212721923e1"
+    },
+    {
+      "path": "apps/web/tests/chat-state.test.mjs",
+      "sha256": "8864e95f00baff599be54dd8133fccb7c91327b7f4cb68b70811de41d4b436b6"
+    },
+    {
+      "path": "apps/web/tests/media-format.test.mjs",
+      "sha256": "0030b57c3d8d47d977fe79e580a1b8b14628615fbb8e8892327ff8368a9227cd"
+    },
+    {
+      "path": "apps/web/tests/proxy-url.test.mjs",
+      "sha256": "1bb379b6c50eaf10a5710d840aea9ca73ac238dab7805fb093b10216f0e8065b"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "sha256": "ab278bd42f607da53f9bb3403e2d5085944223d24e424c4feb89e152f27209f1"
+    },
+    {
+      "path": "fixtures/hospitality/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/README.md",
+      "sha256": "1726b76ec3d021d90ae7be0faea9a09af45c6bd34bc4646216bc95b76e249fa8"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/evaluation/README.txt",
+      "sha256": "04f8dcbcb21008b5316a7f5893ae41faf67ba1f2fd67155ed3ee7939fba607af"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/evaluation/cases.jsonl",
+      "sha256": "5acdbe51a21003faf8f752135a8b9b44967c33e8053ee94c7361565a82fb262d"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/evaluation/coverage.json",
+      "sha256": "a153359b3298687adb1721cd1a565abda6bc7bed8b116edd09bf37984e4e717d"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/evaluation/validate_evaluation.py",
+      "sha256": "4055043c3c32f952b3c714ff03e80934ce6f083e3ef1718917c0c807d1ff2cfe"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/facts.json",
+      "sha256": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/generate_knowledge.py",
+      "sha256": "6070772d79bf6ca7d552f8a8d8eb32e0b3b718bce65a1b7f8cadfe2d55d7369e"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/lifecycle_scenarios.json",
+      "sha256": "54d6f5669ca6ff32d6af5a35c1fffc0069e4659b4081cdd84c66abba3a76ae24"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/manifest.json",
+      "sha256": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/README.txt",
+      "sha256": "02ca6b6afdc12df716212d573974440e819fe0482c49d711428872229d974440"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/amenities-sign.png",
+      "sha256": "93b5212ae3670efddccf07ec0ce3067814d0708efeac09923838e425691dcecb"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/amenities-sign.svg",
+      "sha256": "ae2372697381cc4edae5ea16be40c01ebc73af5c2e7c98967fa260b051511abf"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/illustrative-room-layout.png",
+      "sha256": "f9523e7403274ebf60499aa392ed6906ff449b0317fc5b92e94f11d6e002b0b8"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/illustrative-room-layout.svg",
+      "sha256": "f5194061fc97a7bcb5ce3592b1ce2b244c5c195e2548ded94ab96f0fc6aa42c2"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/information-sign.png",
+      "sha256": "9ad3865fbe04a09746f535fb9b8fb16976825bd5640e2aa89e5be6ac8593952b"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/information-sign.svg",
+      "sha256": "7269fad036c20d41a694487be1549ec1bd5b06e2abf0f2635a650ef18e6e7a8f"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/synthetic-tour-transcript.json",
+      "sha256": "832ba3b78ebe077eb16c8d4da40147024300eb6cfef96bfa2ba5aaec5b692172"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/synthetic-tour.mp4",
+      "sha256": "bf30f92735cea6034e304689da26ed776ff7c584b828e47e3e33d74622a9d5e5"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-BEACH02/synthetic-tour.vtt",
+      "sha256": "c3e52f3a9b3233e0d38d370179d5bfddd6f32ad39e95c75987464b290ff8167b"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/amenities-sign.png",
+      "sha256": "5dc84b342763c6446ec827e37b75803f7d5a799fdeb987ee9adbaabbd304d348"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/amenities-sign.svg",
+      "sha256": "1e333b2319bda645804c566be227e3b5160c729b0bbd89504cfd75f36a089319"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/illustrative-room-layout.png",
+      "sha256": "acd9bc5b49c935bc17e932a5ad398d1c996c7ba12c908c0aedb059fece043f40"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/illustrative-room-layout.svg",
+      "sha256": "125771a3297a2d4f0eef98728ef13fe594577c0c4c5cc46e26695f23a6ea05b6"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/information-sign.png",
+      "sha256": "13a679caaf61b3756900ea7f1c67e3544607d0b81658978f587edff147a78518"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/information-sign.svg",
+      "sha256": "f9e7ad690337e0b16e5d6e5319ff838ff0d392ef2477f9615e1c4095fde757bb"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/synthetic-tour-transcript.json",
+      "sha256": "12034ba44c9c48c27d746e9044764e8c21e672b0c6ded732598c0c7144505659"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/synthetic-tour.mp4",
+      "sha256": "272b237455551371c74667bade0484538c74e8580624ab212da61ff4a59dee43"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-CITY01/synthetic-tour.vtt",
+      "sha256": "e61c17c4905cbec3165a33c50956f60a42d098495501762cf89e7ea0b750f441"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/amenities-sign.png",
+      "sha256": "f1375403b40854e4f4cf0d6e51f8ab41f81765e716264c38554bff3b00a74b35"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/amenities-sign.svg",
+      "sha256": "bb7c60344d6c28fdc01433689ff39b1c49edec2cb3dd6381f1b3c6999d7ebbaa"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/illustrative-room-layout.png",
+      "sha256": "1126e8310493bee84a50d8f60b3656b6b2f4a4afbdc345da0ca5bf9af425c534"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/illustrative-room-layout.svg",
+      "sha256": "f5ede499a101f302dfd4938b377ebcb3ece5106fe2afd7f8dbdcdd3c8a085c94"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/information-sign.png",
+      "sha256": "4be8a3f08b7910934b536e06cd61d61101317723a7417f393832f6f4c9f4e528"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/information-sign.svg",
+      "sha256": "286d79fd0e6f0c72a8e900a7d10ab23ce3d06638df7ff013fba72519f5c8506e"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/synthetic-tour-transcript.json",
+      "sha256": "dd30018c13a0dca36148a3b95b7f182161e1bdc33324ee32ec11d556d849ebf8"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/synthetic-tour.mp4",
+      "sha256": "14ac67e5686c4e6acd835ea6520ac0271a462807fdb8925044e4f9b68eb665cb"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/hotels/HTL-RETREAT03/synthetic-tour.vtt",
+      "sha256": "51200c02a1093601a12ddb05e9c502c967c3f58cc4c06e658774e8d5c8c03beb"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/media_manifest.json",
+      "sha256": "d6800763b1add865e8087d15a1fee2695d2c65d7b8a89a11bbee33534411acbc"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/rasterize_svg_fixtures.js",
+      "sha256": "cba3122577df93aaafbe7219c694275e4fec10dc8b982a4edb285f1012d22441"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/render_video_fixtures.py",
+      "sha256": "63474e6062acbcac46e2ec9765e0a37424277732362db2cc857821522ff4c712"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/unapproved/prompt-injection-sign.svg",
+      "sha256": "8f22f35a9ae9349a650662c45c6eab32f5ea97283ad7a374d9b2afbb25de8b22"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/media/validate_media.py",
+      "sha256": "07c2ac9aa9094a3d1048c80451444fe2a11c93b2fb0b23eba06c27cb06ddda60"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/properties.json",
+      "sha256": "627dd25e733d7ec59be02619eeb813d8c2b037e02d51fd11680eb9a6e88a868e"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources.json",
+      "sha256": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/catalog/htl-beach02.txt",
+      "sha256": "217f631b3e1cbd0ac0b33a4384880f6728199ae8fbff2aeed66b2d692660de74"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/catalog/htl-city01.txt",
+      "sha256": "b5dcc9ba5ca0a309924b9b4cc7582b10c351e16983969652fd6c96e8abb9e129"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/catalog/htl-retreat03.txt",
+      "sha256": "ecd89bc9f23b4a8c506eb2fe656d90048c3f08fe97b25ad80e1af4e0d31975cd"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/guest/htl-beach02.txt",
+      "sha256": "95b95ce0af04b6ba99448f080e2fe25ba56e29521f7548d050037dab19c7c575"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/guest/htl-city01.txt",
+      "sha256": "deb3198c93131b2eba0f12adb1c8dab9e1de6f68ede15b586ac35a6a2d9ba887"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/guest/htl-retreat03.txt",
+      "sha256": "dc5733791314608087dbce16e64c0b3e2cc42118ce6b34a7f5903a59e8de87c8"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/internal/htl-beach02.txt",
+      "sha256": "22a316ecb8ef78e582177791266efd883b1a1f7dda6a2ea3a1ff186991a18711"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/internal/htl-city01.txt",
+      "sha256": "7d01d1c150a9304ec8e3a3c9003f2093dabf0b581b6cd3b1af8cc687e924914c"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/sources/internal/htl-retreat03.txt",
+      "sha256": "7caa981e5e53076dc7f7545e343d63037c8d6ea9dfbdae4dea03c512ed2943ee"
+    },
+    {
+      "path": "fixtures/hospitality/knowledge-v1/validate_knowledge.py",
+      "sha256": "738b951a4376dda63ad0d00ee24b30d982ee022f20752feb6a12da0380fcc74c"
+    },
+    {
+      "path": "fixtures/hospitality/media-pack-v1/assets/pool.mp4",
+      "sha256": "978d55b84cf3b487d0c347f98d5f0c2c9f4f80b28d64385c3e4486775b5247ca"
+    },
+    {
+      "path": "fixtures/hospitality/media-pack-v1/assets/pool.vtt",
+      "sha256": "fcfcae822ebd23748f15a7a063460972fe7d3300cc98c5ba34530bb3db957651"
+    },
+    {
+      "path": "fixtures/hospitality/media-pack-v1/assets/room.png",
+      "sha256": "2f0febb4239e6f57023f0117f6c3eb1e5a3ccd53a550e040a48bf8a7a7008705"
+    },
+    {
+      "path": "fixtures/hospitality/media-pack-v1/manifest.json",
+      "sha256": "84c51779e517861caea5a9ffa3284be3888535abe66db9e7fd02e92bf3a89983"
+    },
+    {
+      "path": "tests/architecture/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/architecture/test_platform_domain_boundary.py",
+      "sha256": "2279a438809974ea333a03436ffef45a33343314b985e5bbbf39fa8ad0d39642"
+    },
+    {
+      "path": "tests/contracts/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/contracts/f06_domain_binding.test.mjs",
+      "sha256": "9e407499834e3b369e04be98f2174d7064e697abfd4051c5abdb269502342aac"
+    },
+    {
+      "path": "tests/contracts/test_fixture_pack.py",
+      "sha256": "f86d757f317708c681403a4076a9eb1488ee2727eb3b2f5dd33b2679f8b46b13"
+    },
+    {
+      "path": "tests/contracts/test_grounded_qa.py",
+      "sha256": "8e5f9d2be69348b5b6e8d5505e749c7dc0df92c616a97721ea897a16ea579c06"
+    },
+    {
+      "path": "tests/contracts/test_sprint1_contracts.py",
+      "sha256": "597564e0a895e8fa897b1ef6300229dae7c4b6b1e7a4206b14bb7494756941de"
+    },
+    {
+      "path": "tests/contracts/test_sprint3_media_api.py",
+      "sha256": "a70270180934f52a5513ffb86892d8d283c5f84cae261a39779b1933895a471b"
+    },
+    {
+      "path": "tests/contracts/test_sprint3_pack.py",
+      "sha256": "34951766288c47c7f4d687020efe4c5b32d2c0341af358eeceb4aaac53d5877a"
+    },
+    {
+      "path": "tests/e2e/hospitality/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/integration/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/integration/test_api_skeleton.py",
+      "sha256": "1eed302856342f7ed0e5e735d0293036f49f2aff7fc20f07c0b892eb9f58eff5"
+    },
+    {
+      "path": "tests/integration/test_sprint1_postgres.py",
+      "sha256": "963604eff78fca7dbf553615685842483d1061a07de3d8363e66feaf46550664"
+    },
+    {
+      "path": "tests/integration/test_sprint3_pack_postgres.py",
+      "sha256": "1e6b03afa4633cc98447a5202e00376559081495a350aa4a2985c016604a8d38"
+    }
+  ]
+}

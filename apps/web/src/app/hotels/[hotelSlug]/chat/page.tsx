@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-
 import { resolveConfiguredTarget, resolveDomainRegistration } from "@/composition/registration";
 import { GuestChatExperience } from "@/composition/GuestChatExperience";
 
@@ -10,8 +8,8 @@ type HotelChatPageProps = Readonly<{
 export default async function HotelChatPage({ params }: HotelChatPageProps) {
   const { hotelSlug } = await params;
   const target = resolveConfiguredTarget();
-  const registration = resolveDomainRegistration(target);
-  if (!registration.content.demoHotelSlugs.includes(hotelSlug)) notFound();
+  // Admission is data-driven by the guest API; unknown slugs are reported by lookup.
+  resolveDomainRegistration(target);
 
   return (
     <GuestChatExperience hotelSlug={hotelSlug} />

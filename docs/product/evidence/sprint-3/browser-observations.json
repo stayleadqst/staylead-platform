@@ -1,0 +1,11 @@
+{
+  "mode": "Actual in-app Chromium browser, Next production build, real isolated PostgreSQL; fake provider except separately logged live cases",
+  "fourth_hotel": {"slug":"garden-terrace-demo","direct_route":"/hotels/garden-terrace-demo/chat","observed_name":"Garden Terrace Demo","code_registration_added":false},
+  "unknown_hotel":{"clear_unavailable_message":true,"composer_disabled":true},
+  "image":{"mime":"image/png","decoded":true,"natural_width":640,"natural_height":360,"source_scheme":"blob:","desktop_and_mobile_observed":true},
+  "video":{"mime":"video/mp4","decoded_width":640,"decoded_height":360,"duration_seconds":3,"observed_running_time":0.765605,"observed_ended_time":3,"ended":true,"error":null,"caption_visually_observed":"The pool deck faces the garden.","corrected_time_button":"Play from 0:00.5–0:02.5","seek_observed_seconds":0.5,"evidence":["desktop-caption-final.jpg","mobile-caption-final.jpg"]},
+  "mobile":{"width":390,"height":844,"document_scroll_width":390,"caption_playback_observed":true},
+  "lifecycle":{"observer":"test-only outer HTML probe wraps Blob create/revoke; product code unchanged by probe","creates":7,"revokes":7,"client_navigation_cleanup":true,"delayed_media_seconds":45,"hotel_switch":"pending hotel4 media then Next link home→Harbor City; after delayed completion images0/videos0, correct Harbor City empty transcript","session_switch":"pending second image then expire only test session in isolated DB; next turn401; explicit Start a new chat before45s completion; after completion image0/video0, fresh Garden Terrace transcript","token_in_url_observed":false,"evidence":["runtime-events.jsonl","session-renewal-no-late-media.jpg"]},
+  "text_unknown":{"fake_text_breakfast":"07:00-10:00, no media","fake_unsupported_accessibility":"explicit could-not-confirm, no new media"},
+  "limitations":["Read-only browser evaluation does not expose HTMLTrackElement.track/cues fully; subtitle proof uses actual rendered caption screenshot with decoded advancing playback, not evaluator empty cues.","mobile-media-layout-final.jpg shows pool video layout; it is not a room-image screenshot.","Final real-Grok semantic acceptance is logged separately; no fake result is a real-model PASS."]
+}

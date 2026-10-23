@@ -23,6 +23,7 @@ from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.knowledge_repository import (
     PostgresKnowledgeFactRepository,
 )
+from staylead_platform.infrastructure.persistence.media_repository import PostgresMediaRepository
 from staylead_platform.infrastructure.persistence.store import (
     IdempotencyConflict,
     RequestInProgress,
@@ -37,6 +38,7 @@ from staylead_platform.infrastructure.persistence.store import (
     reserve_request,
 )
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError
+from staylead_platform.platform.contracts.knowledge import EligibleAsset, MediaDescriptor
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
     GroundedQAOrchestrator,
@@ -49,6 +51,7 @@ from staylead_platform.platform.guest_context.sessions.signing import (
 from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
 
 SESSION_TTL = timedelta(hours=24)
+MEDIA_MAX_BYTES = {"image/png": 5 * 1024 * 1024, "video/mp4": 20 * 1024 * 1024, "text/vtt": 256 * 1024}
 
 
 class GuestChatError(RuntimeError):
@@ -80,6 +83,7 @@ def create_guest_chat_application(
 ) -> GuestChatApplication:
     database = engine or create_database_engine(settings.database_url)
     selected_provider = provider if provider is not None else build_provider(settings)
+    media_repository = PostgresMediaRepository(database)
     orchestrator = None
     if selected_provider:
         repository = PostgresKnowledgeFactRepository(database)
@@ -93,7 +97,7 @@ def create_guest_chat_application(
             selection_schema=FactSelection,
             max_output_tokens=settings.ai_max_output_tokens,
         )
-    return GuestChatApplication(settings, database, orchestrator)
+    return GuestChatApplication(settings, database, orchestrator, media_repository)
 
 
 def _citation_reference(fact: dict[str, Any]) -> dict[str, Any]:
@@ -104,6 +108,33 @@ def _citation_reference(fact: dict[str, Any]) -> dict[str, Any]:
         "section": provenance.get("section"), "fact_version": provenance.get("fact_version"),
         "imported_at": provenance.get("imported_at"),
     }
+
+
+def _media_reference(media: MediaDescriptor, cited_fact_ids: set[str]) -> dict[str, Any] | None:
+    eligible_facts = sorted(set(media.fact_ids) & cited_fact_ids)
+    if not eligible_facts or media.kind not in {"image", "video"}:
+        return None
+    expected_mime = {"image": "image/png", "video": "video/mp4"}[media.kind]
+    if media.mime_type != expected_mime or media.byte_size > MEDIA_MAX_BYTES[expected_mime]:
+        return None
+    result: dict[str, Any] = {
+        "media_id": media.media_id,
+        "hotel_id": media.hotel_id,
+        "fact_ids": eligible_facts,
+        "kind": media.kind,
+        "mime_type": media.mime_type,
+        "byte_size": media.byte_size,
+        "sha256": media.sha256,
+        "caption": media.caption,
+        "alt_text": media.alt_text,
+        "source_id": media.source_id,
+        "source_version": media.source_version,
+    }
+    for name in ("start_seconds", "end_seconds", "duration_seconds", "captions_media_id"):
+        value = getattr(media, name)
+        if value is not None:
+            result[name] = value
+    return result
 
 
 def _remaining_seconds(deadline: float) -> float:
@@ -118,10 +149,60 @@ def _is_database_timeout(exc: OperationalError) -> bool:
 
 
 class GuestChatApplication:
-    def __init__(self, settings: Settings, engine: Engine, orchestrator: GroundedQAOrchestrator | None) -> None:
+    def __init__(
+        self, settings: Settings, engine: Engine, orchestrator: GroundedQAOrchestrator | None,
+        media_repository: Any | None = None,
+    ) -> None:
         self._settings = settings
         self._engine = engine
         self._orchestrator = orchestrator
+        self._media_repository = media_repository or PostgresMediaRepository(engine)
+
+    def lookup_hotel(self, hotel_slug: str) -> dict[str, Any]:
+        try:
+            hotel = get_hotel_by_slug(self._engine, hotel_slug)
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Hotel lookup is unavailable.", retryable=True) from exc
+        if not hotel:
+            raise GuestChatError(404, "hotel_unavailable", "This hotel is not available.")
+        return {
+            "hotel_id": hotel["hotel_id"], "hotel_slug": hotel["slug"],
+            "public_config": hotel["public_config"], "config_version": hotel["config_version"],
+            "guest_contract_version": "1",
+        }
+
+    def read_media(self, *, session_id: str, token: str, media_id: str) -> EligibleAsset:
+        if not self._settings.session_signing_secret:
+            raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
+        try:
+            claims = verify_token(token, secret=self._settings.session_signing_secret.get_secret_value())
+        except InvalidSessionToken as exc:
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
+        if claims.session_id != session_id:
+            raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
+        try:
+            session = get_session(self._engine, session_id)
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Session storage is unavailable.", retryable=True) from exc
+        if not session or session["hotel_id"] != claims.hotel_id or session["expires_at"] <= datetime.now(UTC):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        try:
+            asset = self._media_repository.read_eligible_asset(claims.hotel_id, media_id, datetime.now(UTC))
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Media storage is unavailable.", retryable=True) from exc
+        if asset is None:
+            raise GuestChatError(404, "media_unavailable", "This media is not available.")
+        limit = MEDIA_MAX_BYTES.get(asset.mime_type)
+        if (
+            asset.descriptor.hotel_id != claims.hotel_id
+            or asset.descriptor.media_id != media_id
+            or asset.mime_type != asset.descriptor.mime_type
+            or limit is None
+            or len(asset.content) != asset.descriptor.byte_size
+            or len(asset.content) > limit
+        ):
+            raise GuestChatError(404, "media_unavailable", "This media is not available.")
+        return asset
 
     def open_session(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -220,6 +301,28 @@ class GuestChatApplication:
                 answer = await self._orchestrator.answer(
                     hotel_id=claims.hotel_id, question=question, history=history, deadline=deadline,
                 )
+                cited_fact_ids = {str(fact["fact_id"]) for fact in answer.citations if fact.get("fact_id")}
+                try:
+                    candidate_media = await asyncio.to_thread(
+                        self._media_repository.list_eligible_media,
+                        claims.hotel_id, cited_fact_ids, datetime.now(UTC),
+                        timeout_seconds=_remaining_seconds(deadline),
+                    ) if cited_fact_ids else []
+                except OperationalError as exc:
+                    if _is_database_timeout(exc):
+                        cancellation_event.set()
+                        raise GuestChatError(504, "provider_timeout", "The request exceeded its time limit.", retryable=True) from exc
+                    raise GuestChatError(503, "media_lookup_unavailable", "Approved media could not be loaded.", retryable=True) from exc
+                except TimeoutError as exc:
+                    cancellation_event.set()
+                    raise GuestChatError(504, "provider_timeout", "The request exceeded its time limit.", retryable=True) from exc
+                except Exception as exc:
+                    raise GuestChatError(503, "media_lookup_unavailable", "Approved media could not be loaded.", retryable=True) from exc
+                media = [
+                    projected for item in sorted(candidate_media, key=lambda value: value.media_id)
+                    if item.hotel_id == claims.hotel_id
+                    and (projected := _media_reference(item, cited_fact_ids)) is not None
+                ]
                 trace = {
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
@@ -235,11 +338,14 @@ class GuestChatApplication:
                     self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                     request_id=request_id, question=question, answer=answer.answer,
                     evidence=[_citation_reference(fact) for fact in answer.citations],
-                    response_fields={"unknowns": list(answer.unknowns), "trace": trace},
+                    response_fields={"unknowns": list(answer.unknowns), "trace": trace, "media": media},
                     timeout_seconds=remaining,
                     deadline_monotonic=deadline_monotonic, cancellation_event=cancellation_event,
                 )
                 return result
+        except GuestChatError as exc:
+            await self._fail_request(session_id, request_id, exc.code)
+            raise
         except ProviderError as exc:
             await self._fail_request(session_id, request_id, exc.code)
             status = 504 if exc.code == "provider_timeout" else 401 if exc.code == "provider_auth" else 429 if exc.code == "provider_rate_limited" else 502

@@ -14,7 +14,9 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    Float,
     Integer,
+    LargeBinary,
     MetaData,
     String,
     Table,
@@ -31,7 +33,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
 metadata = MetaData()
-CURRENT_SCHEMA_VERSION = 2
+CURRENT_SCHEMA_VERSION = 3
 schema_versions = Table(
     "schema_versions", metadata,
     Column("version", Integer, primary_key=True),
@@ -90,6 +92,49 @@ messages = Table(
     Column("content", Text, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     UniqueConstraint("session_id", "sequence", name="uq_guest_messages_sequence"),
+)
+knowledge_packs = Table(
+    "knowledge_packs", metadata,
+    Column("hotel_id", String(80), primary_key=True),
+    Column("pack_id", String(120), nullable=False),
+    Column("pack_version", String(80), nullable=False),
+    Column("schema_version", Integer, nullable=False),
+    Column("canonical_hash", String(64), nullable=False),
+    Column("manifest", JSON, nullable=False),
+    Column("imported_at", DateTime(timezone=True), nullable=False),
+)
+knowledge_sources = Table(
+    "knowledge_sources", metadata,
+    Column("source_id", String(120), primary_key=True),
+    Column("hotel_id", String(80), nullable=False, index=True),
+    Column("version", String(80), nullable=False),
+    Column("scope", String(40), nullable=False),
+    Column("guest_approved", Boolean, nullable=False),
+    Column("valid_from", String(20), nullable=False),
+    Column("valid_to", String(20), nullable=False),
+    Column("source", JSON, nullable=False),
+)
+knowledge_media = Table(
+    "knowledge_media", metadata,
+    Column("media_id", String(120), primary_key=True),
+    Column("hotel_id", String(80), nullable=False, index=True),
+    Column("source_id", String(120), nullable=False),
+    Column("source_version", String(80), nullable=False),
+    Column("fact_ids", JSON, nullable=False),
+    Column("kind", String(20), nullable=False),
+    Column("mime_type", String(80), nullable=False),
+    Column("byte_size", Integer, nullable=False),
+    Column("sha256", String(64), nullable=False),
+    Column("caption", Text, nullable=False),
+    Column("alt_text", Text, nullable=False),
+    Column("start_seconds", Float),
+    Column("end_seconds", Float),
+    Column("duration_seconds", Float),
+    Column("captions_media_id", String(120)),
+    Column("guest_approved_whole_file", Boolean, nullable=False),
+    Column("valid_from", String(20), nullable=False),
+    Column("valid_to", String(20), nullable=False),
+    Column("content", LargeBinary, nullable=False),
 )
 
 
@@ -154,6 +199,10 @@ def apply_migrations(engine: Engine) -> int:
                     "ALTER TABLE guest_requests ADD COLUMN expected_version INTEGER NOT NULL DEFAULT 0"
                 ))
             connection.execute(insert(schema_versions).values(version=2, applied_at=utcnow()))
+            existing = 2
+        if existing < 3:
+            # CREATE TABLE IF NOT EXISTS above creates the new pack/source/media tables.
+            connection.execute(insert(schema_versions).values(version=3, applied_at=utcnow()))
     return CURRENT_SCHEMA_VERSION
 
 
@@ -201,6 +250,67 @@ def get_hotel(engine: Engine, hotel_id: str) -> dict[str, Any] | None:
     with engine.connect() as connection:
         row = connection.execute(select(hotels).where(hotels.c.hotel_id == hotel_id)).mappings().first()
     return dict(row) if row else None
+
+
+def import_complete_pack(engine: Engine, pack: dict[str, Any]) -> dict[str, Any]:
+    """Publish one already validated complete pack atomically and immutably."""
+    hotel = pack["hotel"]
+    now = utcnow()
+    with engine.begin() as connection:
+        existing = connection.execute(select(knowledge_packs).where(
+            knowledge_packs.c.hotel_id == hotel["hotel_id"],
+        )).mappings().first()
+        by_slug = connection.execute(select(hotels.c.hotel_id).where(
+            hotels.c.slug == hotel["slug"],
+        )).scalar_one_or_none()
+        if existing:
+            if existing["canonical_hash"] == pack["canonical_hash"]:
+                return {"status": "noop", "hotel_id": hotel["hotel_id"], "canonical_hash": pack["canonical_hash"]}
+            raise ValueError("Hotel already has a different immutable knowledge pack.")
+        if by_slug is not None:
+            raise ValueError("Hotel slug is already registered.")
+        # IDs are globally unique in the existing facts table. Detect every collision before inserts.
+        fact_ids = [fact["fact_id"] for fact in pack["facts"]]
+        if fact_ids and connection.scalar(select(knowledge_facts.c.fact_id).where(
+            knowledge_facts.c.fact_id.in_(fact_ids),
+        ).limit(1)) is not None:
+            raise ValueError("A fact ID is already registered.")
+        if connection.scalar(select(hotels.c.hotel_id).where(
+            hotels.c.hotel_id == hotel["hotel_id"],
+        )) is not None:
+            raise ValueError("Hotel ID is already registered without this pack identity.")
+        connection.execute(insert(hotels).values(
+            hotel_id=hotel["hotel_id"], slug=hotel["slug"],
+            config_version=hotel["config_version"], public_config=hotel["public_config"],
+            synthetic=True, updated_at=now,
+        ))
+        connection.execute(insert(knowledge_packs).values(
+            hotel_id=hotel["hotel_id"], pack_id=pack["pack_id"],
+            pack_version=pack["pack_version"], schema_version=pack["schema_version"],
+            canonical_hash=pack["canonical_hash"], manifest=pack["manifest"], imported_at=now,
+        ))
+        if pack["sources"]:
+            connection.execute(insert(knowledge_sources), [{
+                "source_id": s["source_id"], "hotel_id": hotel["hotel_id"],
+                "version": s["version"], "scope": s["scope"],
+                "guest_approved": s["guest_approved"], "valid_from": s["valid_from"],
+                "valid_to": s["valid_to"], "source": s,
+            } for s in pack["sources"]])
+        if pack["facts"]:
+            connection.execute(insert(knowledge_facts), [{
+                "fact_id": f["fact_id"], "hotel_id": hotel["hotel_id"],
+                "source_id": f["source_refs"][0]["source_id"],
+                "source_version": f["source_refs"][0]["version"],
+                "section": f.get("section", f["topic"]), "fact_version": f.get("fact_version", "1"),
+                "status": f["status"], "valid_from": f["valid_from"], "valid_to": f["valid_to"],
+                "fact": f, "imported_at": now,
+            } for f in pack["facts"]])
+        if pack["media"]:
+            connection.execute(insert(knowledge_media), [{
+                **{k: m.get(k) for k in ("media_id", "source_id", "source_version", "fact_ids", "kind", "mime_type", "byte_size", "sha256", "caption", "alt_text", "start_seconds", "end_seconds", "duration_seconds", "captions_media_id", "guest_approved_whole_file", "valid_from", "valid_to", "content")},
+                "hotel_id": hotel["hotel_id"],
+            } for m in pack["media"]])
+    return {"status": "imported", "hotel_id": hotel["hotel_id"], "canonical_hash": pack["canonical_hash"]}
 
 
 def facts_for_hotel(engine: Engine, hotel_id: str, *, limit: int = 400) -> list[dict[str, Any]]:

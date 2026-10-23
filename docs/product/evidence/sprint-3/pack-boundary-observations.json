@@ -1,0 +1,20 @@
+{
+  "exact400_import_and_runtime_read": true,
+  "checks": [
+    {
+      "changed": "pack_version",
+      "rejected_unchanged": true
+    },
+    {
+      "changed": "pack_content",
+      "rejected_unchanged": true
+    },
+    {
+      "changed": "hotel_config",
+      "rejected_unchanged": true
+    }
+  ],
+  "overflow_atomic": true,
+  "global_fact_collision_atomic": true,
+  "previous_data_unchanged": true
+}

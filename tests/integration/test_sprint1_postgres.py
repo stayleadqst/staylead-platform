@@ -96,7 +96,7 @@ def settings_for(database_url: str, *, ai_turn_timeout_seconds: float = 45.0) ->
 
 
 def test_explicit_migration_fixture_bootstrap_and_hotel_scoped_provenance(engine) -> None:
-    assert schema_version(engine) == 2
+    assert schema_version(engine) == 3
     cities = facts_for_hotel(engine, "HTL-CITY01")
     beach = facts_for_hotel(engine, "HTL-BEACH02")
     assert len(cities) == 109

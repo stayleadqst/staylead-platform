@@ -1,0 +1,8 @@
+{
+  "mode": "real isolated PostgreSQL lock; fake provider",
+  "status": 504,
+  "error": "provider_timeout",
+  "elapsed_seconds": 1.058,
+  "committed_state_version": 0,
+  "pass": true
+}

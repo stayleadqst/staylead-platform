@@ -1,6 +1,7 @@
 """Domain-neutral read port for hotel-scoped guest-eligible knowledge facts."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Protocol
 
 
@@ -27,3 +28,43 @@ class KnowledgeFactRepository(Protocol):
     def get_guest_facts(
         self, hotel_id: str, fact_ids: set[str], *, timeout_seconds: float | None = None,
     ) -> list[KnowledgeFact]: ...
+
+
+@dataclass(frozen=True)
+class MediaDescriptor:
+    """Guest-safe metadata for media bound to approved, cited knowledge facts."""
+
+    media_id: str
+    hotel_id: str
+    fact_ids: tuple[str, ...]
+    kind: str
+    mime_type: str
+    byte_size: int
+    sha256: str
+    caption: str
+    alt_text: str
+    source_id: str
+    source_version: str
+    start_seconds: float | None = None
+    end_seconds: float | None = None
+    duration_seconds: float | None = None
+    captions_media_id: str | None = None
+
+
+@dataclass(frozen=True)
+class EligibleAsset:
+    content: bytes
+    mime_type: str
+    descriptor: MediaDescriptor
+
+
+class EligibleMediaRepository(Protocol):
+    def list_eligible_media(
+        self, hotel_id: str, fact_ids: set[str], now: datetime, *,
+        timeout_seconds: float | None = None,
+    ) -> list[MediaDescriptor]: ...
+
+    def read_eligible_asset(
+        self, hotel_id: str, media_id: str, now: datetime, *,
+        timeout_seconds: float | None = None,
+    ) -> EligibleAsset | None: ...

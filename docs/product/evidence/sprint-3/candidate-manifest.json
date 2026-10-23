@@ -1,0 +1,32 @@
+{
+  "baseline": "21ef9a222236b9d46afd236310670c599c40dea4",
+  "source_test_fixture_sha256": "5b7f71cba464767f9d73ce59fc352c0b32556477378d6b8bb0c46d4b430a4384",
+  "source_files": 189,
+  "database_schema": 3,
+  "pack_schema": 1,
+  "guest_contract_version": "1",
+  "pack_id": "sprint3-hospitality-demo-v1",
+  "pack_version": "1",
+  "hotel_config_version": "1",
+  "source_version": "1",
+  "fact_version": "1",
+  "canonical_hash": "c24d5a27db72a4625c568ee6d402222c10541a797035281e4d2f074270515ef7",
+  "web_build_id": "kkhJNLmsgE6Cow0x-Mjnj",
+  "model": "grok-4-1-fast-reasoning",
+  "deployment": "cc-dev-grok-4-1-fast-reasoning",
+  "provider": "existing Azure Foundry adapter; no deployment performed",
+  "max_calls_per_turn": 2,
+  "answer_output_tokens": 700,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "retries": 0,
+  "hashes": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "9a3408f09976478929fd1cf1d83cdeb3e8d844be9e6bfff254eb6f95b70cbffd",
+    "apps/api/src/staylead_platform/infrastructure/ai_provider.py": "444b06adf37077c9dc9472e3d2bf169843a737e08e09fde4ad700e02e27ff5aa",
+    "apps/api/src/staylead_platform/composition/configuration/settings.py": "f8b52ec760e482e4c8702d0a1f10e828d82e60c77de2cc70adce10bec79384cd",
+    "fixtures/hospitality/media-pack-v1/manifest.json": "84c51779e517861caea5a9ffa3284be3888535abe66db9e7fd02e92bf3a89983"
+  },
+  "delivery_revision": "commit containing final acceptance document",
+  "live_acceptance_source_test_fixture_sha256": "184753fd700f968485944fde43df84129d3b4c9856410d83e6ffd217966c0704",
+  "final_format_only_delta": "one EOF blank removed from test_sprint3_media_api.py; product source unchanged"
+}

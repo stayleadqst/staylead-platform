@@ -1,0 +1,154 @@
+
+> @staylead/platform-web@0.1.0 test:contracts
+> node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/chat-state.test.mjs tests/media-format.test.mjs tests/proxy-url.test.mjs
+
+TAP version 13
+# (node:64460) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:64460) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/composition/domain_registry.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: a target selects its own landing, theme, content, renderer and API binding
+ok 1 - a target selects its own landing, theme, content, renderer and API binding
+  ---
+  duration_ms: 2.246708
+  ...
+# Subtest: unknown profiles and domain/contract/API mismatches fail without fallback
+ok 2 - unknown profiles and domain/contract/API mismatches fail without fallback
+  ---
+  duration_ms: 0.741709
+  ...
+# (node:64461) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:64461) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/api/client.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: session creation verifies real target metadata before sending hotel data
+ok 3 - session creation verifies real target metadata before sending hotel data
+  ---
+  duration_ms: 29.85025
+  ...
+# Subtest: direct hotel lookup is data-driven and unknown hotels surface the backend error
+ok 4 - direct hotel lookup is data-driven and unknown hotels surface the backend error
+  ---
+  duration_ms: 0.47325
+  ...
+# Subtest: binary media fetch uses authenticated same-origin route and returns bytes as Blob
+ok 5 - binary media fetch uses authenticated same-origin route and returns bytes as Blob
+  ---
+  duration_ms: 1.53025
+  ...
+# Subtest: message client forwards bearer and preserves the API response shape
+ok 6 - message client forwards bearer and preserves the API response shape
+  ---
+  duration_ms: 0.398292
+  ...
+# Subtest: proxy gateway failures and lost responses are unknown outcomes
+ok 7 - proxy gateway failures and lost responses are unknown outcomes
+  ---
+  duration_ms: 0.346459
+  ...
+# Subtest: typed provider failures are known API rejections
+ok 8 - typed provider failures are known API rejections
+  ---
+  duration_ms: 0.246875
+  ...
+# (node:64462) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:64462) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/chat/chat-state.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: ambiguous network outcomes and pending requests keep their request ID
+ok 9 - ambiguous network outcomes and pending requests keep their request ID
+  ---
+  duration_ms: 0.613542
+  ...
+# Subtest: a confirmed terminal request failure offers a new request only on explicit retry
+ok 10 - a confirmed terminal request failure offers a new request only on explicit retry
+  ---
+  duration_ms: 0.063875
+  ...
+# Subtest: known retryable provider failures use a new ID because the backend marked the request failed
+ok 11 - known retryable provider failures use a new ID because the backend marked the request failed
+  ---
+  duration_ms: 0.140584
+  ...
+# Subtest: an unresolved same-ID retry blocks the composer until resolved or a new chat starts
+ok 12 - an unresolved same-ID retry blocks the composer until resolved or a new chat starts
+  ---
+  duration_ms: 0.095667
+  ...
+# Subtest: a contract mismatch has a clear deterministic error and no transient retry
+ok 13 - a contract mismatch has a clear deterministic error and no transient retry
+  ---
+  duration_ms: 0.221625
+  ...
+# Subtest: an unknown hotel link explains that the hotel has not been registered
+ok 14 - an unknown hotel link explains that the hotel has not been registered
+  ---
+  duration_ms: 0.869791
+  ...
+# Subtest: provider authentication failure does not trigger guest session renewal
+ok 15 - provider authentication failure does not trigger guest session renewal
+  ---
+  duration_ms: 0.499208
+  ...
+# Subtest: an expired guest session asks for an explicit new session
+ok 16 - an expired guest session asks for an explicit new session
+  ---
+  duration_ms: 0.16875
+  ...
+# Subtest: the request lock rejects a second in-flight send and releases on completion
+ok 17 - the request lock rejects a second in-flight send and releases on completion
+  ---
+  duration_ms: 0.825167
+  ...
+# Subtest: hotel changes reject late session creation responses
+ok 18 - hotel changes reject late session creation responses
+  ---
+  duration_ms: 1.718917
+  ...
+# Subtest: requests require a session and stale response generations are rejected
+ok 19 - requests require a session and stale response generations are rejected
+  ---
+  duration_ms: 0.132
+  ...
+# (node:64463) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:64463) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/chat/media-format.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: clip references retain fractional seconds and exact minute boundaries
+ok 20 - clip references retain fractional seconds and exact minute boundaries
+  ---
+  duration_ms: 15.179
+  ...
+# (node:64464) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:64464) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/api/proxy-url.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: root API base keeps the configured upstream host
+ok 21 - root API base keeps the configured upstream host
+  ---
+  duration_ms: 2.56225
+  ...
+# Subtest: path-prefixed API base appends only the allowlisted backend path
+ok 22 - path-prefixed API base appends only the allowlisted backend path
+  ---
+  duration_ms: 0.108958
+  ...
+# Subtest: leading double slashes remain a path and cannot replace the configured host
+ok 23 - leading double slashes remain a path and cannot replace the configured host
+  ---
+  duration_ms: 0.065375
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 187.487292

@@ -51,6 +51,12 @@ test("a contract mismatch has a clear deterministic error and no transient retry
   assert.equal(network.retryable, true);
 });
 
+test("an unknown hotel link explains that the hotel has not been registered", () => {
+  const failure = classifySessionFailure({ code: "hotel_unavailable", outcome: "rejected" });
+  assert.equal(failure.retryable, false);
+  assert.match(failure.message, /hotel is not available/);
+});
+
 test("provider authentication failure does not trigger guest session renewal", () => {
   const result = classifyFailure({ code: "provider_auth", outcome: "rejected", retryable: false });
   assert.equal(result.retryMode, "none");

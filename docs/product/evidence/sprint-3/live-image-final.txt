@@ -1,0 +1,21 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Garden Terrace Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Garden Terrace Demo":
+    - article:
+      - paragraph: According to the approved room record, does the king room have a balcony? Show its authored illustration.
+      - paragraph: Yes, according to the approved room record, the king room has a balcony. [fact-room-balcony] The king room has a balcony. [fact-room-balcony]
+      - generic "Approved hotel media":
+        - 'figure "Authored illustrative caption: synthetic drawing of a guest room with a balcony."':
+          - img "Synthetic illustration of a guest room balcony; not a photograph."
+          - generic: "Authored illustrative caption: synthetic drawing of a guest room with a balcony."
+      - generic "Hotel records used (1)"
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

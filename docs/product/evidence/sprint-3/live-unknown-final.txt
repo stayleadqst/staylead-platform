@@ -1,0 +1,36 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Garden Terrace Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Garden Terrace Demo":
+    - article:
+      - paragraph: According to the approved room record, does the king room have a balcony? Show its authored illustration.
+      - paragraph: Yes, according to the approved room record, the king room has a balcony. [fact-room-balcony] The king room has a balcony. [fact-room-balcony]
+      - generic "Approved hotel media":
+        - 'figure "Authored illustrative caption: synthetic drawing of a guest room with a balcony."':
+          - img "Synthetic illustration of a guest room balcony; not a photograph."
+          - generic: "Authored illustrative caption: synthetic drawing of a guest room with a balcony."
+      - generic "Hotel records used (1)"
+    - article:
+      - paragraph: According to the authored records, what view does the pool clip describe and what is its approved time reference? Show the clip.
+      - paragraph: According to the authored records, the pool clip describes a garden-facing view. [fact-pool-view] [fact-pool-clip-window] The approved time reference for the pool clip spans 0.5 to 2.5 seconds. [fact-pool-clip-window]
+      - generic "Approved hotel media":
+        - 'figure "Authored illustrative caption: synthetic garden-facing pool clip; not a recording of the property. Play from 0:00.5–0:02.5"':
+          - generic "Synthetic colored animation used to demonstrate clip playback; not property footage."
+          - generic: "Authored illustrative caption: synthetic garden-facing pool clip; not a recording of the property."
+          - button "Play from 0:00.5–0:02.5"
+      - generic "Hotel records used (2)"
+    - article:
+      - paragraph: Can you confirm from that illustration or video that the pool has step-free wheelchair access?
+      - paragraph: Whether the pool has step-free wheelchair access
+      - heading "Could not confirm" [level=2]
+      - list:
+        - listitem: Whether the pool has step-free wheelchair access
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

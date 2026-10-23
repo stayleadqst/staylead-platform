@@ -1,0 +1,98 @@
+{
+  "mode": "fake provider; actual Next production proxy/FastAPI/PostgreSQL",
+  "checks": [
+    {
+      "name": "lookup harbor-city-demo",
+      "pass": true
+    },
+    {
+      "name": "lookup lagoon-family-demo",
+      "pass": true
+    },
+    {
+      "name": "lookup pine-ridge-demo",
+      "pass": true
+    },
+    {
+      "name": "lookup garden-terrace-demo",
+      "pass": true
+    },
+    {
+      "name": "unknown hotel clear",
+      "pass": true
+    },
+    {
+      "name": "exact authenticated media-room",
+      "pass": true,
+      "status": 200,
+      "bytes": 4899,
+      "sha256": "2f0febb4239e6f57023f0117f6c3eb1e5a3ccd53a550e040a48bf8a7a7008705",
+      "mime": "image/png"
+    },
+    {
+      "name": "exact authenticated media-pool-clip",
+      "pass": true,
+      "status": 200,
+      "bytes": 24867,
+      "sha256": "978d55b84cf3b487d0c347f98d5f0c2c9f4f80b28d64385c3e4486775b5247ca",
+      "mime": "video/mp4"
+    },
+    {
+      "name": "exact authenticated media-pool-vtt",
+      "pass": true,
+      "status": 200,
+      "bytes": 70,
+      "sha256": "fcfcae822ebd23748f15a7a063460972fe7d3300cc98c5ba34530bb3db957651",
+      "mime": "text/vtt"
+    },
+    {
+      "name": "missing bearer",
+      "pass": true,
+      "status": 401
+    },
+    {
+      "name": "wrong session token",
+      "pass": true,
+      "status": 403
+    },
+    {
+      "name": "wrong hotel scoped session",
+      "pass": true,
+      "status": 404
+    },
+    {
+      "name": "ineligible missing asset",
+      "pass": true,
+      "status": 404
+    },
+    {
+      "name": "wrong exact proxy route",
+      "pass": true,
+      "status": 404
+    },
+    {
+      "name": "cached replay unchanged",
+      "pass": true,
+      "media_ids": [
+        "media-room"
+      ]
+    },
+    {
+      "name": "final cited media only",
+      "pass": true
+    },
+    {
+      "name": "text/unknown When is breakfast?",
+      "pass": true
+    },
+    {
+      "name": "text/unknown Does the illustration prove step-free accessibility?",
+      "pass": true
+    },
+    {
+      "name": "expired persisted session no bytes",
+      "pass": true,
+      "status": 401
+    }
+  ]
+}

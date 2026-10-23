@@ -56,6 +56,12 @@ export function hasUnresolvedRequest(turns: readonly { retryMode?: RetryMode }[]
 }
 
 export function classifySessionFailure(error: FailureInput): { message: string; retryable: boolean } {
+  if (error.code === "hotel_unavailable") {
+    return {
+      message: "This hotel is not available yet. Check the hotel link or try again after it has been added.",
+      retryable: false,
+    };
+  }
   if (error.code === "contract_mismatch") {
     return {
       message: "This website and the chat service use incompatible versions, so a chat session was not opened.",

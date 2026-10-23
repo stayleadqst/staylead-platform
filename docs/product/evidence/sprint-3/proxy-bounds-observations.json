@@ -1,0 +1,30 @@
+[
+  {
+    "mime": "image/png",
+    "injected_bytes": 5242881,
+    "content_length_omitted": true,
+    "status": 502,
+    "error": "media_response_too_large"
+  },
+  {
+    "mime": "video/mp4",
+    "injected_bytes": 20971521,
+    "content_length_omitted": true,
+    "status": 502,
+    "error": "media_response_too_large"
+  },
+  {
+    "mime": "text/vtt",
+    "injected_bytes": 262145,
+    "content_length_omitted": true,
+    "status": 502,
+    "error": "media_response_too_large"
+  },
+  {
+    "mime": "text/html",
+    "injected_bytes": 10,
+    "content_length_omitted": true,
+    "status": 502,
+    "error": "invalid_media_response"
+  }
+]

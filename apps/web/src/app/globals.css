@@ -40,6 +40,11 @@ body {
 .message p { margin: 0; white-space: pre-wrap; }
 .message-guest { align-self: flex-end; border-bottom-right-radius: 5px; background: #235845; color: #fff; }
 .message-assistant { border: 1px solid #e8ebe5; border-bottom-left-radius: 5px; background: #f8faf7; color: #202922; }
+.answer-media { display: grid; gap: 12px; margin-top: 14px; }
+.media-evidence { margin: 0; overflow: hidden; border: 1px solid #dbe3da; border-radius: 12px; background: #fff; }
+.media-evidence img, .media-evidence video { display: block; width: 100%; max-height: 460px; object-fit: contain; background: #18211d; }
+.media-evidence figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 12px; color: #33443a; font-size: 13px; }
+.media-evidence figcaption .text-button { padding: 0; }
 .answer-text { white-space: pre-wrap; }
 .message-error { border: 1px solid #e8c6b9; background: #fff7f3; color: #713d2b; }
 .message-error p, .session-error p { margin: 0; }

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test:contracts": "node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/chat-state.test.mjs tests/proxy-url.test.mjs"
+    "test:contracts": "node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/chat-state.test.mjs tests/media-format.test.mjs tests/proxy-url.test.mjs"
   },
   "dependencies": {
     "next": "16.4.2",

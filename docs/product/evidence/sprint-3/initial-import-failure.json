@@ -1,0 +1,1 @@
+{"stage":"integration_first_import","base":"21ef9a2 plus W1 draft","schema_version":3,"old_fixture_import":"327 facts successful","new_pack":"failed","error_class":"KeyError","error_field":"source_id","location":"store.import_complete_pack","owner":"Builder A","next_action":"flatten verified fact source/version and rerun producer PostgreSQL tests before integrated retry"}

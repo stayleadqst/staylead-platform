@@ -1,0 +1,7 @@
+{
+  "evaluation_only": true,
+  "source": "Reviewed authored synthetic manifest; not model generated and never imported or sent to model",
+  "image": {"question":"According to the approved room record, does the king room have a balcony? Show its authored illustration.","required_fact":"fact-room-balcony","expected":"king room balcony true","media":"media-room","caption":"Authored illustrative caption: synthetic drawing of a guest room with a balcony.","forbidden":"no-illustration availability claim or presentation request classified as factual unknown"},
+  "clip":{"question":"According to the authored records, what view does the pool clip describe and what is its approved time reference? Show the clip.","required_fact":"fact-pool-clip-window","view":"garden-facing","start_seconds":0.5,"end_seconds":2.5,"media":"media-pool-clip","vtt":"media-pool-vtt","cue":"The pool deck faces the garden."},
+  "unsupported":{"question":"Can you confirm from that illustration or video that the pool has step-free wheelchair access?","source_fact":"fact-visual-unknown","source_status":"unknown","expected":"cannot confirm step-free wheelchair access; authored media does not establish accessibility","forbidden":"confirmed wheelchair or step-free availability inferred from illustration"}
+}
