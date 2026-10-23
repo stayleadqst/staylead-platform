@@ -1,0 +1,503 @@
+{
+  "at_utc": "2026-10-23T13:24:48.496961+00:00",
+  "provider": "codex_cli via existing ChatGPT authentication",
+  "requested_model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "actual_served_model": "unreported",
+  "source_kind": "synthetic authored hotel facts; real model only for opt-in acceptance",
+  "candidate_fingerprint": "511babeb7c0a3312ab24350d18381a087eaf8d4ec3153ba794b65bc946d2b5b4",
+  "semantic_expectations_unchanged": true,
+  "prior_grok_state_unchanged": true,
+  "state": {
+    "run_id": "s5-codex-90-20261023",
+    "max_codex_requests": 8,
+    "codex_requests": 8,
+    "semantic_guest_turns": 4,
+    "answer_only_resumes": 0,
+    "prior_grok_attempts": 8,
+    "authority": "Hieu explicitly requested backend consume Codex/ChatGPT instead of Grok; four sequential semantic turns, max2calls/turn, no automatic retries; previous Grok cap unchanged.",
+    "created_at_utc": "2026-10-23T13:10:47.616982+00:00"
+  },
+  "completed_provider_calls": 8,
+  "failed_or_cancelled_provider_calls": 0,
+  "reported_input_tokens": 62798,
+  "reported_output_tokens": 988,
+  "provider_reported_total_tokens": null,
+  "billing": "unavailable",
+  "native_output_token_cap": false,
+  "automatic_retries": 0,
+  "turns": [
+    {
+      "turn": 1,
+      "id": "capture_dates_adults_faq",
+      "expected": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "nights": 3,
+        "adults": 2,
+        "children": 0
+      },
+      "observed": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "nights": 3,
+        "adults": 2,
+        "children": 0
+      },
+      "checks": {
+        "check_in": true,
+        "check_out": true,
+        "nights": true,
+        "adults": true,
+        "children": true,
+        "version": true,
+        "http_completed": true,
+        "calls_bound": true,
+        "grounded_breakfast": true
+      },
+      "passed": true,
+      "latency_ms": 9015.4,
+      "request_id": "ab65f7dd-9e42-4298-9f55-e969051e2715",
+      "brief": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "pending_fields": []
+      },
+      "receipt": {
+        "request_id": "ab65f7dd-9e42-4298-9f55-e969051e2715",
+        "status": "applied",
+        "brief_version_before": 0,
+        "brief_version_after": 1,
+        "applied_delta": {
+          "dates": {
+            "check_in": "2026-12-10",
+            "check_out": "2026-12-13",
+            "nights": 3
+          },
+          "party": {
+            "adults": 2
+          }
+        },
+        "source_refs": [
+          {
+            "source_utterance_id": "8720f43b-feb7-4cc2-8f00-1bb1460aead2",
+            "request_id": "ab65f7dd-9e42-4298-9f55-e969051e2715",
+            "fields": [
+              "dates.check_in",
+              "dates.check_out",
+              "party.adults"
+            ]
+          }
+        ],
+        "answer_status": "completed",
+        "brief_version_used": 1
+      },
+      "answer": "Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30 đến 09:30 (giờ Việt Nam). [F-HTL-CITY01-040]\nFrom your saved stay details: Đặt phòng từ ngày 10 đến ngày 13 tháng 12 năm 2026, tổng cộng 3 đêm.\nFrom your saved stay details: Có 2 người lớn.",
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "source_hash": "a847c0f2778ece7bd1bac0645689a370a71f9c4816f432b6bce925f1aa52bfc1",
+          "source_generation": 1,
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-23T17:15:10.517336+07:00"
+        }
+      ],
+      "guest_claims": [
+        {
+          "text": "Đặt phòng từ ngày 10 đến ngày 13 tháng 12 năm 2026, tổng cộng 3 đêm.",
+          "refs": [
+            "dates.check_in",
+            "dates.check_out",
+            "dates.nights"
+          ]
+        },
+        {
+          "text": "Có 2 người lớn.",
+          "refs": [
+            "party.adults"
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 15261,
+        "output_tokens": 214,
+        "total_tokens": null
+      },
+      "screenshot": "codex-turn-1.jpg"
+    },
+    {
+      "turn": 2,
+      "id": "add_child_missing_age",
+      "expected": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "nights": 3,
+        "adults": 2,
+        "children": 1,
+        "child_age": null,
+        "missing_age_pending": true
+      },
+      "observed": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "nights": 3,
+        "adults": 2,
+        "children": 1,
+        "child_age": null,
+        "missing_age_pending": true
+      },
+      "checks": {
+        "check_in": true,
+        "check_out": true,
+        "nights": true,
+        "adults": true,
+        "children": true,
+        "child_age": true,
+        "missing_age_pending": true,
+        "version": true,
+        "http_completed": true,
+        "calls_bound": true
+      },
+      "passed": true,
+      "latency_ms": 9360.7,
+      "request_id": "ef3aab5a-de54-4ae7-bcba-a169ed4cf1ea",
+      "brief": {
+        "brief_version": 2,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+              "age": null
+            }
+          ]
+        },
+        "pending_fields": [
+          "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b.age"
+        ]
+      },
+      "receipt": {
+        "request_id": "ef3aab5a-de54-4ae7-bcba-a169ed4cf1ea",
+        "status": "partial_success",
+        "brief_version_before": 1,
+        "brief_version_after": 2,
+        "applied_delta": {
+          "party": {
+            "children_added": [
+              {
+                "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+                "age": null
+              }
+            ]
+          }
+        },
+        "source_refs": [
+          {
+            "source_utterance_id": "4870cda6-eb16-4ef4-8a53-90074c6a4612",
+            "request_id": "ef3aab5a-de54-4ae7-bcba-a169ed4cf1ea",
+            "fields": [
+              "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b"
+            ]
+          }
+        ],
+        "answer_status": "completed",
+        "brief_version_used": 2
+      },
+      "answer": "Trẻ em được xác định là dưới 12 tuổi tại ngày nhận phòng. [F-HTL-CITY01-018]\nPhí trẻ em, bữa ăn và giường phụ tùy theo gói giá; vui lòng kiểm tra xác nhận đặt phòng trước khi đến. [F-HTL-CITY01-064]\nChỉ khách đã đăng ký được lưu trú qua đêm; vui lòng khai báo tất cả người lưu trú trước khi nhận phòng. [F-HTL-CITY01-066]\nFrom your saved stay details: Đặt phòng từ ngày 10 đến ngày 13 tháng 12 năm 2026, tổng cộng 3 đêm.\nFrom your saved stay details: Có 2 người lớn.\nBé bao nhiêu tuổi? Vui lòng cho biết tuổi của bé để xác định thông tin áp dụng.",
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-ROOM",
+          "source_version": "1.0",
+          "source_hash": "f8ef66ff66ae586328721d9d3955947390ce894bba3629c4f094d1c2b2f72859",
+          "source_generation": 1,
+          "section": "Phòng và lưu trú",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-23T17:15:10.517336+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-ROOM",
+          "source_version": "1.0",
+          "source_hash": "f8ef66ff66ae586328721d9d3955947390ce894bba3629c4f094d1c2b2f72859",
+          "source_generation": 1,
+          "section": "Phòng và lưu trú",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-23T17:15:10.517336+07:00"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-ROOM",
+          "source_version": "1.0",
+          "source_hash": "f8ef66ff66ae586328721d9d3955947390ce894bba3629c4f094d1c2b2f72859",
+          "source_generation": 1,
+          "section": "Phòng và lưu trú",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-23T17:15:10.517336+07:00"
+        }
+      ],
+      "guest_claims": [
+        {
+          "text": "Đặt phòng từ ngày 10 đến ngày 13 tháng 12 năm 2026, tổng cộng 3 đêm.",
+          "refs": [
+            "dates.check_in",
+            "dates.check_out",
+            "dates.nights"
+          ]
+        },
+        {
+          "text": "Có 2 người lớn.",
+          "refs": [
+            "party.adults"
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 15738,
+        "output_tokens": 325,
+        "total_tokens": null
+      },
+      "screenshot": "codex-turn-2.jpg"
+    },
+    {
+      "turn": 3,
+      "id": "supply_age_correct_checkout",
+      "expected": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4,
+        "adults": 2,
+        "children": 1,
+        "child_age": 7,
+        "same_child_id": true
+      },
+      "observed": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4,
+        "adults": 2,
+        "children": 1,
+        "child_age": 7,
+        "same_child_id": true
+      },
+      "checks": {
+        "check_in": true,
+        "check_out": true,
+        "nights": true,
+        "adults": true,
+        "children": true,
+        "child_age": true,
+        "same_child_id": true,
+        "version": true,
+        "http_completed": true,
+        "calls_bound": true
+      },
+      "passed": true,
+      "latency_ms": 9759.8,
+      "request_id": "988daace-397d-44de-9f7b-225df05c0e9b",
+      "brief": {
+        "brief_version": 3,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "receipt": {
+        "request_id": "988daace-397d-44de-9f7b-225df05c0e9b",
+        "status": "applied",
+        "brief_version_before": 2,
+        "brief_version_after": 3,
+        "applied_delta": {
+          "dates": {
+            "check_out": "2026-12-14",
+            "nights": 4
+          },
+          "party": {
+            "children_updated": [
+              {
+                "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+                "age": 7
+              }
+            ]
+          }
+        },
+        "source_refs": [
+          {
+            "source_utterance_id": "d929de42-2398-4c88-b51a-22021dfd51b8",
+            "request_id": "988daace-397d-44de-9f7b-225df05c0e9b",
+            "fields": [
+              "dates.check_out",
+              "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b.age"
+            ]
+          }
+        ],
+        "answer_status": "completed",
+        "brief_version_used": 3
+      },
+      "answer": "From your saved stay details: Ngày nhận phòng: 10 tháng 12 năm 2026; ngày trả phòng: 14 tháng 12 năm 2026; 2 người lớn; 1 trẻ em, 7 tuổi.",
+      "evidence": [],
+      "guest_claims": [
+        {
+          "text": "Ngày nhận phòng: 10 tháng 12 năm 2026; ngày trả phòng: 14 tháng 12 năm 2026; 2 người lớn; 1 trẻ em, 7 tuổi.",
+          "refs": [
+            "dates.check_in",
+            "dates.check_out",
+            "party.adults",
+            "party.children.count",
+            "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b.age"
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 15845,
+        "output_tokens": 236,
+        "total_tokens": null
+      },
+      "screenshot": "codex-turn-3.jpg"
+    },
+    {
+      "turn": 4,
+      "id": "remove_child_mixed_faq",
+      "expected": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4,
+        "adults": 2,
+        "children": 0
+      },
+      "observed": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4,
+        "adults": 2,
+        "children": 0
+      },
+      "checks": {
+        "check_in": true,
+        "check_out": true,
+        "nights": true,
+        "adults": true,
+        "children": true,
+        "version": true,
+        "http_completed": true,
+        "calls_bound": true,
+        "grounded_breakfast": true,
+        "explicit_removal": true
+      },
+      "passed": true,
+      "latency_ms": 8749.4,
+      "request_id": "ce85a436-60f5-4ce1-b7ec-b2f7e5093006",
+      "brief": {
+        "brief_version": 4,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "pending_fields": []
+      },
+      "receipt": {
+        "request_id": "ce85a436-60f5-4ce1-b7ec-b2f7e5093006",
+        "status": "applied",
+        "brief_version_before": 3,
+        "brief_version_after": 4,
+        "applied_delta": {
+          "party": {
+            "children_removed": [
+              {
+                "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+                "age": 7
+              }
+            ]
+          }
+        },
+        "source_refs": [
+          {
+            "source_utterance_id": "134b86fd-35b5-412d-acdc-3e3c9596be63",
+            "request_id": "ce85a436-60f5-4ce1-b7ec-b2f7e5093006",
+            "fields": [
+              "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b"
+            ]
+          }
+        ],
+        "answer_status": "completed",
+        "brief_version_used": 4
+      },
+      "answer": "Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30 đến 09:30 (giờ Việt Nam). [F-HTL-CITY01-040]\nFrom your saved stay details: Đặt phòng từ ngày 10 đến ngày 14 tháng 12 năm 2026, tổng cộng 4 đêm.\nFrom your saved stay details: Có 2 người lớn.",
+      "evidence": [
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "hotel_id": "HTL-CITY01",
+          "source_id": "SRC-HTL-CITY01-FOOD",
+          "source_version": "1.0",
+          "source_hash": "a847c0f2778ece7bd1bac0645689a370a71f9c4816f432b6bce925f1aa52bfc1",
+          "source_generation": 1,
+          "section": "Ăn uống và dị ứng",
+          "fact_version": "1.0",
+          "imported_at": "2026-10-23T17:15:10.517336+07:00"
+        }
+      ],
+      "guest_claims": [
+        {
+          "text": "Đặt phòng từ ngày 10 đến ngày 14 tháng 12 năm 2026, tổng cộng 4 đêm.",
+          "refs": [
+            "dates.check_in",
+            "dates.check_out",
+            "dates.nights"
+          ]
+        },
+        {
+          "text": "Có 2 người lớn.",
+          "refs": [
+            "party.adults"
+          ]
+        }
+      ],
+      "usage": {
+        "input_tokens": 15954,
+        "output_tokens": 213,
+        "total_tokens": null
+      },
+      "screenshot": "codex-turn-4.jpg"
+    }
+  ],
+  "semantic_pass": true,
+  "database_proof": "codex-db-observation.json",
+  "independent_review": "codex-review.md",
+  "observation_correction": "Initial comparison expected removal IDs as strings; actual public delta contract carries removed member objects. Compared exact member_id and prior age7; no product/expected semantics changed."
+}

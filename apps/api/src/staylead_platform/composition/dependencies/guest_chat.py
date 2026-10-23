@@ -25,6 +25,7 @@ from staylead_platform.domains.hospitality.schemas.fact_selection import FactSel
 from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
 from staylead_platform.domains.hospitality.schemas.guest_brief import validate_guest_brief_proposal
 from staylead_platform.infrastructure.ai_provider import FoundryGrokConfig, FoundryGrokProvider
+from staylead_platform.infrastructure.codex_provider import CodexCLIProvider
 from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.knowledge_repository import (
     PostgresKnowledgeFactRepository,
@@ -89,6 +90,15 @@ class GuestChatError(RuntimeError):
 def build_provider(settings: Settings) -> AIProvider | None:
     if settings.ai_provider == "disabled":
         return None
+    if settings.ai_provider == "codex_cli":
+        if settings.environment.lower() not in {"development", "test"}:
+            raise ValueError("The Codex CLI provider is available only in development and test environments.")
+        return CodexCLIProvider(
+            executable=settings.codex_cli_executable,
+            timeout_seconds=settings.ai_timeout_seconds,
+            model=settings.codex_cli_model,
+            reasoning_effort=settings.codex_cli_reasoning_effort,
+        )
     if settings.ai_provider != "foundry_grok":
         raise ValueError("Unsupported AI provider configuration.")
     if (not settings.azure_openai_base_url or not settings.azure_openai_api_key
