@@ -9,6 +9,7 @@ import {
   hasUnresolvedRequest,
   isCurrentGeneration,
   releaseRequest,
+  retryModeForFailure,
 } from "../src/shared/chat/chat-state.ts";
 
 test("ambiguous network outcomes and pending requests keep their request ID", () => {
@@ -26,16 +27,38 @@ test("stale sources require a guest initiated turn and never auto-retry", () => 
   assert.match(stale.message, /latest records/);
 });
 
-test("known retryable provider failures use a new ID because the backend marked the request failed", () => {
-  for (const code of ["provider_timeout", "provider_rate_limited", "storage_unavailable"]) {
+test("retryable errors require same-ID verification until the server confirms terminal failure", () => {
+  for (const code of ["provider_timeout", "provider_rate_limited", "provider_failure",
+    "storage_unavailable", "freshness_unavailable", "brief_apply_outcome_unknown"]) {
     const result = classifyFailure({ code, outcome: "rejected", retryable: true });
-    assert.equal(result.retryMode, "new-request", `${code} must not replay a terminal request ID`);
-    assert.match(result.message, /new request/);
+    assert.equal(result.retryMode, "same-request", `${code} must first check the original request`);
+    assert.match(result.message, /same request/);
   }
+  assert.equal(classifyFailure({ code: "brief_apply_no_effect", retryable: true }).retryMode, "new-request");
+  assert.equal(classifyFailure({ code: "request_failed" }).retryMode, "new-request");
   assert.equal(
     classifyFailure({ code: "request_in_progress", outcome: "rejected", retryable: true }).retryMode,
     "same-request",
   );
+  for (const code of ["storage_unavailable", "freshness_unavailable"]) {
+    assert.equal(classifyFailure({ code, outcome: "rejected", retryable: true }).retryMode, "same-request");
+  }
+});
+
+test("a committed partial result never offers resubmitting the original edit under a new ID", () => {
+  const originalEditFailure = classifyFailure({ code: "provider_failure", outcome: "rejected", retryable: true });
+  assert.equal(originalEditFailure.retryMode, "same-request");
+  assert.equal(retryModeForFailure(originalEditFailure.retryMode, true), undefined);
+  assert.equal(retryModeForFailure("same-request", true), undefined);
+  assert.equal(retryModeForFailure("new-request", false), "new-request");
+});
+
+test("uncertain brief-apply completion stays on the same request until scoped recovery resolves it", () => {
+  const uncertain = classifyFailure({ code: "brief_apply_outcome_unknown", outcome: "rejected", retryable: true });
+  assert.equal(uncertain.retryMode, "same-request");
+  assert.match(uncertain.message, /same request/);
+  const confirmedNoEffect = classifyFailure({ code: "brief_apply_no_effect", outcome: "rejected", retryable: true });
+  assert.equal(confirmedNoEffect.retryMode, "new-request");
 });
 
 test("an unresolved same-ID retry blocks the composer until resolved or a new chat starts", () => {
@@ -44,7 +67,7 @@ test("an unresolved same-ID retry blocks the composer until resolved or a new ch
   assert.equal(canStartRequest(true, false, hasUnresolvedRequest([pendingTurn])), false);
   assert.equal(claimRequest(5, { current: null }), true); // explicit retry remains available
 
-  const terminalTurn = { retryMode: classifyFailure({ code: "provider_timeout", outcome: "rejected", retryable: true }).retryMode };
+  const terminalTurn = { retryMode: classifyFailure({ code: "request_failed", outcome: "rejected" }).retryMode };
   assert.equal(hasUnresolvedRequest([terminalTurn]), false);
   assert.equal(canStartRequest(true, false, hasUnresolvedRequest([terminalTurn])), true);
 });

@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
-import type { AnswerRendererProps, DomainTarget } from "@/composition/registration";
+import type { AnswerRendererProps, GuestBriefRendererProps, DomainTarget } from "@/composition/registration";
 import { formatMediaTime } from "@/shared/chat/media-format";
 import {
   canStartRequest,
@@ -13,6 +13,7 @@ import {
   hasUnresolvedRequest,
   isCurrentGeneration,
   releaseRequest,
+  retryModeForFailure,
   type RetryMode,
 } from "@/shared/chat/chat-state";
 import {
@@ -21,6 +22,8 @@ import {
   GuestMessageResponse,
   GuestMediaDescriptor,
   GuestSession,
+  GuestBriefReceipt,
+  GuestBriefSnapshot,
   checkGuestFreshness,
   fetchGuestMedia,
   sendGuestMessage,
@@ -35,6 +38,13 @@ type ChatTurn = {
   sending?: boolean;
   stale?: boolean;
   freshnessError?: string;
+  receipt?: GuestBriefReceipt | null;
+  appliedDelta?: Record<string, unknown>;
+  resumeReceiptId?: string;
+  partialSuccess?: boolean;
+  briefSnapshot?: GuestBriefSnapshot;
+  answerOnlyReceiptId?: string;
+  sameIdOnly?: boolean;
 };
 
 function requestId() {
@@ -46,12 +56,14 @@ export function GuestChat({
   brand,
   syntheticDisclosure,
   AnswerRenderer,
+  GuestBriefRenderer,
   target,
 }: {
   hotelSlug: string;
   brand: string;
   syntheticDisclosure: string;
   AnswerRenderer: ComponentType<AnswerRendererProps>;
+  GuestBriefRenderer: ComponentType<GuestBriefRendererProps>;
   target: DomainTarget;
 }) {
   const [session, setSession] = useState<GuestSession | null>(null);
@@ -59,11 +71,13 @@ export function GuestChat({
   const [sessionError, setSessionError] = useState("");
   const [sessionErrorRetryable, setSessionErrorRetryable] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
+  const [guestBrief, setGuestBrief] = useState<GuestBriefSnapshot | null>(null);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
   const turnsRef = useRef<ChatTurn[]>([]);
   const freshnessInFlight = useRef(new Set<string>());
   const generation = useRef(0);
+  const briefVersion = useRef(-1);
   const activeRequest = useRef<number | null>(null);
   const hotelName = typeof session?.hotel.name === "string"
     ? session.hotel.name
@@ -73,8 +87,17 @@ export function GuestChat({
     turnsRef.current = turns;
   }, [turns]);
 
+  const acceptBrief = useCallback((brief: GuestBriefSnapshot | undefined, expectedGeneration: number) => {
+    if (!brief || !isCurrentGeneration(expectedGeneration, generation.current)) return;
+    if (brief.brief_version < briefVersion.current) return;
+    briefVersion.current = brief.brief_version;
+    setGuestBrief(brief);
+  }, []);
+
   const openSession = useCallback(async (expectedGeneration: number) => {
     setSession(null);
+    briefVersion.current = -1;
+    setGuestBrief(null);
     setSessionError("");
     setSessionErrorRetryable(false);
     setSessionLoading(true);
@@ -100,7 +123,7 @@ export function GuestChat({
     };
   }, [hotelSlug, openSession]);
 
-  const deliver = useCallback(async (turn: ChatTurn, id: string) => {
+  const deliver = useCallback(async (turn: ChatTurn, id: string, answerOnlyReceiptId?: string) => {
     const currentGeneration = generation.current;
     const activeSession = session;
     if (!activeSession || !claimRequest(currentGeneration, activeRequest)) return;
@@ -113,31 +136,79 @@ export function GuestChat({
         sessionId: activeSession.session_id,
         accessToken: activeSession.access_token,
         requestId: id,
-        question: turn.question,
+        question: answerOnlyReceiptId ? undefined : turn.question,
+        answerOnlyReceiptId,
         target,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
-      setTurns((current) => current.map((item) => item.id === turn.id
-        ? { ...item, id, answer, sending: false, error: undefined, retryMode: undefined }
-        : item));
+      acceptBrief(answer.guest_brief, currentGeneration);
+      if (answer.status === "partial_success") {
+        const partialReceipt = answer.brief_receipt ?? null;
+        setTurns((current) => current.map((item) => item.id === turn.id
+          ? { ...item, id, answerOnlyReceiptId, receipt: partialReceipt,
+              appliedDelta: answer.applied_delta ?? partialReceipt?.applied_delta,
+              briefSnapshot: answer.guest_brief ?? item.briefSnapshot,
+              resumeReceiptId: partialReceipt?.request_id,
+              partialSuccess: true, sending: false,
+              sameIdOnly: false,
+              error: "Your trip details were updated, but the answer did not finish.", retryMode: undefined }
+          : item));
+        return;
+      }
+      setTurns((current) => current.map((item) => {
+        if (item.id === turn.id) {
+          return { ...item, id, answer, receipt: answer.brief_receipt ?? item.receipt,
+            answerOnlyReceiptId,
+            briefSnapshot: answer.guest_brief ?? item.briefSnapshot,
+            appliedDelta: answer.applied_delta ?? item.appliedDelta,
+            resumeReceiptId: undefined, partialSuccess: false,
+            sameIdOnly: false,
+            stale: answer.brief_narrative_stale === true
+              || (answer.brief_version_used !== undefined && answer.guest_brief !== undefined
+                && answer.brief_version_used !== answer.guest_brief.brief_version),
+            sending: false, error: undefined, retryMode: undefined };
+        }
+        if (answerOnlyReceiptId && item.resumeReceiptId === answerOnlyReceiptId) {
+          return { ...item, resumeReceiptId: undefined,
+            receipt: item.receipt ? { ...item.receipt, answer_status: "completed" } : item.receipt };
+        }
+        return item;
+      }));
     } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      const partial = error instanceof ApiError ? error.partialResult : undefined;
+      if (partial) acceptBrief(partial.guest_brief, currentGeneration);
       const display = classifyFailure(error instanceof ApiError
         ? error
         : { outcome: "unknown" });
+      const errorCode = error instanceof ApiError ? error.code : undefined;
       setTurns((current) => current.map((item) => item.id === turn.id
-        ? { ...item, id, sending: false, error: display.message, retryMode: display.retryMode }
+        ? { ...item, id, sending: false,
+            answerOnlyReceiptId,
+            sameIdOnly: partial ? false : errorCode === "brief_apply_no_effect" || errorCode === "request_failed" ? false
+              : item.sameIdOnly || errorCode === "brief_apply_outcome_unknown",
+            error: partial ? "Your trip details were updated, but the answer did not finish." : display.message,
+            receipt: partial?.brief_receipt ?? item.receipt,
+            briefSnapshot: partial?.guest_brief ?? item.briefSnapshot,
+            appliedDelta: partial?.applied_delta ?? item.appliedDelta,
+            resumeReceiptId: partial?.brief_receipt.request_id ?? item.resumeReceiptId,
+            partialSuccess: Boolean(partial),
+            retryMode: partial ? undefined
+              : errorCode === "brief_apply_no_effect" || errorCode === "request_failed" ? display.retryMode
+                : item.sameIdOnly || errorCode === "brief_apply_outcome_unknown"
+                  ? "same-request" : retryModeForFailure(display.retryMode, false) }
         : item));
     } finally {
       if (isCurrentGeneration(currentGeneration, generation.current)) setBusy(false);
       releaseRequest(currentGeneration, activeRequest);
     }
-  }, [session, target]);
+  }, [acceptBrief, session, target]);
 
   const unresolvedRequest = hasUnresolvedRequest(turns);
 
   const recheckAnswer = useCallback(async (turnId: string, response: GuestMessageResponse) => {
     if (!session || freshnessInFlight.current.has(response.request_id)) return;
+    const currentGeneration = generation.current;
     freshnessInFlight.current.add(response.request_id);
     try {
       const result = await checkGuestFreshness({
@@ -146,10 +217,12 @@ export function GuestChat({
         requestId: response.request_id,
         target,
       });
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       setTurns((current) => current.map((item) => item.id === turnId
         ? { ...item, stale: result.status === "stale", freshnessError: undefined }
         : item));
     } catch {
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       setTurns((current) => current.map((item) => item.id === turnId
         ? { ...item, freshnessError: "Could not verify whether this answer is still current." }
         : item));
@@ -183,6 +256,8 @@ export function GuestChat({
   function startNewChat() {
     if (sessionLoading) return;
     setTurns([]);
+    setGuestBrief(null);
+    briefVersion.current = -1;
     setQuestion("");
     const current = ++generation.current;
     setBusy(false);
@@ -210,13 +285,23 @@ export function GuestChat({
       return;
     }
     if (turn.retryMode === "same-request") {
-      void deliver(turn, turn.id);
+      void deliver(turn, turn.id, turn.answerOnlyReceiptId);
       return;
     }
     if (turn.retryMode === "new-request") {
       const nextId = requestId();
-      void deliver(turn, nextId);
+      void deliver(turn, nextId, turn.answerOnlyReceiptId);
     }
+  }
+
+  function resumeAnswer(turn: ChatTurn) {
+    if (!turn.resumeReceiptId || !session || busy) return;
+    const resumeTurn: ChatTurn = {
+      id: requestId(), question: "Continue the answer using the saved trip details.",
+      sending: true, answerOnlyReceiptId: turn.resumeReceiptId,
+    };
+    setTurns((current) => [...current, resumeTurn]);
+    void deliver(resumeTurn, resumeTurn.id, turn.resumeReceiptId);
   }
 
   return (
@@ -226,6 +311,7 @@ export function GuestChat({
         <p className="synthetic-label">{syntheticDisclosure}</p>
         <h1>{hotelName}</h1>
         <p className="chat-intro">Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.</p>
+        {guestBrief && guestBrief.brief_version > 0 && <GuestBriefRenderer brief={guestBrief} />}
       </header>
 
       <section className="chat-panel" aria-label={`Chat with ${hotelName}`}>
@@ -239,6 +325,11 @@ export function GuestChat({
               {turn.error && (
                 <div className="message message-error" role="status">
                   <p>{turn.error}</p>
+                  {turn.partialSuccess && turn.resumeReceiptId && (
+                    <button className="text-button" type="button" onClick={() => resumeAnswer(turn)} disabled={busy || !session}>
+                      Continue the answer using the updated trip details
+                    </button>
+                  )}
                   {turn.retryMode && turn.retryMode !== "none" && (
                     <button className="text-button" type="button" onClick={() => retry(turn)} disabled={busy || !session}>
                       {turn.retryMode === "same-request" ? "Retry this request" : turn.retryMode === "new-request" ? "Submit as a new request" : "Start a new chat"}
@@ -251,6 +342,17 @@ export function GuestChat({
                   )}
                 </div>
               )}
+              {turn.receipt && <>
+                <details className="brief-receipt">
+                  <summary>Trip update receipt · version {turn.receipt.brief_version_after}</summary>
+                  <p>{turn.receipt.status === "applied" ? "The update was applied." : turn.receipt.status === "no_change"
+                    ? "No trip details changed." : turn.receipt.status === "clarification"
+                      ? "Some details still need clarification." : turn.receipt.answer_status === "completed"
+                        ? "The update was applied and the answer has now completed." : "The update was applied, but the answer did not finish."}</p>
+                  <p>Recorded at trip details version {turn.receipt.brief_version_after}; current details may have changed since.</p>
+                  <GuestBriefRenderer brief={guestBrief ?? turn.briefSnapshot ?? {}} receipt={turn.receipt} delta={turn.appliedDelta} />
+                </details>
+              </>}
               {turn.answer && <AnswerCard
                 response={turn.answer}
                 session={session}
@@ -325,7 +427,7 @@ function AnswerCard({
       {stale && <p className="status-note" role="status">This answer may no longer be current. Ask again for an updated answer.</p>}
       {freshnessError && <p className="status-note" role="status">{freshnessError}</p>}
       <button className="text-button" type="button" onClick={onRecheck}>Check whether this answer is current</button>
-      <AnswerRenderer answer={response.answer} />
+      <AnswerRenderer answer={response.answer ?? ""} />
       {!stale && !freshnessError && !!response.media?.length && session && (
         <div className="answer-media" aria-label="Approved hotel media">
           {response.media.map((media) => (
@@ -333,17 +435,17 @@ function AnswerCard({
           ))}
         </div>
       )}
-      {!!response.unknowns.length && (
+      {!!response.unknowns?.length && (
         <div className="unknown-block">
           <h2>Could not confirm</h2>
-          <ul>{response.unknowns.map((unknown, index) => <li key={`${index}-${unknown}`}>{unknown}</li>)}</ul>
+          <ul>{response.unknowns?.map((unknown, index) => <li key={`${index}-${unknown}`}>{unknown}</li>)}</ul>
         </div>
       )}
-      {!!response.evidence.length && (
+      {!!response.evidence?.length && (
         <details className="evidence-list">
           <summary>Hotel records used ({response.evidence.length})</summary>
           <ul>
-            {response.evidence.map((item, index) => (
+            {response.evidence?.map((item, index) => (
               <li key={`${item.fact_id}-${index}`}>
                 <span>{item.section || "Hotel information"}</span>
                 <small>Record {item.fact_id} · source {item.source_id} · version {item.source_version}</small>

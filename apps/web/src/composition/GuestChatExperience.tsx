@@ -14,6 +14,7 @@ export function GuestChatExperience({ hotelSlug }: { hotelSlug: string }) {
     };
   }, []);
   const AnswerRenderer = registration.answerRenderer;
+  const GuestBriefRenderer = registration.guestBriefRenderer;
 
   return (
     <div className={registration.themeClass}>
@@ -24,6 +25,7 @@ export function GuestChatExperience({ hotelSlug }: { hotelSlug: string }) {
         brand={registration.content.brand}
         syntheticDisclosure={registration.content.syntheticDisclosure}
         AnswerRenderer={AnswerRenderer}
+        GuestBriefRenderer={GuestBriefRenderer}
       />
     </div>
   );

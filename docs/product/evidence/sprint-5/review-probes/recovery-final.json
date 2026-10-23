@@ -1,0 +1,22 @@
+{
+  "lost_ack": {
+    "http": 502,
+    "status": "partial_success",
+    "error": "brief_apply_outcome_unknown",
+    "receipt_returned": true,
+    "replay_extra_provider_calls": 0,
+    "answer_only_resume_http": 200,
+    "children_after_resume": 1
+  },
+  "completed_replay_lookup_failure": {
+    "http": 503,
+    "error": {
+      "code": "freshness_unavailable",
+      "message": "Trip details freshness could not be checked.",
+      "retryable": true
+    },
+    "same_id_recovery_http": 200,
+    "replay_extra_provider_calls": 0,
+    "children_after_same_id_recovery": 1
+  }
+}

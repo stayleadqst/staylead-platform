@@ -32,6 +32,10 @@ body {
 }
 .chat-header h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(32px, 6vw, 46px); letter-spacing: -.03em; }
 .chat-intro { max-width: 620px; margin: 10px 0 0; color: #5a625d; font-size: 16px; line-height: 1.55; }
+.brief-summary { margin-top: 16px; border: 1px solid #dce6dd; border-radius: 12px; padding: 12px 14px; background: #f8faf7; color: #34473b; }
+.brief-summary h2 { margin: 0 0 6px; font-size: 14px; }
+.brief-summary p { margin: 4px 0; font-size: 13px; }
+.brief-summary small { color: #69736c; font-size: 11px; }
 .chat-panel { overflow: hidden; border: 1px solid #e1e3dc; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px rgb(41 51 43 / 8%); }
 .chat-transcript { display: flex; min-height: 350px; max-height: min(58vh, 700px); flex-direction: column; gap: 20px; overflow-y: auto; padding: 28px clamp(16px, 4vw, 36px); }
 .status-note { margin: 0; color: #69736c; font-size: 14px; }
@@ -47,6 +51,11 @@ body {
 .media-evidence figcaption .text-button { padding: 0; }
 .answer-text { white-space: pre-wrap; }
 .message-error { border: 1px solid #e8c6b9; background: #fff7f3; color: #713d2b; }
+.brief-receipt, .brief-delta { max-width: min(100%, 680px); border: 1px solid #dce6dd; border-radius: 12px; padding: 10px 13px; background: #fbfcfa; color: #34473b; font-size: 13px; }
+.brief-receipt summary, .brief-delta summary { color: #315f4d; font-weight: 700; cursor: pointer; }
+.brief-receipt p { margin: 8px 0 0; }
+.brief-delta-text { margin: 8px 0 0; color: #39473e; }
+.brief-delta pre { overflow: auto; max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message-error p, .session-error p { margin: 0; }
 .text-button { margin-top: 10px; border: 0; padding: 0; background: transparent; color: #235845; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 .text-button:disabled { color: #7e8781; cursor: wait; }

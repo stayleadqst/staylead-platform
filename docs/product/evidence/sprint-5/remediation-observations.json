@@ -1,0 +1,36 @@
+{
+  "story": 90,
+  "state": "Blocked in Sprint5; fixed code/offline mechanics PASS, real-model gate incomplete",
+  "candidate_fingerprint": "0b00a3ce05f908fdf974e8e5df91d190e86a121ccdd82555e2782c70a5d7d4ba",
+  "prior_attempts": 1,
+  "continued_attempts": 7,
+  "continued_limit": 8,
+  "successful_returned_results": 5,
+  "real_semantic_turns": 2,
+  "explicit_answer_only_resumes": 1,
+  "automatic_paid_retries": 0,
+  "success_usage_subset": {
+    "input_tokens": 13106,
+    "output_tokens": 277,
+    "total_tokens": 18196
+  },
+  "failed_and_cancelled_usage": "unavailable; aggregate complete sprint usage/billing unknown",
+  "diagnostic": {
+    "attempt": 7,
+    "milliseconds": 4271.6,
+    "tcp_complete_ms": 387.4,
+    "tls_complete_ms": 916.1,
+    "response_headers_complete_ms": 4270.0,
+    "interpretation": "one tiny request worked; no transport timing exists for earlier failed requests; model/application latency cause not proven"
+  },
+  "verified_app_defect": "empty semantic selection previously retained preliminary retrieval facts; fixed and regression tested",
+  "request_fixes": [
+    "documented max_completion_tokens field, same number",
+    "separate concise committed answer and selection-only prompts; extraction path preserved",
+    "empty selected IDs clear preliminary facts",
+    "optional sanitized transport timing and cancellation events; default requests unchanged"
+  ],
+  "real_acceptance": "Initial turn1 passed old phase; turn2 child mutation correct but answer timedout; receipt resume later exhausted45s; fresh four-turn sequence on final fixed candidate NOT RUN",
+  "next_action": "Retain #90 and #84\u201387 Blocked insideSprint5; publish reviewed fixes; no more paid calls/cap change. Remaining1call cannot cover required freshfourturn gate.",
+  "human_limit_decision": "Hieu explicitly confirmed KEEP8 on both extension questions"
+}

@@ -1,0 +1,12 @@
+{
+  "initial_http": 200,
+  "replay_http": 503,
+  "replay_error": {
+    "code": "freshness_unavailable",
+    "message": "Trip details freshness could not be checked.",
+    "retryable": true
+  },
+  "replay_extra_provider_calls": 0,
+  "child_count_before_replay": 1,
+  "child_count_after_offered_raw_retry": 2
+}

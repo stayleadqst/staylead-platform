@@ -34,6 +34,14 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
+from staylead_platform.platform.contracts.guest_brief import (
+    GuestBriefContext,
+    GuestBriefMutationResult,
+    GuestBriefReceipt,
+    GuestBriefSnapshot,
+    GuestBriefSourceRef,
+    ValidatedGuestBriefPatch,
+)
 from staylead_platform.platform.contracts.knowledge import (
     ActiveKnowledgeSnapshot,
     EvidenceBinding,
@@ -42,7 +50,7 @@ from staylead_platform.platform.contracts.knowledge import (
 )
 
 metadata = MetaData()
-CURRENT_SCHEMA_VERSION = 4
+CURRENT_SCHEMA_VERSION = 5
 schema_versions = Table(
     "schema_versions", metadata,
     Column("version", Integer, primary_key=True),
@@ -159,6 +167,44 @@ lifecycle_operations = Table(
     Column("operation_kind", String(24), nullable=False),
     Column("payload_hash", String(64), nullable=False),
     Column("result", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+)
+guest_briefs = Table(
+    "guest_briefs", metadata,
+    Column("session_id", String(36), primary_key=True),
+    Column("hotel_id", String(80), nullable=False, index=True),
+    Column("brief_version", Integer, nullable=False),
+    Column("data", JSON, nullable=False),
+    Column("pending_fields", JSON, nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+)
+guest_brief_source_utterances = Table(
+    "guest_brief_source_utterances", metadata,
+    Column("source_utterance_id", String(36), primary_key=True),
+    Column("session_id", String(36), nullable=False, index=True),
+    Column("hotel_id", String(80), nullable=False),
+    Column("request_id", String(128), nullable=False),
+    Column("content", Text, nullable=False),
+    Column("fields", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+)
+guest_brief_receipts = Table(
+    "guest_brief_receipts", metadata,
+    Column("request_id", String(128), primary_key=True),
+    Column("session_id", String(36), nullable=False, index=True),
+    Column("hotel_id", String(80), nullable=False),
+    Column("expected_brief_version", Integer, nullable=False),
+    Column("payload_hash", String(64), nullable=False),
+    Column("status", String(24), nullable=False),
+    Column("brief_version_before", Integer, nullable=False),
+    Column("brief_version_after", Integer, nullable=False),
+    Column("applied_delta", JSON, nullable=False),
+    Column("source_utterance_id", String(36), nullable=False),
+    Column("source_fields", JSON, nullable=False),
+    Column("answer_status", String(20), nullable=False),
+    Column("brief_version_used", Integer),
+    Column("brief_dependent", Boolean, nullable=False, server_default="true"),
+    Column("answer_payload", JSON),
     Column("created_at", DateTime(timezone=True), nullable=False),
 )
 
@@ -464,6 +510,10 @@ def apply_migrations(engine: Engine) -> int:
                 )))
             _backfill_legacy_response_bindings(connection, utcnow())
             connection.execute(insert(schema_versions).values(version=4, applied_at=utcnow()))
+            existing = 4
+        if existing < 5:
+            # New guest brief/source/receipt tables were created by metadata.create_all above.
+            connection.execute(insert(schema_versions).values(version=5, applied_at=utcnow()))
     return CURRENT_SCHEMA_VERSION
 
 
@@ -1059,6 +1109,201 @@ def create_session(engine: Engine, session_id: str, hotel_id: str, expires_at: d
         ))
 
 
+def _brief_snapshot(row: Any | None) -> GuestBriefSnapshot:
+    if row is None:
+        return GuestBriefSnapshot(0, {"dates": {"check_in": None, "check_out": None, "nights": None},
+                                   "party": {"adults": None, "children": []}}, ())
+    return GuestBriefSnapshot(int(row["brief_version"]), dict(row["data"]),
+                              tuple(row["pending_fields"] or ()))
+
+
+def get_guest_brief(
+    engine: Engine, *, session_id: str, hotel_id: str,
+    timeout_seconds: float | None = None,
+) -> GuestBriefSnapshot:
+    """Read the canonical brief in its hotel/session scope; absent briefs are version zero."""
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions.c.session_id).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > utcnow(),
+        ))).first()
+        if session is None:
+            raise ScopeError("session scope is invalid")
+        row = connection.execute(select(guest_briefs).where(and_(
+            guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        return _brief_snapshot(row)
+
+
+def _brief_receipt(row: Any) -> GuestBriefReceipt:
+    ref = GuestBriefSourceRef(
+        source_utterance_id=row["source_utterance_id"], request_id=row["request_id"],
+        fields=tuple(row["source_fields"] or ()),
+    )
+    return GuestBriefReceipt(
+        request_id=row["request_id"], status=row["status"],
+        brief_version_before=int(row["brief_version_before"]),
+        brief_version_after=int(row["brief_version_after"]),
+        applied_delta=dict(row["applied_delta"] or {}), source_refs=(ref,),
+        answer_status=row["answer_status"], brief_version_used=row["brief_version_used"],
+    )
+
+
+def get_guest_brief_receipt(
+    engine: Engine, *, session_id: str, hotel_id: str, receipt_id: str,
+    timeout_seconds: float | None = None,
+) -> dict[str, Any] | None:
+    """Load an applied receipt and current brief only for its owning session and hotel."""
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        row = connection.execute(select(guest_brief_receipts).where(and_(
+            guest_brief_receipts.c.request_id == receipt_id,
+            guest_brief_receipts.c.session_id == session_id,
+            guest_brief_receipts.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        if row is None:
+            return None
+        current = connection.execute(select(guest_briefs).where(and_(
+            guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        return {
+            "brief": _brief_snapshot(current), "receipt": _brief_receipt(row),
+            "answer_payload": dict(row["answer_payload"] or {}),
+            "brief_dependent": bool(row["brief_dependent"]),
+        }
+
+
+def get_guest_brief_source_utterance(
+    engine: Engine, *, session_id: str, hotel_id: str, receipt_id: str,
+    timeout_seconds: float | None = None,
+) -> dict[str, Any] | None:
+    """Load the durable original utterance only through its owning applied receipt."""
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        row = connection.execute(select(
+            guest_brief_source_utterances.c.source_utterance_id,
+            guest_brief_source_utterances.c.request_id,
+            guest_brief_source_utterances.c.content,
+            guest_brief_source_utterances.c.fields,
+        ).select_from(guest_brief_receipts.join(
+            guest_brief_source_utterances,
+            guest_brief_receipts.c.source_utterance_id
+            == guest_brief_source_utterances.c.source_utterance_id,
+        )).where(and_(
+            guest_brief_receipts.c.request_id == receipt_id,
+            guest_brief_receipts.c.session_id == session_id,
+            guest_brief_receipts.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        return dict(row) if row else None
+
+
+def apply_guest_brief_patch(
+    engine: Engine, *, context: GuestBriefContext, mutation: ValidatedGuestBriefPatch,
+    payload_hash: str, timeout_seconds: float | None = None,
+    now: datetime | None = None, deadline_monotonic: float | None = None,
+    cancellation_event: Event | None = None,
+) -> GuestBriefMutationResult:
+    """CAS-commit canonical brief, durable guest utterance, delta, and receipt atomically."""
+    checked_at = (now or utcnow()).astimezone(UTC)
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions).where(and_(
+            sessions.c.session_id == context.session_id,
+            sessions.c.hotel_id == context.hotel_id,
+            sessions.c.expires_at > checked_at,
+        )).with_for_update()).mappings().first()
+        if session is None:
+            raise ScopeError("session scope is invalid")
+        prior_receipt = connection.execute(select(guest_brief_receipts).where(
+            guest_brief_receipts.c.request_id == context.request_id,
+        )).mappings().first()
+        if prior_receipt is not None:
+            if (prior_receipt["session_id"] != context.session_id
+                    or prior_receipt["hotel_id"] != context.hotel_id
+                    or prior_receipt["payload_hash"] != payload_hash):
+                raise IdempotencyConflict("request_id was already used with different brief data")
+            current = connection.execute(select(guest_briefs).where(and_(
+                guest_briefs.c.session_id == context.session_id,
+                guest_briefs.c.hotel_id == context.hotel_id,
+            ))).mappings().first()
+            return GuestBriefMutationResult(_brief_snapshot(current), _brief_receipt(prior_receipt), True)
+
+        current_row = connection.execute(select(guest_briefs).where(and_(
+            guest_briefs.c.session_id == context.session_id,
+            guest_briefs.c.hotel_id == context.hotel_id,
+        )).with_for_update()).mappings().first()
+        current = _brief_snapshot(current_row)
+        if current.brief_version != context.expected_brief_version:
+            raise VersionConflict("guest brief version changed")
+        refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        before = current.brief_version
+        changed = (mutation.data != current.data
+                   or tuple(mutation.pending_fields) != current.pending_fields)
+        after = before + 1 if changed else before
+        status = mutation.status if changed else "no_change"
+        if changed:
+            if current_row is None:
+                connection.execute(insert(guest_briefs).values(
+                    session_id=context.session_id, hotel_id=context.hotel_id,
+                    brief_version=after, data=mutation.data,
+                    pending_fields=list(mutation.pending_fields), updated_at=checked_at,
+                ))
+            else:
+                connection.execute(update(guest_briefs).where(and_(
+                    guest_briefs.c.session_id == context.session_id,
+                    guest_briefs.c.hotel_id == context.hotel_id,
+                    guest_briefs.c.brief_version == before,
+                )).values(brief_version=after, data=mutation.data,
+                          pending_fields=list(mutation.pending_fields), updated_at=checked_at))
+        connection.execute(insert(guest_brief_source_utterances).values(
+            source_utterance_id=context.source_utterance_id,
+            session_id=context.session_id, hotel_id=context.hotel_id,
+            request_id=context.request_id, content=context.source_utterance,
+            fields=list(mutation.source_fields), created_at=checked_at,
+        ))
+        connection.execute(insert(guest_brief_receipts).values(
+            request_id=context.request_id, session_id=context.session_id,
+            hotel_id=context.hotel_id, expected_brief_version=before,
+            payload_hash=payload_hash, status=status,
+            brief_version_before=before, brief_version_after=after,
+            applied_delta=mutation.applied_delta,
+            source_utterance_id=context.source_utterance_id,
+            source_fields=list(mutation.source_fields), answer_status="pending",
+            brief_version_used=after if changed else None, brief_dependent=changed,
+            created_at=checked_at,
+        ))
+        refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        brief = GuestBriefSnapshot(after, mutation.data, tuple(mutation.pending_fields))
+        source_ref = GuestBriefSourceRef(context.source_utterance_id, context.request_id,
+                                         tuple(mutation.source_fields))
+        receipt = GuestBriefReceipt(context.request_id, status, before, after,
+                                    mutation.applied_delta, (source_ref,), "pending",
+                                    after if changed else None)
+        refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        return GuestBriefMutationResult(brief, receipt)
+
+
+def record_guest_brief_answer(
+    engine: Engine, *, context: GuestBriefContext, brief_version_used: int,
+    answer_status: str, answer_payload: dict[str, Any],
+    evidence_bindings: list[EvidenceBinding | dict[str, Any]] | None = None,
+    expected_generation: int | None = None,
+    timeout_seconds: float | None = None,
+) -> None:
+    """Persist a terminal receipt outcome; completion freshness is checked separately."""
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        updated = connection.execute(update(guest_brief_receipts).where(and_(
+            guest_brief_receipts.c.request_id == context.request_id,
+            guest_brief_receipts.c.session_id == context.session_id,
+            guest_brief_receipts.c.hotel_id == context.hotel_id,
+        )).values(answer_status=answer_status, brief_version_used=brief_version_used,
+                  answer_payload=answer_payload, brief_dependent=True))
+        if updated.rowcount != 1:
+            raise ScopeError("guest brief receipt scope is invalid")
+
+
 def get_session(
     engine: Engine, session_id: str, *, timeout_seconds: float | None = None,
 ) -> dict[str, Any] | None:
@@ -1127,12 +1372,82 @@ def reserve_request(
         if row["status"] == "processing":
             raise RequestInProgress("request is still processing")
         if row["status"] == "error":
-            raise RuntimeError(row["error_code"] or "request_failed")
-        response = dict(row["response"])
+            # The worker may have committed the canonical brief and then lost its
+            # acknowledgement to a timeout/cancellation. Recover the durable effect
+            # by request ID so a same-ID replay never reapplies it or calls the model.
+            receipt_row = connection.execute(select(guest_brief_receipts).where(and_(
+                guest_brief_receipts.c.request_id == request_id,
+                guest_brief_receipts.c.session_id == session_id,
+                guest_brief_receipts.c.hotel_id == hotel_id,
+            ))).mappings().first()
+            if (row["error_code"] == "brief_apply_outcome_unknown"
+                    and (receipt_row is None or receipt_row["brief_version_after"]
+                         <= receipt_row["brief_version_before"])):
+                raise RuntimeError("brief_apply_no_effect")
+            if receipt_row is None:
+                raise RuntimeError(row["error_code"] or "request_failed")
+            connection.execute(update(guest_brief_receipts).where(and_(
+                guest_brief_receipts.c.request_id == request_id,
+                guest_brief_receipts.c.session_id == session_id,
+                guest_brief_receipts.c.hotel_id == hotel_id,
+            )).values(answer_status="failed"))
+            current_brief = connection.execute(select(guest_briefs).where(and_(
+                guest_briefs.c.session_id == session_id,
+                guest_briefs.c.hotel_id == hotel_id,
+            ))).mappings().first()
+            response = {
+                "request_id": request_id, "status": "partial_success",
+                "answer_status": "failed", "error": {
+                    "code": row["error_code"] or "answer_failed",
+                    "message": "The brief was saved, but the answer did not finish. Resume using this receipt.",
+                },
+                "applied_delta": receipt_row["applied_delta"] or {},
+                "brief_receipt": {
+                    "request_id": request_id, "status": receipt_row["status"],
+                    "brief_version_before": receipt_row["brief_version_before"],
+                    "brief_version_after": receipt_row["brief_version_after"],
+                    "applied_delta": receipt_row["applied_delta"] or {},
+                    "answer_status": "failed",
+                    "brief_version_used": receipt_row["brief_version_used"],
+                    "source_refs": [{
+                        "source_utterance_id": receipt_row["source_utterance_id"],
+                        "request_id": request_id,
+                        "fields": receipt_row["source_fields"] or [],
+                    }],
+                },
+                "evidence": [], "evidence_bindings": [],
+            }
+            if current_brief is not None:
+                response["guest_brief"] = {
+                    "brief_version": current_brief["brief_version"],
+                    **(current_brief["data"] or {}),
+                    "pending_fields": current_brief["pending_fields"] or [],
+                }
+            connection.execute(update(requests).where(and_(
+                requests.c.session_id == session_id,
+                requests.c.hotel_id == hotel_id,
+                requests.c.request_id == request_id,
+                requests.c.status == "error",
+            )).values(status="completed", response=response))
+        else:
+            response = dict(row["response"])
         bindings = response.get("evidence_bindings", [])
         decision = _validate_evidence_on_connection(connection, hotel_id, bindings, utcnow())
         response["freshness"] = {"status": decision.status, "eligible": decision.eligible,
                                  "checked_at": decision.checked_at.isoformat(), "reason": decision.reason}
+        if response.get("brief_dependent"):
+            current_brief = connection.execute(select(guest_briefs).where(and_(
+                guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+            ))).mappings().first()
+            current_brief_version = int(current_brief["brief_version"]) if current_brief else 0
+            response["brief_narrative_stale"] = current_brief_version != response.get("brief_version_used")
+            response["brief_freshness"] = "stale" if response["brief_narrative_stale"] else "current"
+            if current_brief is not None:
+                response["guest_brief"] = {
+                    "brief_version": current_brief_version,
+                    **(current_brief["data"] or {}),
+                    "pending_fields": current_brief["pending_fields"] or [],
+                }
         return response
 
 
@@ -1141,6 +1456,9 @@ def complete_request(
     question: str, answer: str, evidence: list[dict[str, Any]],
     response_fields: dict[str, Any] | None = None,
     expected_generation: int | None = None,
+    brief_version_used: int | None = None,
+    brief_dependent: bool = False,
+    brief_receipt_id: str | None = None,
     evidence_bindings: list[EvidenceBinding | dict[str, Any]] | None = None,
     timeout_seconds: float | None = None,
     deadline_monotonic: float | None = None,
@@ -1154,6 +1472,9 @@ def complete_request(
         "status": "completed",
     }
     result.update(response_fields or {})
+    if brief_version_used is not None:
+        result["brief_version_used"] = brief_version_used
+        result["brief_dependent"] = brief_dependent
     bindings = evidence_bindings or []
     serialized_bindings = [{
         "source": {
@@ -1197,6 +1518,14 @@ def complete_request(
         )).with_for_update()).mappings().first()
         if not session:
             raise ScopeError("session scope is invalid")
+        if brief_dependent:
+            if brief_version_used is None:
+                raise ValueError("A brief-dependent answer requires brief_version_used.")
+            current_brief_version = connection.scalar(select(guest_briefs.c.brief_version).where(and_(
+                guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+            ))) or 0
+            if brief_version_used != current_brief_version:
+                raise VersionConflict("guest brief changed before the answer completed")
         # Locks may have waited across session or source expiry. Validate the actual
         # commit-time UTC day after all scope locks have been acquired.
         now = utcnow()
@@ -1229,10 +1558,63 @@ def complete_request(
         if updated.rowcount != 1:
             raise VersionConflict("session state version changed")
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
-        connection.execute(update(requests).where(and_(
+        if brief_version_used is not None or brief_receipt_id is not None:
+            receipt_query = select(guest_brief_receipts.c.request_id).where(and_(
+                guest_brief_receipts.c.request_id == (brief_receipt_id or request_id),
+                guest_brief_receipts.c.session_id == session_id,
+                guest_brief_receipts.c.hotel_id == hotel_id,
+            ))
+            receipt_exists = connection.scalar(receipt_query)
+            if receipt_exists is not None:
+                receipt_values: dict[str, Any] = {
+                    "answer_status": "completed",
+                    "answer_payload": {"answer": answer},
+                    "brief_dependent": brief_dependent,
+                }
+                if brief_version_used is not None:
+                    receipt_values["brief_version_used"] = brief_version_used
+                receipt_updated = connection.execute(update(guest_brief_receipts).where(and_(
+                    guest_brief_receipts.c.request_id == (brief_receipt_id or request_id),
+                    guest_brief_receipts.c.session_id == session_id,
+                    guest_brief_receipts.c.hotel_id == hotel_id,
+                )).values(**receipt_values))
+                if receipt_updated.rowcount != 1:
+                    raise ScopeError("guest brief receipt scope is invalid")
+                receipt_row = connection.execute(select(guest_brief_receipts).where(and_(
+                    guest_brief_receipts.c.request_id == (brief_receipt_id or request_id),
+                    guest_brief_receipts.c.session_id == session_id,
+                    guest_brief_receipts.c.hotel_id == hotel_id,
+                ))).mappings().one()
+                result["brief_receipt"] = {
+                    "request_id": receipt_row["request_id"],
+                    "status": receipt_row["status"],
+                    "brief_version_before": receipt_row["brief_version_before"],
+                    "brief_version_after": receipt_row["brief_version_after"],
+                    "applied_delta": receipt_row["applied_delta"],
+                    "source_refs": [{
+                        "source_utterance_id": receipt_row["source_utterance_id"],
+                        "request_id": receipt_row["request_id"],
+                        "fields": receipt_row["source_fields"],
+                    }],
+                    "answer_status": receipt_row["answer_status"],
+                    "brief_version_used": receipt_row["brief_version_used"],
+                }
+                current_brief = connection.execute(select(guest_briefs).where(and_(
+                    guest_briefs.c.session_id == session_id,
+                    guest_briefs.c.hotel_id == hotel_id,
+                ))).mappings().first()
+                if current_brief is not None:
+                    result["guest_brief"] = {
+                        "brief_version": current_brief["brief_version"],
+                        **(current_brief["data"] or {}),
+                        "pending_fields": current_brief["pending_fields"],
+                    }
+        updated_request = connection.execute(update(requests).where(and_(
             requests.c.session_id == session_id, requests.c.request_id == request_id,
             requests.c.hotel_id == hotel_id, requests.c.status == "processing",
         )).values(status="completed", response=result))
+        if updated_request.rowcount != 1:
+            raise ScopeError("request scope is invalid")
         final_now = utcnow()
         if session["expires_at"] <= final_now:
             raise ScopeError("session scope is invalid")
@@ -1257,6 +1639,83 @@ def fail_request(
             requests.c.session_id == session_id, requests.c.request_id == request_id,
             requests.c.status == "processing",
         )).values(status="error", error_code=code))
+
+
+def complete_partial_request(
+    engine: Engine, *, session_id: str, hotel_id: str, request_id: str,
+    response: dict[str, Any], brief_receipt_id: str | None = None,
+    brief_version_used: int | None = None, timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Persist an applied-brief/failed-answer result as replayable terminal state."""
+    if response.get("status") != "partial_success" or response.get("answer_status") != "failed":
+        raise ValueError("A partial brief result must have failed answer status.")
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        result = dict(response)
+        receipt_id = brief_receipt_id or request_id
+        receipt_query = select(guest_brief_receipts).where(and_(
+            guest_brief_receipts.c.request_id == receipt_id,
+            guest_brief_receipts.c.session_id == session_id,
+            guest_brief_receipts.c.hotel_id == hotel_id,
+        )).with_for_update()
+        receipt = connection.execute(receipt_query).mappings().first()
+        if receipt is None:
+            raise ScopeError("guest brief receipt scope is invalid")
+        receipt_values: dict[str, Any] = {
+            "answer_status": "failed", "answer_payload": result,
+            "brief_dependent": brief_version_used is not None,
+        }
+        if brief_version_used is not None:
+            receipt_values["brief_version_used"] = brief_version_used
+        changed = receipt["brief_version_after"] > receipt["brief_version_before"]
+        if changed:
+            receipt_values["status"] = "partial_success"
+        receipt_updated = connection.execute(update(guest_brief_receipts).where(and_(
+            guest_brief_receipts.c.request_id == receipt_id,
+            guest_brief_receipts.c.session_id == session_id,
+            guest_brief_receipts.c.hotel_id == hotel_id,
+        )).values(**receipt_values))
+        if receipt_updated.rowcount != 1:
+            raise ScopeError("guest brief receipt scope is invalid")
+        receipt = connection.execute(receipt_query).mappings().one()
+        result["applied_delta"] = receipt["applied_delta"] or {}
+        result["brief_receipt"] = {
+            "request_id": receipt["request_id"], "status": receipt["status"],
+            "brief_version_before": receipt["brief_version_before"],
+            "brief_version_after": receipt["brief_version_after"],
+            "applied_delta": receipt["applied_delta"] or {},
+            "source_refs": [{
+                "source_utterance_id": receipt["source_utterance_id"],
+                "request_id": receipt["request_id"],
+                "fields": receipt["source_fields"] or [],
+            }],
+            "answer_status": "failed",
+            "brief_version_used": receipt["brief_version_used"],
+        }
+        current_brief = connection.execute(select(guest_briefs).where(and_(
+            guest_briefs.c.session_id == session_id,
+            guest_briefs.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        if current_brief is not None:
+            result["guest_brief"] = {
+                "brief_version": current_brief["brief_version"],
+                **(current_brief["data"] or {}),
+                "pending_fields": current_brief["pending_fields"] or [],
+            }
+        connection.execute(update(guest_brief_receipts).where(and_(
+            guest_brief_receipts.c.request_id == receipt_id,
+            guest_brief_receipts.c.session_id == session_id,
+            guest_brief_receipts.c.hotel_id == hotel_id,
+        )).values(answer_payload=result))
+        updated = connection.execute(update(requests).where(and_(
+            requests.c.session_id == session_id,
+            requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id,
+            requests.c.status == "processing",
+        )).values(status="completed", response=result))
+        if updated.rowcount != 1:
+            raise ScopeError("request scope is invalid")
+    return result
 
 
 def update_completed_response(engine: Engine, session_id: str, request_id: str, response: dict[str, Any]) -> None:

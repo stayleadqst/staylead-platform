@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy.engine import Engine
 
 from staylead_platform.composition.configuration.settings import Settings
@@ -24,8 +24,17 @@ class CreateSessionRequest(BaseModel):
 
 
 class MessageRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     request_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
-    question: str = Field(min_length=1, max_length=MAX_QUESTION_CHARS)
+    question: str | None = Field(default=None, min_length=1, max_length=MAX_QUESTION_CHARS)
+    answer_only_receipt_id: str | None = Field(default=None, min_length=1, max_length=128,
+                                               pattern=r"^[A-Za-z0-9._:-]+$")
+
+    @model_validator(mode="after")
+    def require_question_or_resume_receipt(self) -> "MessageRequest":
+        if (self.question is None) == (self.answer_only_receipt_id is None):
+            raise ValueError("Provide either a question or an answer-only receipt reference.")
+        return self
 
 
 class FreshnessRequest(BaseModel):
@@ -55,9 +64,14 @@ def create_app(
 
     @app.exception_handler(GuestChatError)
     async def guest_chat_error(_request: Any, exc: GuestChatError) -> JSONResponse:
-        return JSONResponse(status_code=exc.status, content={
+        content: dict[str, Any] = {
             "error": {"code": exc.code, "message": str(exc), "retryable": exc.retryable},
-        })
+        }
+        partial_result = getattr(exc, "partial_result", None)
+        if partial_result is not None:
+            content.update(partial_result)
+            content["error"] = {"code": exc.code, "message": str(exc), "retryable": exc.retryable}
+        return JSONResponse(status_code=exc.status, content=content)
 
     @app.get("/health", tags=["health"])
     async def health() -> dict[str, str]:
@@ -81,7 +95,7 @@ def create_app(
         body: MessageRequest,
         authorization: str | None = Header(default=None),
     ) -> dict[str, Any]:
-        if not body.question.strip():
+        if body.answer_only_receipt_id is None and (body.question is None or not body.question.strip()):
             raise HTTPException(status_code=422, detail={
                 "error": {"code": "invalid_question", "message": "Question cannot be blank.", "retryable": False},
                 "request_id": body.request_id,
@@ -91,6 +105,7 @@ def create_app(
         return await guest_chat.send_message(
             session_id=session_id, token=authorization[7:],
             request_id=body.request_id, question=body.question,
+            answer_only_receipt_id=body.answer_only_receipt_id,
         )
 
     @app.post("/v1/guest/sessions/{session_id}/freshness", tags=["guest chat"])
