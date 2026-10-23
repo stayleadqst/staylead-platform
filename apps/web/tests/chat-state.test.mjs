@@ -20,6 +20,12 @@ test("a confirmed terminal request failure offers a new request only on explicit
   assert.equal(classifyFailure({ code: "request_failed", outcome: "rejected" }).retryMode, "new-request");
 });
 
+test("stale sources require a guest initiated turn and never auto-retry", () => {
+  const stale = classifyFailure({ code: "stale_source", outcome: "rejected" });
+  assert.equal(stale.retryMode, "none");
+  assert.match(stale.message, /latest records/);
+});
+
 test("known retryable provider failures use a new ID because the backend marked the request failed", () => {
   for (const code of ["provider_timeout", "provider_rate_limited", "storage_unavailable"]) {
     const result = classifyFailure({ code, outcome: "rejected", retryable: true });

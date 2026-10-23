@@ -1,0 +1,200 @@
+{
+  "format": "staylead-hospitality-pack",
+  "schema_version": 1,
+  "pack_id": "sprint4-acceptance-v1",
+  "pack_version": "1",
+  "hotel": {
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "slug": "sprint4-garden",
+    "config_version": "1",
+    "name": "Sprint 4 Garden Demo",
+    "address": "10 Garden Lane",
+    "description": "Synthetic pilot hotel pack.",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "currency": "VND"
+  },
+  "sources": [
+    {
+      "source_id": "source-hotel-guide",
+      "version": "1",
+      "scope": "hotel-specific",
+      "guest_approved": true,
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "title": "Reviewed synthetic hotel guide"
+    },
+    {
+      "source_id": "source-independent-B",
+      "version": "1",
+      "scope": "hotel-specific",
+      "guest_approved": true,
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "title": "Independent synthetic parking guide"
+    }
+  ],
+  "facts": [
+    {
+      "fact_id": "fact-room-balcony",
+      "topic": "room",
+      "subject": "king_room",
+      "field": "balcony",
+      "value": true,
+      "status": "confirmed",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-hotel-guide",
+          "version": "1"
+        }
+      ],
+      "section": "Rooms",
+      "fact_version": "1"
+    },
+    {
+      "fact_id": "fact-pool-view",
+      "topic": "facilities",
+      "subject": "pool",
+      "field": "view",
+      "value": "garden-facing",
+      "status": "confirmed",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-hotel-guide",
+          "version": "1"
+        }
+      ],
+      "section": "Facilities",
+      "fact_version": "1"
+    },
+    {
+      "fact_id": "fact-visual-unknown",
+      "topic": "accessibility",
+      "subject": "pool",
+      "field": "step_free_access",
+      "value": null,
+      "status": "unknown",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-hotel-guide",
+          "version": "1"
+        }
+      ],
+      "section": "Accessibility",
+      "fact_version": "1"
+    },
+    {
+      "fact_id": "fact-pool-clip-window",
+      "topic": "facilities",
+      "subject": "pool",
+      "field": "approved_video_reference",
+      "value": "The authored pool clip reference spans 0.5 to 2.5 seconds and its authored caption identifies a garden-facing pool. This metadata describes the approved clip reference, not visual recognition.",
+      "status": "confirmed",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-hotel-guide",
+          "version": "1"
+        }
+      ],
+      "section": "Facilities",
+      "fact_version": "1"
+    },
+    {
+      "fact_id": "fact-breakfast-hours",
+      "topic": "dining",
+      "subject": "breakfast",
+      "field": "hours",
+      "value": "07:00-10:00",
+      "status": "confirmed",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-hotel-guide",
+          "version": "1"
+        }
+      ],
+      "section": "Dining",
+      "fact_version": "1"
+    },
+    {
+      "fact_id": "fact-parking-hours",
+      "topic": "parking",
+      "subject": "car_park",
+      "field": "access",
+      "value": "Open daily",
+      "status": "confirmed",
+      "valid_from": "2025-01-01",
+      "valid_to": "2035-12-31",
+      "source_refs": [
+        {
+          "source_id": "source-independent-B",
+          "version": "1"
+        }
+      ],
+      "section": "Parking",
+      "fact_version": "1"
+    }
+  ],
+  "media": [
+    {
+      "media_id": "media-room",
+      "kind": "image",
+      "asset_path": "assets/room.png",
+      "mime_type": "image/png",
+      "sha256": "2f0febb4239e6f57023f0117f6c3eb1e5a3ccd53a550e040a48bf8a7a7008705",
+      "byte_size": 4899,
+      "source_id": "source-hotel-guide",
+      "source_version": "1",
+      "fact_ids": [
+        "fact-room-balcony"
+      ],
+      "caption": "Authored illustrative caption: synthetic drawing of a guest room with a balcony.",
+      "alt_text": "Synthetic illustration of a guest room balcony; not a photograph.",
+      "guest_approved_whole_file": true
+    },
+    {
+      "media_id": "media-pool-clip",
+      "kind": "video",
+      "asset_path": "assets/pool.mp4",
+      "mime_type": "video/mp4",
+      "sha256": "978d55b84cf3b487d0c347f98d5f0c2c9f4f80b28d64385c3e4486775b5247ca",
+      "byte_size": 24867,
+      "source_id": "source-hotel-guide",
+      "source_version": "1",
+      "fact_ids": [
+        "fact-pool-view",
+        "fact-pool-clip-window"
+      ],
+      "caption": "Authored illustrative caption: synthetic garden-facing pool clip; not a recording of the property.",
+      "alt_text": "Synthetic colored animation used to demonstrate clip playback; not property footage.",
+      "guest_approved_whole_file": true,
+      "start_seconds": 0.5,
+      "end_seconds": 2.5,
+      "captions_media_id": "media-pool-vtt"
+    },
+    {
+      "media_id": "media-pool-vtt",
+      "kind": "captions",
+      "asset_path": "assets/pool.vtt",
+      "mime_type": "text/vtt",
+      "sha256": "fcfcae822ebd23748f15a7a063460972fe7d3300cc98c5ba34530bb3db957651",
+      "byte_size": 70,
+      "source_id": "source-hotel-guide",
+      "source_version": "1",
+      "fact_ids": [
+        "fact-pool-view"
+      ],
+      "caption": "Authored caption transcript",
+      "alt_text": "",
+      "guest_approved_whole_file": true
+    }
+  ]
+}

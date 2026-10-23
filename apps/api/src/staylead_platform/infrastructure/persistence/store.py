@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import time
 import uuid
 from datetime import UTC, datetime
@@ -23,6 +24,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     and_,
+    delete,
     insert,
     inspect,
     select,
@@ -32,8 +34,15 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
+from staylead_platform.platform.contracts.knowledge import (
+    ActiveKnowledgeSnapshot,
+    EvidenceBinding,
+    FreshnessDecision,
+    SourceVersionRef,
+)
+
 metadata = MetaData()
-CURRENT_SCHEMA_VERSION = 3
+CURRENT_SCHEMA_VERSION = 4
 schema_versions = Table(
     "schema_versions", metadata,
     Column("version", Integer, primary_key=True),
@@ -47,6 +56,7 @@ hotels = Table(
     Column("public_config", JSON, nullable=False),
     Column("synthetic", Boolean, nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
+    Column("knowledge_generation", Integer, nullable=False, server_default="1"),
 )
 knowledge_facts = Table(
     "knowledge_facts", metadata,
@@ -91,6 +101,7 @@ messages = Table(
     Column("role", String(20), nullable=False),
     Column("content", Text, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("evidence_bindings", JSON, nullable=False, server_default="[]"),
     UniqueConstraint("session_id", "sequence", name="uq_guest_messages_sequence"),
 )
 knowledge_packs = Table(
@@ -113,6 +124,10 @@ knowledge_sources = Table(
     Column("valid_from", String(20), nullable=False),
     Column("valid_to", String(20), nullable=False),
     Column("source", JSON, nullable=False),
+    Column("source_hash", String(64), nullable=False, server_default=""),
+    Column("lifecycle_status", String(24), nullable=False, server_default="approved"),
+    Column("last_success_at", DateTime(timezone=True)),
+    Column("last_failure", Text),
 )
 knowledge_media = Table(
     "knowledge_media", metadata,
@@ -136,6 +151,16 @@ knowledge_media = Table(
     Column("valid_to", String(20), nullable=False),
     Column("content", LargeBinary, nullable=False),
 )
+lifecycle_operations = Table(
+    "knowledge_lifecycle_operations", metadata,
+    Column("operation_id", String(128), primary_key=True),
+    Column("hotel_id", String(80), nullable=False, index=True),
+    Column("source_id", String(120), nullable=False),
+    Column("operation_kind", String(24), nullable=False),
+    Column("payload_hash", String(64), nullable=False),
+    Column("result", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+)
 
 
 class ScopeError(ValueError):
@@ -154,8 +179,211 @@ class RequestInProgress(ValueError):
     pass
 
 
+class StaleSource(ValueError):
+    pass
+
+
 def utcnow() -> datetime:
     return datetime.now(UTC)
+
+
+def _canonical_hash(value: Any) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+                         allow_nan=False, default=_canonical_hash_default)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _canonical_hash_default(item: Any) -> str:
+    if isinstance(item, datetime):
+        return item.astimezone(UTC).isoformat()
+    if isinstance(item, bytes):
+        return hashlib.sha256(item).hexdigest()
+    raise TypeError(f"Unsupported canonical hash value: {type(item).__name__}")
+
+
+def _source_snapshot_hash(source: dict[str, Any], facts: list[dict[str, Any]],
+                          media: list[dict[str, Any]]) -> str:
+    return _canonical_hash({
+        "source": source,
+        "facts": sorted(facts, key=lambda item: item["fact_id"]),
+        "media": sorted(({
+            key: value for key, value in item.items() if key != "content"
+        } | {"content_sha256": hashlib.sha256(item["content"]).hexdigest()}
+                         for item in media), key=lambda item: item["media_id"]),
+    })
+
+
+def _source_hash_from_connection(connection: Any, hotel_id: str, source_id: str) -> str:
+    source = connection.execute(select(knowledge_sources.c.source).where(and_(
+        knowledge_sources.c.hotel_id == hotel_id, knowledge_sources.c.source_id == source_id,
+    ))).scalar_one()
+    facts = [dict(row) | {"fact": row["fact"]} for row in connection.execute(
+        select(knowledge_facts).where(and_(knowledge_facts.c.hotel_id == hotel_id,
+                                           knowledge_facts.c.source_id == source_id))
+    ).mappings()]
+    media = [dict(row) for row in connection.execute(
+        select(knowledge_media).where(and_(knowledge_media.c.hotel_id == hotel_id,
+                                           knowledge_media.c.source_id == source_id))
+    ).mappings()]
+    return _source_snapshot_hash(source, facts, media)
+
+
+def _current_hotel_lifecycle(connection: Any, hotel_id: str, now: datetime) -> dict[str, Any]:
+    generation = connection.scalar(select(hotels.c.knowledge_generation).where(
+        hotels.c.hotel_id == hotel_id,
+    ))
+    sources = connection.execute(select(knowledge_sources).where(
+        knowledge_sources.c.hotel_id == hotel_id,
+    ).order_by(knowledge_sources.c.source_id)).mappings().all()
+    day = now.astimezone(UTC).date().isoformat()
+    return {
+        "generation": generation,
+        "sources": [{
+            "source_id": source["source_id"], "version": source["version"],
+            "source_hash": source["source_hash"],
+            "status": _reported_source_status(source, day),
+            "guest_approved": source["guest_approved"],
+            "valid_from": source["valid_from"], "valid_to": source["valid_to"],
+            "last_success_at": source["last_success_at"].isoformat() if source["last_success_at"] else None,
+            "last_failure": source["last_failure"],
+        } for source in sources],
+    }
+
+
+def _effective_source_status(source: Any, today: str) -> str:
+    status = source["lifecycle_status"]
+    if status == "approved" and (not source["guest_approved"] or source["valid_from"] > today):
+        return "not_yet_valid"
+    if status == "approved" and source["valid_to"] < today:
+        return "expired"
+    return status
+
+
+def _reported_source_status(source: Any, today: str) -> str:
+    status = _effective_source_status(source, today)
+    return "refresh_failed" if status == "approved" and source["last_failure"] else status
+
+
+def _source_ref(row: Any, generation: int, today: str) -> SourceVersionRef:
+    return SourceVersionRef(
+        hotel_id=row["hotel_id"], source_id=row["source_id"], hotel_generation=generation,
+        source_version=row["version"], source_hash=row["source_hash"],
+        status=_reported_source_status(row, today), guest_approved=row["guest_approved"],
+        valid_from=row["valid_from"], valid_to=row["valid_to"], last_failure=row["last_failure"],
+        last_success_at=row["last_success_at"].isoformat() if row["last_success_at"] else None,
+    )
+
+
+def get_active_snapshot(
+    engine: Engine, hotel_id: str, *, now: datetime | None = None,
+    timeout_seconds: float | None = None,
+) -> ActiveKnowledgeSnapshot | None:
+    checked_at = (now or utcnow()).astimezone(UTC)
+    today = checked_at.date().isoformat()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        hotel = connection.execute(select(hotels.c.knowledge_generation).where(
+            hotels.c.hotel_id == hotel_id,
+        ).with_for_update(read=True)).first()
+        if hotel is None:
+            return None
+        generation = hotel.knowledge_generation
+        rows = connection.execute(select(knowledge_sources).where(
+            knowledge_sources.c.hotel_id == hotel_id,
+        ).order_by(knowledge_sources.c.source_id)).mappings().all()
+        refs = tuple(_source_ref(row, generation, today) for row in rows)
+    return ActiveKnowledgeSnapshot(hotel_id, generation, refs)
+
+
+def _binding_from_value(value: EvidenceBinding | dict[str, Any]) -> EvidenceBinding:
+    if isinstance(value, EvidenceBinding):
+        return value
+    source = value.get("source", value)
+    ref = source if isinstance(source, SourceVersionRef) else SourceVersionRef(
+        hotel_id=source["hotel_id"], source_id=source["source_id"],
+        hotel_generation=int(source.get("hotel_generation", source.get("source_generation", 0))),
+        source_version=source.get("source_version", source.get("version", "")),
+        source_hash=source.get("source_hash", ""), status=source.get("status", "approved"),
+        guest_approved=source.get("guest_approved", True),
+        valid_from=source.get("valid_from", "0001-01-01"),
+        valid_to=source.get("valid_to", "9999-12-31"),
+        last_failure=source.get("last_failure"),
+        last_success_at=source.get("last_success_at"),
+    )
+    return EvidenceBinding(ref, tuple(value.get("fact_ids", ())), tuple(value.get("media_ids", ())),
+                           value.get("media_sha256"))
+
+
+def _validate_evidence_on_connection(
+    connection: Any, hotel_id: str, evidence: list[EvidenceBinding | dict[str, Any]], now: datetime,
+) -> FreshnessDecision:
+    checked_at = now.astimezone(UTC)
+    today = checked_at.date().isoformat()
+    refresh_failed = False
+    for raw in evidence:
+        binding = _binding_from_value(raw)
+        ref = binding.source
+        if ref.hotel_id != hotel_id:
+            return FreshnessDecision("stale", False, checked_at, "hotel_scope_changed")
+        row = connection.execute(select(knowledge_sources).where(and_(
+            knowledge_sources.c.hotel_id == hotel_id,
+            knowledge_sources.c.source_id == ref.source_id,
+        ))).mappings().first()
+        if row is None:
+            return FreshnessDecision("deleted", False, checked_at, "source_unavailable")
+        status = _effective_source_status(row, today)
+        if status != "approved" or not row["guest_approved"]:
+            return FreshnessDecision(status, False, checked_at, "source_not_eligible")
+        refresh_failed = refresh_failed or bool(row["last_failure"])
+        if row["version"] != ref.source_version or row["source_hash"] != ref.source_hash:
+            return FreshnessDecision("stale", False, checked_at, "source_version_changed")
+        if binding.fact_ids:
+            count = connection.scalar(select(knowledge_facts.c.fact_id).where(and_(
+                knowledge_facts.c.hotel_id == hotel_id,
+                knowledge_facts.c.source_id == ref.source_id,
+                knowledge_facts.c.source_version == ref.source_version,
+                knowledge_facts.c.fact_id.in_(binding.fact_ids),
+                knowledge_facts.c.status.in_(["confirmed", "unknown", "needs_confirmation"]),
+                knowledge_facts.c.valid_from <= today, knowledge_facts.c.valid_to >= today,
+            )).limit(1))
+            found = set(connection.scalars(select(knowledge_facts.c.fact_id).where(and_(
+                knowledge_facts.c.hotel_id == hotel_id,
+                knowledge_facts.c.source_id == ref.source_id,
+                knowledge_facts.c.source_version == ref.source_version,
+                knowledge_facts.c.fact_id.in_(binding.fact_ids),
+                knowledge_facts.c.status.in_(["confirmed", "unknown", "needs_confirmation"]),
+                knowledge_facts.c.valid_from <= today, knowledge_facts.c.valid_to >= today,
+            ))).all())
+            if count is None or found != set(binding.fact_ids):
+                return FreshnessDecision("stale", False, checked_at, "fact_evidence_changed")
+        if binding.media_ids:
+            media_rows = connection.execute(select(knowledge_media).where(and_(
+                knowledge_media.c.hotel_id == hotel_id,
+                knowledge_media.c.source_id == ref.source_id,
+                knowledge_media.c.source_version == ref.source_version,
+                knowledge_media.c.media_id.in_(binding.media_ids),
+                knowledge_media.c.guest_approved_whole_file.is_(True),
+                knowledge_media.c.valid_from <= today, knowledge_media.c.valid_to >= today,
+            ))).mappings().all()
+            found_media = {item["media_id"] for item in media_rows}
+            expected_hashes = binding.media_sha256 or {}
+            if found_media != set(binding.media_ids) or set(expected_hashes) != set(binding.media_ids):
+                return FreshnessDecision("stale", False, checked_at, "media_evidence_changed")
+            for item in media_rows:
+                if (item["sha256"] != expected_hashes[item["media_id"]]
+                        or hashlib.sha256(bytes(item["content"])).hexdigest() != item["sha256"]):
+                    return FreshnessDecision("stale", False, checked_at, "media_hash_changed")
+    return FreshnessDecision("refresh_failed" if refresh_failed else "current", True, checked_at,
+                             "active_snapshot_retained" if refresh_failed else None)
+
+
+def validate_evidence_current(
+    engine: Engine, hotel_id: str, evidence: list[EvidenceBinding | dict[str, Any]], now: datetime,
+    *, timeout_seconds: float | None = None,
+) -> FreshnessDecision:
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        return _validate_evidence_on_connection(connection, hotel_id, evidence, now)
 
 
 def set_transaction_timeout(connection: Any, timeout_seconds: float | None) -> None:
@@ -203,7 +431,228 @@ def apply_migrations(engine: Engine) -> int:
         if existing < 3:
             # CREATE TABLE IF NOT EXISTS above creates the new pack/source/media tables.
             connection.execute(insert(schema_versions).values(version=3, applied_at=utcnow()))
+            existing = 3
+        if existing < 4:
+            columns = {column["name"] for column in inspect(connection).get_columns("hotels")}
+            if "knowledge_generation" not in columns:
+                connection.execute(text(
+                    "ALTER TABLE hotels ADD COLUMN knowledge_generation INTEGER NOT NULL DEFAULT 1"
+                ))
+            columns = {column["name"] for column in inspect(connection).get_columns("knowledge_sources")}
+            for name, sql in (
+                ("source_hash", "VARCHAR(64) NOT NULL DEFAULT ''"),
+                ("lifecycle_status", "VARCHAR(24) NOT NULL DEFAULT 'approved'"),
+                ("last_success_at", "TIMESTAMP WITH TIME ZONE"),
+                ("last_failure", "TEXT"),
+            ):
+                if name not in columns:
+                    connection.execute(text(f"ALTER TABLE knowledge_sources ADD COLUMN {name} {sql}"))
+            columns = {column["name"] for column in inspect(connection).get_columns("guest_messages")}
+            if "evidence_bindings" not in columns:
+                connection.execute(text(
+                    "ALTER TABLE guest_messages ADD COLUMN evidence_bindings JSON NOT NULL DEFAULT '[]'"
+                ))
+            _backfill_legacy_sources(connection, utcnow())
+            # Source identity hashes are backfilled without relying on optional PG extensions.
+            for row in connection.execute(select(knowledge_sources).where(
+                knowledge_sources.c.source_hash == "",
+            )).mappings():
+                connection.execute(update(knowledge_sources).where(
+                    knowledge_sources.c.source_id == row["source_id"],
+                ).values(source_hash=_source_hash_from_connection(
+                    connection, row["hotel_id"], row["source_id"],
+                )))
+            _backfill_legacy_response_bindings(connection, utcnow())
+            connection.execute(insert(schema_versions).values(version=4, applied_at=utcnow()))
     return CURRENT_SCHEMA_VERSION
+
+
+def _backfill_legacy_sources(connection: Any, imported_at: datetime) -> None:
+    """Register schema-3 fixture facts only when stored provenance proves guest eligibility."""
+    rows = connection.execute(select(knowledge_facts).order_by(
+        knowledge_facts.c.hotel_id, knowledge_facts.c.source_id, knowledge_facts.c.fact_id,
+    )).mappings().all()
+    groups: dict[tuple[str, str], list[Any]] = {}
+    for row in rows:
+        groups.setdefault((row["hotel_id"], row["source_id"]), []).append(row)
+    for (hotel_id, source_id), facts in groups.items():
+        if connection.scalar(select(knowledge_sources.c.source_id).where(
+            knowledge_sources.c.source_id == source_id,
+        )) is not None:
+            continue
+        hotel = connection.execute(select(hotels.c.synthetic, hotels.c.public_config).where(
+            hotels.c.hotel_id == hotel_id,
+        )).first()
+        trusted_bootstrap = bool(
+            hotel and hotel.synthetic and hotel.public_config.get("source_pack") == "staylead-hospitality-knowledge-v1"
+        )
+        versions = {fact["source_version"] for fact in facts}
+        refs_match = all(
+            isinstance(fact["fact"], dict)
+            and fact["fact"].get("hotel_id") == hotel_id
+            and fact["fact"].get("approved") is True
+            and fact["fact"].get("visibility") == "guest"
+            and isinstance(fact["fact"].get("source_refs"), list)
+            and len(fact["fact"].get("source_refs", [])) == 1
+            and isinstance(fact["fact"]["source_refs"][0], dict)
+            and fact["fact"]["source_refs"][0].get("source_id") == source_id
+            and fact["fact"]["source_refs"][0].get("version") == fact["source_version"]
+            and fact["status"] in {"confirmed", "unknown", "needs_confirmation"}
+            for fact in facts
+        )
+        version = next(iter(versions)) if len(versions) == 1 else "legacy-needs-review"
+        valid_from = max(fact["valid_from"] for fact in facts)
+        valid_to = min(fact["valid_to"] for fact in facts)
+        eligible = bool(trusted_bootstrap and refs_match and len(versions) == 1 and valid_from <= valid_to)
+        source = {
+            "source_id": source_id, "hotel_id": hotel_id, "version": version,
+            "scope": "hotel-specific", "guest_approved": eligible,
+            "valid_from": valid_from, "valid_to": valid_to,
+            "legacy_backfill": True,
+        }
+        connection.execute(insert(knowledge_sources).values(
+            source_id=source_id, hotel_id=hotel_id, version=version,
+            scope="hotel-specific", guest_approved=eligible,
+            valid_from=valid_from, valid_to=valid_to, source=source,
+            source_hash="",
+            lifecycle_status="approved" if eligible else "needs_review",
+            last_success_at=imported_at if eligible else None,
+            last_failure=None,
+        ))
+
+
+def _backfill_legacy_response_bindings(connection: Any, now: datetime) -> None:
+    """Bind schema-3 completed responses and assistant history to persisted source revisions."""
+    requests_to_backfill = connection.execute(select(
+        requests.c.session_id, requests.c.request_id, requests.c.hotel_id,
+        requests.c.expected_version, requests.c.response,
+    ).where(and_(requests.c.status == "completed", requests.c.response.is_not(None)))).mappings().all()
+    for request in requests_to_backfill:
+        response = dict(request["response"])
+        if "evidence_bindings" in response:
+            continue
+        groups: dict[str, dict[str, Any]] = {}
+        fact_metadata: dict[str, dict[str, Any]] = {}
+        media_metadata: dict[str, dict[str, Any]] = {}
+        unresolved = False
+        fact_ids = {item.get("fact_id") for item in response.get("evidence", [])
+                    if isinstance(item, dict) and item.get("fact_id")}
+        fact_rows = connection.execute(select(knowledge_facts).where(and_(
+            knowledge_facts.c.hotel_id == request["hotel_id"],
+            knowledge_facts.c.fact_id.in_(fact_ids or ["__no_fact__"]),
+        ))).mappings().all()
+        matched_fact_ids = {fact["fact_id"] for fact in fact_rows}
+        unresolved = bool(fact_ids - matched_fact_ids)
+        for fact in fact_rows:
+            source = connection.execute(select(knowledge_sources).where(and_(
+                knowledge_sources.c.hotel_id == request["hotel_id"],
+                knowledge_sources.c.source_id == fact["source_id"],
+                knowledge_sources.c.version == fact["source_version"],
+            ))).mappings().first()
+            if source is None:
+                unresolved = True
+                continue
+            binding = groups.setdefault(source["source_id"], {
+                "source": _serialized_source_ref(source, request["hotel_id"], connection, now),
+                "fact_ids": [], "media_ids": [], "media_sha256": {},
+            })
+            binding["fact_ids"].append(fact["fact_id"])
+            source_ref = binding["source"]
+            fact_metadata[fact["fact_id"]] = {
+                "source_id": source["source_id"], "source_version": source["version"],
+                "source_hash": source["source_hash"],
+                "source_generation": source_ref["hotel_generation"],
+            }
+        if "evidence" in response:
+            response["evidence"] = [
+                ({**item, **fact_metadata[item["fact_id"]]}
+                 if isinstance(item, dict) and item.get("fact_id") in fact_metadata else item)
+                for item in response["evidence"]
+            ]
+        media_ids = {item.get("media_id") for item in response.get("media", [])
+                     if isinstance(item, dict) and item.get("media_id")}
+        media_rows = connection.execute(select(knowledge_media).where(and_(
+            knowledge_media.c.hotel_id == request["hotel_id"],
+            knowledge_media.c.media_id.in_(media_ids or ["__no_media__"]),
+        ))).mappings().all()
+        matched_media_ids = {media["media_id"] for media in media_rows}
+        unresolved = unresolved or bool(media_ids - matched_media_ids)
+        for media in media_rows:
+            source = connection.execute(select(knowledge_sources).where(and_(
+                knowledge_sources.c.hotel_id == request["hotel_id"],
+                knowledge_sources.c.source_id == media["source_id"],
+                knowledge_sources.c.version == media["source_version"],
+            ))).mappings().first()
+            if source is None:
+                unresolved = True
+                continue
+            binding = groups.setdefault(source["source_id"], {
+                "source": _serialized_source_ref(source, request["hotel_id"], connection, now),
+                "fact_ids": [], "media_ids": [], "media_sha256": {},
+            })
+            binding["media_ids"].append(media["media_id"])
+            binding["media_sha256"][media["media_id"]] = media["sha256"]
+            source_ref = binding["source"]
+            media_metadata[media["media_id"]] = {
+                "hotel_id": request["hotel_id"], "source_id": media["source_id"],
+                "source_version": media["source_version"], "source_hash": source["source_hash"],
+                "source_generation": source_ref["hotel_generation"], "sha256": media["sha256"],
+            }
+            captions_media_id = media.get("captions_media_id")
+            if captions_media_id:
+                captions_sha256 = connection.scalar(select(knowledge_media.c.sha256).where(and_(
+                    knowledge_media.c.hotel_id == request["hotel_id"],
+                    knowledge_media.c.media_id == captions_media_id,
+                    knowledge_media.c.source_id == media["source_id"],
+                    knowledge_media.c.source_version == media["source_version"],
+                )))
+                if captions_sha256:
+                    media_metadata[media["media_id"]]["captions_sha256"] = captions_sha256
+                    binding["media_ids"].append(captions_media_id)
+                    binding["media_sha256"][captions_media_id] = captions_sha256
+                else:
+                    unresolved = True
+        if "media" in response:
+            response["media"] = [
+                ({**item, **media_metadata[item["media_id"]]}
+                 if isinstance(item, dict) and item.get("media_id") in media_metadata else item)
+                for item in response["media"]
+            ]
+        bindings = list(groups.values())
+        if unresolved:
+            bindings.append({
+                "source": {"hotel_id": request["hotel_id"], "source_id": "__legacy_unresolved__",
+                           "hotel_generation": 0, "source_version": "", "source_hash": "",
+                           "status": "unavailable", "guest_approved": False,
+                           "valid_from": "0001-01-01", "valid_to": "9999-12-31"},
+                "fact_ids": [], "media_ids": [], "media_sha256": {},
+            })
+        response["evidence_bindings"] = bindings
+        connection.execute(update(requests).where(
+            requests.c.request_id == request["request_id"],
+        ).values(response=response))
+        connection.execute(update(messages).where(and_(
+            messages.c.session_id == request["session_id"],
+            messages.c.hotel_id == request["hotel_id"],
+            messages.c.sequence == request["expected_version"] * 2 + 1,
+            messages.c.role == "assistant",
+        )).values(evidence_bindings=bindings))
+
+
+def _serialized_source_ref(source: Any, hotel_id: str, connection: Any, now: datetime) -> dict[str, Any]:
+    generation = connection.scalar(select(hotels.c.knowledge_generation).where(
+        hotels.c.hotel_id == hotel_id,
+    )) or 1
+    return {
+        "hotel_id": hotel_id, "source_id": source["source_id"],
+        "hotel_generation": generation, "source_version": source["version"],
+        "source_hash": source["source_hash"],
+        "status": _reported_source_status(source, now.astimezone(UTC).date().isoformat()),
+        "guest_approved": source["guest_approved"],
+        "valid_from": source["valid_from"], "valid_to": source["valid_to"],
+        "last_failure": source["last_failure"],
+        "last_success_at": source["last_success_at"].isoformat() if source["last_success_at"] else None,
+    }
 
 
 def schema_version(engine: Engine) -> int | None:
@@ -222,6 +671,7 @@ def save_bootstrap(
     public_config: dict[str, Any],
     synthetic: bool,
     facts: list[dict[str, Any]],
+    sources: list[dict[str, Any]] | None = None,
 ) -> int:
     now = utcnow()
     with engine.begin() as connection:
@@ -235,8 +685,23 @@ def save_bootstrap(
             )
         )
         connection.execute(knowledge_facts.delete().where(knowledge_facts.c.hotel_id == hotel_id))
+        connection.execute(knowledge_sources.delete().where(knowledge_sources.c.hotel_id == hotel_id))
         if facts:
             connection.execute(insert(knowledge_facts), facts)
+        facts_by_source = {
+            source["source_id"]: [row["fact"] for row in facts if row["source_id"] == source["source_id"]]
+            for source in sources or []
+        }
+        if sources:
+            connection.execute(insert(knowledge_sources), [{
+                "source_id": source["source_id"], "hotel_id": hotel_id,
+                "version": source["version"], "scope": source["scope"],
+                "guest_approved": source["guest_approved"],
+                "valid_from": source["valid_from"], "valid_to": source["valid_to"],
+                "source": source,
+                "source_hash": _source_snapshot_hash(source, facts_by_source[source["source_id"]], []),
+                "lifecycle_status": "approved", "last_success_at": now, "last_failure": None,
+            } for source in sources])
     return len(facts)
 
 
@@ -265,7 +730,10 @@ def import_complete_pack(engine: Engine, pack: dict[str, Any]) -> dict[str, Any]
         )).scalar_one_or_none()
         if existing:
             if existing["canonical_hash"] == pack["canonical_hash"]:
-                return {"status": "noop", "hotel_id": hotel["hotel_id"], "canonical_hash": pack["canonical_hash"]}
+                current = _current_hotel_lifecycle(connection, hotel["hotel_id"], now)
+                return {"status": "noop", "hotel_id": hotel["hotel_id"],
+                        "canonical_hash": pack["canonical_hash"], "receipt_hash": existing["canonical_hash"],
+                        **current}
             raise ValueError("Hotel already has a different immutable knowledge pack.")
         if by_slug is not None:
             raise ValueError("Hotel slug is already registered.")
@@ -290,11 +758,21 @@ def import_complete_pack(engine: Engine, pack: dict[str, Any]) -> dict[str, Any]
             canonical_hash=pack["canonical_hash"], manifest=pack["manifest"], imported_at=now,
         ))
         if pack["sources"]:
+            facts_by_source = {source["source_id"]: [fact for fact in pack["facts"]
+                                if fact["source_refs"][0]["source_id"] == source["source_id"]]
+                               for source in pack["sources"]}
+            media_by_source = {source["source_id"]: [item for item in pack["media"]
+                                if item["source_id"] == source["source_id"]]
+                               for source in pack["sources"]}
             connection.execute(insert(knowledge_sources), [{
                 "source_id": s["source_id"], "hotel_id": hotel["hotel_id"],
                 "version": s["version"], "scope": s["scope"],
                 "guest_approved": s["guest_approved"], "valid_from": s["valid_from"],
                 "valid_to": s["valid_to"], "source": s,
+                "source_hash": _source_snapshot_hash(s, facts_by_source[s["source_id"]],
+                                                     media_by_source[s["source_id"]]),
+                "lifecycle_status": "approved",
+                "last_success_at": now, "last_failure": None,
             } for s in pack["sources"]])
         if pack["facts"]:
             connection.execute(insert(knowledge_facts), [{
@@ -311,6 +789,250 @@ def import_complete_pack(engine: Engine, pack: dict[str, Any]) -> dict[str, Any]
                 "hotel_id": hotel["hotel_id"],
             } for m in pack["media"]])
     return {"status": "imported", "hotel_id": hotel["hotel_id"], "canonical_hash": pack["canonical_hash"]}
+
+
+def _operation_replay(connection: Any, operation_id: str, hotel_id: str,
+                      source_id: str, kind: str, payload_hash: str, now: datetime) -> dict[str, Any] | None:
+    prior = connection.execute(select(lifecycle_operations).where(
+        lifecycle_operations.c.operation_id == operation_id,
+    )).mappings().first()
+    if prior is None:
+        return None
+    if (prior["hotel_id"] != hotel_id or prior["source_id"] != source_id
+            or prior["operation_kind"] != kind or prior["payload_hash"] != payload_hash):
+        raise IdempotencyConflict("operation_id was already used with a different scope or payload")
+    return {**prior["result"], "status": "noop", "current": _current_hotel_lifecycle(connection, hotel_id, now)}
+
+
+def _validate_lifecycle_pack(pack: dict[str, Any], hotel_id: str, source_id: str,
+                             hotel: Any) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
+    payload_hotel = pack["hotel"]
+    if (payload_hotel["hotel_id"] != hotel_id or payload_hotel["slug"] != hotel["slug"]
+            or payload_hotel["config_version"] != hotel["config_version"]
+            or payload_hotel["public_config"] != hotel["public_config"]):
+        raise ScopeError("replacement payload must preserve the authoritative hotel config")
+    if len(pack["sources"]) != 1 or pack["sources"][0]["source_id"] != source_id:
+        raise ScopeError("replacement must contain exactly the selected hotel source")
+    source = pack["sources"][0]
+    facts = pack["facts"]
+    media = pack["media"]
+    for fact in facts:
+        refs = fact.get("source_refs", [])
+        if len(refs) != 1 or refs[0].get("source_id") != source_id or refs[0].get("version") != source["version"]:
+            raise ScopeError("replacement fact references a foreign source")
+    for item in media:
+        if item.get("source_id") != source_id or item.get("source_version") != source["version"]:
+            raise ScopeError("replacement media references a foreign source")
+        if set(item.get("fact_ids", [])) - {fact["fact_id"] for fact in facts}:
+            raise ScopeError("replacement media references a missing or foreign fact")
+    return source, facts, media
+
+
+def replace_source_snapshot(
+    engine: Engine, *, hotel_id: str, source_id: str, expected_generation: int,
+    expected_version: str, expected_source_hash: str, operation_id: str,
+    pack: dict[str, Any], now: datetime | None = None,
+) -> dict[str, Any]:
+    """Atomically replace exactly one source snapshot using hotel and source CAS tokens."""
+    timestamp = (now or utcnow()).astimezone(UTC)
+    payload_hash = _canonical_hash({
+        "hotel_id": hotel_id, "source_id": source_id, "expected_generation": expected_generation,
+        "expected_version": expected_version, "expected_source_hash": expected_source_hash,
+        "snapshot_hash": pack.get("canonical_hash") or _canonical_hash(pack["manifest"]),
+    })
+    if not operation_id or len(operation_id) > 128:
+        raise ValueError("operation_id must contain 1–128 characters")
+    with engine.begin() as connection:
+        replay = _operation_replay(connection, operation_id, hotel_id, source_id,
+                                   "refresh", payload_hash, timestamp)
+        if replay is not None:
+            return replay
+        hotel = connection.execute(select(hotels).where(
+            hotels.c.hotel_id == hotel_id,
+        ).with_for_update()).mappings().first()
+        if hotel is None:
+            raise ScopeError("hotel scope is invalid")
+        replay = _operation_replay(connection, operation_id, hotel_id, source_id,
+                                   "refresh", payload_hash, timestamp)
+        if replay is not None:
+            return replay
+        source, facts, media = _validate_lifecycle_pack(pack, hotel_id, source_id, hotel)
+        current = connection.execute(select(knowledge_sources).where(and_(
+            knowledge_sources.c.hotel_id == hotel_id,
+            knowledge_sources.c.source_id == source_id,
+        )).with_for_update()).mappings().first()
+        if current is None:
+            raise ScopeError("selected source does not exist")
+        if (hotel["knowledge_generation"] != expected_generation
+                or current["version"] != expected_version
+                or current["source_hash"] != expected_source_hash):
+            raise VersionConflict("selected source or hotel generation changed")
+        fact_ids = [fact["fact_id"] for fact in facts]
+        media_ids = [item["media_id"] for item in media]
+        collisions = connection.execute(select(knowledge_facts.c.fact_id).where(and_(
+            knowledge_facts.c.fact_id.in_(fact_ids or [""]),
+            ~and_(knowledge_facts.c.hotel_id == hotel_id, knowledge_facts.c.source_id == source_id),
+        )).limit(1)).scalar_one_or_none()
+        if collisions is not None:
+            raise ScopeError("replacement fact ID belongs to another source")
+        media_collision = connection.execute(select(knowledge_media.c.media_id).where(and_(
+            knowledge_media.c.media_id.in_(media_ids or [""]),
+            ~and_(knowledge_media.c.hotel_id == hotel_id, knowledge_media.c.source_id == source_id),
+        )).limit(1)).scalar_one_or_none()
+        if media_collision is not None:
+            raise ScopeError("replacement media ID belongs to another source")
+        active_day = (now or utcnow()).astimezone(UTC).date().isoformat()
+        active_other_facts = select(knowledge_facts.c.fact_id).select_from(
+            knowledge_facts.outerjoin(knowledge_sources, and_(
+                knowledge_sources.c.hotel_id == knowledge_facts.c.hotel_id,
+                knowledge_sources.c.source_id == knowledge_facts.c.source_id,
+                knowledge_sources.c.version == knowledge_facts.c.source_version,
+            ))
+        ).where(and_(
+            knowledge_facts.c.hotel_id == hotel_id,
+            knowledge_facts.c.source_id != source_id,
+            knowledge_facts.c.status.in_(["confirmed", "unknown", "needs_confirmation"]),
+            knowledge_facts.c.valid_from <= active_day,
+            knowledge_facts.c.valid_to >= active_day,
+            (knowledge_sources.c.source_id.is_(None) | and_(
+                knowledge_sources.c.guest_approved.is_(True),
+                knowledge_sources.c.lifecycle_status == "approved",
+                knowledge_sources.c.valid_from <= active_day,
+                knowledge_sources.c.valid_to >= active_day,
+            )),
+        )).limit(401)
+        other_count = len(connection.execute(active_other_facts).all())
+        replacement_active_count = sum(
+            1 for fact in facts
+            if source["guest_approved"] is True
+            and source["valid_from"] <= active_day <= source["valid_to"]
+            and fact["status"] in {"confirmed", "unknown", "needs_confirmation"}
+            and fact["valid_from"] <= active_day <= fact["valid_to"]
+        )
+        if other_count + replacement_active_count > 400:
+            raise ValueError("aggregate active hotel facts exceed the 400 fact limit")
+        next_generation = expected_generation + 1
+        connection.execute(delete(knowledge_facts).where(and_(
+            knowledge_facts.c.hotel_id == hotel_id, knowledge_facts.c.source_id == source_id,
+        )))
+        connection.execute(delete(knowledge_media).where(and_(
+            knowledge_media.c.hotel_id == hotel_id, knowledge_media.c.source_id == source_id,
+        )))
+        if facts:
+            connection.execute(insert(knowledge_facts), [{
+                "fact_id": fact["fact_id"], "hotel_id": hotel_id, "source_id": source_id,
+                "source_version": source["version"], "section": fact.get("section", fact["topic"]),
+                "fact_version": fact.get("fact_version", "1"), "status": fact["status"],
+                "valid_from": fact["valid_from"], "valid_to": fact["valid_to"],
+                "fact": fact, "imported_at": timestamp,
+            } for fact in facts])
+        if media:
+            connection.execute(insert(knowledge_media), [{
+                **{key: item.get(key) for key in (
+                    "media_id", "source_id", "source_version", "fact_ids", "kind", "mime_type",
+                    "byte_size", "sha256", "caption", "alt_text", "start_seconds", "end_seconds",
+                    "duration_seconds", "captions_media_id", "guest_approved_whole_file",
+                    "valid_from", "valid_to", "content",
+                )}, "hotel_id": hotel_id,
+            } for item in media])
+        source_hash = _source_snapshot_hash(source, facts, media)
+        connection.execute(update(knowledge_sources).where(and_(
+            knowledge_sources.c.hotel_id == hotel_id,
+            knowledge_sources.c.source_id == source_id,
+        )).values(version=source["version"], scope=source["scope"],
+                  guest_approved=source["guest_approved"], valid_from=source["valid_from"],
+                  valid_to=source["valid_to"], source=source, source_hash=source_hash,
+                  lifecycle_status="approved", last_success_at=timestamp, last_failure=None))
+        connection.execute(update(hotels).where(and_(
+            hotels.c.hotel_id == hotel_id,
+            hotels.c.knowledge_generation == expected_generation,
+        )).values(knowledge_generation=next_generation, updated_at=timestamp))
+        result = {"status": "applied", "hotel_id": hotel_id, "source_id": source_id,
+                  "generation": next_generation, "source_version": source["version"],
+                  "source_hash": source_hash, "last_success_at": timestamp.isoformat()}
+        connection.execute(insert(lifecycle_operations).values(
+            operation_id=operation_id, hotel_id=hotel_id, source_id=source_id,
+            operation_kind="refresh", payload_hash=payload_hash, result=result, created_at=timestamp,
+        ))
+    return result
+
+
+def transition_source(
+    engine: Engine, *, hotel_id: str, source_id: str, expected_generation: int,
+    expected_version: str, expected_source_hash: str, operation_id: str,
+    action: str, now: datetime | None = None,
+) -> dict[str, Any]:
+    """Revoke or delete one source with CAS and durable operation replay."""
+    if action not in {"revoke", "delete"}:
+        raise ValueError("action must be revoke or delete")
+    timestamp = (now or utcnow()).astimezone(UTC)
+    payload_hash = _canonical_hash({"hotel_id": hotel_id, "source_id": source_id,
+                                    "expected_generation": expected_generation,
+                                    "expected_version": expected_version,
+                                    "expected_source_hash": expected_source_hash, "action": action})
+    if not operation_id or len(operation_id) > 128:
+        raise ValueError("operation_id must contain 1–128 characters")
+    with engine.begin() as connection:
+        replay = _operation_replay(connection, operation_id, hotel_id, source_id,
+                                   action, payload_hash, timestamp)
+        if replay is not None:
+            return replay
+        hotel = connection.execute(select(hotels).where(
+            hotels.c.hotel_id == hotel_id,
+        ).with_for_update()).mappings().first()
+        if hotel is None:
+            raise ScopeError("hotel scope is invalid")
+        replay = _operation_replay(connection, operation_id, hotel_id, source_id,
+                                   action, payload_hash, timestamp)
+        if replay is not None:
+            return replay
+        source = connection.execute(select(knowledge_sources).where(and_(
+            knowledge_sources.c.hotel_id == hotel_id,
+            knowledge_sources.c.source_id == source_id,
+        )).with_for_update()).mappings().first()
+        if source is None:
+            raise ScopeError("selected source does not exist")
+        if (hotel["knowledge_generation"] != expected_generation or source["version"] != expected_version
+                or source["source_hash"] != expected_source_hash):
+            raise VersionConflict("selected source or hotel generation changed")
+        next_generation = expected_generation + 1
+        if action == "revoke":
+            connection.execute(update(knowledge_sources).where(and_(
+                knowledge_sources.c.hotel_id == hotel_id, knowledge_sources.c.source_id == source_id,
+            )).values(guest_approved=False, lifecycle_status="revoked"))
+        else:
+            connection.execute(delete(knowledge_media).where(and_(
+                knowledge_media.c.hotel_id == hotel_id, knowledge_media.c.source_id == source_id,
+            )))
+            connection.execute(delete(knowledge_facts).where(and_(
+                knowledge_facts.c.hotel_id == hotel_id, knowledge_facts.c.source_id == source_id,
+            )))
+            connection.execute(update(knowledge_sources).where(and_(
+                knowledge_sources.c.hotel_id == hotel_id, knowledge_sources.c.source_id == source_id,
+            )).values(guest_approved=False, lifecycle_status="deleted"))
+        connection.execute(update(hotels).where(and_(
+            hotels.c.hotel_id == hotel_id,
+            hotels.c.knowledge_generation == expected_generation,
+        )).values(knowledge_generation=next_generation, updated_at=timestamp))
+        result = {"status": "applied", "hotel_id": hotel_id, "source_id": source_id,
+                  "generation": next_generation, "source_version": source["version"],
+                  "source_hash": source["source_hash"], "lifecycle_status": action + "d" if action == "revoke" else "deleted"}
+        connection.execute(insert(lifecycle_operations).values(
+            operation_id=operation_id, hotel_id=hotel_id, source_id=source_id,
+            operation_kind=action, payload_hash=payload_hash, result=result, created_at=timestamp,
+        ))
+    return result
+
+
+def record_source_failure(engine: Engine, hotel_id: str, source_id: str, failure_code: str,
+                         *, now: datetime | None = None) -> None:
+    """Record a bounded, non-sensitive failure label without changing active permission."""
+    safe_code = "".join(character for character in failure_code if character.isalnum() or character in "_-.")[:80]
+    with engine.begin() as connection:
+        connection.execute(update(knowledge_sources).where(and_(
+            knowledge_sources.c.hotel_id == hotel_id,
+            knowledge_sources.c.source_id == source_id,
+        )).values(last_failure=safe_code or "refresh_failed"))
 
 
 def facts_for_hotel(engine: Engine, hotel_id: str, *, limit: int = 400) -> list[dict[str, Any]]:
@@ -350,14 +1072,23 @@ def recent_messages(
     engine: Engine, session_id: str, hotel_id: str, *, limit: int = 8,
     timeout_seconds: float | None = None,
 ) -> list[dict[str, str]]:
+    now = utcnow()
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
         rows = connection.execute(
-            select(messages.c.role, messages.c.content)
+            select(messages.c.role, messages.c.content, messages.c.evidence_bindings)
             .where(and_(messages.c.session_id == session_id, messages.c.hotel_id == hotel_id))
             .order_by(messages.c.sequence.desc()).limit(limit)
         ).all()
-    return [{"role": row.role, "content": row.content} for row in reversed(rows)]
+        projected = []
+        for row in reversed(rows):
+            bindings = row.evidence_bindings or []
+            if row.role == "assistant" and bindings:
+                decision = _validate_evidence_on_connection(connection, hotel_id, bindings, now)
+                if not decision.eligible:
+                    continue
+            projected.append({"role": row.role, "content": row.content})
+    return projected
 
 
 def reserve_request(
@@ -397,13 +1128,20 @@ def reserve_request(
             raise RequestInProgress("request is still processing")
         if row["status"] == "error":
             raise RuntimeError(row["error_code"] or "request_failed")
-        return dict(row["response"])
+        response = dict(row["response"])
+        bindings = response.get("evidence_bindings", [])
+        decision = _validate_evidence_on_connection(connection, hotel_id, bindings, utcnow())
+        response["freshness"] = {"status": decision.status, "eligible": decision.eligible,
+                                 "checked_at": decision.checked_at.isoformat(), "reason": decision.reason}
+        return response
 
 
 def complete_request(
     engine: Engine, *, session_id: str, hotel_id: str, request_id: str,
     question: str, answer: str, evidence: list[dict[str, Any]],
     response_fields: dict[str, Any] | None = None,
+    expected_generation: int | None = None,
+    evidence_bindings: list[EvidenceBinding | dict[str, Any]] | None = None,
     timeout_seconds: float | None = None,
     deadline_monotonic: float | None = None,
     cancellation_event: Event | None = None,
@@ -416,15 +1154,35 @@ def complete_request(
         "status": "completed",
     }
     result.update(response_fields or {})
+    bindings = evidence_bindings or []
+    serialized_bindings = [{
+        "source": {
+            "hotel_id": item.source.hotel_id, "source_id": item.source.source_id,
+            "hotel_generation": item.source.hotel_generation,
+            "source_version": item.source.source_version, "source_hash": item.source.source_hash,
+            "status": item.source.status, "guest_approved": item.source.guest_approved,
+            "valid_from": item.source.valid_from, "valid_to": item.source.valid_to,
+            "last_failure": item.source.last_failure,
+            "last_success_at": item.source.last_success_at,
+        }, "fact_ids": list(item.fact_ids), "media_ids": list(item.media_ids),
+        "media_sha256": item.media_sha256 or {},
+    } for item in map(_binding_from_value, bindings)]
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
-        hotel = connection.execute(select(hotels.c.config_version).where(
+        hotel = connection.execute(select(hotels).where(
             hotels.c.hotel_id == hotel_id,
-        )).scalar_one_or_none()
+        ).with_for_update()).mappings().first()
         if hotel is None:
             raise ScopeError("hotel scope is invalid")
-        result["config_version"] = hotel
+        result["config_version"] = hotel["config_version"]
+        if expected_generation is not None and hotel["knowledge_generation"] != expected_generation:
+            raise StaleSource("hotel knowledge generation changed before commit")
+        decision = _validate_evidence_on_connection(connection, hotel_id, serialized_bindings, now)
+        if not decision.eligible:
+            raise StaleSource(f"source evidence is no longer eligible: {decision.status}")
+        result["knowledge_generation"] = hotel["knowledge_generation"]
+        result["evidence_bindings"] = serialized_bindings
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
         request = connection.execute(select(requests).where(and_(
             requests.c.session_id == session_id, requests.c.hotel_id == hotel_id,
@@ -439,6 +1197,14 @@ def complete_request(
         )).with_for_update()).mappings().first()
         if not session:
             raise ScopeError("session scope is invalid")
+        # Locks may have waited across session or source expiry. Validate the actual
+        # commit-time UTC day after all scope locks have been acquired.
+        now = utcnow()
+        if session["expires_at"] <= now:
+            raise ScopeError("session scope is invalid")
+        decision = _validate_evidence_on_connection(connection, hotel_id, serialized_bindings, now)
+        if not decision.eligible:
+            raise StaleSource(f"source evidence is no longer eligible: {decision.status}")
         start = session["state_version"]
         if start != request["expected_version"]:
             raise VersionConflict("session state version changed")
@@ -450,10 +1216,10 @@ def complete_request(
         connection.execute(insert(messages), [
             {"message_id": user_message_id, "session_id": session_id,
              "hotel_id": hotel_id, "sequence": sequence, "role": "user",
-             "content": question, "created_at": now},
+             "content": question, "created_at": now, "evidence_bindings": []},
             {"message_id": assistant_message_id, "session_id": session_id,
              "hotel_id": hotel_id, "sequence": sequence + 1, "role": "assistant",
-             "content": answer, "created_at": now},
+             "content": answer, "created_at": now, "evidence_bindings": serialized_bindings},
         ])
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
         updated = connection.execute(update(sessions).where(and_(
@@ -467,6 +1233,14 @@ def complete_request(
             requests.c.session_id == session_id, requests.c.request_id == request_id,
             requests.c.hotel_id == hotel_id, requests.c.status == "processing",
         )).values(status="completed", response=result))
+        final_now = utcnow()
+        if session["expires_at"] <= final_now:
+            raise ScopeError("session scope is invalid")
+        final_decision = _validate_evidence_on_connection(
+            connection, hotel_id, serialized_bindings, final_now,
+        )
+        if not final_decision.eligible:
+            raise StaleSource(f"source evidence is no longer eligible: {final_decision.status}")
         if (deadline_monotonic is not None and time.monotonic() >= deadline_monotonic
                 or cancellation_event is not None and cancellation_event.is_set()):
             raise TimeoutError("The guest turn expired before its transaction could commit.")
@@ -493,6 +1267,31 @@ def update_completed_response(engine: Engine, session_id: str, request_id: str, 
         )).values(response=response))
         if updated.rowcount != 1:
             raise ScopeError("completed request scope is invalid")
+
+
+def get_completed_response(
+    engine: Engine, *, session_id: str, hotel_id: str, request_id: str,
+    now: datetime | None = None, timeout_seconds: float | None = None,
+) -> dict[str, Any] | None:
+    """Load a completed response within its owner scope and recompute evidence freshness."""
+    checked_at = (now or utcnow()).astimezone(UTC)
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        row = connection.execute(select(requests.c.response).where(and_(
+            requests.c.session_id == session_id, requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id, requests.c.status == "completed",
+        ))).scalar_one_or_none()
+        if row is None:
+            return None
+        response = dict(row)
+        decision = _validate_evidence_on_connection(
+            connection, hotel_id, response.get("evidence_bindings", []), checked_at,
+        )
+        response["freshness"] = {
+            "status": decision.status, "eligible": decision.eligible,
+            "checked_at": decision.checked_at.isoformat(), "reason": decision.reason,
+        }
+        return response
 
 
 def export_snapshot(engine: Engine, hotel_id: str) -> dict[str, Any]:

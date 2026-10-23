@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.engine import Engine
 
 from staylead_platform.composition.configuration.settings import Settings
@@ -26,6 +26,11 @@ class CreateSessionRequest(BaseModel):
 class MessageRequest(BaseModel):
     request_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
     question: str = Field(min_length=1, max_length=MAX_QUESTION_CHARS)
+
+
+class FreshnessRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
 
 
 def create_app(
@@ -88,15 +93,36 @@ def create_app(
             request_id=body.request_id, question=body.question,
         )
 
+    @app.post("/v1/guest/sessions/{session_id}/freshness", tags=["guest chat"])
+    def check_freshness(
+        session_id: str,
+        body: FreshnessRequest,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, str]:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        return guest_chat.check_freshness(
+            session_id=session_id, token=authorization[7:], request_id=body.request_id,
+        )
+
     @app.get("/v1/guest/sessions/{session_id}/media/{media_id}", tags=["guest media"])
     def get_guest_media(
         session_id: str,
         media_id: str,
+        generation: int,
+        source_id: str,
+        source_version: str,
+        source_hash: str,
+        sha256: str,
         authorization: str | None = Header(default=None),
     ) -> Response:
         if not authorization or not authorization.startswith("Bearer "):
             raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
-        asset = guest_chat.read_media(session_id=session_id, token=authorization[7:], media_id=media_id)
+        asset = guest_chat.read_media(
+            session_id=session_id, token=authorization[7:], media_id=media_id,
+            generation=generation, source_id=source_id, source_version=source_version,
+            source_hash=source_hash, media_sha256=sha256,
+        )
         return Response(
             content=asset.content,
             media_type=asset.mime_type,

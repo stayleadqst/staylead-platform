@@ -1,0 +1,11 @@
+{
+  "action": "init",
+  "result": {
+    "schema": 4,
+    "outcome": {
+      "status": "imported",
+      "hotel_id": "HTL-S4-ACCEPTANCE",
+      "canonical_hash": "63597a709fdc8f83fbbb8daff1ffd3ba72ac931b89bb1308454c0b4ec417ee7d"
+    }
+  }
+}

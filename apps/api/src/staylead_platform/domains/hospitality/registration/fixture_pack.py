@@ -29,6 +29,7 @@ class BootstrapHotel:
     public_config: dict[str, Any]
     synthetic: bool
     facts: tuple[dict[str, Any], ...]
+    sources: tuple[dict[str, Any], ...]
 
 
 def _read_json(path: Path) -> Any:
@@ -109,5 +110,9 @@ def parse_fixture_pack(fixture_root: str | Path, *, reference_date: date | None 
         prepared.append(BootstrapHotel(
             hotel_id=hotel_id, slug=slug, config_version=manifest.get("version", "unknown"),
             public_config=config, synthetic=True, facts=tuple(selected),
+            sources=tuple(sorted({
+                ref["source_id"]: hotel_sources[ref["source_id"]]
+                for fact in selected for ref in fact["source_refs"]
+            }.values(), key=lambda source: source["source_id"])),
         ))
     return tuple(prepared)

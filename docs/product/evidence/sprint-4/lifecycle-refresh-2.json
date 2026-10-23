@@ -1,0 +1,12 @@
+{
+  "action": "refresh",
+  "result": {
+    "status": "applied",
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "source_id": "source-hotel-guide",
+    "generation": 2,
+    "source_version": "2",
+    "source_hash": "0cdd24b412a865d9bb1e27b9ec529ada32a9b60a68327f1dae896c57408bc16c",
+    "last_success_at": "2026-10-23T07:57:16.383935+00:00"
+  }
+}

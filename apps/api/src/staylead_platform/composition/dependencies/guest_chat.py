@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import time
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -11,6 +12,7 @@ from typing import Any
 
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     FACT_SELECTION_INSTRUCTIONS,
@@ -28,17 +30,27 @@ from staylead_platform.infrastructure.persistence.store import (
     IdempotencyConflict,
     RequestInProgress,
     ScopeError,
+    StaleSource,
     VersionConflict,
     complete_request,
     create_session,
     fail_request,
+    get_active_snapshot,
+    get_completed_response,
     get_hotel_by_slug,
     get_session,
     recent_messages,
     reserve_request,
+    validate_evidence_current,
 )
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError
-from staylead_platform.platform.contracts.knowledge import EligibleAsset, MediaDescriptor
+from staylead_platform.platform.contracts.knowledge import (
+    ActiveKnowledgeSnapshot,
+    EligibleAsset,
+    EvidenceBinding,
+    MediaDescriptor,
+    SourceVersionRef,
+)
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
     GroundedQAOrchestrator,
@@ -100,17 +112,22 @@ def create_guest_chat_application(
     return GuestChatApplication(settings, database, orchestrator, media_repository)
 
 
-def _citation_reference(fact: dict[str, Any]) -> dict[str, Any]:
+def _citation_reference(fact: dict[str, Any], source: SourceVersionRef) -> dict[str, Any]:
     provenance = fact.get("provenance", {})
     return {
         "fact_id": fact["fact_id"], "hotel_id": fact["hotel_id"],
         "source_id": provenance.get("source_id"), "source_version": provenance.get("source_version"),
+        "source_hash": source.source_hash, "source_generation": source.hotel_generation,
         "section": provenance.get("section"), "fact_version": provenance.get("fact_version"),
         "imported_at": provenance.get("imported_at"),
     }
 
 
-def _media_reference(media: MediaDescriptor, cited_fact_ids: set[str]) -> dict[str, Any] | None:
+def _media_reference(
+    media: MediaDescriptor, cited_fact_ids: set[str], source: SourceVersionRef,
+) -> dict[str, Any] | None:
+    if media.source_version != source.source_version:
+        return None
     eligible_facts = sorted(set(media.fact_ids) & cited_fact_ids)
     if not eligible_facts or media.kind not in {"image", "video"}:
         return None
@@ -129,12 +146,52 @@ def _media_reference(media: MediaDescriptor, cited_fact_ids: set[str]) -> dict[s
         "alt_text": media.alt_text,
         "source_id": media.source_id,
         "source_version": media.source_version,
+        "source_hash": source.source_hash,
+        "source_generation": source.hotel_generation,
     }
     for name in ("start_seconds", "end_seconds", "duration_seconds", "captions_media_id"):
         value = getattr(media, name)
         if value is not None:
             result[name] = value
+    if media.captions_sha256 is not None:
+        result["captions_sha256"] = media.captions_sha256
     return result
+
+
+def _evidence_bindings(
+    evidence: list[dict[str, Any]], media: list[dict[str, Any]],
+    snapshot: ActiveKnowledgeSnapshot | None = None,
+) -> list[EvidenceBinding]:
+    """Group response evidence by the exact hotel source revision that supplied it."""
+    refs = {item.source_id: item for item in snapshot.sources} if snapshot else {}
+    grouped: dict[tuple[str, str, str, int], dict[str, Any]] = {}
+    for collection, rows, id_field in (("facts", evidence, "fact_id"), ("media", media, "media_id")):
+        for item in rows:
+            source_id = item.get("source_id")
+            ref = refs.get(source_id) or SourceVersionRef(
+                hotel_id=item.get("hotel_id", ""), source_id=source_id or "",
+                hotel_generation=int(item.get("source_generation", 0)),
+                source_version=item.get("source_version", ""), source_hash=item.get("source_hash", ""),
+                status="approved", guest_approved=True, valid_from="0001-01-01", valid_to="9999-12-31",
+            )
+            key = (ref.source_id, ref.source_version, ref.source_hash, ref.hotel_generation)
+            binding = grouped.setdefault(key, {
+                "source": ref, "fact_ids": [], "media_ids": [], "media_sha256": {},
+            })
+            if collection == "facts":
+                binding["fact_ids"].append(item[id_field])
+            else:
+                binding["media_ids"].append(item[id_field])
+                binding["media_sha256"][item[id_field]] = item.get("sha256", "")
+                captions_id = item.get("captions_media_id")
+                captions_hash = item.get("captions_sha256")
+                if captions_id and captions_hash:
+                    binding["media_ids"].append(captions_id)
+                    binding["media_sha256"][captions_id] = captions_hash
+    return [EvidenceBinding(
+        source=value["source"], fact_ids=tuple(sorted(set(value["fact_ids"]))),
+        media_ids=tuple(sorted(set(value["media_ids"]))), media_sha256=value["media_sha256"],
+    ) for value in grouped.values()]
 
 
 def _remaining_seconds(deadline: float) -> float:
@@ -171,7 +228,10 @@ class GuestChatApplication:
             "guest_contract_version": "1",
         }
 
-    def read_media(self, *, session_id: str, token: str, media_id: str) -> EligibleAsset:
+    def read_media(
+        self, *, session_id: str, token: str, media_id: str, generation: int,
+        source_id: str, source_version: str, source_hash: str, media_sha256: str,
+    ) -> EligibleAsset:
         if not self._settings.session_signing_secret:
             raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
         try:
@@ -187,7 +247,11 @@ class GuestChatApplication:
         if not session or session["hotel_id"] != claims.hotel_id or session["expires_at"] <= datetime.now(UTC):
             raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
         try:
-            asset = self._media_repository.read_eligible_asset(claims.hotel_id, media_id, datetime.now(UTC))
+            asset = self._media_repository.read_eligible_asset(
+                claims.hotel_id, media_id, datetime.now(UTC), expected_generation=generation,
+                expected_source_id=source_id, expected_source_version=source_version,
+                expected_source_hash=source_hash, expected_media_sha256=media_sha256,
+            )
         except Exception as exc:
             raise GuestChatError(503, "storage_unavailable", "Media storage is unavailable.", retryable=True) from exc
         if asset is None:
@@ -196,13 +260,46 @@ class GuestChatApplication:
         if (
             asset.descriptor.hotel_id != claims.hotel_id
             or asset.descriptor.media_id != media_id
+            or asset.descriptor.source_id != source_id
+            or asset.descriptor.source_version != source_version
+            or asset.descriptor.source_hash != source_hash
             or asset.mime_type != asset.descriptor.mime_type
             or limit is None
             or len(asset.content) != asset.descriptor.byte_size
             or len(asset.content) > limit
+            or hashlib.sha256(asset.content).hexdigest() != media_sha256
+            or asset.descriptor.sha256 != media_sha256
         ):
             raise GuestChatError(404, "media_unavailable", "This media is not available.")
         return asset
+
+    def check_freshness(
+        self, *, session_id: str, token: str, request_id: str,
+    ) -> dict[str, str]:
+        if not self._settings.session_signing_secret:
+            raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
+        try:
+            claims = verify_token(token, secret=self._settings.session_signing_secret.get_secret_value())
+        except InvalidSessionToken as exc:
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
+        if claims.session_id != session_id:
+            raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
+        try:
+            session = get_session(self._engine, session_id)
+            if not session or session["hotel_id"] != claims.hotel_id or session["expires_at"] <= datetime.now(UTC):
+                raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+            stored = get_completed_response(
+                self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+                request_id=request_id, now=datetime.now(UTC),
+            )
+            if stored is None:
+                raise GuestChatError(404, "response_unavailable", "The saved answer is not available.")
+            freshness = stored.get("freshness", {})
+        except GuestChatError:
+            raise
+        except Exception as exc:
+            raise GuestChatError(503, "freshness_unavailable", "Answer freshness could not be checked.", retryable=True) from exc
+        return {"status": "current" if freshness.get("eligible") else "stale"}
 
     def open_session(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -287,6 +384,19 @@ class GuestChatApplication:
         except Exception as exc:
             raise GuestChatError(503, "storage_unavailable", "Request storage is unavailable.", retryable=True) from exc
         if cached is not None:
+            bindings = cached.get("evidence_bindings") or _evidence_bindings(
+                cached.get("evidence", []), cached.get("media", []),
+            )
+            try:
+                decision = await asyncio.to_thread(
+                    validate_evidence_current, self._engine, claims.hotel_id, bindings, datetime.now(UTC),
+                )
+            except Exception as exc:
+                raise GuestChatError(503, "freshness_unavailable", "Answer freshness could not be checked.", retryable=True) from exc
+            if not decision.eligible:
+                raise GuestChatError(409, "stale_source", "The saved answer is no longer current. Ask again in a new turn.")
+            cached.pop("evidence_bindings", None)
+            cached.pop("freshness", None)
             return cached
         if self._orchestrator is None:
             await self._fail_request(session_id, request_id, "provider_unavailable")
@@ -294,9 +404,16 @@ class GuestChatApplication:
         try:
             async with asyncio.timeout_at(deadline):
                 remaining = _remaining_seconds(deadline)
+                snapshot = await asyncio.to_thread(
+                    get_active_snapshot, self._engine, claims.hotel_id, now=datetime.now(UTC),
+                    timeout_seconds=_remaining_seconds(deadline),
+                )
+                if snapshot is None:
+                    raise GuestChatError(404, "hotel_unavailable", "This hotel's records are unavailable.")
+                source_refs = {source.source_id: source for source in snapshot.sources}
                 history = await asyncio.to_thread(
                     recent_messages, self._engine, session_id, claims.hotel_id,
-                    timeout_seconds=remaining,
+                    timeout_seconds=_remaining_seconds(deadline),
                 )
                 answer = await self._orchestrator.answer(
                     hotel_id=claims.hotel_id, question=question, history=history, deadline=deadline,
@@ -321,8 +438,17 @@ class GuestChatApplication:
                 media = [
                     projected for item in sorted(candidate_media, key=lambda value: value.media_id)
                     if item.hotel_id == claims.hotel_id
-                    and (projected := _media_reference(item, cited_fact_ids)) is not None
+                    and item.source_id in source_refs
+                    and (projected := _media_reference(item, cited_fact_ids, source_refs[item.source_id])) is not None
                 ]
+                evidence = []
+                for fact in answer.citations:
+                    source_id = fact.get("provenance", {}).get("source_id")
+                    source = source_refs.get(source_id)
+                    if source is None or fact.get("provenance", {}).get("source_version") != source.source_version:
+                        raise StaleSource("retrieved evidence no longer matches active source state")
+                    evidence.append(_citation_reference(fact, source))
+                bindings = _evidence_bindings(evidence, media, snapshot)
                 trace = {
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
@@ -337,11 +463,15 @@ class GuestChatApplication:
                     complete_request,
                     self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                     request_id=request_id, question=question, answer=answer.answer,
-                    evidence=[_citation_reference(fact) for fact in answer.citations],
-                    response_fields={"unknowns": list(answer.unknowns), "trace": trace, "media": media},
+                    evidence=evidence,
+                    expected_generation=snapshot.generation,
+                    evidence_bindings=bindings,
+                    response_fields={"unknowns": list(answer.unknowns), "trace": trace, "media": media,
+                                     "source_generation": snapshot.generation},
                     timeout_seconds=remaining,
                     deadline_monotonic=deadline_monotonic, cancellation_event=cancellation_event,
                 )
+                result.pop("evidence_bindings", None)
                 return result
         except GuestChatError as exc:
             await self._fail_request(session_id, request_id, exc.code)
@@ -371,6 +501,9 @@ class GuestChatApplication:
         except VersionConflict as exc:
             await self._fail_request(session_id, request_id, "state_version_conflict")
             raise GuestChatError(409, "state_version_conflict", "Session state changed; submit a new request_id.") from exc
+        except StaleSource as exc:
+            await self._fail_request(session_id, request_id, "stale_source")
+            raise GuestChatError(409, "stale_source", "Hotel records changed while this answer was being prepared. Ask again in a new turn.") from exc
         except Exception as exc:
             await self._fail_request(session_id, request_id, "internal_error")
             raise GuestChatError(500, "internal_error", "The request could not be completed.") from exc

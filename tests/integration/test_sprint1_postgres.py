@@ -37,7 +37,9 @@ from staylead_platform.infrastructure.persistence.store import (
     reserve_request,
     schema_version,
 )
-from staylead_platform.infrastructure.source_connectors.knowledge_v1 import import_fixture_pack
+from staylead_platform.infrastructure.source_connectors.knowledge_v1 import (
+    import_fixture_pack,
+)
 from staylead_platform.platform.contracts.ai_provider import (
     GenerationRequest,
     GenerationResult,
@@ -96,7 +98,7 @@ def settings_for(database_url: str, *, ai_turn_timeout_seconds: float = 45.0) ->
 
 
 def test_explicit_migration_fixture_bootstrap_and_hotel_scoped_provenance(engine) -> None:
-    assert schema_version(engine) == 3
+    assert schema_version(engine) == 4
     cities = facts_for_hotel(engine, "HTL-CITY01")
     beach = facts_for_hotel(engine, "HTL-BEACH02")
     assert len(cities) == 109

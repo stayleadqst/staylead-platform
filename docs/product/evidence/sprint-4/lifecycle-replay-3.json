@@ -1,0 +1,34 @@
+{
+  "action": "replay",
+  "result": {
+    "status": "noop",
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "canonical_hash": "63597a709fdc8f83fbbb8daff1ffd3ba72ac931b89bb1308454c0b4ec417ee7d",
+    "receipt_hash": "63597a709fdc8f83fbbb8daff1ffd3ba72ac931b89bb1308454c0b4ec417ee7d",
+    "generation": 3,
+    "sources": [
+      {
+        "source_id": "source-hotel-guide",
+        "version": "2",
+        "source_hash": "0cdd24b412a865d9bb1e27b9ec529ada32a9b60a68327f1dae896c57408bc16c",
+        "status": "revoked",
+        "guest_approved": false,
+        "valid_from": "2025-01-01",
+        "valid_to": "2035-12-31",
+        "last_success_at": "2026-10-23T14:57:16.383935+07:00",
+        "last_failure": null
+      },
+      {
+        "source_id": "source-independent-B",
+        "version": "1",
+        "source_hash": "ae875a798b432724faea9c10dfbf1087ec26d61c94cd5ed46f13afde7324aa84",
+        "status": "approved",
+        "guest_approved": true,
+        "valid_from": "2025-01-01",
+        "valid_to": "2035-12-31",
+        "last_success_at": "2026-10-23T14:47:36.067566+07:00",
+        "last_failure": null
+      }
+    ]
+  }
+}

@@ -112,7 +112,7 @@ loaded into serving knowledge.
 ### Complete local hotel packs (Sprint 3)
 
 Pack schema v1 supports a single new synthetic hotel, approved facts and authored PNG/MP4/VTT evidence.
-Apply database schema v3 explicitly, then run the trusted CLI with an allowlisted parent directory:
+Apply database schema v4 explicitly, then run the trusted CLI with an allowlisted parent directory:
 
 ```sh
 cd apps/api
@@ -135,6 +135,32 @@ understanding or real-property approval. Guest media uses authenticated session-
 with server-selected mappings from validated final citations; no bearer token or arbitrary media URL
 is included in a public descriptor. See the [Sprint 3 acceptance](docs/product/SPRINT_3_ACCEPTANCE.md)
 for exact evidence, versions and remaining limitations.
+
+### Source lifecycle (Sprint 4)
+
+After explicit schema v4 migration, a separate trusted local CLI can refresh, revoke or delete
+one existing source. Read its current CAS tokens first:
+
+```sh
+python -m staylead_platform.infrastructure.source_connectors.lifecycle snapshot --hotel-id HOTEL_ID
+python -m staylead_platform.infrastructure.source_connectors.lifecycle refresh \
+  --hotel-id HOTEL_ID --source-id SOURCE_ID \
+  --expected-generation GENERATION --expected-version SOURCE_VERSION \
+  --expected-source-hash SOURCE_HASH --operation-id UNIQUE_OPERATION_ID \
+  --pack-root /approved/root/source-replacement --allowed-root /approved/root
+```
+
+The replacement is a complete pack-shaped snapshot of exactly the selected source and its facts/media;
+preserve the existing hotel configuration and pack identity. Omitted source-owned records cease serving.
+`revoke` and `delete` accept the same scope/CAS/operation arguments without the pack paths. Retrying an
+operation with identical content is a no-op; a different payload or stale CAS is rejected. Original
+first-import replay remains a no-op reporting current state and cannot restore removed/revoked content.
+
+Answers, replay, history and media revalidate source identity, approval and UTC-inclusive validity.
+The web checks existing answers explicitly, before a new turn and on view re-entry; stale media is
+removed and Blob URLs revoked. No polling/push or recall of already downloaded bytes is implied.
+Lifecycle/freshness adds no model calls. See [Sprint 4 acceptance](docs/product/SPRINT_4_ACCEPTANCE.md)
+for migration compatibility, AC evidence and the bounded real-Grok run.
 
 After installing the API development dependencies, run the API smoke and architecture checks
 from `apps/api`:

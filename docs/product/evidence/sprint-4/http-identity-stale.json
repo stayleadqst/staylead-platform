@@ -1,0 +1,9 @@
+{
+  "replay_status": 409,
+  "replay_error": "stale_source",
+  "old_media_status": 404,
+  "freshness_status": 200,
+  "decision": {
+    "status": "stale"
+  }
+}

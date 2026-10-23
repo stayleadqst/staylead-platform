@@ -2,21 +2,26 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import UTC, datetime
 
 from sqlalchemy import and_, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
+
 from staylead_platform.infrastructure.persistence.store import (
+    hotels,
     knowledge_facts,
+    knowledge_sources,
     set_transaction_timeout,
 )
 from staylead_platform.platform.contracts.knowledge import KnowledgeFact
 
 
 class PostgresKnowledgeFactRepository:
-    def __init__(self, engine: Engine) -> None:
+    def __init__(self, engine: Engine, *, clock: Callable[[], datetime] | None = None) -> None:
         self._engine = engine
+        self._clock = clock or (lambda: datetime.now(UTC))
 
     @staticmethod
     def _materialize(row: object) -> KnowledgeFact:
@@ -29,6 +34,8 @@ class PostgresKnowledgeFactRepository:
             status=values["status"], valid_from=values["valid_from"], valid_to=values["valid_to"],
             provenance={
                 "source_id": values["source_id"], "source_version": values["source_version"],
+                "source_hash": values.get("source_hash") or "",
+                "source_generation": values.get("source_generation") or 0,
                 "section": values["section"], "fact_version": values["fact_version"],
                 "imported_at": values["imported_at"].isoformat(),
             },
@@ -37,15 +44,27 @@ class PostgresKnowledgeFactRepository:
     def list_guest_facts(
         self, hotel_id: str, *, limit: int = 400, timeout_seconds: float | None = None,
     ) -> list[KnowledgeFact]:
-        today = datetime.now(UTC).date().isoformat()
+        today = self._clock().astimezone(UTC).date().isoformat()
         try:
             with self._engine.begin() as connection:
                 set_transaction_timeout(connection, timeout_seconds)
-                rows = connection.execute(select(knowledge_facts).where(and_(
+                today = self._clock().astimezone(UTC).date().isoformat()
+                rows = connection.execute(select(
+                    knowledge_facts, knowledge_sources.c.source_hash,
+                    hotels.c.knowledge_generation.label("source_generation"),
+                ).join(knowledge_sources, and_(
+                    knowledge_sources.c.hotel_id == knowledge_facts.c.hotel_id,
+                    knowledge_sources.c.source_id == knowledge_facts.c.source_id,
+                    knowledge_sources.c.version == knowledge_facts.c.source_version,
+                )).join(hotels, hotels.c.hotel_id == knowledge_facts.c.hotel_id).where(and_(
                     knowledge_facts.c.hotel_id == hotel_id,
                     knowledge_facts.c.status.in_(["confirmed", "unknown", "needs_confirmation"]),
                     knowledge_facts.c.valid_from <= today,
                     knowledge_facts.c.valid_to >= today,
+                    knowledge_sources.c.guest_approved.is_(True),
+                    knowledge_sources.c.lifecycle_status == "approved",
+                    knowledge_sources.c.valid_from <= today,
+                    knowledge_sources.c.valid_to >= today,
                 )).limit(min(max(limit, 1), 400))).all()
         except OperationalError as exc:
             self._raise_if_timeout(exc)
@@ -57,16 +76,27 @@ class PostgresKnowledgeFactRepository:
     ) -> list[KnowledgeFact]:
         if not fact_ids:
             return []
-        today = datetime.now(UTC).date().isoformat()
+        today = self._clock().astimezone(UTC).date().isoformat()
         try:
             with self._engine.begin() as connection:
                 set_transaction_timeout(connection, timeout_seconds)
-                rows = connection.execute(select(knowledge_facts).where(and_(
+                rows = connection.execute(select(
+                    knowledge_facts, knowledge_sources.c.source_hash,
+                    hotels.c.knowledge_generation.label("source_generation"),
+                ).join(knowledge_sources, and_(
+                    knowledge_sources.c.hotel_id == knowledge_facts.c.hotel_id,
+                    knowledge_sources.c.source_id == knowledge_facts.c.source_id,
+                    knowledge_sources.c.version == knowledge_facts.c.source_version,
+                )).join(hotels, hotels.c.hotel_id == knowledge_facts.c.hotel_id).where(and_(
                 knowledge_facts.c.hotel_id == hotel_id,
                 knowledge_facts.c.fact_id.in_(fact_ids),
                 knowledge_facts.c.status.in_(["confirmed", "unknown", "needs_confirmation"]),
                 knowledge_facts.c.valid_from <= today,
                 knowledge_facts.c.valid_to >= today,
+                knowledge_sources.c.guest_approved.is_(True),
+                knowledge_sources.c.lifecycle_status == "approved",
+                knowledge_sources.c.valid_from <= today,
+                knowledge_sources.c.valid_to >= today,
                 ))).all()
         except OperationalError as exc:
             self._raise_if_timeout(exc)

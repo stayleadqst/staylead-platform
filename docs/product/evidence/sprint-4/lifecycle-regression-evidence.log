@@ -1,0 +1,45 @@
+Sprint 4 producer/lifecycle regression evidence
+Date: 2026-10-23
+
+PostgreSQL test command (using the isolated sprint4_test database through the local socket; DSN omitted):
+PYTHONPATH=apps/api/src STAYLEAD_TEST_DATABASE_URL=<isolated-sprint4-test-dsn> apps/api/.venv/bin/python -m pytest -q tests/contracts/test_fixture_pack.py tests/integration/test_sprint4_lifecycle_postgres.py tests/integration/test_sprint1_postgres.py::test_http_guest_session_scope_and_idempotent_response_retry tests/integration/test_sprint1_postgres.py::test_turn_deadline_bounds_postgres_lock_wait_and_cleans_reservation tests/integration/test_sprint1_postgres.py::test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits
+Result: 7 passed, 1 Starlette/httpx deprecation warning.
+
+Coverage in this focused run:
+- legacy fixture bootstrap source metadata and response replay
+- source refresh/revoke/expiry, operation replay, rollback, CAS, media digest and fact limits
+- revoked-source facts are excluded from the 400 active-fact limit
+- two PostgreSQL lock/deadline regression cases
+
+Schema 3 to 4 upgrade probe (reviewer-owned isolated database; source script: /tmp/sprint4_review_upgrade_existing2.py):
+- existing 109 facts and session state version 1 preserved
+- 14 validated knowledge-v1 source rows registered
+- saved response replay returned HTTP 200 without another provider call
+- a new guest turn returned HTTP 200
+- after source revocation, stale assistant prose was absent from recent history
+
+Schema 3 complete-pack upgrade probe (reviewer-owned isolated database; source script: /tmp/sprint4_review_packupgrade.py):
+- saved response replay returned HTTP 200 with zero provider calls
+- replayed media descriptor included generation 1 and the current source hash
+- authenticated PNG asset fetch returned HTTP 200 with image/png
+- original immutable import receipt remained a no-op at generation 1
+
+Active-fact-cap reviewer probe:
+- after revoking a source with 396 stored facts, replacement of the remaining source with 400 eligible facts applied successfully
+
+Static checks:
+apps/api/.venv/bin/ruff check apps/api/src/staylead_platform/domains/hospitality/registration/fixture_pack.py apps/api/src/staylead_platform/infrastructure/source_connectors/knowledge_v1.py apps/api/src/staylead_platform/infrastructure/persistence/store.py apps/api/src/staylead_platform/infrastructure/persistence/knowledge_repository.py tests/contracts/test_fixture_pack.py tests/integration/test_sprint4_lifecycle_postgres.py
+Result: All checks passed.
+
+PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m compileall -q apps/api/src/staylead_platform/domains/hospitality/registration/fixture_pack.py apps/api/src/staylead_platform/infrastructure/source_connectors/knowledge_v1.py apps/api/src/staylead_platform/infrastructure/persistence/store.py apps/api/src/staylead_platform/infrastructure/persistence/knowledge_repository.py
+Result: passed.
+
+After the active-snapshot row-lock and schema-3 media-descriptor backfill deltas:
+apps/api/.venv/bin/ruff check apps/api/src/staylead_platform/infrastructure/persistence/store.py
+Result: All checks passed.
+
+PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m compileall -q apps/api/src/staylead_platform/infrastructure/persistence/store.py
+Result: passed.
+
+git diff --check -- apps/api/src/staylead_platform/infrastructure/persistence/store.py
+Result: passed.

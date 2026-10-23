@@ -31,6 +31,12 @@ export function classifyFailure(error: FailureInput): { message: string; retryMo
       retryMode: "none",
     };
   }
+  if (error.code === "stale_source") {
+    return {
+      message: "Hotel records changed while this answer was being prepared. Ask again to use the latest records.",
+      retryMode: "none",
+    };
+  }
   if (error.outcome === "rejected" && error.retryable) {
     return {
       message: "The previous attempt failed. Retry to submit it as a new request.",

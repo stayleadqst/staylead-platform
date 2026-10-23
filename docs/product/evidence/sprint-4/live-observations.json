@@ -1,0 +1,246 @@
+{
+  "candidate_fingerprint": "a358cfef3ccfbd354fcf2b1ad6ea71ef79db7a413f9b20c06ac78d3225f2b7a4",
+  "provider_calls": 6,
+  "guest_turns": 3,
+  "usage": {
+    "input_tokens": 3544,
+    "output_tokens": 142,
+    "total_tokens": 5448
+  },
+  "monetary_cost": "unknown",
+  "paid_retries": 0,
+  "model": "grok-4-1-fast-reasoning",
+  "live_server_stopped": true,
+  "turns": [
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/9c41d4e7-cc85-473f-a084-c31a6df3115a/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "What are the breakfast hours?",
+      "response": {
+        "request_id": "cf8d5b50-3ba9-4b14-9f9e-18991f793aa1",
+        "answer": "The breakfast hours are 07:00-10:00. [fact-breakfast-hours]",
+        "evidence": [
+          {
+            "fact_id": "fact-breakfast-hours",
+            "hotel_id": "HTL-S4-ACCEPTANCE",
+            "source_id": "source-hotel-guide",
+            "source_version": "3",
+            "source_hash": "6ba1adbed5b18054c524bc0d69e5c43a09549ed06918a29cb705149f3ae54393",
+            "source_generation": 4,
+            "section": "Dining",
+            "fact_version": "3",
+            "imported_at": "2026-10-23T15:02:53.653965+07:00"
+          }
+        ],
+        "status": "completed",
+        "unknowns": [],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "337a0a22-42d3-48c3-b0ad-a7e2811543d0",
+          "provider_request_ids": [
+            "b8189e57-db4c-400d-9fdd-7d9c8b5fe9e2",
+            "337a0a22-42d3-48c3-b0ad-a7e2811543d0"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1209,
+            "output_tokens": 48,
+            "total_tokens": 1813
+          },
+          "retrieved_fact_ids": [
+            "fact-breakfast-hours"
+          ],
+          "failure_stage": null
+        },
+        "media": [],
+        "source_generation": 4,
+        "config_version": "1",
+        "knowledge_generation": 4,
+        "state_version": 1
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/9c41d4e7-cc85-473f-a084-c31a6df3115a/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "What are the breakfast hours now?",
+      "response": {
+        "request_id": "ad8f9cb3-fedf-474d-97dc-32d2cb865048",
+        "answer": "The breakfast hours are 08:00-11:00. [fact-breakfast-hours]\nBreakfast is served from 08:00 to 11:00. [fact-breakfast-hours]",
+        "evidence": [
+          {
+            "fact_id": "fact-breakfast-hours",
+            "hotel_id": "HTL-S4-ACCEPTANCE",
+            "source_id": "source-hotel-guide",
+            "source_version": "4",
+            "source_hash": "2c894a44c5dfafb8445d18457e9340afd474c896915555d3bda4e1d55fccdefe",
+            "source_generation": 5,
+            "section": "Dining",
+            "fact_version": "4",
+            "imported_at": "2026-10-23T15:06:37.075891+07:00"
+          }
+        ],
+        "status": "completed",
+        "unknowns": [],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "eae183c1-6e53-4499-9880-211388963438",
+          "provider_request_ids": [
+            "b76be012-75ef-44ae-bfc4-b19c0fe232a3",
+            "eae183c1-6e53-4499-9880-211388963438"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1214,
+            "output_tokens": 71,
+            "total_tokens": 1927
+          },
+          "retrieved_fact_ids": [
+            "fact-breakfast-hours"
+          ],
+          "failure_stage": null
+        },
+        "media": [],
+        "source_generation": 5,
+        "config_version": "1",
+        "knowledge_generation": 5,
+        "state_version": 2
+      }
+    },
+    {
+      "stage": "http",
+      "method": "POST",
+      "path": "/v1/guest/sessions/9c41d4e7-cc85-473f-a084-c31a6df3115a/messages",
+      "status": 200,
+      "provider_mode": "live",
+      "question": "Can you confirm those breakfast hours now?",
+      "response": {
+        "request_id": "db15399a-796e-4038-a7ed-3f3c9beeab84",
+        "answer": "Breakfast hours need confirmation.",
+        "evidence": [],
+        "status": "completed",
+        "unknowns": [
+          "Breakfast hours need confirmation."
+        ],
+        "trace": {
+          "provider": "foundry_grok",
+          "deployment": "cc-dev-grok-4-1-fast-reasoning",
+          "model": "grok-4-1-fast-reasoning",
+          "provider_request_id": "85ca8b4f-851c-4d31-a4f9-a2d20837f460",
+          "provider_request_ids": [
+            "ffa21e35-4ff2-4c34-b736-84b0dc2fdfe4",
+            "85ca8b4f-851c-4d31-a4f9-a2d20837f460"
+          ],
+          "calls": 2,
+          "usage": {
+            "input_tokens": 1121,
+            "output_tokens": 23,
+            "total_tokens": 1708
+          },
+          "retrieved_fact_ids": [],
+          "failure_stage": null
+        },
+        "media": [],
+        "source_generation": 6,
+        "config_version": "1",
+        "knowledge_generation": 6,
+        "state_version": 3
+      }
+    }
+  ],
+  "provider_observations": [
+    {
+      "unix_time": 1792742769.633703,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "b8189e57-db4c-400d-9fdd-7d9c8b5fe9e2",
+      "usage": {
+        "input_tokens": 418,
+        "output_tokens": 9,
+        "total_tokens": 660
+      },
+      "output_json": "{\"fact_ids\":[\"fact-breakfast-hours\"]}",
+      "instructions_sha256": "a132bfe99c8d1de5a39284a150bea61db2a4c5b90cd1e6fc6b6d209672cd2d56",
+      "input_sha256": "45e669a01bdf2b934b3e99cca4df1d35ddd89c1b0c24681e810d5203e9f47043"
+    },
+    {
+      "unix_time": 1792742775.4733171,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "337a0a22-42d3-48c3-b0ad-a7e2811543d0",
+      "usage": {
+        "input_tokens": 791,
+        "output_tokens": 39,
+        "total_tokens": 1153
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"The breakfast hours are 07:00-10:00.\",\"fact_ids\":[\"fact-breakfast-hours\"]}], \"unknowns\":[], \"conflicts\":[]}",
+      "instructions_sha256": "913251665f2f1766285576d05b4e4fcac7795f828c174e2a5db866ecbaf4494f",
+      "input_sha256": "c4f1e970d11983114bbebc1a5036d1366f3afb49722ae3ea1a8012dcd8e1371c"
+    },
+    {
+      "unix_time": 1792742852.789044,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "b76be012-75ef-44ae-bfc4-b19c0fe232a3",
+      "usage": {
+        "input_tokens": 409,
+        "output_tokens": 9,
+        "total_tokens": 706
+      },
+      "output_json": "{\"fact_ids\":[\"fact-breakfast-hours\"]}",
+      "instructions_sha256": "a132bfe99c8d1de5a39284a150bea61db2a4c5b90cd1e6fc6b6d209672cd2d56",
+      "input_sha256": "3463c37ca1e9b6b4c70650c41e6dd2680eb90733133589990902eb223ed92af2"
+    },
+    {
+      "unix_time": 1792742858.8277519,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "eae183c1-6e53-4499-9880-211388963438",
+      "usage": {
+        "input_tokens": 805,
+        "output_tokens": 62,
+        "total_tokens": 1221
+      },
+      "output_json": "{\"supported_claims\":[{\"text\":\"The breakfast hours are 08:00-11:00.\",\"fact_ids\":[\"fact-breakfast-hours\"]},{\"text\":\"Breakfast is served from 08:00 to 11:00.\",\"fact_ids\":[\"fact-breakfast-hours\"]}],\n\"unknowns\":[],\"conflicts\":[]}",
+      "instructions_sha256": "913251665f2f1766285576d05b4e4fcac7795f828c174e2a5db866ecbaf4494f",
+      "input_sha256": "3e0adcf658eaa3d612fa7233cee0f1cf24a67c294e88af578faa74bd5cc3b95b"
+    },
+    {
+      "unix_time": 1792742910.713901,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "ffa21e35-4ff2-4c34-b736-84b0dc2fdfe4",
+      "usage": {
+        "input_tokens": 339,
+        "output_tokens": 5,
+        "total_tokens": 578
+      },
+      "output_json": "{\"fact_ids\":[]}",
+      "instructions_sha256": "a132bfe99c8d1de5a39284a150bea61db2a4c5b90cd1e6fc6b6d209672cd2d56",
+      "input_sha256": "da915580e3268db9cd816e56de78545c27c23c129f55460f5a18b231672a5682"
+    },
+    {
+      "unix_time": 1792742915.8412879,
+      "stage": "live_provider",
+      "model": "grok-4-1-fast-reasoning",
+      "provider_request_id": "85ca8b4f-851c-4d31-a4f9-a2d20837f460",
+      "usage": {
+        "input_tokens": 782,
+        "output_tokens": 18,
+        "total_tokens": 1130
+      },
+      "output_json": "{\"supported_claims\":[],\"unknowns\":[\"Breakfast hours need confirmation.\"],\"conflicts\":[]}",
+      "instructions_sha256": "913251665f2f1766285576d05b4e4fcac7795f828c174e2a5db866ecbaf4494f",
+      "input_sha256": "ab7f57a71274651f8643ac45e652752664e272023cc58b3d40901c1a114dab33"
+    }
+  ]
+}

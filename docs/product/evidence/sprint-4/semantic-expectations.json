@@ -1,0 +1,10 @@
+{
+  "basis": "Independent expected values from synthetic fixture manifest plus explicit source refresh; not serving input or an LLM judge.",
+  "model": "grok-4-1-fast-reasoning",
+  "turns": [
+    {"phase": "v1", "question": "What are the breakfast hours?", "expected": "07:00-10:00 from current approved source; cite breakfast fact, no unsupported extra claims."},
+    {"phase": "v2", "question": "What are the breakfast hours now?", "expected": "08:00-11:00 from refreshed approved source; do not reuse the old hours or old assistant prose as evidence."},
+    {"phase": "revoked", "question": "Can you confirm those breakfast hours now?", "expected": "Unknown or cannot confirm after known source revocation; neither v1 nor v2 hours asserted as current, no obsolete evidence/media."}
+  ],
+  "limits": "3 guest turns opt-in; existing whole-turn/call/output/context limits; no automatic paid retry or LLM judge. Record failures and provider usage. Offline UI/media/race checks precede live."
+}

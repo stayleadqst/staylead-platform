@@ -1,0 +1,35 @@
+{
+  "action": "snapshot",
+  "result": {
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "generation": 1,
+    "sources": [
+      {
+        "hotel_id": "HTL-S4-ACCEPTANCE",
+        "source_id": "source-hotel-guide",
+        "hotel_generation": 1,
+        "source_version": "1",
+        "source_hash": "0d21c9e91a0148fdeede59cc81629c7cff4c85f071885cfc0dcbe7f5e26261d6",
+        "status": "approved",
+        "guest_approved": true,
+        "valid_from": "2025-01-01",
+        "valid_to": "2035-12-31",
+        "last_failure": null,
+        "last_success_at": "2026-10-23T14:47:36.067566+07:00"
+      },
+      {
+        "hotel_id": "HTL-S4-ACCEPTANCE",
+        "source_id": "source-independent-B",
+        "hotel_generation": 1,
+        "source_version": "1",
+        "source_hash": "ae875a798b432724faea9c10dfbf1087ec26d61c94cd5ed46f13afde7324aa84",
+        "status": "approved",
+        "guest_approved": true,
+        "valid_from": "2025-01-01",
+        "valid_to": "2035-12-31",
+        "last_failure": null,
+        "last_success_at": "2026-10-23T14:47:36.067566+07:00"
+      }
+    ]
+  }
+}

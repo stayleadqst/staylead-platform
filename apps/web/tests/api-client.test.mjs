@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ApiError, createGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
+import { ApiError, checkGuestFreshness, createGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
 
 const target = {
   domain: "hospitality",
@@ -51,6 +51,7 @@ test("direct hotel lookup is data-driven and unknown hotels surface the backend 
 test("binary media fetch uses authenticated same-origin route and returns bytes as Blob", async () => {
   const originalFetch = globalThis.fetch;
   const bytes = new Uint8Array([0, 255, 13, 10, 1]);
+  const media = { media_id: "IMG-1", source_id: "SRC-1", source_version: "2", source_hash: "a".repeat(64), source_generation: 7, sha256: "b".repeat(64) };
   let call;
   globalThis.fetch = async (url, init) => {
     call = { url, init };
@@ -58,10 +59,10 @@ test("binary media fetch uses authenticated same-origin route and returns bytes 
   };
   try {
     const blob = await fetchGuestMedia({ sessionId: "12345678-1234-4234-8234-123456789abc",
-      mediaId: "IMG-1", accessToken: "guest-token", target, signal: new AbortController().signal });
-    assert.equal(call.url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc/media/IMG-1");
+      media, accessToken: "guest-token", target, signal: new AbortController().signal });
+    assert.equal(call.url, `/api/guest/sessions/12345678-1234-4234-8234-123456789abc/media/IMG-1?generation=7&source_id=SRC-1&source_version=2&source_hash=${"a".repeat(64)}&sha256=${"b".repeat(64)}`);
     assert.equal(call.init.headers.authorization, "Bearer guest-token");
-    assert.equal(new URL(call.url, "https://local.test").search, "");
+    assert.equal(new URL(call.url, "https://local.test").searchParams.get("sha256"), media.sha256);
     assert.deepEqual(new Uint8Array(await blob.arrayBuffer()), bytes);
   } finally {
     globalThis.fetch = originalFetch;
@@ -75,13 +76,14 @@ test("message client forwards bearer and preserves the API response shape", asyn
     request_id: "turn-1",
     status: "completed",
     answer: "Breakfast is served.",
-    evidence: [{ fact_id: "F-1", hotel_id: "H-1", source_id: "S-1", source_version: "1",
+    evidence: [{ fact_id: "F-1", hotel_id: "H-1", source_id: "S-1", source_version: "1", source_hash: "a".repeat(64), source_generation: 1,
       section: "Dining", fact_version: "1.0", imported_at: "2026-10-22T00:00:00Z" }],
     media: [],
     unknowns: [],
     trace: {},
     config_version: "1",
     state_version: 1,
+    source_generation: 1,
   };
   globalThis.fetch = async (url, init) => {
     call = { url, init };
@@ -99,6 +101,25 @@ test("message client forwards bearer and preserves the API response shape", asyn
     assert.equal(call.url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc/messages");
     assert.equal(call.init.headers.authorization, "Bearer guest-token");
     assert.deepEqual(JSON.parse(call.init.body), { request_id: "turn-1", question: "When is breakfast?" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("freshness check sends only the scoped evidence bindings", async () => {
+  const originalFetch = globalThis.fetch;
+  let call;
+  globalThis.fetch = async (url, init) => {
+    call = { url, init };
+    return Response.json({ status: "stale" });
+  };
+  try {
+    assert.deepEqual(await checkGuestFreshness({
+      sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token", requestId: "turn-1", target,
+    }), { status: "stale" });
+    assert.equal(call.url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc/freshness");
+    assert.equal(call.init.headers.authorization, "Bearer guest-token");
+    assert.deepEqual(JSON.parse(call.init.body), { request_id: "turn-1" });
   } finally {
     globalThis.fetch = originalFetch;
   }
