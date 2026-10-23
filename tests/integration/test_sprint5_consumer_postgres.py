@@ -75,7 +75,7 @@ class BriefConsumerProvider:
                 {"op": "add_child", "age": 9},
             ]
 
-        if "Select only fact IDs" in request.instructions:
+        if "candidate_index" in payload:
             candidates = payload.get("candidate_index", [])
             result: dict[str, Any] = {"fact_ids": [candidates[0]["fact_id"]] if candidates else []}
             if operations:
@@ -147,6 +147,12 @@ def test_mixed_edit_commits_before_answer_and_brief_remains_available_after_hist
     assert first["evidence"], "the mixed breakfast question should retain hotel evidence"
     assert first["trace"]["calls"] <= 2
     assert any(item.get("guest_brief", {}).get("brief_version") == 1 for item in provider.inputs if "facts" in item)
+    committed_calls = [item for item in provider.inputs if item.get("guest_brief_patch_enabled") is False]
+    assert committed_calls
+    committed_instructions = committed_calls[-1]["instructions"]
+    assert len(committed_instructions) < 3000
+    assert "guest_patch" not in committed_instructions
+    assert "set_dates" not in committed_instructions
 
     for _ in range(5):
         faq = _post(client, session, {"request_id": str(uuid.uuid4()), "question": "What are the breakfast hours?"})

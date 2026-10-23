@@ -1,6 +1,8 @@
 # Sprint 5 — canonical guest brief and safe chat edits
 
-**Outcome: implemented and locally verified; Sprint DoD BLOCKED.** No Sprint 5 story is Done. The first real-Grok guest turn failed with `provider_timeout`/HTTP504 before any brief mutation. The shared four-turn semantic acceptance is unverified. Follow-up [S5-R1 #88](https://github.com/stayleadqst/staylead-platform/issues/88) is in the product backlog, linked to #84–#87 and E2 #4. No sprint, parent or epic was closed.
+**Current outcome: remediation implemented and locally verified in Sprint 5 (#90); final real-model acceptance remains BLOCKED.** No story is Done. New fixed candidate requires a fresh four-turn consumer run; previous partial runs are retained as failures, not combined into a final PASS.
+
+**Initial delivery outcome: implemented and locally verified; Sprint DoD BLOCKED.** No Sprint 5 story is Done. The first real-Grok guest turn failed with `provider_timeout`/HTTP504 before any brief mutation. The shared four-turn semantic acceptance is unverified. Follow-up [S5-R1 #88](https://github.com/stayleadqst/staylead-platform/issues/88) is in the product backlog, linked to #84–#87 and E2 #4. No sprint, parent or epic was closed.
 
 Delivery branch: `sprint-5-canonical-brief`, based on verified S4 local `65a901ef8bc681689e60183355dd5d4b466b18d8` / tree `f0b80eec93b0e7c398c8ef8a8fe92333bf483684`. Remote S4 commit `9576a59004667395bd91ee548eaab4bfdb518cb0` has the same tree; PR #83 remains unmerged. Delivery is branch/draft-PR only; publication identity is recorded on #87 at handoff. No main merge or deployment.
 
@@ -88,3 +90,64 @@ Live tokens and monetary cost: **unavailable**; do not infer zero billing or ass
 Sources/guests/media are synthetic/authored. No real hotel/operator acceptance, full parent stories, room/stay planners, persistent browser transcript, stretch #74, deployment, paid-resource creation, timeout/budget increase, main/PR83 merge or parent/epic/milestone closure. No manual GitHub CI invocation/rerun or CI wait gate; automatic workflows may run when publishing/updating the branch/PR, and no CI success is asserted. Secrets/Bearer/private runtime values are excluded from the delivery.
 
 The live API is stopped. Local acceptance services are returned to fake/offline mode or stopped before handoff; private runtime/isolated databases remain local for recovery. Future owner starts from #88 and the final fingerprint without repeating unaffected checks or resetting consumed live-attempt accounting.
+
+## S5-R2 #90 — execution resumed in Sprint 5
+
+Hieu explicitly requested immediate blocker remediation and dependent-story execution in Sprint 5 on2026-10-23. New [story #90](https://github.com/stayleadqst/staylead-platform/issues/90) is milestone5/InProgress. #88 retains original diagnosis/history; earlier deferral is superseded. #84–#87 remain Blocked until full AC/DoD pass. No main merge/deploy/paid resources or timeout/model/budget increase.
+
+| Agent / role | Exact model / reasoning | Ownership scope and exclusions | Assignment rationale / quality responsibility |
+| --- | --- | --- | --- |
+| Builder B, reused /root/brief_consumer | gpt-6-luna/high | Provider adapter and targeted adapter tests; no paid calls/config/infra | Narrow documented wire correction and regression |
+| Harness helper, reused /root/acceptance_runtime | gpt-6-luna/high | acceptance_runtime.py only; no services/live calls | Persisted call accounting and diagnostic events |
+| Coordinator /root | Runtime model/effort unavailable | Live operation, integration, evidence, GitHub/report; no competing product edits | AC mapping, secret protection, bounded actual consumer |
+| Fresh independent reviewer | gpt-6.1-sol/high | Read/reproduce final diff and evidence, review artifact only | Provider/core regression and real-model semantics; read-only by instruction, not enforced |
+
+| ID / phase | Agent — exact model / reasoning | Work / specific scope | Inputs / dependencies / parallelism | Deliverables / completion criteria / verification |
+| --- | --- | --- | --- | --- |
+| R2-D | B — gpt-6-luna/high | Diagnose request protocol/settings, correct evidenced adapter defect | Existing504 logs, official provider protocol, adapter; parallel R2-H | Verified difference vs unknown cause, smallest correction, focused wire/error tests |
+| R2-H | Helper — gpt-6-luna/high | Add latency/shape/failure telemetry and persisted additional attempt bounds | Existing harness, prior1call; parallel R2-D | No raw credentials; max8additionalattempts survives restart; fake tests remain offline |
+| R2-V | Coordinator — unavailable | Fixed candidate, actual production UI/API/PG/Grok four-turn sequence | R2-D/H ready and focused checks; pinned original semantic expectations | Expected/observed state, answers/citations, stableID, pending, usage, failures and calls |
+| R2-Q | Fresh reviewer — gpt-6.1-sol/high | Independent final requirements and affected-regression review; builder repairs targeted findings | R2-V evidence + candidate; avoid duplicate full audit | PASS only all AC/DoD, otherwise concrete blocker and bounded next action |
+| R2-F | Coordinator — unavailable | Publish updated PR89 and accurate dependent/backlog status | R2-Q and relevant local checks | Commit/push, statuses and report tied to candidate; no main merge/deploy |
+
+| Item | Rule / execution approach / condition |
+| --- | --- |
+| Waves/concurrency | 2 reused Luna agents + coordinator; fresh reviewer only once candidate ready; one editor/file |
+| Handoffs/context | Reuse valid prior86/46backend,32web and consumer evidence unless affected; concise changed-file/failure handoff |
+| Call accounting | New instruction authorizes one continued bounded run: max8additionalobservedproviderattempts incl diagnosis, no automaticpaidretry; prior1 remains recorded, never reset by restart |
+| Runtime bounds | Same model/deployment,25sprovider/45sturn/max2calls, original four semantic guest turns; no unverified reasoning setting |
+| Remediation/escalation | Same failure class repeats → reassess mechanism before more mutation/run; no speculative model escalation or weakened acceptance |
+| Tokens/cost | Record provider usage when returned; missing tokens/billing and coding-agent metrics unavailable; no savings claim |
+| Closure | Dependent stories only Done after all AC/DoD; parents/epics/milestones/main/deploy remain excluded |
+
+### S5-R2 interim observations (not final acceptance)
+
+The request cap field was corrected to documented `max_completion_tokens`, preserving the configured number. Initial continued turn1 passed with two real results, correct briefv1/dates/adults and grounded breakfast. Turn2 applied one unknown-age child atv2, then final answer timedout25.8s; receipt/brief survived with no duplicate.
+
+The post-commit answer prompt carried extraction grammar even though extraction was disabled. It was separated into a domain-owned concise prompt (2,507chars after explicit-array wording), leaving the extraction prompts intact. Full backend99tests and Ruff/compile pass; unchanged web evidence reused. Receipt-only resume then consumed two calls: selector19.37s, final answer canceled after about25.60s at the45s whole-turn boundary. The same briefv2/one child remains; no semantic clarification completion is claimed. The prompt change is verified request simplification, not proven timeout root-cause remediation.
+
+Current continued-run accounting:6additionalattempts,4successfullyreturnedproviderresults,2originalsemanticturns,1explicitreceiptresume; prior1attempt retained. No automaticpaidretry. Current bound remains8; user extension questions are pending, not approval. Provider wait vs connection/TLS overhead requires timing evidence before further product fixes. All dependent stories remain Blocked inside Sprint5.
+
+### S5-R2 fixed-candidate handoff / final real-model gate
+
+[Story #90](https://github.com/stayleadqst/staylead-platform/issues/90) stays in **Sprint5**, EpicE2/P0. No deferral to Sprint6. This supersedes earlier future-backlog scheduling; #88 preserves initial evidence/history. Dependent #84–#87 remain Blocked/Open until full AC/DoD.
+
+| Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
+| --- | --- | --- | --- | --- |
+| Adapter and committed-answer requests | B, gpt-6-luna/high | Implemented; final fingerprint below | Full backend99 passed before final narrow deltas; adapter2 focused checks; concise answer/selection-only prompts preserve extraction path | No claim these alone explain provider latency |
+| Empty semantic selection | B, gpt-6-luna/high | Fixed: clear preliminary facts when selectedIDs empty | Explicit nonempty preliminary facts/index fixture: old behaviorFAIL, fixedPASS; finalgrounded23, affectedcontracts/API/consumerPG34 pass, Ruff/compile | Actual model latency effect not yet measured on final candidate |
+| Harness and diagnosis | Helper, gpt-6-luna/high | Persisted8attempt/current7 guard; transport/cancellation instrumentation | Guard/fake probes pass; minimal realprobe4.27s, TCP/TLS complete0.92s | Tiny probe is not semantic acceptance or proof of failed-request latency cause |
+| Integration / final acceptance | Coordinator, actualmodel/effort unavailable | Final fixed candidate ready; prior real failures retained | Firstoldphasecapture/FAQpassed; childmutationcorrect; answerfailed25.8s; receiptresumefailed45s | Freshfourturnconsumersequence ononefixedcandidate NOT RUN; cannot fit remaining1call |
+| Independent review | Fresh Q, gpt-6.1-sol/high | Targeted final code review recorded separately | Existingguardreview reused; newnegative test gap identified and corrected | CodePASS separate from SprintDoD; no finalmodelPASS |
+
+Final source/test/fixture fingerprint: `0b00a3ce05f908fdf974e8e5df91d190e86a121ccdd82555e2782c70a5d7d4ba` (190files; explicit sortedJSON manifest method, distinct from original198file method). [Manifest](evidence/sprint-5/remediation-candidate-manifest.json). Documentation/harness hashes and phases are retained in boundary/review evidence; no silent replacement of original pins or expectations.
+
+Continued execution consumed **7providerattempts /5returnedresults**, including1tiny diagnostic; original1failedattempt remains separate (cumulative8). There were2originalsemanticturns and1explicitreceipt-onlyresume. Known successful subset usage asreported: input13,106/output277/total18,196; totals need not equal displayed input+output, unexplained components remain unknown. Usage for failed/cancelled calls and full billing are **unavailable**. No automaticpaidretry, no model/timeout/resource changes.
+
+[Observations](evidence/sprint-5/remediation-observations.json), [events](evidence/sprint-5/remediation-runtime-events.jsonl), [database after child timeout](evidence/sprint-5/remediation-post-timeout-db.json), [pre-fix failure](evidence/sprint-5/empty-selection-prefixed-regression.log), [fixed regression](evidence/sprint-5/empty-selection-fixed-regression.log), [backend99](evidence/sprint-5/remediation-backend-tests.log), [independent review](evidence/sprint-5/remediation-review.md).
+
+**Final disposition after Hieu's explicit limit decision:** keep the continued-run cap at8, with7observedattempts plusoriginal1 retained. No further paidcalls or capchange. The required freshfourturn gate on the fixedcandidate cannot fit the remaining1call, so #90 and #84–#87 remain **Blocked inside Sprint5**. No deferral toSprint6, no Done/closure, and no further budget request. The previous9/10cap questions were declined; any earlier pending/extension text is historical and superseded by this decision.
+
+No main/PR83 merge, deployment, newresources, optionalfeatures, parent/epic/milestoneclosure or manualCI. Web/source code is unchanged, so valid prior32webcontracts/lint/typecheck/build/browsermechanics are reused. Only scoped backend/harness/evidence changed.
+
+Independent final review: **code/offline mechanics PASS**, final real-model DoD **BLOCKED**. No remaining reproduced code finding; inference latency cause for prior failed full requests remains unknown. Final8consumerPG evidence: [log](evidence/sprint-5/empty-selection-consumer-postgres.log).

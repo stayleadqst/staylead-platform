@@ -16,6 +16,8 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
+    COMMITTED_FACT_SELECTION_INSTRUCTIONS,
+    COMMITTED_GROUNDED_QA_INSTRUCTIONS,
     FACT_SELECTION_INSTRUCTIONS,
     GROUNDED_QA_INSTRUCTIONS,
 )
@@ -114,8 +116,10 @@ def create_guest_chat_application(
             provider=selected_provider,
             retriever=retriever,
             instructions=GROUNDED_QA_INSTRUCTIONS,
+            committed_instructions=COMMITTED_GROUNDED_QA_INSTRUCTIONS,
             response_schema=HospitalityGroundedAnswer,
             selection_instructions=FACT_SELECTION_INSTRUCTIONS,
+            committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
             selection_schema=FactSelection,
             max_output_tokens=settings.ai_max_output_tokens,
         )

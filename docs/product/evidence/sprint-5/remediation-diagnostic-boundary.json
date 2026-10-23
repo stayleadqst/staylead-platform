@@ -1,0 +1,11 @@
+{
+  "purpose": "one synthetic minimal request partitions transport setup vs response wait; not semantic acceptance",
+  "observed_attempts_before": 6,
+  "additional_limit": 8,
+  "prior_attempts": 1,
+  "automatic_retries": 0,
+  "provider_timeout_seconds": 25,
+  "request_max_completion_tokens": 140,
+  "candidate_fingerprint": "a9cb6fb3a7e0976ec5d87a8bb4598205538ad5778dc59fdbc33976e3124be228",
+  "harness_sha256": "09f8627c5ee1eee0f5e9dc98e7171effa054fd964a386ae2e54dddc6a09f8f39"
+}

@@ -128,16 +128,20 @@ class GroundedQAOrchestrator:
         provider: AIProvider,
         retriever: KnowledgeRetriever,
         instructions: str,
+        committed_instructions: str,
         response_schema: type[BaseModel],
         selection_instructions: str,
+        committed_selection_instructions: str,
         selection_schema: type[BaseModel],
         max_output_tokens: int = 700,
     ) -> None:
         self._provider = provider
         self._retriever = retriever
         self._instructions = instructions
+        self._committed_instructions = committed_instructions
         self._response_schema = response_schema
         self._selection_instructions = selection_instructions
+        self._committed_selection_instructions = committed_selection_instructions
         self._selection_schema = selection_schema
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
 
@@ -175,7 +179,10 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selected = await self._provider.generate(GenerationRequest(
-                    instructions=self._selection_instructions,
+                    instructions=(
+                        self._selection_instructions
+                        if extract_guest_patch else self._committed_selection_instructions
+                    ),
                     input_text=selection_input,
                     max_output_tokens=140,
                 ))
@@ -196,6 +203,8 @@ class GroundedQAOrchestrator:
                         self._retriever.get_by_ids, hotel_id, selected_ids,
                         timeout_seconds=self._remaining(deadline),
                     ))
+                else:
+                    relevant_facts = []
             except ProviderError:
                 raise
             except TimeoutError:
@@ -232,7 +241,7 @@ class GroundedQAOrchestrator:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")
         try:
             generated = await self._provider.generate(GenerationRequest(
-                instructions=self._instructions,
+                instructions=self._instructions if extract_guest_patch else self._committed_instructions,
                 input_text=evidence,
                 max_output_tokens=self._max_output_tokens,
             ))

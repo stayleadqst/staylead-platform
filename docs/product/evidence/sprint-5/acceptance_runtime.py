@@ -4,14 +4,17 @@ Manual use from the repository root::
 
     PYTHONPATH=apps/api/src python3 docs/product/evidence/sprint-5/acceptance_runtime.py fake
     STAYLEAD_LIVE_EVAL=1 PYTHONPATH=apps/api/src python3 docs/product/evidence/sprint-5/acceptance_runtime.py live
+    STAYLEAD_LIVE_EVAL=1 PYTHONPATH=apps/api/src python3 docs/product/evidence/sprint-5/acceptance_runtime.py diagnostic
 
 Fake controls live in ``/tmp/staylead-sprint5-control.json``. Set
 ``{"hide_completed_response_once":true}`` to deliver one retryable 503 after
 the API has completed a request; replay the same request ID to observe its stored
 result. ``{"fail_postapply_answer":true}`` injects one post-apply answer failure,
 and ``{"response_delay_seconds":N}`` delays message responses by at most 30 seconds.
-The completion fault is rejected in live mode. Runtime credentials are read from
-the existing private ``/tmp/staylead-sprint5-runtime.json`` file.
+The completion fault is rejected in live mode. The remediation state persists a
+four-semantic-turn cap; answer-only receipt resumes are counted separately and do
+not consume a semantic turn. Runtime credentials are read from the existing private
+``/tmp/staylead-sprint5-runtime.json`` file.
 """
 from __future__ import annotations
 
@@ -33,19 +36,130 @@ from typing import Any
 
 BASE = Path(__file__).resolve().parent
 EVENTS = BASE / "runtime-events.jsonl"
+REMEDIATION_EVENTS = BASE / "remediation-runtime-events.jsonl"
 RUNTIME = Path("/tmp/staylead-sprint5-runtime.json")
 CONTROL = Path("/tmp/staylead-sprint5-control.json")
+RUN_STATE = BASE / "remediation-run-state.json"
+REMEDIATION_RUN_ID = "s5-r2-90-20261023"
+ADDITIONAL_ATTEMPT_LIMIT = 8
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 18085
 LOCK = threading.Lock()
 TURN = contextvars.ContextVar("sprint5_turn", default=None)
+HTTPX_TRACE_EVENTS = contextvars.ContextVar("sprint5_httpx_trace_events", default=None)
+HTTPX_TRACE_START = contextvars.ContextVar("sprint5_httpx_trace_start", default=None)
 TOTAL_PROVIDER_CALLS = 0
-TOTAL_GUEST_TURNS = 0
 
 
 def event(item: dict[str, Any]) -> None:
-    with LOCK, EVENTS.open("a", encoding="utf-8") as stream:
+    is_remediation = item.get("provider_mode") == "live" or str(item.get("stage", "")).startswith("live_")
+    path = REMEDIATION_EVENTS if is_remediation else EVENTS
+    with LOCK, path.open("a", encoding="utf-8") as stream:
         stream.write(json.dumps({"unix_time": time.time(), **item}, ensure_ascii=False) + "\n")
+
+
+def _load_run_state() -> dict[str, Any]:
+    try:
+        value = json.loads(RUN_STATE.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise SystemExit("Approved remediation run state is missing; live mode was not started.") from exc
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit("Approved remediation run state is unreadable; live mode was not started.") from exc
+    if (
+        not isinstance(value, dict)
+        or value.get("run_id") != REMEDIATION_RUN_ID
+        or value.get("max_additional_attempts") != ADDITIONAL_ATTEMPT_LIMIT
+        or value.get("prior_attempts") != 1
+        or not isinstance(value.get("observed_attempts"), int)
+        or isinstance(value.get("observed_attempts"), bool)
+        or value["observed_attempts"] < 0
+        or value["observed_attempts"] > ADDITIONAL_ATTEMPT_LIMIT
+        or not isinstance(value.get("semantic_guest_turns"), int)
+        or isinstance(value.get("semantic_guest_turns"), bool)
+        or value["semantic_guest_turns"] < 0
+        or value["semantic_guest_turns"] > 4
+        or not isinstance(value.get("answer_only_resumes", 0), int)
+        or isinstance(value.get("answer_only_resumes", 0), bool)
+        or value.get("answer_only_resumes", 0) < 0
+    ):
+        raise SystemExit("Approved remediation run state does not match this bounded run; live mode was not started.")
+    return value
+
+
+def _write_run_state(state: dict[str, Any]) -> None:
+    temp_path = RUN_STATE.with_name(RUN_STATE.name + ".tmp")
+    temp_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temp_path.replace(RUN_STATE)
+
+
+def _reserve_provider_attempt() -> int:
+    """Persist one additional observed call immediately before invoking the provider."""
+    with LOCK:
+        state = _load_run_state()
+        if state["observed_attempts"] >= state["max_additional_attempts"]:
+            raise RuntimeError("Sprint 5 additional provider-attempt limit reached; no provider call was made.")
+        state["observed_attempts"] += 1
+        _write_run_state(state)
+        return state["observed_attempts"]
+
+
+def _reserve_semantic_turn() -> int:
+    with LOCK:
+        state = _load_run_state()
+        if state["semantic_guest_turns"] >= 4:
+            raise RuntimeError("Sprint 5 four-semantic-turn limit reached; no message was sent to the API.")
+        state["semantic_guest_turns"] += 1
+        _write_run_state(state)
+        return state["semantic_guest_turns"]
+
+
+def _reserve_answer_only_resume() -> int:
+    with LOCK:
+        state = _load_run_state()
+        state["answer_only_resumes"] = state.get("answer_only_resumes", 0) + 1
+        _write_run_state(state)
+        return state["answer_only_resumes"]
+
+
+def _safe_request_id(value: Any) -> str | None:
+    if not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9._:-]{1,200}", value):
+        return None
+    return value
+
+
+def _live_failure_event(
+    exc: BaseException, *, attempt: int, turn_call: int, started_at: float,
+    trace_events: list[dict[str, Any]], cancelled: bool = False,
+) -> None:
+    failure: dict[str, Any] = {
+        "stage": "live_provider_cancelled" if cancelled else "live_provider_failure",
+        "provider_mode": "live", "run_id": REMEDIATION_RUN_ID,
+        "attempt": attempt, "turn_call": turn_call, "provider": "foundry_grok",
+        "exception_class": type(exc).__name__,
+        "latency_ms": round((time.monotonic() - started_at) * 1000, 1),
+        "usage": "unknown", "httpx_trace": trace_events[:100],
+    }
+    cause = exc.__cause__ or exc.__context__
+    if cause is not None:
+        cause_class = type(cause).__name__
+        cause_module = type(cause).__module__
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,99}", cause_class):
+            failure["cause_class"] = cause_class
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]{0,199}", cause_module):
+            failure["cause_module"] = cause_module
+    error_code = getattr(exc, "code", None)
+    if isinstance(error_code, str) and re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", error_code):
+        failure["provider_error_code"] = error_code
+    retryable = getattr(exc, "retryable", None)
+    if isinstance(retryable, bool):
+        failure["retryable"] = retryable
+    status = getattr(exc, "status_code", getattr(exc, "status", None))
+    if isinstance(status, int) and 100 <= status <= 599:
+        failure["provider_status"] = status
+    provider_request_id = _safe_request_id(getattr(exc, "request_id", None))
+    if provider_request_id:
+        failure["provider_request_id"] = provider_request_id
+    event(failure)
 
 
 def controls() -> dict[str, Any]:
@@ -199,7 +313,7 @@ class FakeProvider:
             raise RuntimeError("Sprint 5 acceptance limit: two provider calls per guest turn")
         payload = _parse_input(request)
         question = _question(payload)
-        is_selector = str(request.instructions).startswith("Select only fact IDs")
+        is_selector = "candidate_index" in payload
         control = controls()
         if (
             not state["fail_used"] and state["saw_patch"] and not is_selector
@@ -254,9 +368,21 @@ def _live_provider() -> Any:
     if result.returncode:
         raise SystemExit("Existing development credential retrieval unavailable; live mode was not started.")
     api_key = json.loads(result.stdout)["key1"]
+
+    async def trace_httpx(name: str, info: dict[str, Any]) -> None:
+        del info
+        events = HTTPX_TRACE_EVENTS.get()
+        started = HTTPX_TRACE_START.get()
+        if events is None or started is None or not isinstance(name, str):
+            return
+        if len(events) >= 100 or not re.fullmatch(r"[A-Za-z0-9_.-]{1,160}", name):
+            return
+        events.append({"event": name, "offset_ms": round((time.monotonic() - started) * 1000, 1)})
+
     provider = FoundryGrokProvider(FoundryGrokConfig(
         base_url="https://ken-openai-useast2.services.ai.azure.com/openai/v1/",
         api_key=SecretStr(api_key), deployment="cc-dev-grok-4-1-fast-reasoning",
+        trace_callback=trace_httpx,
     ))
     original = provider.generate
 
@@ -266,22 +392,53 @@ def _live_provider() -> Any:
         if state is None:
             state = {"calls": 0, "saw_patch": False, "fail_used": False}
             TURN.set(state)
+        if state["calls"] >= 2:
+            raise RuntimeError("Sprint 5 two-provider-calls-per-turn limit reached; no provider call was made.")
+        attempt = _reserve_provider_attempt()
         state["calls"] += 1
         TOTAL_PROVIDER_CALLS += 1
-        if state["calls"] > 2 or TOTAL_PROVIDER_CALLS > 8:
-            raise RuntimeError("Sprint 5 bounded provider call limit reached")
+        started_at = time.monotonic()
+        trace_events: list[dict[str, Any]] = []
+        event({
+            "stage": "live_provider_call_started", "provider_mode": "live",
+            "run_id": REMEDIATION_RUN_ID, "attempt": attempt,
+            "turn_call": state["calls"], "provider": "foundry_grok",
+            "requested_model": "grok-4-1-fast-reasoning",
+            "request_shape": {
+                "instructions_chars": len(request.instructions),
+                "input_chars": len(request.input_text),
+                "max_output_tokens": request.max_output_tokens,
+            },
+        })
+        trace_token = HTTPX_TRACE_EVENTS.set(trace_events)
+        trace_start_token = HTTPX_TRACE_START.set(started_at)
         try:
             response = await original(request)
-        except Exception as exc:
-            event({"stage": "live_provider_failure", "class": type(exc).__name__, "usage": "unknown"})
+        except asyncio.CancelledError as exc:
+            _live_failure_event(
+                exc, attempt=attempt, turn_call=state["calls"],
+                started_at=started_at, trace_events=trace_events, cancelled=True,
+            )
             raise
+        except Exception as exc:
+            _live_failure_event(
+                exc, attempt=attempt, turn_call=state["calls"],
+                started_at=started_at, trace_events=trace_events,
+            )
+            raise
+        finally:
+            HTTPX_TRACE_START.reset(trace_start_token)
+            HTTPX_TRACE_EVENTS.reset(trace_token)
         event({
-            "stage": "live_provider", "model": response.model,
-            "provider_request_id": response.request_id,
+            "stage": "live_provider_call_completed", "provider_mode": "live",
+            "run_id": REMEDIATION_RUN_ID, "attempt": attempt,
+            "turn_call": state["calls"], "provider": response.provider,
+            "model": response.model, "deployment": response.deployment,
+            "provider_request_id": _safe_request_id(response.request_id),
+            "latency_ms": round((time.monotonic() - started_at) * 1000, 1),
             "usage": asdict(response.usage), "output_chars": len(response.text),
-            "output_sha256": hashlib.sha256(response.text.encode()).hexdigest(),
-            "instructions_sha256": hashlib.sha256(request.instructions.encode()).hexdigest(),
-            "input_sha256": hashlib.sha256(request.input_text.encode()).hexdigest(),
+            "output_limit_tokens": request.max_output_tokens,
+            "httpx_trace": trace_events[:100],
         })
         return response
 
@@ -296,6 +453,8 @@ def create_runtime_app(live: bool = False) -> Any:
         raise SystemExit("Live mode requires explicit STAYLEAD_LIVE_EVAL=1.")
     if live and controls().get("hide_completed_response_once") is True:
         raise SystemExit("hide_completed_response_once is fake-only; clear it before starting live mode.")
+    if live:
+        _load_run_state()
 
     from pydantic import SecretStr
     from staylead_platform.composition.configuration.settings import Settings
@@ -313,7 +472,6 @@ def create_runtime_app(live: bool = False) -> Any:
 
     @app.middleware("http")
     async def acceptance_events(request: Any, call_next: Any) -> Any:
-        global TOTAL_GUEST_TURNS
         request_body = await request.body()
         # Starlette's middleware call_next consumes the original receive stream;
         # install a replay receive so FastAPI can parse the same body.
@@ -339,11 +497,27 @@ def create_runtime_app(live: bool = False) -> Any:
         except (json.JSONDecodeError, UnicodeDecodeError):
             pass
 
+        turn_kind: str | None = None
+        semantic_turn: int | None = None
+        resume_count: int | None = None
         if live and is_message:
-            TOTAL_GUEST_TURNS += 1
-            if TOTAL_GUEST_TURNS > 4:
+            try:
+                if body_json.get("answer_only_receipt_id"):
+                    turn_kind = "answer_only_resume"
+                    resume_count = _reserve_answer_only_resume()
+                elif body_json.get("question") is not None:
+                    turn_kind = "semantic_guest_turn"
+                    semantic_turn = _reserve_semantic_turn()
+            except RuntimeError:
+                if token is not None:
+                    TURN.reset(token)
+                event({
+                    "stage": "live_acceptance_limit", "provider_mode": "live",
+                    "run_id": REMEDIATION_RUN_ID, "turn_kind": turn_kind,
+                    "status": 429, "provider_calls_in_turn": 0,
+                })
                 return Response(
-                    content=json.dumps({"error": {"code": "acceptance_limit", "message": "Sprint 5 acceptance turn limit reached."}}),
+                    content=json.dumps({"error": {"code": "acceptance_limit", "message": "Sprint 5 acceptance limit reached."}}),
                     status_code=429, media_type="application/json",
                 )
         try:
@@ -386,6 +560,12 @@ def create_runtime_app(live: bool = False) -> Any:
                 item["internal_status"] = response.status_code
                 item["internal_response"] = redact(decoded_response)
                 item["delivered_status"] = delivered_status
+                if live:
+                    item["turn_kind"] = turn_kind
+                    if semantic_turn is not None:
+                        item["semantic_guest_turn"] = semantic_turn
+                    if resume_count is not None:
+                        item["answer_only_resume"] = resume_count
                 if injected_unknown_completion:
                     item["fault"] = "hide_completed_response_once"
                     item["delivered_response"] = redact(json.loads(delivered_body))
@@ -405,9 +585,30 @@ def create_runtime_app(live: bool = False) -> Any:
     return app
 
 
+async def _run_diagnostic() -> None:
+    from staylead_platform.platform.contracts.ai_provider import GenerationRequest
+
+    provider = _live_provider()
+    turn_token = TURN.set({"calls": 0, "saw_patch": False, "fail_used": False})
+    try:
+        result = await provider.generate(GenerationRequest(
+            instructions='Return one JSON object with the key "ok" set to true.',
+            input_text='{"probe":"ping"}', max_output_tokens=140,
+        ))
+    finally:
+        TURN.reset(turn_token)
+    event({
+        "stage": "live_diagnostic_completed", "provider_mode": "live",
+        "run_id": REMEDIATION_RUN_ID, "provider": result.provider,
+        "model": result.model, "provider_request_id": _safe_request_id(result.request_id),
+        "usage": asdict(result.usage), "output_chars": len(result.text),
+    })
+    print("One-call provider diagnostic completed; see remediation-runtime-events.jsonl.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("init", "fake", "live"))
+    parser.add_argument("mode", choices=("init", "fake", "live", "diagnostic"))
     parser.add_argument("--host", default=DEFAULT_HOST)
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     args = parser.parse_args()
@@ -422,6 +623,26 @@ def main() -> None:
 
     if args.mode == "live" and os.environ.get("STAYLEAD_LIVE_EVAL") != "1":
         raise SystemExit("Live mode requires explicit STAYLEAD_LIVE_EVAL=1.")
+    if args.mode == "diagnostic":
+        if os.environ.get("STAYLEAD_LIVE_EVAL") != "1":
+            raise SystemExit("Diagnostic mode requires explicit STAYLEAD_LIVE_EVAL=1.")
+        if controls().get("hide_completed_response_once") is True:
+            raise SystemExit("hide_completed_response_once is fake-only; clear it before diagnostic mode.")
+        _load_run_state()
+        try:
+            asyncio.run(_run_diagnostic())
+        except RuntimeError as exc:
+            code = getattr(exc, "code", None)
+            safe_code = (
+                code if isinstance(code, str) and re.fullmatch(r"[A-Za-z0-9._:-]{1,100}", code)
+                else type(exc).__name__
+            )
+            print(f"One-call provider diagnostic failed ({safe_code}); see remediation-runtime-events.jsonl.")
+            raise SystemExit(1) from None
+        except asyncio.CancelledError:
+            print("One-call provider diagnostic was cancelled; see remediation-runtime-events.jsonl.")
+            raise SystemExit(1) from None
+        return
     import uvicorn
     uvicorn.run(create_runtime_app(args.mode == "live"), host=args.host, port=args.port, access_log=False)
 
