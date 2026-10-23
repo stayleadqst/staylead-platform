@@ -21,6 +21,7 @@ import {
   GuestMessageResponse,
   GuestMediaDescriptor,
   GuestSession,
+  checkGuestFreshness,
   fetchGuestMedia,
   sendGuestMessage,
 } from "@/shared/api/client";
@@ -32,6 +33,8 @@ type ChatTurn = {
   error?: string;
   retryMode?: RetryMode;
   sending?: boolean;
+  stale?: boolean;
+  freshnessError?: string;
 };
 
 function requestId() {
@@ -58,11 +61,17 @@ export function GuestChat({
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
+  const turnsRef = useRef<ChatTurn[]>([]);
+  const freshnessInFlight = useRef(new Set<string>());
   const generation = useRef(0);
   const activeRequest = useRef<number | null>(null);
   const hotelName = typeof session?.hotel.name === "string"
     ? session.hotel.name
     : hotelSlug.replaceAll("-", " ");
+
+  useEffect(() => {
+    turnsRef.current = turns;
+  }, [turns]);
 
   const openSession = useCallback(async (expectedGeneration: number) => {
     setSession(null);
@@ -127,6 +136,50 @@ export function GuestChat({
 
   const unresolvedRequest = hasUnresolvedRequest(turns);
 
+  const recheckAnswer = useCallback(async (turnId: string, response: GuestMessageResponse) => {
+    if (!session || freshnessInFlight.current.has(response.request_id)) return;
+    freshnessInFlight.current.add(response.request_id);
+    try {
+      const result = await checkGuestFreshness({
+        sessionId: session.session_id,
+        accessToken: session.access_token,
+        requestId: response.request_id,
+        target,
+      });
+      setTurns((current) => current.map((item) => item.id === turnId
+        ? { ...item, stale: result.status === "stale", freshnessError: undefined }
+        : item));
+    } catch {
+      setTurns((current) => current.map((item) => item.id === turnId
+        ? { ...item, freshnessError: "Could not verify whether this answer is still current." }
+        : item));
+    } finally {
+      freshnessInFlight.current.delete(response.request_id);
+    }
+  }, [session, target]);
+
+  const recheckVisibleAnswers = useCallback(async () => {
+    const current = turnsRef.current;
+    await Promise.all(current.filter((item) => item.answer && !item.stale)
+      .map((item) => recheckAnswer(item.id, item.answer!)));
+  }, [recheckAnswer]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void recheckVisibleAnswers();
+    };
+    const onPageShow = () => void recheckVisibleAnswers();
+    const onFocus = () => void recheckVisibleAnswers();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [recheckVisibleAnswers]);
+
   function startNewChat() {
     if (sessionLoading) return;
     setTurns([]);
@@ -143,7 +196,11 @@ export function GuestChat({
     const turn: ChatTurn = { id: requestId(), question: text, sending: true };
     setTurns((current) => [...current, turn]);
     setQuestion("");
-    void deliver(turn, turn.id);
+    void (async () => {
+      setBusy(true);
+      await recheckVisibleAnswers();
+      await deliver(turn, turn.id);
+    })();
   }
 
   function retry(turn: ChatTurn) {
@@ -199,6 +256,9 @@ export function GuestChat({
                 session={session}
                 target={target}
                 AnswerRenderer={AnswerRenderer}
+                stale={turn.stale ?? false}
+                freshnessError={turn.freshnessError}
+                onRecheck={() => void recheckAnswer(turn.id, turn.answer!)}
               />}
             </article>
           ))}
@@ -248,19 +308,28 @@ function AnswerCard({
   session,
   target,
   AnswerRenderer,
+  stale,
+  freshnessError,
+  onRecheck,
 }: {
   response: GuestMessageResponse;
   session: GuestSession | null;
   target: DomainTarget;
   AnswerRenderer: ComponentType<AnswerRendererProps>;
+  stale: boolean;
+  freshnessError?: string;
+  onRecheck: () => void;
 }) {
   return (
     <div className="message message-assistant">
+      {stale && <p className="status-note" role="status">This answer may no longer be current. Ask again for an updated answer.</p>}
+      {freshnessError && <p className="status-note" role="status">{freshnessError}</p>}
+      <button className="text-button" type="button" onClick={onRecheck}>Check whether this answer is current</button>
       <AnswerRenderer answer={response.answer} />
-      {!!response.media?.length && session && (
+      {!stale && !freshnessError && !!response.media?.length && session && (
         <div className="answer-media" aria-label="Approved hotel media">
           {response.media.map((media) => (
-            <GuestMedia key={`${session.session_id}-${media.media_id}`} media={media} session={session} target={target} />
+          <GuestMedia key={`${session.session_id}-${media.media_id}-${media.source_hash}`} media={media} session={session} target={target} />
           ))}
         </div>
       )}
@@ -306,7 +375,7 @@ function GuestMedia({ media, session, target }: {
       try {
         const blob = await fetchGuestMedia({
           sessionId: session.session_id,
-          mediaId: media.media_id,
+          media,
           accessToken: session.access_token,
           target,
           signal: controller.signal,
@@ -318,7 +387,9 @@ function GuestMedia({ media, session, target }: {
         if (media.captions_media_id) {
           const captions = await fetchGuestMedia({
             sessionId: session.session_id,
+            media,
             mediaId: media.captions_media_id,
+            sha256: media.captions_sha256,
             accessToken: session.access_token,
             target,
             signal: controller.signal,
@@ -338,7 +409,7 @@ function GuestMedia({ media, session, target }: {
       controller.abort();
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [media.media_id, media.captions_media_id, session.session_id, session.access_token, target]);
+  }, [media, session.session_id, session.access_token, target]);
 
   const timeReference = media.start_seconds !== undefined
     ? `${formatMediaTime(media.start_seconds)}${media.end_seconds !== undefined ? `–${formatMediaTime(media.end_seconds)}` : ""}`

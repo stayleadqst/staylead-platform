@@ -1,0 +1,12 @@
+{
+  "action": "revoke",
+  "result": {
+    "status": "applied",
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "source_id": "source-hotel-guide",
+    "generation": 6,
+    "source_version": "4",
+    "source_hash": "2c894a44c5dfafb8445d18457e9340afd474c896915555d3bda4e1d55fccdefe",
+    "lifecycle_status": "revoked"
+  }
+}

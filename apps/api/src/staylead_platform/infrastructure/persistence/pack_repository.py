@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime
 
 from sqlalchemy import and_, select
 from sqlalchemy.engine import Engine
+
 from staylead_platform.infrastructure.persistence.store import (
+    hotels,
     import_complete_pack,
     knowledge_facts,
     knowledge_media,
@@ -39,6 +42,9 @@ class PostgresMediaRepository:
             start_seconds=values["start_seconds"], end_seconds=values["end_seconds"],
             duration_seconds=values["duration_seconds"],
             captions_media_id=values["captions_media_id"],
+            source_hash=values.get("source_hash", ""),
+            source_generation=values.get("source_generation", 0),
+            captions_sha256=values.get("captions_sha256"),
         )
 
     def list_eligible_media(
@@ -50,19 +56,23 @@ class PostgresMediaRepository:
         today = now.date().isoformat()
         with self._engine.begin() as connection:
             set_transaction_timeout(connection, timeout_seconds)
-            rows = connection.execute(select(knowledge_media).join(
+            rows = connection.execute(select(
+                knowledge_media, knowledge_sources.c.source_hash,
+                hotels.c.knowledge_generation.label("source_generation"),
+            ).join(
                 knowledge_sources, and_(
                     knowledge_sources.c.source_id == knowledge_media.c.source_id,
                     knowledge_sources.c.hotel_id == knowledge_media.c.hotel_id,
                     knowledge_sources.c.version == knowledge_media.c.source_version,
                 ),
-            ).where(and_(
+            ).join(hotels, hotels.c.hotel_id == knowledge_media.c.hotel_id).where(and_(
                 knowledge_media.c.hotel_id == hotel_id,
                 knowledge_media.c.guest_approved_whole_file.is_(True),
                 knowledge_media.c.kind.in_(["image", "video"]),
                 knowledge_media.c.valid_from <= today,
                 knowledge_media.c.valid_to >= today,
                 knowledge_sources.c.guest_approved.is_(True),
+                knowledge_sources.c.lifecycle_status == "approved",
                 knowledge_sources.c.valid_from <= today,
                 knowledge_sources.c.valid_to >= today,
             ))).mappings().all()
@@ -83,33 +93,58 @@ class PostgresMediaRepository:
                     knowledge_facts.c.valid_to >= today,
                 ))).all())
             if eligible:
-                result.append(self._descriptor(row, fact_ids=tuple(sorted(eligible))))
+                values = dict(row)
+                captions_hash = None
+                if row["captions_media_id"]:
+                    with self._engine.begin() as connection:
+                        captions_hash = connection.scalar(select(knowledge_media.c.sha256).where(and_(
+                            knowledge_media.c.hotel_id == hotel_id,
+                            knowledge_media.c.media_id == row["captions_media_id"],
+                        )))
+                values["captions_sha256"] = captions_hash
+                result.append(self._descriptor(values, fact_ids=tuple(sorted(eligible))))
         return result
 
     def read_eligible_asset(
         self, hotel_id: str, media_id: str, now: datetime, *,
+        expected_generation: int | None = None,
+        expected_source_id: str | None = None,
+        expected_source_version: str | None = None,
+        expected_source_hash: str | None = None,
+        expected_media_sha256: str | None = None,
         timeout_seconds: float | None = None,
     ) -> EligibleAsset | None:
         today = now.date().isoformat()
         with self._engine.begin() as connection:
             set_transaction_timeout(connection, timeout_seconds)
-            row = connection.execute(select(knowledge_media).join(
+            row = connection.execute(select(
+                knowledge_media, knowledge_sources.c.source_hash,
+                hotels.c.knowledge_generation.label("source_generation"),
+            ).join(
                 knowledge_sources, and_(
                     knowledge_sources.c.source_id == knowledge_media.c.source_id,
                     knowledge_sources.c.hotel_id == knowledge_media.c.hotel_id,
                     knowledge_sources.c.version == knowledge_media.c.source_version,
                 ),
-            ).where(and_(
+            ).join(hotels, hotels.c.hotel_id == knowledge_media.c.hotel_id).where(and_(
                 knowledge_media.c.hotel_id == hotel_id,
                 knowledge_media.c.media_id == media_id,
                 knowledge_media.c.guest_approved_whole_file.is_(True),
                 knowledge_media.c.valid_from <= today,
                 knowledge_media.c.valid_to >= today,
                 knowledge_sources.c.guest_approved.is_(True),
+                knowledge_sources.c.lifecycle_status == "approved",
                 knowledge_sources.c.valid_from <= today,
                 knowledge_sources.c.valid_to >= today,
             ))).mappings().first()
         if row is None:
+            return None
+        if (expected_generation is not None and expected_generation > row["source_generation"]
+                or expected_source_id is not None and row["source_id"] != expected_source_id
+                or expected_source_version is not None and row["source_version"] != expected_source_version
+                or expected_source_hash is not None and row["source_hash"] != expected_source_hash
+                or expected_media_sha256 is not None and row["sha256"] != expected_media_sha256
+                or hashlib.sha256(bytes(row["content"])).hexdigest() != row["sha256"]):
             return None
         with self._engine.begin() as connection:
             set_transaction_timeout(connection, timeout_seconds)
@@ -124,6 +159,13 @@ class PostgresMediaRepository:
             ))).all())
         if not eligible_fact_ids:
             return None
-        descriptor = self._descriptor(row, fact_ids=tuple(sorted(eligible_fact_ids)))
+        values = dict(row)
+        if row["captions_media_id"]:
+            with self._engine.begin() as connection:
+                values["captions_sha256"] = connection.scalar(select(knowledge_media.c.sha256).where(and_(
+                    knowledge_media.c.hotel_id == hotel_id,
+                    knowledge_media.c.media_id == row["captions_media_id"],
+                )))
+        descriptor = self._descriptor(values, fact_ids=tuple(sorted(eligible_fact_ids)))
         return EligibleAsset(content=bytes(row["content"]), mime_type=row["mime_type"],
                              descriptor=descriptor)

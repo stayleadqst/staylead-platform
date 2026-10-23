@@ -14,6 +14,8 @@ export type GuestEvidence = Readonly<{
   hotel_id: string;
   source_id: string;
   source_version: string;
+  source_hash: string;
+  source_generation: number;
   section: string;
   fact_version: string;
   imported_at: string;
@@ -31,10 +33,13 @@ export type GuestMediaDescriptor = Readonly<{
   alt_text: string;
   source_id: string;
   source_version: string;
+  source_hash: string;
+  source_generation: number;
   start_seconds?: number;
   end_seconds?: number;
   duration_seconds?: number;
   captions_media_id?: string;
+  captions_sha256?: string;
 }>;
 
 export type GuestHotel = Readonly<{
@@ -55,7 +60,10 @@ export type GuestMessageResponse = Readonly<{
   trace: Readonly<Record<string, unknown>>;
   config_version: string;
   state_version: number;
+  source_generation: number;
 }>;
+
+export type GuestFreshnessResponse = Readonly<{ status: "current" | "stale" }>;
 
 export type GuestContractMetadata = Readonly<{
   status: "ok";
@@ -230,16 +238,26 @@ export async function sendGuestMessage(args: {
 
 export async function fetchGuestMedia(args: {
   sessionId: string;
-  mediaId: string;
+  media: GuestMediaDescriptor;
+  mediaId?: string;
+  sha256?: string;
   accessToken: string;
   target: DomainTarget;
   signal: AbortSignal;
 }): Promise<Blob> {
   const sessionId = encodeURIComponent(args.sessionId);
-  const mediaId = encodeURIComponent(args.mediaId);
+  const requestedMediaId = args.mediaId ?? args.media.media_id;
+  const mediaId = encodeURIComponent(requestedMediaId);
+  const query = new URLSearchParams({
+    generation: String(args.media.source_generation),
+    source_id: args.media.source_id,
+    source_version: args.media.source_version,
+    source_hash: args.media.source_hash,
+    sha256: args.sha256 ?? args.media.sha256,
+  });
   let response: Response;
   try {
-    response = await fetch(endpoint(args.target, `/sessions/${sessionId}/media/${mediaId}`), {
+    response = await fetch(endpoint(args.target, `/sessions/${sessionId}/media/${mediaId}?${query}`), {
       method: "GET",
       cache: "no-store",
       signal: args.signal,
@@ -256,4 +274,21 @@ export async function fetchGuestMedia(args: {
     throw new ApiError({ status: 502, code: "invalid_media_type", message: "Hotel media could not be displayed.", outcome: "rejected" });
   }
   return response.blob();
+}
+
+export async function checkGuestFreshness(args: {
+  sessionId: string;
+  accessToken: string;
+  requestId: string;
+  target: DomainTarget;
+}): Promise<GuestFreshnessResponse> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  return request<GuestFreshnessResponse>(endpoint(args.target, `/sessions/${sessionId}/freshness`), {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${args.accessToken}`,
+    },
+    body: JSON.stringify({ request_id: args.requestId }),
+  });
 }

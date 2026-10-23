@@ -1,0 +1,8 @@
+{
+  "valid_replay_identical": true,
+  "reported_calls_in_identical_initial_and_replay_trace": 2,
+  "media_status": 200,
+  "media_bytes": 4899,
+  "missing_auth": 401,
+  "wrong_session": 403
+}

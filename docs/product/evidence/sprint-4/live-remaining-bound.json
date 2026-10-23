@@ -1,0 +1,10 @@
+{
+  "reason": "One cached replay HTTP request was incorrectly counted by the harness guest-request limiter; it made zero provider calls. Correct remaining scope is enforced for the last planned question.",
+  "observed_provider_calls_before_restart": 4,
+  "verified_model_guest_turns": 2,
+  "remaining_guest_turns": 1,
+  "remaining_provider_calls_max": 2,
+  "overall_guest_turns_max": 3,
+  "overall_provider_calls_max": 6,
+  "paid_retries": 0
+}

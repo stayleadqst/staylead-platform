@@ -35,7 +35,7 @@ def test_complete_pack_publication_replay_immutability_and_scoped_media_reads(tm
     )
 
     engine = create_database_engine(os.environ["STAYLEAD_TEST_DATABASE_URL"])
-    if schema_version(engine) != 3:
+    if schema_version(engine) != 4:
         apply_migrations(engine)
     root = tmp_path / "allowed" / "pack"
     root.parent.mkdir()

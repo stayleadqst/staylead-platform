@@ -20,6 +20,48 @@ class KnowledgeFact:
     provenance: dict[str, Any]
 
 
+@dataclass(frozen=True)
+class SourceVersionRef:
+    """Lifecycle identity used to bind facts, media, and saved answers to a source."""
+
+    hotel_id: str
+    source_id: str
+    hotel_generation: int
+    source_version: str
+    source_hash: str
+    status: str
+    guest_approved: bool
+    valid_from: str
+    valid_to: str
+    last_failure: str | None = None
+    last_success_at: str | None = None
+
+
+@dataclass(frozen=True)
+class ActiveKnowledgeSnapshot:
+    hotel_id: str
+    generation: int
+    sources: tuple[SourceVersionRef, ...]
+
+
+@dataclass(frozen=True)
+class EvidenceBinding:
+    """Source versions that supported a persisted response."""
+
+    source: SourceVersionRef
+    fact_ids: tuple[str, ...] = ()
+    media_ids: tuple[str, ...] = ()
+    media_sha256: dict[str, str] | None = None
+
+
+@dataclass(frozen=True)
+class FreshnessDecision:
+    status: str
+    eligible: bool
+    checked_at: datetime
+    reason: str | None = None
+
+
 class KnowledgeFactRepository(Protocol):
     def list_guest_facts(
         self, hotel_id: str, *, limit: int = 400, timeout_seconds: float | None = None,
@@ -49,6 +91,9 @@ class MediaDescriptor:
     end_seconds: float | None = None
     duration_seconds: float | None = None
     captions_media_id: str | None = None
+    captions_sha256: str | None = None
+    source_hash: str = ""
+    source_generation: int = 0
 
 
 @dataclass(frozen=True)
@@ -66,5 +111,10 @@ class EligibleMediaRepository(Protocol):
 
     def read_eligible_asset(
         self, hotel_id: str, media_id: str, now: datetime, *,
+        expected_generation: int | None = None,
+        expected_source_id: str | None = None,
+        expected_source_version: str | None = None,
+        expected_source_hash: str | None = None,
+        expected_media_sha256: str | None = None,
         timeout_seconds: float | None = None,
     ) -> EligibleAsset | None: ...

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from sqlalchemy.engine import Engine
+
 from staylead_platform.domains.hospitality.registration.fixture_pack import parse_fixture_pack
 from staylead_platform.infrastructure.persistence.store import save_bootstrap
 
@@ -31,7 +32,7 @@ def import_fixture_pack(engine: Engine, fixture_root: str | Path) -> dict[str, A
         count = save_bootstrap(
             engine, hotel_id=item.hotel_id, slug=item.slug,
             config_version=item.config_version, public_config=item.public_config,
-            synthetic=item.synthetic, facts=facts,
+            synthetic=item.synthetic, facts=facts, sources=list(item.sources),
         )
         report["hotels"][item.hotel_id] = {
             "slug": item.slug, "config_version": item.config_version, "guest_facts": count,

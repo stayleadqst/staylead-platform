@@ -21,8 +21,8 @@ def main() -> None:
     if not allowed_root:
         raise SystemExit("STAYLEAD_KNOWLEDGE_PACK_ROOT must name the allowlisted local pack root.")
     engine = create_database_engine(Settings().database_url)
-    if schema_version(engine) != 3:
-        raise SystemExit("Apply the explicit PostgreSQL schema v3 migration before importing packs.")
+    if schema_version(engine) != 4:
+        raise SystemExit("Apply the explicit PostgreSQL schema v4 migration before importing packs.")
     result = import_hospitality_pack(engine, Path(args.pack_dir), allowed_root=allowed_root)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 

@@ -106,10 +106,26 @@ async function forward(request: NextRequest, context: RouteContext) {
     backendPath = `/v1/guest/sessions/${path[1]}/messages`;
     requiresJsonBody = true;
   } else if (
+    method === "POST" && path.length === 3 && path[0] === "sessions"
+    && SESSION_ID_PATTERN.test(path[1]) && path[2] === "freshness"
+  ) {
+    backendPath = `/v1/guest/sessions/${path[1]}/freshness`;
+    requiresJsonBody = true;
+  } else if (
     method === "GET" && path.length === 4 && path[0] === "sessions"
     && SESSION_ID_PATTERN.test(path[1]) && path[2] === "media" && SAFE_ID_PATTERN.test(path[3])
   ) {
-    backendPath = `/v1/guest/sessions/${path[1]}/media/${encodeURIComponent(path[3])}`;
+    const query = request.nextUrl.searchParams;
+    const expectedKeys = ["generation", "source_id", "source_version", "source_hash", "sha256"];
+    const values = expectedKeys.map((key) => query.getAll(key));
+    if (query.size !== expectedKeys.length || values.some((items) => items.length !== 1)
+        || !/^\d+$/.test(values[0][0]) || !SAFE_ID_PATTERN.test(values[1][0])
+        || !SAFE_ID_PATTERN.test(values[2][0]) || !/^[0-9a-f]{64}$/i.test(values[3][0])
+        || !/^[0-9a-f]{64}$/i.test(values[4][0])) {
+      return proxyError(400, "invalid_media_binding", "A version-bound media request is required.");
+    }
+    const binding = new URLSearchParams(expectedKeys.map((key, index) => [key, values[index][0]]));
+    backendPath = `/v1/guest/sessions/${path[1]}/media/${encodeURIComponent(path[3])}?${binding}`;
     binaryLimit = MAX_VIDEO_BYTES;
   } else {
     return proxyError(404, "proxy_route_not_found", "This API route is not available.");
@@ -138,6 +154,7 @@ async function forward(request: NextRequest, context: RouteContext) {
   if (requiresJsonBody) headers.set("content-type", "application/json");
   const authorization = request.headers.get("authorization");
   const scopedGuestRequest = (method === "POST" && path.length === 3 && path[2] === "messages")
+    || (method === "POST" && path.length === 3 && path[2] === "freshness")
     || (method === "GET" && path.length === 4 && path[2] === "media");
   if (scopedGuestRequest && authorization?.startsWith("Bearer ")) {
     headers.set("authorization", authorization);

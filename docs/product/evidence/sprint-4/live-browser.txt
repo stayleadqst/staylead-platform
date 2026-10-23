@@ -1,0 +1,43 @@
+Browser tab: 3, Title: "StayLead Platform", URL: "http://127.0.0.1:13005/hotels/sprint4-garden/chat".
+0 AXWebArea StayLead Platform, URL: 127.0.0.1:13005/hotels/sprint4-garden/chat
+	1 container
+		2 link Description: StayLead · Hospitality, Value: 127.0.0.1:13005/
+		3 text Demo experience using synthetic hotel information.
+		4 heading Sprint 4 Garden Demo, Value: 1
+			5 text Sprint 4 Garden Demo
+		6 text Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+		7 container Chat with Sprint 4 Garden Demo
+			13 container
+				14 text What are the breakfast hours?
+				15 text This answer may no longer be current. Ask again for an updated answer.
+				16 button Check whether this answer is current
+				17 text The breakfast hours are 07:00-10:00. [fact-breakfast-hours]
+				18 button (collapsed) Hotel records used (1), Secondary Actions: Expand
+					19 text Hotel records used (
+					20 text 1
+					21 text )
+				22 text What are the breakfast hours now?
+				29 text This answer may no longer be current. Ask again for an updated answer.
+				23 button Check whether this answer is current
+				24 text The breakfast hours are 08:00-11:00. [fact-breakfast-hours]
+Breakfast is served from 08:00 to 11:00. [fact-breakfast-hours]
+				25 button (collapsed) Hotel records used (1), Secondary Actions: Expand
+					26 text Hotel records used (
+					27 text 1
+					28 text )
+				30 text Can you confirm those breakfast hours now?
+				31 button Check whether this answer is current
+				32 text Breakfast hours need confirmation.
+				33 heading COULD NOT CONFIRM, Value: 2
+					34 text COULD NOT CONFIRM
+				35 content list
+					36 container
+						37 AXListMarker •
+						38 text Breakfast hours need confirmation.
+			8 container
+				9 text Your question
+				10 text entry area (settable) Your question, ID: guest-question
+				11 button (disabled) Send
+				12 text Your conversation stays in this browser tab and starts fresh when reloaded.
+
+The focused UI element is 0 AXWebArea StayLead Platform, URL: 127.0.0.1:13005/hotels/sprint4-garden/chat

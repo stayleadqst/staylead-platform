@@ -1,0 +1,55 @@
+{
+  "reviewed_final_fingerprint": "a358cfef3ccfbd354fcf2b1ad6ea71ef79db7a413f9b20c06ac78d3225f2b7a4",
+  "final_manifest_file_count": 192,
+  "final_manifest_deltas": [],
+  "offline_only": true,
+  "independent_results": {
+    "foreign_fact_id_and_config_change": "rejected before publication",
+    "publication_interruption": "rollback preserved original facts/media/hash/last-success/generation",
+    "same_operation_concurrency": [
+      "applied",
+      "noop"
+    ],
+    "obsolete_and_wrong_hotel_media": "no bytes",
+    "delete_and_first_import_replay": "source A unavailable; B preserved; replay noop; no resurrection",
+    "active_cap_before_repair": {
+      "eligible_before": 1,
+      "replacement_active_facts": 400,
+      "observed": "ValueError aggregate active hotel facts exceed the 400 fact limit"
+    },
+    "active_cap_after_repair": {
+      "status": "applied",
+      "eligible_after": 400
+    },
+    "schema3_first_upgrade_failure": "TypeError serializing imported_at datetime during source hash backfill",
+    "schema3_intermediate_upgrade": {
+      "migration": 4,
+      "facts_preserved": 109,
+      "session_state_preserved": 1,
+      "old_valid_replay_http": 409,
+      "new_turn_http": 200,
+      "old_assistant_after_revoke": true
+    },
+    "schema3_repaired_upgrade": {
+      "migration": 4,
+      "source_count": 14,
+      "facts_preserved": 109,
+      "session_state_preserved": 1,
+      "old_valid_replay_http": 200,
+      "old_valid_replay_provider_calls": 0,
+      "new_turn_http": 200,
+      "old_assistant_after_revoke": false
+    },
+    "schema3_existing_pack_media_upgrade": {
+      "saved_replay_http": 200,
+      "provider_calls": 0,
+      "descriptor_generation": 1,
+      "descriptor_source_hash_present": true,
+      "image_fetch_http": 200,
+      "image_mime": "image/png",
+      "original_import_replay": "noop",
+      "generation": 1
+    }
+  },
+  "scope": "Independent targeted PG/API probes and source review; coordinator owns production browser and opt-in Grok acceptance"
+}

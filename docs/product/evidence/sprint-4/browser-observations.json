@@ -1,0 +1,22 @@
+{
+  "positive_image_dimensions": [
+    640,
+    360
+  ],
+  "refresh_stale_media_elements": 0,
+  "delayed_clip_seconds": 45,
+  "media_elements_after_delay": {
+    "images": 0,
+    "videos": 0
+  },
+  "blob_urls_created": 2,
+  "blob_urls_revoked": 2,
+  "same_session_new_v2": "08:00-11:00",
+  "triggers_verified_in_browser": [
+    "explicit check",
+    "before next turn"
+  ],
+  "reentry_handlers": "source reviewed: focus/pageshow/visibility",
+  "fake_revoke_harness_failure": "Fallback selected unrelated parking record; corrected harness, not claimed semantic PASS. Actual Grok revoked phase passes separately.",
+  "late_fetch_proof": "Browser DOM remained empty of media after delayed response; no video Blob was created."
+}

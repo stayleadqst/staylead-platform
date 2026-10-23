@@ -1,0 +1,13 @@
+{
+  "action": "refresh",
+  "result": {
+    "generation": 5,
+    "hotel_id": "HTL-S4-ACCEPTANCE",
+    "last_success_at": "2026-10-23T08:06:37.075891+00:00",
+    "source_hash": "2c894a44c5dfafb8445d18457e9340afd474c896915555d3bda4e1d55fccdefe",
+    "source_id": "source-hotel-guide",
+    "source_version": "4",
+    "status": "applied",
+    "operator_surface": "trusted-local-cli"
+  }
+}

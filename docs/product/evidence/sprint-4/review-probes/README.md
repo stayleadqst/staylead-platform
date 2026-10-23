@@ -1,0 +1,9 @@
+# Independent reviewer probes
+
+These are sanitized copies of the exact focused probes used during review. They contain no private DSN, token or production credential. Set `STAYLEAD_REVIEW_DATABASE_URL` to a disposable, isolated PostgreSQL database. Run from the repository root with `PYTHONPATH=apps/api/src` and `apps/api/.venv/bin/python`. Model providers are offline fakes.
+
+- `atomic_isolation.py`: publication interruption/rollback, foreign-source/config rejection, concurrent same-operation replay, obsolete/wrong-hotel media, delete and original-import replay. Uses unique synthetic IDs within its database; requires an empty database or fresh IDs for rerun.
+- `active_fact_cap.py`: reproducer with source A=1 fact, source B=396 facts, revoke B, replace A with 400 valid facts. Before repair: rejected at the active cap. After repair: applied with 400 eligible facts. Uses its own empty database.
+- Upgrade probes use an exact schema-3 store module saved from baseline `1e020d0:apps/api/src/staylead_platform/infrastructure/persistence/store.py`; put its local path in `STAYLEAD_SCHEMA3_STORE_FILE`. `prepare_schema3_fixture.py` seeds baseline schema-3 fixtures; then `upgrade_existing_session.py` creates a baseline saved response/session, applies migration 4, checks valid replay/new turn, and revokes its source to inspect history filtering. They must use the same fresh database. `upgrade_existing_media.py` independently initializes a schema-3 S3 pack and saved media response, applies migration 4, and checks version-bound image fetch and first-import replay; use another fresh database.
+
+Observed results and limitations are recorded in `../review-findings.md`. Probe connection values and generated session tokens were not retained. Failed cases were preserved during review, then only affected checks were rerun after repair.
