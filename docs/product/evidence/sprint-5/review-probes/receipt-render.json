@@ -1,0 +1,22 @@
+{
+  "brief": {
+    "brief_version": 2,
+    "dates": {
+      "check_in": "2027-05-10",
+      "check_out": "2027-05-15",
+      "nights": 5
+    },
+    "party": {
+      "adults": 2,
+      "children": []
+    },
+    "pending_fields": []
+  },
+  "delta": {
+    "dates": {
+      "check_out": "2027-05-15",
+      "nights": 5
+    }
+  },
+  "rendered": "<p class=\"brief-delta-text\">Stay dates: check-in not set to 2027-05-15 (5 nights).</p>"
+}

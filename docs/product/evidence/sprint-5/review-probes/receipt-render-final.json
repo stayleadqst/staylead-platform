@@ -1,0 +1,11 @@
+{
+  "rendered": "<p class=\"brief-delta-text\">Check-out changed to 2027-05-15. Stay length is 5 nights.</p>",
+  "retry_modes": {
+    "provider_timeout": "same-request",
+    "freshness_unavailable": "same-request",
+    "storage_unavailable": "same-request",
+    "brief_apply_outcome_unknown": "same-request",
+    "brief_apply_no_effect": "new-request",
+    "request_failed": "new-request"
+  }
+}

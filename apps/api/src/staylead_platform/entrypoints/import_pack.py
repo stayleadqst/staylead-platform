@@ -7,7 +7,10 @@ from pathlib import Path
 
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.infrastructure.database import create_database_engine
-from staylead_platform.infrastructure.persistence.store import schema_version
+from staylead_platform.infrastructure.persistence.store import (
+    CURRENT_SCHEMA_VERSION,
+    schema_version,
+)
 from staylead_platform.infrastructure.source_connectors.hospitality_pack import (
     import_hospitality_pack,
 )
@@ -21,8 +24,8 @@ def main() -> None:
     if not allowed_root:
         raise SystemExit("STAYLEAD_KNOWLEDGE_PACK_ROOT must name the allowlisted local pack root.")
     engine = create_database_engine(Settings().database_url)
-    if schema_version(engine) != 4:
-        raise SystemExit("Apply the explicit PostgreSQL schema v4 migration before importing packs.")
+    if schema_version(engine) != CURRENT_SCHEMA_VERSION:
+        raise SystemExit("Apply the explicit PostgreSQL schema migration before importing packs.")
     result = import_hospitality_pack(engine, Path(args.pack_dir), allowed_root=allowed_root)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 

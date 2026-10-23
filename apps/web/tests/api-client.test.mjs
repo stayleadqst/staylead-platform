@@ -169,3 +169,43 @@ test("typed provider failures are known API rejections", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("answer-only resume sends the applied receipt reference without replaying the guest edit", async () => {
+  const originalFetch = globalThis.fetch;
+  let call;
+  globalThis.fetch = async (url, init) => {
+    call = { url, init };
+    return Response.json({ request_id: "resume-1", status: "completed", answer: "Breakfast is served." });
+  };
+  try {
+    await sendGuestMessage({
+      sessionId: "12345678-1234-4234-8234-123456789abc",
+      accessToken: "guest-token", requestId: "resume-1", answerOnlyReceiptId: "original-1", target,
+    });
+    assert.deepEqual(JSON.parse(call.init.body), { request_id: "resume-1", answer_only_receipt_id: "original-1" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("partial-success errors preserve the committed receipt for explicit answer resume", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({
+    request_id: "turn-1", status: "partial_success",
+    error: { code: "provider_timeout", message: "answer failed" },
+    guest_brief: { brief_version: 1, dates: {}, party: {}, pending_fields: [] },
+    brief_receipt: { request_id: "turn-1", status: "partial_success", brief_version_before: 0,
+      brief_version_after: 1, applied_delta: {}, source_refs: [], answer_status: "failed", brief_version_used: 1 },
+    applied_delta: {}, answer_status: "failed",
+  }, { status: 502 });
+  try {
+    await assert.rejects(
+      sendGuestMessage({ sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token",
+        requestId: "turn-1", question: "Add a child and ask about breakfast", target }),
+      (error) => error instanceof ApiError && error.partialResult?.status === "partial_success"
+        && error.partialResult.brief_receipt.request_id === "turn-1",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

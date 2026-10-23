@@ -6,17 +6,24 @@ export type FailureInput = Readonly<{
 
 export type RetryMode = "same-request" | "new-request" | "new-session" | "none";
 
+export function retryModeForFailure(retryMode: RetryMode, hasCommittedPartialResult: boolean): RetryMode | undefined {
+  // A partial result means the edit was committed. Only answer-only resume is safe.
+  return hasCommittedPartialResult ? undefined : retryMode;
+}
+
 export function classifyFailure(error: FailureInput): { message: string; retryMode: RetryMode } {
+  if (error.code === "brief_apply_no_effect" || error.code === "request_failed") {
+    return {
+      message: error.code === "brief_apply_no_effect"
+        ? "The trip update was not saved. Submit it again as a new request."
+        : "That request ended without an answer. Retry to submit it as a new request.",
+      retryMode: "new-request",
+    };
+  }
   if (error.outcome === "unknown" || error.code === "request_in_progress") {
     return {
       message: "Your request may still be processing. Retry to check the same request.",
       retryMode: "same-request",
-    };
-  }
-  if (error.code === "request_failed") {
-    return {
-      message: "That request ended without an answer. Retry to submit it as a new request.",
-      retryMode: "new-request",
     };
   }
   if (error.code === "invalid_session" || error.code === "session_scope_mismatch") {
@@ -37,10 +44,10 @@ export function classifyFailure(error: FailureInput): { message: string; retryMo
       retryMode: "none",
     };
   }
-  if (error.outcome === "rejected" && error.retryable) {
+  if (error.retryable) {
     return {
-      message: "The previous attempt failed. Retry to submit it as a new request.",
-      retryMode: "new-request",
+      message: "We could not verify whether this request finished. Retry this same request to check.",
+      retryMode: "same-request",
     };
   }
   return {

@@ -52,15 +52,53 @@ export type GuestHotel = Readonly<{
 
 export type GuestMessageResponse = Readonly<{
   request_id: string;
-  status: "completed";
-  answer: string;
-  evidence: readonly GuestEvidence[];
-  media: readonly GuestMediaDescriptor[];
-  unknowns: readonly string[];
-  trace: Readonly<Record<string, unknown>>;
-  config_version: string;
-  state_version: number;
-  source_generation: number;
+  status: "completed" | "partial_success";
+  answer?: string;
+  evidence?: readonly GuestEvidence[];
+  media?: readonly GuestMediaDescriptor[];
+  unknowns?: readonly string[];
+  guest_claims?: readonly Readonly<{ text: string; refs: readonly string[] }>[];
+  trace?: Readonly<Record<string, unknown>>;
+  config_version?: string;
+  state_version?: number;
+  source_generation?: number;
+  guest_brief?: GuestBriefSnapshot;
+  brief_receipt?: GuestBriefReceipt | null;
+  applied_delta?: Record<string, unknown>;
+  answer_status?: "pending" | "completed" | "failed";
+  brief_version_used?: number | null;
+  brief_dependent?: boolean;
+  brief_narrative_stale?: boolean;
+  replayed?: boolean;
+  error?: Readonly<{ code: string; message: string }>;
+}>;
+
+export type GuestBriefMember = Readonly<{ member_id: string; age: number | null }>;
+export type GuestBriefSnapshot = Readonly<{
+  brief_version: number;
+  dates: Readonly<{ check_in: string | null; check_out: string | null; nights: number | null }>;
+  party: Readonly<{ adults: number | null; children: readonly GuestBriefMember[] }>;
+  pending_fields: readonly string[];
+}>;
+export type GuestBriefReceipt = Readonly<{
+  request_id: string;
+  status: "applied" | "no_change" | "clarification" | "partial_success";
+  brief_version_before: number;
+  brief_version_after: number;
+  applied_delta: Record<string, unknown>;
+  source_refs: readonly Readonly<{ source_utterance_id: string; request_id: string; fields: readonly string[] }>[];
+  answer_status: "pending" | "completed" | "failed";
+  brief_version_used: number | null;
+}>;
+
+export type GuestPartialResult = Readonly<{
+  request_id: string;
+  status: "partial_success";
+  guest_brief: GuestBriefSnapshot;
+  brief_receipt: GuestBriefReceipt;
+  applied_delta: Record<string, unknown>;
+  answer_status: "failed";
+  error: Readonly<{ code: string; message: string }>;
 }>;
 
 export type GuestFreshnessResponse = Readonly<{ status: "current" | "stale" }>;
@@ -77,6 +115,7 @@ export class ApiError extends Error {
   readonly retryable: boolean;
   readonly requestId?: string;
   readonly outcome: "unknown" | "rejected";
+  readonly partialResult?: GuestPartialResult;
 
   constructor(args: {
     status: number;
@@ -85,6 +124,7 @@ export class ApiError extends Error {
     retryable?: boolean;
     requestId?: string;
     outcome: "unknown" | "rejected";
+    partialResult?: GuestPartialResult;
   }) {
     super(args.message);
     this.name = "ApiError";
@@ -93,6 +133,7 @@ export class ApiError extends Error {
     this.retryable = args.retryable ?? false;
     this.requestId = args.requestId;
     this.outcome = args.outcome;
+    this.partialResult = args.partialResult;
   }
 }
 
@@ -156,6 +197,10 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
       outcome: typeof details?.code === "string" && details.code.startsWith("api_proxy_")
         ? "unknown"
         : "rejected",
+      partialResult: body && typeof body === "object" && "status" in body
+        && (body as { status?: unknown }).status === "partial_success"
+        ? body as GuestPartialResult
+        : undefined,
     });
   }
 
@@ -222,7 +267,8 @@ export async function sendGuestMessage(args: {
   sessionId: string;
   accessToken: string;
   requestId: string;
-  question: string;
+  question?: string;
+  answerOnlyReceiptId?: string;
   target: DomainTarget;
 }): Promise<GuestMessageResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
@@ -232,7 +278,8 @@ export async function sendGuestMessage(args: {
       "content-type": "application/json",
       authorization: `Bearer ${args.accessToken}`,
     },
-    body: JSON.stringify({ request_id: args.requestId, question: args.question }),
+    body: JSON.stringify({ request_id: args.requestId, ...(args.question ? { question: args.question } : {}),
+      ...(args.answerOnlyReceiptId ? { answer_only_receipt_id: args.answerOnlyReceiptId } : {}) }),
   });
 }
 

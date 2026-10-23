@@ -1,5 +1,6 @@
 import asyncio
 import json
+from dataclasses import replace
 
 import pytest
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
@@ -15,6 +16,7 @@ from staylead_platform.platform.contracts.ai_provider import (
     GenerationResult,
     Usage,
 )
+from staylead_platform.platform.contracts.guest_brief import GuestBriefSnapshot
 from staylead_platform.platform.contracts.knowledge import KnowledgeFact
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
@@ -100,6 +102,24 @@ def test_low_overlap_multilingual_question_gets_scoped_semantic_selection() -> N
     assert answer.usage.total_tokens == 60
     assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
     assert "06:30" in answer.answer and "09:30" in answer.answer
+
+
+def test_multicall_usage_stays_unknown_when_any_call_omits_metrics() -> None:
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    generate = provider.generate
+
+    async def generate_with_missing_usage(request: GenerationRequest) -> GenerationResult:
+        result = await generate(request)
+        if len(provider.calls) == 1:
+            return replace(result, usage=Usage())
+        return result
+
+    provider.generate = generate_with_missing_usage  # type: ignore[method-assign]
+    answer = asyncio.run(build(provider).answer(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[],
+    ))
+    assert answer.calls == 2
+    assert answer.usage == Usage()
 
 
 def test_multiturn_current_question_triggers_selection_and_expands_conflict_versions() -> None:
@@ -238,6 +258,8 @@ def test_media_request_keeps_answer_grounded_and_leaves_attachment_binding_to_se
     assert "do not claim that an attachment is or is not available" in GROUNDED_QA_INSTRUCTIONS
     assert "repeat the display request in `unknowns`" in GROUNDED_QA_INSTRUCTIONS
     assert "`unknowns` must contain only unresolved factual hotel information" in GROUNDED_QA_INSTRUCTIONS
+    assert "except for concise targeted questions for explicitly listed pending guest-brief fields" in GROUNDED_QA_INSTRUCTIONS
+    assert "explicitly listed pending guest-brief fields" in GROUNDED_QA_INSTRUCTIONS
     assert "Never infer visual properties from authored captions or media metadata" in GROUNDED_QA_INSTRUCTIONS
     assert "if a visual detail is unsupported" in GROUNDED_QA_INSTRUCTIONS
     assert "keep it unknown" in GROUNDED_QA_INSTRUCTIONS
@@ -338,3 +360,127 @@ def test_generic_conflict_text_uses_typed_fact_ids_for_supported_details() -> No
     ))
     assert "[F-HTL-CITY01-040]" in answer.answer
     assert "please confirm" in answer.answer
+
+
+def test_low_overlap_preparation_combines_patch_selection_and_committed_answer_in_two_calls() -> None:
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"], answer={
+        "supported_claims": [{
+            "text": "Breakfast is served at the restaurant [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    # The first provider response includes both selected facts and a typed patch proposal.
+    original_generate = provider.generate
+
+    async def generate_with_patch(request: GenerationRequest) -> GenerationResult:
+        if request.instructions == FACT_SELECTION_INSTRUCTIONS:
+            provider.calls.append(request)
+            return GenerationResult(
+                text=json.dumps({"fact_ids": ["F-HTL-CITY01-040"], "guest_patch": {
+                    "ops": [{"op": "add_child", "age": None}],
+                }}), provider="fake", deployment="test", model="recorded-fake",
+                request_id="prepare-1", usage=Usage(input_tokens=21, output_tokens=17, total_tokens=38),
+            )
+        return await original_generate(request)
+
+    provider.generate = generate_with_patch  # type: ignore[method-assign]
+    brief = GuestBriefSnapshot(0, {
+        "dates": {"check_in": None, "check_out": None, "nights": None},
+        "party": {"adults": None, "children": []},
+    })
+    orchestrator = build(provider)
+    prepared = asyncio.run(orchestrator.prepare_turn(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？ 子どもを追加してください。",
+        history=[], brief=brief, source_utterance_id="source-1",
+    ))
+    assert prepared.provisional_answer is None
+    assert prepared.preparation_calls == 1
+    assert prepared.provider_request_ids == ("prepare-1",)
+    assert prepared.total_tokens == 38
+    assert prepared.guest_patch is not None
+    assert prepared.guest_patch.operations == ({"op": "add_child", "age": None},)
+    committed = GuestBriefSnapshot(1, {
+        **brief.data,
+        "party": {"adults": None, "children": [{"member_id": "member-1", "age": None}]},
+    }, ("party.children.member-1.age",))
+    final = asyncio.run(orchestrator.answer_committed_turn(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？ 子どもを追加してください。",
+        history=[], brief=committed, selected_fact_ids=prepared.selected_fact_ids,
+    ))
+    assert len(provider.calls) == 2
+    final_input = json.loads(provider.calls[-1].input_text)
+    assert final_input["guest_brief"]["brief_version"] == 1
+    assert final_input["guest_brief_patch_enabled"] is False
+    assert final.brief_version_used is None
+
+
+def test_high_overlap_prepare_returns_provisional_answer_and_patch_in_first_call() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast is served at Ben Gio [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+        "guest_patch": {"ops": [{"op": "set_adults", "count": 2}]},
+    })
+    brief = GuestBriefSnapshot(0, {
+        "dates": {"check_in": None, "check_out": None, "nights": None},
+        "party": {"adults": None, "children": []},
+    })
+    prepared = asyncio.run(build(provider).prepare_turn(
+        hotel_id="HTL-CITY01", question="breakfast", history=[], brief=brief,
+    ))
+    assert len(provider.calls) == 1
+    assert prepared.provisional_answer is not None
+    assert "[F-HTL-CITY01-040]" in prepared.provisional_answer.answer
+    assert prepared.guest_patch is not None
+    assert prepared.guest_patch.operations == ({"op": "set_adults", "count": 2},)
+
+
+def test_answer_brief_refs_are_validated_and_pure_faq_stays_independent() -> None:
+    brief = GuestBriefSnapshot(3, {
+        "dates": {"check_in": "2027-05-10", "check_out": "2027-05-13", "nights": 3},
+        "party": {"adults": 2, "children": []},
+    })
+    dependent_provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{"text": "Your stay is 3 nights.", "refs": ["dates.nights"]}],
+    })
+    dependent = asyncio.run(build(dependent_provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="How many nights?", history=[], brief=brief,
+    ))
+    assert dependent.brief_dependent is True
+    assert dependent.brief_version_used == 3
+    assert dependent.guest_brief_refs == ("dates.nights",)
+    assert "From your saved stay details: Your stay is 3 nights." in dependent.answer
+
+    faq_provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast begins at 06:30 [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }], "unknowns": [], "conflicts": [], "guest_brief_refs": [],
+    })
+    faq = asyncio.run(build(faq_provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="What time is breakfast?", history=[], brief=brief,
+    ))
+    assert faq.brief_dependent is False
+    assert faq.brief_version_used is None
+
+    unsupported_provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{"text": "Your stay is 4 nights.", "refs": ["dates.nights"]}],
+    })
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(unsupported_provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="How many nights?", history=[], brief=brief,
+        ))
+
+    invalid_provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_brief_refs": ["party.children.not-a-member.age"],
+    })
+    with pytest.raises(ConversationFailure, match="missing guest brief field"):
+        asyncio.run(build(invalid_provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="What did I tell you?", history=[], brief=brief,
+        ))

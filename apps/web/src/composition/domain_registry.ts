@@ -7,6 +7,11 @@ export type DomainTarget = Readonly<{
 }>;
 
 export type AnswerRendererProps = Readonly<{ answer: string }>;
+export type GuestBriefRendererProps = Readonly<{
+  brief: unknown;
+  receipt?: unknown;
+  delta?: unknown;
+}>;
 
 export type DomainRegistration = Readonly<{
   domain: string;
@@ -14,6 +19,7 @@ export type DomainRegistration = Readonly<{
   apiBasePath: string;
   landing: ComponentType;
   answerRenderer: ComponentType<AnswerRendererProps>;
+  guestBriefRenderer: ComponentType<GuestBriefRendererProps>;
   themeClass: string;
   content: Readonly<{
     brand: string;
