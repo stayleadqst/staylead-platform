@@ -1,0 +1,727 @@
+[
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "fake_provider",
+    "call": 1,
+    "question": "[unsafe] Breakfast & parking <b>hello</b>"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "966b86cd-c69f-49de-bf2d-bb4eb960419c",
+    "question": "[unsafe] Breakfast & parking <b>hello</b>"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 2,
+    "question": "Breakfast replay test"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 3,
+    "question": "Breakfast replay test"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "16fada11-9c4c-49d6-b37f-3767b797c438",
+    "question": "Breakfast replay test"
+  },
+  {
+    "stage": "dropped_after_commit",
+    "request_id": "16fada11-9c4c-49d6-b37f-3767b797c438"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "16fada11-9c4c-49d6-b37f-3767b797c438",
+    "question": "Breakfast replay test"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 4,
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 5,
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 504,
+    "upstream": 18082,
+    "request_id": "a64487be-ac3a-4ae5-b82e-0be12afd5072",
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 6,
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 7,
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "e91378eb-7602-4644-81d8-aa312b7933d7",
+    "question": "[terminal] Breakfast please"
+  },
+  {
+    "stage": "controlled_error",
+    "code": "request_in_progress",
+    "request_id": "a16dc06a-687c-47d3-beba-a466d942517d"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 8,
+    "question": "Breakfast pending test"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 9,
+    "question": "Breakfast pending test"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "a16dc06a-687c-47d3-beba-a466d942517d",
+    "question": "Breakfast pending test"
+  },
+  {
+    "stage": "non_envelope_422",
+    "request_id": "eb6e6a1c-177d-42ec-bb07-6dca06be3343"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 10,
+    "question": "[provider-auth] Breakfast please"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 11,
+    "question": "[provider-auth] Breakfast please"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/bfa1a27f-8255-45c7-9069-9dbff2602d84/messages",
+    "status": 401,
+    "upstream": 18082,
+    "request_id": "22cc843e-3972-4553-8795-9736c139b67f",
+    "question": "[provider-auth] Breakfast please"
+  },
+  {
+    "stage": "controlled_error",
+    "code": "invalid_session",
+    "request_id": "60f815d7-dc9d-46a0-b7f5-68ee01d7982d"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "fake_provider",
+    "call": 12,
+    "question": "[delay] Breakfast double click"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 13,
+    "question": "[delay] Breakfast double click"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/1b7e3412-1bc2-4f7e-ad5f-40daf4210bed/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "0b345a9a-cfd9-45b2-b0c5-dfe9cc34a54d",
+    "question": "[delay] Breakfast double click"
+  },
+  {
+    "stage": "fake_provider",
+    "call": 14,
+    "question": "Breakfast at beach"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/a13eba53-dbbd-4ce1-97c9-2b1dd08d6b7f/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "4a787601-50dd-49c4-8bb9-66adae2d3676",
+    "question": "Breakfast at beach"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "fake_provider",
+    "call": 15,
+    "question": "Breakfast at retreat"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/2f854542-c466-4054-a67c-0a60449b0591/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "741bf3b3-8717-42d9-ad17-8ec5c1cfbfbf",
+    "question": "Breakfast at retreat"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "metadata_override",
+    "path": "/health"
+  },
+  {
+    "stage": "metadata_override",
+    "path": "/health"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "fake_provider",
+    "call": 16,
+    "question": "Mobile breakfast"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/4cb7abbc-dd73-42c0-b94f-75dbaf539728/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "292ebd86-ee9f-4d5f-823f-00bfadfca82e",
+    "question": "Mobile breakfast"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18082
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18082
+  },
+  {
+    "stage": "fake_provider",
+    "call": 17,
+    "question": "Mobile breakfast"
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/5d2436b0-0fae-4fc9-9a55-fbad618fa74f/messages",
+    "status": 200,
+    "upstream": 18082,
+    "request_id": "b341e935-5c81-4fd2-b104-836dfdb00df7",
+    "question": "Mobile breakfast"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18084
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "0991ebb2-1f2f-4dc9-9bf4-9ee43e577744",
+    "usage": {
+      "input_tokens": 1701,
+      "output_tokens": 144,
+      "total_tokens": 2425
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/6bfe42fa-ecf7-47c8-8ed2-a07d79cfffa2/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "2877ed45-8a4b-4cb9-8526-e231fe5028eb",
+    "question": "Bữa sáng ở đâu, lúc mấy giờ? Khách lái ô tô đến thì đỗ xe có mất phí và được giữ chỗ không?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "e61f3882-921b-49eb-b6bf-8a68b15ae1bd",
+    "usage": {
+      "input_tokens": 1838,
+      "output_tokens": 98,
+      "total_tokens": 2241
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/6bfe42fa-ecf7-47c8-8ed2-a07d79cfffa2/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "3f1e8f27-7d61-4a02-a88e-5edcc94c2ff5",
+    "question": "Nhà hàng bạn vừa nói nằm ở tầng nào?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "8e78af82-3408-4d49-aeef-aea291537261",
+    "usage": {
+      "input_tokens": 1960,
+      "output_tokens": 198,
+      "total_tokens": 3177
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/6bfe42fa-ecf7-47c8-8ed2-a07d79cfffa2/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "a410c738-9bc1-4412-bfce-82262ffbfd9b",
+    "question": "Bữa sáng bắt đầu và kết thúc lúc nào? Khách sạn có sân đáp trực thăng không? Giờ nhận phòng chính xác là mấy giờ?"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18084
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "baf03a02-3e53-4184-9137-734c087037cc",
+    "usage": {
+      "input_tokens": 3408,
+      "output_tokens": 48,
+      "total_tokens": 4254
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "1b2ac658-fd9d-4005-ac4f-3602f23f68d0",
+    "usage": {
+      "input_tokens": 818,
+      "output_tokens": 231,
+      "total_tokens": 1914
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/91089bd9-e945-4350-91cb-bd69a4123fc1/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "b306640c-9b63-45fb-8c7f-50f23feffa48",
+    "question": "朝食は何時から何時までで、月曜日も利用できますか。駐車場の料金と、16人を超えるバスで入る場合の条件を教えてください。"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "b51b8157-f4c8-4843-9d09-4cdd436ebad1",
+    "usage": {
+      "input_tokens": 3237,
+      "output_tokens": 54,
+      "total_tokens": 4948
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "9ab1ea2c-69e1-42b7-bc1d-c3e38b5a8dfc",
+    "usage": {
+      "input_tokens": 862,
+      "output_tokens": 271,
+      "total_tokens": 2194
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/8f73fb09-2cdd-4960-8fa8-2d8c371a3a21/messages",
+    "status": 502,
+    "upstream": 18084,
+    "request_id": "9220a610-0a41-4c6e-96bd-76d2f1685c67",
+    "question": "Où et à quelles heures sert-on le petit-déjeuner ? Quels sont les horaires de la piscine et les règles pour un enfant de 8 ans ?"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18084
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "e262d764-53c6-485b-b556-a9dab5c6c361",
+    "usage": {
+      "input_tokens": 3237,
+      "output_tokens": 54,
+      "total_tokens": 4855
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "d97f9f72-cf8e-495c-bc75-0abbaa9257a6",
+    "usage": {
+      "input_tokens": 862,
+      "output_tokens": 252,
+      "total_tokens": 2156
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/0a13a12c-331e-44a7-bd0e-10af458a4ed6/messages",
+    "status": 502,
+    "upstream": 18084,
+    "request_id": "9e84633e-2b63-4ed0-b9be-5d7bdca1303b",
+    "question": "Où et à quelles heures sert-on le petit-déjeuner ? Quels sont les horaires de la piscine et les règles pour un enfant de 8 ans ?"
+  },
+  {
+    "stage": "gateway",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "upstream": 18084
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions",
+    "status": 201,
+    "upstream": 18084
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "7a1baf5a-5deb-441a-86d4-97448395ffc5",
+    "usage": {
+      "input_tokens": 3174,
+      "output_tokens": 22,
+      "total_tokens": 3752
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "a9127001-d232-48ee-b4b6-6e601ec45d3c",
+    "usage": {
+      "input_tokens": 689,
+      "output_tokens": 105,
+      "total_tokens": 1331
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/d36d58bd-88ba-4770-9477-cb35dec7938a/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "0fa9ef42-2261-4231-b289-4516e285c1cc",
+    "question": "Bữa sáng ở đâu, lúc mấy giờ? Khách lái ô tô đến thì đỗ xe có mất phí và được giữ chỗ không?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "49c4fc75-a146-436c-894f-d6a6ca04ba15",
+    "usage": {
+      "input_tokens": 3282,
+      "output_tokens": 13,
+      "total_tokens": 4066
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "ffe82703-0a5a-4b19-aba3-8717f72eb3ce",
+    "usage": {
+      "input_tokens": 3237,
+      "output_tokens": 64,
+      "total_tokens": 5691
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "e4e0d39a-63ad-4493-8bd5-8df1a01efa9f",
+    "usage": {
+      "input_tokens": 773,
+      "output_tokens": 144,
+      "total_tokens": 1440
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/d36d58bd-88ba-4770-9477-cb35dec7938a/messages",
+    "status": 502,
+    "upstream": 18084,
+    "request_id": "2c97bfa7-d981-4a3e-82cc-248e7b5f7d14",
+    "question": "Nhà hàng bạn vừa nói nằm ở tầng nào?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "e9f5552b-99c4-4ae1-9c22-dc5d7f9dd250",
+    "usage": {
+      "input_tokens": 958,
+      "output_tokens": 273,
+      "total_tokens": 3416
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/0a13a12c-331e-44a7-bd0e-10af458a4ed6/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "b524743a-50f3-4208-b241-c4be45102d89",
+    "question": "Où et à quelles heures sert-on le petit-déjeuner ? Quels sont les horaires de la piscine et les règles pour un enfant de 8 ans ?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "747724f5-4504-453c-8426-790999744847",
+    "usage": {
+      "input_tokens": 3282,
+      "output_tokens": 13,
+      "total_tokens": 3932
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "3c3bf41d-58ae-4dd6-8655-e70acd14a2f6",
+    "usage": {
+      "input_tokens": 733,
+      "output_tokens": 40,
+      "total_tokens": 1171
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/d36d58bd-88ba-4770-9477-cb35dec7938a/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "79b2a89c-ba03-438f-a234-c565760a9a4a",
+    "question": "Nhà hàng bạn vừa nói nằm ở tầng nào?"
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "b8877850-0553-40c5-9852-49807995708f",
+    "usage": {
+      "input_tokens": 3351,
+      "output_tokens": 22,
+      "total_tokens": 4193
+    }
+  },
+  {
+    "stage": "live_provider",
+    "model": "grok-4-1-fast-reasoning",
+    "request_id": "6cdc893d-dceb-4a67-8f78-88869073e8f4",
+    "usage": {
+      "input_tokens": 956,
+      "output_tokens": 192,
+      "total_tokens": 2153
+    }
+  },
+  {
+    "stage": "gateway",
+    "method": "POST",
+    "path": "/v1/guest/sessions/d36d58bd-88ba-4770-9477-cb35dec7938a/messages",
+    "status": 200,
+    "upstream": 18084,
+    "request_id": "1d662ddd-8e9b-4156-b5c1-e77e4a6d526e",
+    "question": "Bữa sáng bắt đầu và kết thúc lúc nào? Khách sạn có sân đáp trực thăng không? Giờ nhận phòng chính xác là mấy giờ?"
+  }
+]

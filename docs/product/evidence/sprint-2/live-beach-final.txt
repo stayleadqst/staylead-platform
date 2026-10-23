@@ -1,0 +1,40 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Lagoon Family Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Lagoon Family Demo":
+    - article:
+      - paragraph: Où et à quelles heures sert-on le petit-déjeuner ? Quels sont les horaires de la piscine et les règles pour un enfant de 8 ans ?
+      - status:
+        - paragraph: We could not answer this request. You can ask a new question or start a new chat.
+    - article:
+      - paragraph: Où et à quelles heures sert-on le petit-déjeuner ? Quels sont les horaires de la piscine et les règles pour un enfant de 8 ans ?
+      - paragraph: "Le petit-déjeuner est servi à Vịnh Nhỏ de 06:30 à 10:00. [F-HTL-BEACH02-040] La piscine familiale est ouverte de 07:00 à 19:00 ; les enfants de moins de 12 ans doivent être surveillés directement par un adulte. [F-HTL-BEACH02-043] Les enfants doivent rester sous la supervision de leur adulte accompagnateur dans les installations partagées. [F-HTL-BEACH02-064] Enfant : moins de 12 ans à la date de réception. [F-HTL-BEACH02-018] Les clients de moins de 18 ans doivent être accompagnés d'un adulte responsable. [F-HTL-BEACH02-019] Les horaires des équipements sont en heure locale de l'établissement et doivent être reconfirmés le jour même. [F-HTL-BEACH02-072] Fuseau horaire : Asia/Ho_Chi_Minh. [F-HTL-BEACH02-040] [F-HTL-BEACH02-072]"
+      - generic "Hotel records used (6)" [active]
+      - list:
+        - generic: Ăn uống và dị ứng
+        - generic: Record F-HTL-BEACH02-040 · source SRC-HTL-BEACH02-FOOD · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Tiện ích
+        - generic: Record F-HTL-BEACH02-043 · source SRC-HTL-BEACH02-AMENITY · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Phòng và lưu trú
+        - generic: Record F-HTL-BEACH02-064 · source SRC-HTL-BEACH02-ROOM · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Phòng và lưu trú
+        - generic: Record F-HTL-BEACH02-018 · source SRC-HTL-BEACH02-ROOM · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Phòng và lưu trú
+        - generic: Record F-HTL-BEACH02-019 · source SRC-HTL-BEACH02-ROOM · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Tiện ích
+        - generic: Record F-HTL-BEACH02-072 · source SRC-HTL-BEACH02-AMENITY · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

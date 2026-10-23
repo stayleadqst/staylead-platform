@@ -1,0 +1,56 @@
+{
+  "candidate": "18d3bcc622df08d5bbd1809c239e6840552a478e33db3bffb0da122794aa3437",
+  "checks": [
+    {
+      "id": "WEB-01",
+      "case": "Safe text",
+      "observed": "Actual browser showed literal script/img attributes and mixed Unicode; title StayLead Platform, injected img count0; no horizontal overflow at observed desktop width."
+    },
+    {
+      "id": "WEB-02",
+      "case": "Committed response lost then replay",
+      "request_id": "16fada11-9c4c-49d6-b37f-3767b797c438",
+      "observed": "First200 committed then gateway dropped connection; UI retained question, SAME-IDretry only, composer disabled. Retry200; exactly2fake provider calls total for this original turn;0extra replaycalls; session had4messages for2completedturns."
+    },
+    {
+      "id": "WEB-03",
+      "case": "Terminal timeout",
+      "observed": "504provider_timeout then explicit new-request retry200; IDs a64487be-ac3a-4ae5-b82e-0be12afd5072 vs e91378eb-7602-4644-81d8-aa312b7933d7. Noautomaticretry."
+    },
+    {
+      "id": "WEB-04",
+      "case": "Pending request",
+      "observed": "Controlled request_in_progress retainedsameID; composerdisabled, explicitretryresolved; noautoloop."
+    },
+    {
+      "id": "WEB-05",
+      "case": "Validation/provider/session failures",
+      "observed": "Non-envelope422 normalized; provider_auth retainedsameguest session/noautoPOSTsession; invalid_session offeredexplicitfreshchat;freshchat clearedtranscript anddidnotresendoldquestion. Gateway injectedinvalid_session; actual expiry enforcement covered realPGregression."
+    },
+    {
+      "id": "WEB-06",
+      "case": "Double-click / switch / late creation",
+      "observed": "Delayedquestiondoubleclick onePOSTrequest; navigateCITY->BEACHduringpending: BEACHfreshtranscript+scopedevidence; delayedBEACHsessioncreation thenclientnavigationviahome->RETREAT leftRETREATempty afterlateBEACHresponse. Server maycompleteoldturn butUIdoesnotreuseit."
+    },
+    {
+      "id": "WEB-07",
+      "case": "Separate browser tabs / reload",
+      "observed": "BEACH andRETREATtabs gotseparatesessions, correctpropertyevidence. Reloadclearedtranscript andcreatednewanonymoussession; noidentityfieldrequired. Independenttabs, not separatecookiecontainers; auth isper-tabmemory."
+    },
+    {
+      "id": "WEB-08",
+      "case": "Compatibility",
+      "observed": "Actualbrowserdomain electrical andversion999 metadataoverrides eachblockedbeforePOSTsession/message, clearincompatibilitycopy, composerdisabled,nofallback. Unknownprofile/alternateprofile coveredcompositioncontracts."
+    },
+    {
+      "id": "WEB-09",
+      "case": "Responsive and keyboard",
+      "observed": "390x844actualmobilebrowser viewport, innerWidth390/scrollWidth390; successfulsendandanswer,noclipping. Desktop keyboardTab->SendEnter successful. Screenshotmobile-fake.png; fakeanswersnotsemanticproof."
+    },
+    {
+      "id": "WEB-10",
+      "case": "Fixed proxy",
+      "observed": "Actualproductionbrowser->sameoriginproxy->gateway->FastAPI->isolatedPostgreSQL. UnexpectedGETendpoint404. Root/prefix/double-prefixoriginpreservation regressions; Final production root-base proxy verified through successful Grok turns after helper repair."
+    }
+  ]
+}

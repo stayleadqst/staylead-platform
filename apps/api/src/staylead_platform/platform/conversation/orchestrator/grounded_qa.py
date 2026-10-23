@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from pydantic import BaseModel, ValidationError
+
 from staylead_platform.platform.contracts.ai_provider import (
     AIProvider,
     GenerationRequest,
@@ -79,6 +80,30 @@ def _model_fact_projection(fact: dict[str, Any]) -> dict[str, Any]:
     return {key: fact.get(key) for key in _MODEL_FACT_FIELDS}
 
 
+def _answer_context(
+    history: list[dict[str, str]], allowed_fact_ids: set[str], *, limit: int,
+) -> list[dict[str, str]]:
+    """Keep guest turns and only prior assistant lines grounded by current evidence."""
+    projected: list[dict[str, str]] = []
+    for item in history[-limit:]:
+        if item.get("role") != "assistant":
+            projected.append(item)
+            continue
+        kept_lines = []
+        for line in item.get("content", "").splitlines():
+            references = _FACT_REFERENCE.findall(line)
+            tokens = _FACT_TOKEN.findall(line)
+            if tokens != references:
+                continue
+            if references and not set(references) <= allowed_fact_ids:
+                continue
+            if line.strip():
+                kept_lines.append(line)
+        if kept_lines:
+            projected.append({**item, "content": "\n".join(kept_lines)})
+    return projected
+
+
 class GroundedQAOrchestrator:
     def __init__(
         self,
@@ -141,19 +166,23 @@ class GroundedQAOrchestrator:
                 raise ConversationFailure("invalid_retrieval_selection", "The model returned an invalid evidence selection.") from exc
             except Exception as exc:
                 raise ConversationFailure("provider_failure", "Semantic evidence selection failed.") from exc
+        conflicts = self._retriever.conflicts_for(relevant_facts)
+        answer_history = _answer_context(
+            history, {fact["fact_id"] for fact in relevant_facts}, limit=8,
+        )
         evidence = json.dumps({
             "hotel_id": hotel_id,
             "question": question,
-            "recent_context": history[-8:],
+            "recent_context": answer_history,
             "facts": [_model_fact_projection(fact) for fact in relevant_facts],
-            "conflicts": list(retrieved.conflicts),
+            "conflicts": list(conflicts),
         }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 18000:
             evidence = json.dumps({
                 "hotel_id": hotel_id, "question": question,
-                "recent_context": history[-4:],
+                "recent_context": answer_history[-4:],
                 "facts": [_model_fact_projection(fact) for fact in relevant_facts],
-                "conflicts": list(retrieved.conflicts),
+                "conflicts": list(conflicts),
             }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 22000:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")

@@ -1,0 +1,20 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Pine Ridge Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Pine Ridge Demo":
+    - article:
+      - paragraph: 朝食は何時から何時までで、月曜日も利用できますか。駐車場の料金と、16人を超えるバスで入る場合の条件を教えてください。
+      - paragraph: 朝食はThông Sươngで07:00-09:30です。月曜日は閉店です。 [F-HTL-RETREAT03-040] 駐車場は18台分あり、無料です。 [F-HTL-RETREAT03-046] 入口が狭いため、16席を超える車両は確認が必要です。 [F-HTL-RETREAT03-046] 予約1件につき登録車両1台です。それ以外はスタッフの確認が必要です。 [F-HTL-RETREAT03-078] タイムゾーンはAsia/Ho_Chi_Minhです。 [F-HTL-RETREAT03-040] 駐車スペースの単位は車両スペースです。 [F-HTL-RETREAT03-046] 車両の高さ/クリアランス制限は記録されていません。デスクで確認してください。
+      - heading "Could not confirm" [level=2]
+      - list:
+        - listitem: 車両の高さ/クリアランス制限は記録されていません。デスクで確認してください。
+      - generic "Hotel records used (3)"
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

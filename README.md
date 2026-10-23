@@ -30,9 +30,10 @@ configuration.
 Sprint 1 acceptance, supported limits and evidence are recorded in
 [the acceptance report](docs/product/SPRINT_1_ACCEPTANCE.md).
 
-- `GET /health` reports that the API process is alive and which compiled-in domain profile
-  was selected.
-- The web home page is explicitly labeled as a source skeleton. It is not a chat or product demo.
+- `GET /health` reports that the API process is alive, the selected domain, and its guest contract
+  version. The web checks this metadata before creating an anonymous guest session.
+- The web forwards guest traffic through a fixed same-origin proxy. The upstream API URL is
+  server-only configuration; the browser receives only public profile and contract metadata.
 - The PostgreSQL engine factory is lazy; app import and startup do not connect or create schema.
 - `POST /v1/guest/sessions` creates a hotel-bound anonymous session from the server bootstrapped
   allowlist; `POST /v1/guest/sessions/{session_id}/messages` sends a bounded FAQ request.
@@ -86,6 +87,9 @@ npm run dev
 ```
 
 The API listens on `http://127.0.0.1:8000`; the web app defaults to `http://localhost:3000`.
+The web proxy reads `STAYLEAD_API_BASE_URL` from server-side `.env.local`. The public domain and
+guest contract version in `apps/web/.env.example` must match the API health response. Unsupported
+profiles or mismatched contract versions fail before session or question data is sent.
 
 The optional Sprint 1 live acceptance harness sends a small set of real requests through the
 running API and its configured model provider. It is disabled unless explicitly opted in, and

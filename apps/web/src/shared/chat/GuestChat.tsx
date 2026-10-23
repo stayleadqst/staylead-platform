@@ -1,0 +1,270 @@
+"use client";
+
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import type { ComponentType } from "react";
+import Link from "next/link";
+import type { AnswerRendererProps, DomainTarget } from "@/composition/registration";
+import {
+  canStartRequest,
+  claimRequest,
+  classifyFailure,
+  classifySessionFailure,
+  hasUnresolvedRequest,
+  isCurrentGeneration,
+  releaseRequest,
+  type RetryMode,
+} from "@/shared/chat/chat-state";
+import {
+  ApiError,
+  createGuestSession,
+  GuestMessageResponse,
+  GuestSession,
+  sendGuestMessage,
+} from "@/shared/api/client";
+
+type ChatTurn = {
+  id: string;
+  question: string;
+  answer?: GuestMessageResponse;
+  error?: string;
+  retryMode?: RetryMode;
+  sending?: boolean;
+};
+
+function requestId() {
+  return crypto.randomUUID();
+}
+
+export function GuestChat({
+  hotelSlug,
+  brand,
+  syntheticDisclosure,
+  AnswerRenderer,
+  target,
+}: {
+  hotelSlug: string;
+  brand: string;
+  syntheticDisclosure: string;
+  AnswerRenderer: ComponentType<AnswerRendererProps>;
+  target: DomainTarget;
+}) {
+  const [session, setSession] = useState<GuestSession | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [sessionError, setSessionError] = useState("");
+  const [sessionErrorRetryable, setSessionErrorRetryable] = useState(false);
+  const [turns, setTurns] = useState<ChatTurn[]>([]);
+  const [question, setQuestion] = useState("");
+  const [busy, setBusy] = useState(false);
+  const generation = useRef(0);
+  const activeRequest = useRef<number | null>(null);
+  const hotelName = typeof session?.hotel.name === "string"
+    ? session.hotel.name
+    : hotelSlug.replaceAll("-", " ");
+
+  const openSession = useCallback(async (expectedGeneration: number) => {
+    setSession(null);
+    setSessionError("");
+    setSessionErrorRetryable(false);
+    setSessionLoading(true);
+    try {
+      const created = await createGuestSession({ hotelSlug, target });
+      if (generation.current === expectedGeneration) setSession(created);
+    } catch (error) {
+      if (generation.current === expectedGeneration) {
+        const failure = classifySessionFailure(error instanceof ApiError ? error : { outcome: "unknown" });
+        setSessionError(failure.message);
+        setSessionErrorRetryable(failure.retryable);
+      }
+    } finally {
+      if (generation.current === expectedGeneration) setSessionLoading(false);
+    }
+  }, [hotelSlug, target]);
+
+  useEffect(() => {
+    const current = ++generation.current;
+    void openSession(current);
+    return () => {
+      generation.current += 1;
+    };
+  }, [hotelSlug, openSession]);
+
+  const deliver = useCallback(async (turn: ChatTurn, id: string) => {
+    const currentGeneration = generation.current;
+    const activeSession = session;
+    if (!activeSession || !claimRequest(currentGeneration, activeRequest)) return;
+    setBusy(true);
+    setTurns((current) => current.map((item) => item.id === turn.id
+      ? { ...item, sending: true, error: undefined, retryMode: undefined }
+      : item));
+    try {
+      const answer = await sendGuestMessage({
+        sessionId: activeSession.session_id,
+        accessToken: activeSession.access_token,
+        requestId: id,
+        question: turn.question,
+        target,
+      });
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      setTurns((current) => current.map((item) => item.id === turn.id
+        ? { ...item, id, answer, sending: false, error: undefined, retryMode: undefined }
+        : item));
+    } catch (error) {
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      const display = classifyFailure(error instanceof ApiError
+        ? error
+        : { outcome: "unknown" });
+      setTurns((current) => current.map((item) => item.id === turn.id
+        ? { ...item, id, sending: false, error: display.message, retryMode: display.retryMode }
+        : item));
+    } finally {
+      if (isCurrentGeneration(currentGeneration, generation.current)) setBusy(false);
+      releaseRequest(currentGeneration, activeRequest);
+    }
+  }, [session, target]);
+
+  const unresolvedRequest = hasUnresolvedRequest(turns);
+
+  function startNewChat() {
+    if (sessionLoading) return;
+    setTurns([]);
+    setQuestion("");
+    const current = ++generation.current;
+    setBusy(false);
+    void openSession(current);
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const text = question.trim();
+    if (!text || !canStartRequest(Boolean(session), activeRequest.current === generation.current, unresolvedRequest)) return;
+    const turn: ChatTurn = { id: requestId(), question: text, sending: true };
+    setTurns((current) => [...current, turn]);
+    setQuestion("");
+    void deliver(turn, turn.id);
+  }
+
+  function retry(turn: ChatTurn) {
+    if (!session || !turn.retryMode) return;
+    if (turn.retryMode === "new-session") {
+      startNewChat();
+      return;
+    }
+    if (turn.retryMode === "same-request") {
+      void deliver(turn, turn.id);
+      return;
+    }
+    if (turn.retryMode === "new-request") {
+      const nextId = requestId();
+      void deliver(turn, nextId);
+    }
+  }
+
+  return (
+    <main className="chat-shell">
+      <header className="chat-header">
+        <Link className="back-link" href="/">{brand}</Link>
+        <p className="synthetic-label">{syntheticDisclosure}</p>
+        <h1>{hotelName}</h1>
+        <p className="chat-intro">Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.</p>
+      </header>
+
+      <section className="chat-panel" aria-label={`Chat with ${hotelName}`}>
+        <div className="chat-transcript" aria-live="polite" aria-relevant="additions text">
+          {!turns.length && sessionLoading && <p className="status-note">Starting a new private chat…</p>}
+          {!turns.length && session && <p className="status-note">Ask a question about {hotelName} to get started.</p>}
+          {turns.map((turn) => (
+            <article className="turn" key={`${turn.id}-${turn.question}`}>
+              <div className="message message-guest"><p>{turn.question}</p></div>
+              {turn.sending && <p className="status-note">Checking hotel records…</p>}
+              {turn.error && (
+                <div className="message message-error" role="status">
+                  <p>{turn.error}</p>
+                  {turn.retryMode && turn.retryMode !== "none" && (
+                    <button className="text-button" type="button" onClick={() => retry(turn)} disabled={busy || !session}>
+                      {turn.retryMode === "same-request" ? "Retry this request" : turn.retryMode === "new-request" ? "Submit as a new request" : "Start a new chat"}
+                    </button>
+                  )}
+                  {turn.retryMode === "same-request" && (
+                    <button className="text-button" type="button" onClick={startNewChat} disabled={sessionLoading}>
+                      Start a new chat
+                    </button>
+                  )}
+                </div>
+              )}
+              {turn.answer && <AnswerCard response={turn.answer} AnswerRenderer={AnswerRenderer} />}
+            </article>
+          ))}
+          {sessionError && (
+            <div className="session-error" role="alert">
+              <p>{sessionError}</p>
+              {sessionErrorRetryable && (
+                <button className="text-button" type="button" disabled={sessionLoading} onClick={() => {
+                  const current = ++generation.current;
+                  void openSession(current);
+                }}>
+                  Try again
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <form className="chat-composer" onSubmit={submit}>
+          <label htmlFor="guest-question">Your question</label>
+          <div className="composer-row">
+            <textarea
+              id="guest-question"
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              placeholder="Ask in any language…"
+              maxLength={2000}
+              rows={2}
+              disabled={!session || busy || unresolvedRequest}
+              aria-describedby="question-hint"
+              required
+            />
+            <button className="send-button" type="submit" disabled={!session || busy || unresolvedRequest || !question.trim()}>
+              Send
+            </button>
+          </div>
+          {unresolvedRequest && <p className="composer-hint">Retry the pending request with the same ID, or start a new chat before asking another question.</p>}
+          <p id="question-hint" className="composer-hint">Your conversation stays in this browser tab and starts fresh when reloaded.</p>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+function AnswerCard({
+  response,
+  AnswerRenderer,
+}: {
+  response: GuestMessageResponse;
+  AnswerRenderer: ComponentType<AnswerRendererProps>;
+}) {
+  return (
+    <div className="message message-assistant">
+      <AnswerRenderer answer={response.answer} />
+      {!!response.unknowns.length && (
+        <div className="unknown-block">
+          <h2>Could not confirm</h2>
+          <ul>{response.unknowns.map((unknown, index) => <li key={`${index}-${unknown}`}>{unknown}</li>)}</ul>
+        </div>
+      )}
+      {!!response.evidence.length && (
+        <details className="evidence-list">
+          <summary>Hotel records used ({response.evidence.length})</summary>
+          <ul>
+            {response.evidence.map((item, index) => (
+              <li key={`${item.fact_id}-${index}`}>
+                <span>{item.section || "Hotel information"}</span>
+                <small>Record {item.fact_id} · source {item.source_id} · version {item.source_version}</small>
+                {item.imported_at && <small>Imported {item.imported_at}</small>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  );
+}

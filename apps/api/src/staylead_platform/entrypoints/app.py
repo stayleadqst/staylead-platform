@@ -16,6 +16,7 @@ from staylead_platform.composition.startup.domain_profile import select_domain_p
 from staylead_platform.platform.contracts.ai_provider import AIProvider
 
 MAX_QUESTION_CHARS = 2000
+GUEST_CONTRACT_VERSION = "1"
 
 
 class CreateSessionRequest(BaseModel):
@@ -55,7 +56,11 @@ def create_app(
 
     @app.get("/health", tags=["health"])
     async def health() -> dict[str, str]:
-        return {"status": "ok", "domain": profile.name}
+        return {
+            "status": "ok",
+            "domain": profile.name,
+            "guest_contract_version": GUEST_CONTRACT_VERSION,
+        }
 
     @app.post("/v1/guest/sessions", status_code=201, tags=["guest chat"])
     async def open_guest_session(body: CreateSessionRequest) -> dict[str, Any]:

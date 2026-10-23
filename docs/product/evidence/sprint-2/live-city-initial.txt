@@ -1,0 +1,27 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Harbor City Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Harbor City Demo":
+    - article:
+      - paragraph: Bữa sáng ở đâu, lúc mấy giờ? Khách lái ô tô đến thì đỗ xe có mất phí và được giữ chỗ không?
+      - paragraph: Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30-09:30 (timezone Asia/Ho_Chi_Minh). [F-HTL-CITY01-040] Bãi xe có mái che, 40 chỗ tham chiếu; phí 100000 VND/xe/đêm, không bảo lưu chỗ. [F-HTL-CITY01-046] Giờ mở cửa và dịch vụ có thể thay đổi; xác nhận tại quầy trong ngày sử dụng. [F-HTL-CITY01-036]
+      - generic "Hotel records used (3)" [active]
+      - list:
+        - generic: Ăn uống và dị ứng
+        - generic: Record F-HTL-CITY01-040 · source SRC-HTL-CITY01-FOOD · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Đỗ xe và di chuyển
+        - generic: Record F-HTL-CITY01-046 · source SRC-HTL-CITY01-TRANSPORT · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Khu vực và di chuyển
+        - generic: Record F-HTL-CITY01-036 · source SRC-HTL-CITY01-LOCAL · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

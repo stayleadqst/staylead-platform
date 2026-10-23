@@ -1,14 +1,22 @@
+import Link from "next/link";
+import styles from "./HospitalityLanding.module.css";
+
 export function HospitalityLanding() {
   return (
-    <main style={{ margin: "12vh auto", maxWidth: 720, padding: "0 24px" }}>
+    <main className={styles.landing}>
       <p style={{ color: "#6b6358", letterSpacing: ".08em", textTransform: "uppercase" }}>
         StayLead · Hospitality
       </p>
-      <h1>Source skeleton</h1>
+      <h1>Ask about your stay</h1>
       <p>
-        This page confirms the hospitality frontend composition is wired. Guest chat,
-        recommendations, room planning, and stay planning are not implemented.
+        Get clear answers about each demo hotel. No sign-up is needed.
       </p>
+      <p className={styles.disclosure}>Demo experience using synthetic hotel information.</p>
+      <ul className={styles.hotelList} aria-label="Demo hotels">
+        <li><Link className={styles.hotelLink} href="/hotels/harbor-city-demo/chat">Harbor City Demo</Link></li>
+        <li><Link className={styles.hotelLink} href="/hotels/lagoon-family-demo/chat">Lagoon Family Demo</Link></li>
+        <li><Link className={styles.hotelLink} href="/hotels/pine-ridge-demo/chat">Pine Ridge Demo</Link></li>
+      </ul>
     </main>
   );
 }

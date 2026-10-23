@@ -7,3 +7,71 @@ body {
   color: #24231f;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.theme-hospitality {
+  min-height: 100vh;
+  padding: 40px 20px 64px;
+  background: radial-gradient(ellipse at top left, #f4ead9 0, #f7f5f0 52%, #f1f2ec 100%);
+  color: #202922;
+}
+
+.chat-shell { width: min(100%, 860px); margin: 0 auto; }
+.chat-header { padding: 4px 8px 22px; }
+.back-link { color: #2a5d4d; font-size: 14px; font-weight: 700; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }
+.synthetic-label {
+  display: inline-block;
+  margin: 28px 0 10px;
+  padding: 7px 11px;
+  border: 1px solid #decba9;
+  border-radius: 999px;
+  background: #fff9ec;
+  color: #73552b;
+  font-size: 12px;
+  font-weight: 700;
+}
+.chat-header h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(32px, 6vw, 46px); letter-spacing: -.03em; }
+.chat-intro { max-width: 620px; margin: 10px 0 0; color: #5a625d; font-size: 16px; line-height: 1.55; }
+.chat-panel { overflow: hidden; border: 1px solid #e1e3dc; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px rgb(41 51 43 / 8%); }
+.chat-transcript { display: flex; min-height: 350px; max-height: min(58vh, 700px); flex-direction: column; gap: 20px; overflow-y: auto; padding: 28px clamp(16px, 4vw, 36px); }
+.status-note { margin: 0; color: #69736c; font-size: 14px; }
+.turn { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.message { max-width: min(100%, 680px); border-radius: 16px; padding: 15px 18px; line-height: 1.6; overflow-wrap: anywhere; }
+.message p { margin: 0; white-space: pre-wrap; }
+.message-guest { align-self: flex-end; border-bottom-right-radius: 5px; background: #235845; color: #fff; }
+.message-assistant { border: 1px solid #e8ebe5; border-bottom-left-radius: 5px; background: #f8faf7; color: #202922; }
+.answer-text { white-space: pre-wrap; }
+.message-error { border: 1px solid #e8c6b9; background: #fff7f3; color: #713d2b; }
+.message-error p, .session-error p { margin: 0; }
+.text-button { margin-top: 10px; border: 0; padding: 0; background: transparent; color: #235845; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.text-button:disabled { color: #7e8781; cursor: wait; }
+.unknown-block { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e0e6de; }
+.unknown-block h2 { margin: 0 0 6px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+.unknown-block ul, .evidence-list ul { margin: 6px 0 0; padding-left: 20px; }
+.evidence-list { margin-top: 16px; padding-top: 12px; border-top: 1px solid #e0e6de; }
+.evidence-list summary { color: #315f4d; font-size: 13px; font-weight: 700; cursor: pointer; }
+.evidence-list li { margin: 8px 0; }
+.evidence-list li span, .evidence-list li small { display: block; }
+.evidence-list li small { margin-top: 2px; color: #68736c; font-size: 11px; overflow-wrap: anywhere; }
+.session-error { margin: 0; color: #8a3d2e; font-size: 14px; }
+.chat-composer { border-top: 1px solid #eaede7; padding: 20px clamp(16px, 4vw, 36px) 18px; }
+.chat-composer label { display: block; margin-bottom: 8px; color: #39473e; font-size: 13px; font-weight: 700; }
+.composer-row { display: flex; align-items: stretch; gap: 10px; }
+.composer-row textarea { width: 100%; min-height: 56px; resize: vertical; border: 1px solid #ccd5cd; border-radius: 12px; padding: 12px 14px; color: #202922; font: inherit; line-height: 1.4; }
+.composer-row textarea:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #93b8a3; outline-offset: 2px; }
+.composer-row textarea:disabled { background: #f5f6f3; }
+.send-button { min-width: 88px; border: 0; border-radius: 12px; padding: 0 20px; background: #235845; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.send-button:hover:not(:disabled) { background: #174432; }
+.send-button:disabled { background: #aebbb3; cursor: not-allowed; }
+.composer-hint { margin: 8px 0 0; color: #727c75; font-size: 12px; }
+
+@media (max-width: 560px) {
+  .theme-hospitality { padding: 22px 12px 32px; }
+  .chat-header { padding: 4px 4px 17px; }
+  .synthetic-label { margin-top: 20px; font-size: 11px; }
+  .chat-intro { font-size: 14px; }
+  .chat-panel { border-radius: 16px; }
+  .chat-transcript { min-height: 42vh; max-height: 55vh; padding-top: 20px; padding-bottom: 20px; }
+  .composer-row { align-items: stretch; flex-direction: column; }
+  .send-button { min-height: 48px; }
+}

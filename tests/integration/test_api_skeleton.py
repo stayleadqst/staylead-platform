@@ -13,7 +13,9 @@ def test_health_reports_selected_hospitality_profile() -> None:
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "domain": "hospitality"}
+    assert response.json() == {
+        "status": "ok", "domain": "hospitality", "guest_contract_version": "1",
+    }
 
 
 def test_unsupported_domain_profile_is_rejected() -> None:

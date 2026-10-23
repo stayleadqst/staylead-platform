@@ -1,0 +1,42 @@
+- main:
+  - link "StayLead · Hospitality":
+    - /url: /
+  - paragraph: Demo experience using synthetic hotel information.
+  - heading "Harbor City Demo" [level=1]
+  - paragraph: Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.
+  - region "Chat with Harbor City Demo":
+    - article:
+      - paragraph: Bữa sáng ở đâu, lúc mấy giờ? Khách lái ô tô đến thì đỗ xe có mất phí và được giữ chỗ không?
+      - paragraph: Bữa sáng tự chọn tại Bến Gió, tầng 1, từ 06:30-09:30 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-040] Bãi xe có mái che, 40 chỗ tham chiếu; phí 100000 VND/xe/đêm, không bảo lưu chỗ. [F-HTL-CITY01-046]
+      - generic "Hotel records used (2)"
+    - article:
+      - paragraph: Nhà hàng bạn vừa nói nằm ở tầng nào?
+      - status:
+        - paragraph: We could not answer this request. You can ask a new question or start a new chat.
+    - article:
+      - paragraph: Nhà hàng bạn vừa nói nằm ở tầng nào?
+      - paragraph: Nhà hàng Bến Gió nằm ở tầng 1. [F-HTL-CITY01-040]
+      - generic "Hotel records used (1)"
+    - article:
+      - paragraph: Bữa sáng bắt đầu và kết thúc lúc nào? Khách sạn có sân đáp trực thăng không? Giờ nhận phòng chính xác là mấy giờ?
+      - paragraph: Bữa sáng từ 06:30 đến 09:30 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-040] Giờ nhận phòng từ 15:00 đến 23:00 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-005] Giờ nhận phòng từ 17:00 đến 22:00 (Asia/Ho_Chi_Minh). [F-HTL-CITY01-CONFLICT-005] Nhà hàng Bến Gió nằm ở tầng 1. [F-HTL-CITY01-040] Khách sạn có sân đáp trực thăng hay không chưa được xác nhận. Giờ nhận phòng có sự xung đột giữa các nguồn.
+      - heading "Could not confirm" [level=2]
+      - list:
+        - listitem: Khách sạn có sân đáp trực thăng hay không chưa được xác nhận.
+      - generic "Hotel records used (3)" [active]
+      - list:
+        - generic: Ăn uống và dị ứng
+        - generic: Record F-HTL-CITY01-040 · source SRC-HTL-CITY01-FOOD · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Nhận và trả phòng
+        - generic: Record F-HTL-CITY01-005 · source SRC-HTL-CITY01-STAY · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+        - generic: Nhận và trả phòng
+        - generic: Record F-HTL-CITY01-CONFLICT-005 · source SRC-HTL-CITY01-STAY · version 1.0
+        - generic: Imported 2026-10-23T09:01:29.233078+07:00
+    - generic: Your question
+    - textbox "Your question":
+      - /placeholder: Ask in any language…
+    - button "Send" [disabled]
+    - paragraph: Your conversation stays in this browser tab and starts fresh when reloaded.
+- alert

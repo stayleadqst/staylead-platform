@@ -7,7 +7,9 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     GROUNDED_QA_INSTRUCTIONS,
 )
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
-from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
+from staylead_platform.domains.hospitality.schemas.grounded_answer import (
+    HospitalityGroundedAnswer,
+)
 from staylead_platform.platform.contracts.ai_provider import (
     GenerationRequest,
     GenerationResult,
@@ -98,6 +100,84 @@ def test_low_overlap_multilingual_question_gets_scoped_semantic_selection() -> N
     assert answer.usage.total_tokens == 60
     assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
     assert "06:30" in answer.answer and "09:30" in answer.answer
+
+
+def test_multiturn_current_question_triggers_selection_and_expands_conflict_versions() -> None:
+    facts = MemoryFacts()
+    facts.facts.extend([
+        KnowledgeFact(
+            fact_id="F-HTL-CITY01-005", hotel_id="HTL-CITY01", topic="rooms",
+            subject="front_desk", field="check_in_hours", value="15:00-23:00",
+            conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+            provenance={"source_id": "SRC-1", "source_version": "1", "section": "Arrival"},
+        ),
+        KnowledgeFact(
+            fact_id="F-HTL-CITY01-CONFLICT-005", hotel_id="HTL-CITY01", topic="rooms",
+            subject="front_desk", field="check_in_hours", value="17:00-22:00",
+            conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+            provenance={"source_id": "SRC-2", "source_version": "1", "section": "Arrival"},
+        ),
+    ])
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-005"], answer={
+        "supported_claims": [{
+            "text": "The check-in records differ and need confirmation.",
+            "fact_ids": ["F-HTL-CITY01-005", "F-HTL-CITY01-CONFLICT-005"],
+        }],
+        "unknowns": [], "conflicts": ["The check-in records differ and need confirmation."],
+    })
+    question = (
+        "Bữa sáng bắt đầu và kết thúc lúc nào? Khách sạn có sân đáp trực thăng không? "
+        "Giờ nhận phòng chính xác là mấy giờ?"
+    )
+    history = [
+        {"role": "user", "content": "Does the hotel have a pool, spa or gym?"},
+        {"role": "assistant", "content": "I could not verify those amenities."},
+    ]
+
+    answer = asyncio.run(build(provider, facts).answer(
+        hotel_id="HTL-CITY01", question=question, history=history,
+    ))
+
+    assert answer.calls == 2
+    selection = json.loads(provider.calls[0].input_text)
+    assert selection["question"] == question
+    answer_input = json.loads(provider.calls[1].input_text)
+    assert {fact["fact_id"] for fact in answer_input["facts"]} >= {
+        "F-HTL-CITY01-005", "F-HTL-CITY01-CONFLICT-005",
+    }
+    assert any(set(item["fact_ids"]) >= {
+        "F-HTL-CITY01-005", "F-HTL-CITY01-CONFLICT-005",
+    } for item in answer_input["conflicts"])
+
+
+def test_answer_context_drops_assistant_claims_outside_final_selected_facts() -> None:
+    memory = MemoryFacts()
+    memory.facts.append(KnowledgeFact(
+        fact_id="F-HTL-CITY01-046", hotel_id="HTL-CITY01", topic="parking",
+        subject="parking", field="availability", value="Parking is available.",
+        conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-1", "source_version": "1", "section": "Parking"},
+    ))
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    history = [
+        {"role": "assistant", "content": (
+            "Breakfast at Ben Gio is on floor 1 [F-HTL-CITY01-040].\n"
+            "Parking is available [F-HTL-CITY01-046]."
+        )},
+        {"role": "user", "content": "Nhà hàng bữa sáng đó nằm ở tầng mấy?"},
+    ]
+
+    answer = asyncio.run(build(provider, memory).answer(
+        hotel_id="HTL-CITY01", question="Nhà hàng bữa sáng đó nằm ở tầng mấy?", history=history,
+    ))
+
+    assert answer.calls == 2
+    selection_context = json.loads(provider.calls[0].input_text)["recent_context"]
+    assert "F-HTL-CITY01-046" in json.dumps(selection_context)
+    answer_context = json.loads(provider.calls[1].input_text)["recent_context"]
+    assert "F-HTL-CITY01-040" in json.dumps(answer_context)
+    assert "F-HTL-CITY01-046" not in json.dumps(answer_context)
+    assert any(item["role"] == "user" for item in answer_context)
 
 
 def test_lexical_supported_question_uses_one_call_and_never_crosses_hotel() -> None:
