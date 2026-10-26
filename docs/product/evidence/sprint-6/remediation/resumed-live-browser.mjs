@@ -24,10 +24,15 @@ const { chromium } = await import(pathToFileURL(
 
 const ROOT = process.cwd();
 const MATRIX_PATH = path.join(ROOT, "docs/product/evidence/sprint-6/live-cases.json");
-const OUTPUT = path.join(ROOT, "docs/product/evidence/sprint-6/remediation/resumed-live-run");
+const RUN_NAMESPACE = process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1";
+requireCheck(["remediation-1", "remediation-2"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1 or remediation-2");
+const RUN_ID = `s6-codex-20261026-${RUN_NAMESPACE}`;
+const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : "remediation-2-live-run";
+const OUTPUT = path.join(ROOT, "docs/product/evidence/sprint-6/remediation", OUTPUT_DIR);
 const BASE_URL = process.env.STAYLEAD_S6_WEB_URL ?? "http://127.0.0.1:13016";
-const RUNTIME_STATE = "/private/tmp/staylead-sprint6-remediation-run-state.json";
-const RUNTIME_EVENTS = "/private/tmp/staylead-sprint6-remediation-runtime-events.jsonl";
+const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : "staylead-sprint6-remediation-2";
+const RUNTIME_STATE = `/private/tmp/${PRIVATE_PREFIX}-run-state.json`;
+const RUNTIME_EVENTS = `/private/tmp/${PRIVATE_PREFIX}-runtime-events.jsonl`;
 
 function requireCheck(condition, message) {
   if (!condition) throw new Error(message);
@@ -236,6 +241,8 @@ const matrix = JSON.parse(await fs.readFile(MATRIX_PATH, "utf8"));
 requireCheck(matrix.turns.length === 9 && matrix.limits.max_codex_requests === 18, "Pinned matrix bounds are invalid");
 await fs.mkdir(OUTPUT, { recursive: false });
 await fs.writeFile(path.join(OUTPUT, "run-meta.json"), JSON.stringify({
+  run_id: RUN_ID,
+  run_namespace: RUN_NAMESPACE,
   matrix_id: matrix.matrix_id,
   started_at_utc: new Date().toISOString(),
   base_url: BASE_URL,
@@ -247,6 +254,20 @@ await fs.writeFile(path.join(OUTPUT, "run-meta.json"), JSON.stringify({
 const browser = await chromium.launch({ headless: process.env.STAYLEAD_S6_HEADLESS !== "0", channel: "chrome" });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
 await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: BASE_URL });
+const baseOrigin = new URL(BASE_URL).origin;
+const externalBrowserRequests = [];
+context.on("request", (request) => {
+  try {
+    const requestUrl = new URL(request.url());
+    if (requestUrl.origin === baseOrigin) return;
+    externalBrowserRequests.push({
+      origin: requestUrl.origin,
+      url_sha256: nodeCreateHash("sha256").update(request.url()).digest("hex"),
+    });
+  } catch {
+    externalBrowserRequests.push({ origin: "invalid-url", url_sha256: null });
+  }
+});
 const page = await context.newPage();
 const observationsPath = path.join(OUTPUT, "observations.jsonl");
 const screenshotsDir = path.join(OUTPUT, "turn-screenshots");
@@ -254,11 +275,12 @@ await fs.mkdir(screenshotsDir);
 let stopReason = null;
 let introducedChildHash = null;
 let keepBrowserOpen = false;
-const attemptedResumeReceipts = new Set();
 let resumeObservationIndex = 0;
 
 async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) {
   keepBrowserOpen = true;
+  let activePartialApi = partialApi;
+  let activeReceiptId = rawReceiptId;
   const terminal = createInterface({ input: stdin, output: stdout });
   try {
     while (true) {
@@ -279,15 +301,11 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
         console.log("No command submitted. Only continue, snapshot, or close is accepted.");
         continue;
       }
-      if (partialApi.status !== "partial_success" || typeof rawReceiptId !== "string" || !rawReceiptId) {
+      if (activePartialApi.status !== "partial_success" || typeof activeReceiptId !== "string" || !activeReceiptId) {
         console.log("This response has no resumable partial receipt; no request was sent.");
         continue;
       }
-      const receiptHash = hashIdentifier(rawReceiptId);
-      if (attemptedResumeReceipts.has(receiptHash)) {
-        console.log("This receipt was already explicitly continued once in this browser; no duplicate request was sent.");
-        continue;
-      }
+      const receiptHash = hashIdentifier(activeReceiptId);
       const button = page.locator(".message-error button.text-button")
         .filter({ hasText: "Continue the answer using the updated trip details" }).last();
       const buttonCount = await page.locator(".message-error button.text-button")
@@ -296,17 +314,18 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
         console.log("The existing Continue answer control is not rendered; no request was sent.");
         continue;
       }
-      attemptedResumeReceipts.add(receiptHash);
       const beforeState = runtimeSnapshot(turnCase.turn).state;
       const beforeAssistantCount = await page.locator(".message-assistant[lang][dir]").count();
       const responsePromise = page.waitForResponse((candidate) =>
         candidate.request().method() === "POST" && /\/api\/guest\/sessions\/[^/]+\/messages$/.test(candidate.url()),
-      { timeout: 60000 });
+      { timeout: 60000 }).then((value) => ({ value }), (error) => ({ error }));
       let response = null;
       let requestIssue = null;
       try {
         await button.click();
-        response = await responsePromise;
+        const result = await responsePromise;
+        if (result.error) throw result.error;
+        response = result.value;
       } catch (error) {
         requestIssue = redactText(error.message);
       }
@@ -314,6 +333,12 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
       try { rawResponse = response ? await response.json() : { request_error: requestIssue }; }
       catch { rawResponse = { parse_error: true }; }
       const resumedApi = safeApiResponse(rawResponse);
+      if (resumedApi.status === "partial_success") {
+        activePartialApi = resumedApi;
+        if (typeof rawResponse?.brief_receipt?.request_id === "string") {
+          activeReceiptId = rawResponse.brief_receipt.request_id;
+        }
+      }
       const status = response?.status() ?? 0;
       let resumedRendered = null;
       let resumedClipboard = { result: "not_checked", equals_rendered_text: false };
@@ -379,6 +404,10 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
         return { ok: true, api: resumedApi, rendered: resumedRendered, clipboard: resumedClipboard };
       }
       console.error(`Explicit answer-only attempt was recorded and did not pass: ${semanticIssue}. No retry was sent.`);
+      if (!response || status >= 400 || resumedApi.status === "partial_success") {
+        console.log("The original partial receipt remains available when the UI permits; another attempt requires a new explicit continue command.");
+        continue;
+      }
       return { ok: false, reason: semanticIssue };
     }
   } finally {
@@ -401,12 +430,14 @@ try {
     await textarea.fill(turnCase.utterance);
     const responsePromise = page.waitForResponse((response) =>
       response.request().method() === "POST" && /\/api\/guest\/sessions\/[^/]+\/messages$/.test(response.url()),
-    { timeout: 60000 });
+    { timeout: 60000 }).then((value) => ({ value }), (error) => ({ error }));
     let response = null;
     let requestIssue = null;
     try {
       await submit.click();
-      response = await responsePromise;
+      const result = await responsePromise;
+      if (result.error) throw result.error;
+      response = result.value;
     } catch (error) {
       requestIssue = error.message;
     }
@@ -543,12 +574,13 @@ try {
     }
   }
   await fs.writeFile(path.join(OUTPUT, "run-result.json"), JSON.stringify({
-    run_id: "s6-codex-20261026-remediation-1",
+    run_id: RUN_ID,
     result: stopReason ? "stopped_with_preserved_partial_evidence_browser_held_open" : "completed_matrix_pending_semantic_review",
     turns_observed: (await fs.readFile(observationsPath, "utf8")).trim().split("\n").filter(Boolean).length,
     stop_reason: stopReason,
     automatic_retry_or_resume_used: false,
-    non_provider_external_network_calls: 0,
+    non_provider_external_network_calls: "unmeasured_by_browser_driver",
+    external_browser_requests: { scope: "browser-context-only", count: externalBrowserRequests.length, origin_and_url_hashes: externalBrowserRequests },
     provider_network_activity: "handled by the approved Codex CLI runtime; not measured by the browser script",
     semantic_verdict: "not_assigned_by_browser_script",
     reviewer_decision_required: true,
@@ -574,6 +606,59 @@ try {
     } finally {
       terminal.close();
     }
+  }
+} catch (error) {
+  stopReason = stopReason ?? `browser driver exception: ${redactText(error?.message ?? error).slice(0, 500)}`;
+  let screenshot = null;
+  try {
+    screenshot = path.join(OUTPUT, "driver-exception.png");
+    await page.screenshot({ path: screenshot, fullPage: true });
+  } catch {
+    screenshot = null;
+  }
+  const observedTurns = await fs.readFile(observationsPath, "utf8").catch(() => "");
+  const crashEvidence = {
+    run_id: RUN_ID,
+    exception_class: error?.constructor?.name ?? "Error",
+    message: stopReason,
+    screenshot: screenshot ? path.relative(ROOT, screenshot) : null,
+    runtime: runtimeSnapshot(0),
+    automatic_retry_or_resume_used: false,
+    non_provider_external_network_calls: "unmeasured_by_browser_driver",
+    external_browser_requests: { scope: "browser-context-only", count: externalBrowserRequests.length, origin_and_url_hashes: externalBrowserRequests },
+    observed_at_utc: new Date().toISOString(),
+  };
+  await fs.appendFile(path.join(OUTPUT, "driver-errors.jsonl"), JSON.stringify(crashEvidence) + "\n", { mode: 0o600 }).catch(() => {});
+  await fs.writeFile(path.join(OUTPUT, "run-result.json"), JSON.stringify({
+    run_id: RUN_ID,
+    result: "driver_exception_preserved_partial_evidence_browser_held_open",
+    turns_observed: observedTurns.trim() ? observedTurns.trim().split("\n").filter(Boolean).length : 0,
+    stop_reason: stopReason,
+    exception_class: crashEvidence.exception_class,
+    screenshot: crashEvidence.screenshot,
+    automatic_retry_or_resume_used: false,
+    semantic_verdict: "not_assigned_by_browser_script",
+    reviewer_decision_required: true,
+    completed_at_utc: new Date().toISOString(),
+  }, null, 2) + "\n", { mode: 0o600 }).catch(() => {});
+  keepBrowserOpen = true;
+  console.error(`Acceptance driver stopped unexpectedly: ${stopReason}. Error log/run result were saved where possible; browser/session will remain open. No request was retried.`);
+  const terminal = createInterface({ input: stdin, output: stdout });
+  try {
+    while (true) {
+      const command = await terminal.question("Paused after driver error. Type snapshot to save current state, or close to close browser: ");
+      if (command.trim().toLowerCase() === "snapshot") {
+        await page.screenshot({ path: path.join(OUTPUT, "driver-exception-current.png"), fullPage: true }).catch(() => {});
+        console.log("Paused browser screenshot saved if the page is still available; no HTTP request was made.");
+      } else if (command.trim().toLowerCase() === "close") {
+        keepBrowserOpen = false;
+        break;
+      } else {
+        console.log("No command submitted. Only snapshot or close is accepted after a driver error.");
+      }
+    }
+  } finally {
+    terminal.close();
   }
 } finally {
   if (!keepBrowserOpen) {

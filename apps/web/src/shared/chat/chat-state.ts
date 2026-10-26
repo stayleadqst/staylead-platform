@@ -6,6 +6,45 @@ export type FailureInput = Readonly<{
 
 export type RetryMode = "same-request" | "new-request" | "new-session" | "none";
 
+export type AnswerOnlyReceiptTurn = {
+  id: string;
+  resumeReceiptId?: string;
+  answerOnlyReceiptId?: string;
+  retryMode?: RetryMode;
+  sameIdOnly?: boolean;
+  sending?: boolean;
+  partialSuccess?: boolean;
+  error?: string;
+  recovered?: boolean;
+  receipt?: { answer_status?: string } | null;
+};
+
+/**
+ * A later successful answer-only continuation resolves every pending UI turn
+ * associated with that committed receipt, without replacing historical answers.
+ */
+export function resolveAnswerOnlyReceipt<T extends AnswerOnlyReceiptTurn>(
+  turns: readonly T[],
+  receiptId: string,
+  completedTurnId: string,
+): T[] {
+  return turns.map((item) => {
+    if (item.id === completedTurnId ||
+        (item.resumeReceiptId !== receiptId && item.answerOnlyReceiptId !== receiptId)) return item;
+    return {
+      ...item,
+      resumeReceiptId: undefined,
+      retryMode: undefined,
+      sameIdOnly: false,
+      sending: false,
+      partialSuccess: false,
+      error: undefined,
+      recovered: true,
+      receipt: item.receipt ? { ...item.receipt, answer_status: "completed" } : item.receipt,
+    };
+  });
+}
+
 export function retryModeForFailure(retryMode: RetryMode, hasCommittedPartialResult: boolean): RetryMode | undefined {
   // A partial result means the edit was committed. Only answer-only resume is safe.
   return hasCommittedPartialResult ? undefined : retryMode;

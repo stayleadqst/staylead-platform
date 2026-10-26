@@ -22,6 +22,16 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
+    def test_only_two_isolated_run_namespaces_are_available(self):
+        first = runtime._namespace_configuration("remediation-1")
+        second = runtime._namespace_configuration("remediation-2")
+        self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
+        self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
+        for key in ("run_state", "events", "runtime", "capture_dir"):
+            self.assertNotEqual(first[key], second[key], key)
+        with self.assertRaises(ValueError):
+            runtime._namespace_configuration("arbitrary-run")
+
     def test_fresh_namespace_and_frozen_limits(self):
         self.assertEqual(runtime.RUN_ID, "s6-codex-20261026-remediation-1")
         self.assertNotEqual(runtime.RUN_STATE, Path("/private/tmp/staylead-sprint6-run-state.json"))
@@ -73,7 +83,7 @@ class RuntimeBoundsTests(unittest.TestCase):
                 self.assertEqual(json.loads(state_path.read_text())["codex_requests"], 18)
                 self.assertEqual(json.loads(state_path.read_text())["guest_turns"], 9)
 
-    def test_explicit_answer_only_resume_has_separate_counter_and_blocks_duplicate_receipt(self):
+    def test_explicit_answer_only_resume_has_separate_counter_and_allows_operator_repeat(self):
         with tempfile.TemporaryDirectory() as directory:
             state_path = Path(directory) / "state.json"
             state = {
@@ -97,9 +107,11 @@ class RuntimeBoundsTests(unittest.TestCase):
                 self.assertEqual(after_first["guest_turns"], 1)
                 self.assertEqual(after_first["codex_requests"], 2)
                 self.assertEqual(after_first["answer_only_resumes"], 1)
-                with self.assertRaisesRegex(RuntimeError, "already reserved"):
-                    runtime._reserve_answer_only_resume("synthetic-receipt")
-                self.assertEqual(json.loads(state_path.read_text())["answer_only_resumes"], 1)
+                self.assertEqual(runtime._reserve_answer_only_resume("synthetic-receipt"), (2, 1))
+                after_second = json.loads(state_path.read_text())
+                self.assertEqual(after_second["guest_turns"], 1)
+                self.assertEqual(after_second["codex_requests"], 2)
+                self.assertEqual(after_second["answer_only_resumes"], 2)
 
     def test_two_provider_requests_per_turn_is_hard_stop(self):
         class Provider:
@@ -246,8 +258,13 @@ class RuntimeBoundsTests(unittest.TestCase):
 
     def test_browser_driver_does_not_submit_after_failure_and_snapshots_copy_counters(self):
         source = Path(__file__).with_name("resumed-live-browser.mjs").read_text(encoding="utf-8")
+        self.assertIn('process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1"', source)
+        self.assertIn('"remediation-2-live-run"', source)
         self.assertIn("keepBrowserOpen = true", source)
         self.assertIn("this driver will not submit another turn", source)
+        self.assertIn('result: "driver_exception_preserved_partial_evidence_browser_held_open"', source)
+        self.assertIn('path.join(OUTPUT, "driver-exception.png")', source)
+        self.assertIn('non_provider_external_network_calls: "unmeasured_by_browser_driver"', source)
         self.assertIn("beforeCopy = runtimeSnapshot", source)
         self.assertIn("afterCopy = runtimeSnapshot", source)
         self.assertIn("turn-screenshots", source)

@@ -2,7 +2,9 @@
 
 This module does not call a provider on import or application startup. The live
 server requires an explicit opt-in, an approved persistent run-state file, and
-the private runtime config at ``/private/tmp/staylead-sprint6-remediation-runtime.json``.
+the namespace-specific private runtime config selected by
+``STAYLEAD_S6_RUN_NAMESPACE`` (default ``remediation-1``; the isolated new
+batch uses ``remediation-2``).
 This namespace is distinct from the immutable original run; its fresh counters
 are 9 guest turns / 18 Codex requests.
 
@@ -41,12 +43,39 @@ from typing import Any
 
 BASE = Path(__file__).resolve().parent
 MATRIX_PATH = BASE.parent / "live-cases.json"
-RUN_STATE = Path("/private/tmp/staylead-sprint6-remediation-run-state.json")
-EVENTS = Path("/private/tmp/staylead-sprint6-remediation-runtime-events.jsonl")
-RUNTIME = Path("/private/tmp/staylead-sprint6-remediation-runtime.json")
-CAPTURE_DIR = Path("/private/tmp/staylead-sprint6-remediation-synthetic-output")
-RUN_ID = "s6-codex-20261026-remediation-1"
 MATRIX_ID = "staylead-s6-nine-turn-multilingual-20261026-v1"
+RUN_NAMESPACE = os.environ.get("STAYLEAD_S6_RUN_NAMESPACE", "remediation-1")
+
+
+def _namespace_configuration(namespace: str) -> dict[str, Any]:
+    if namespace == "remediation-1":
+        prefix = "staylead-sprint6-remediation"
+        run_id = "s6-codex-20261026-remediation-1"
+    elif namespace == "remediation-2":
+        prefix = "staylead-sprint6-remediation-2"
+        run_id = "s6-codex-20261026-remediation-2"
+    else:
+        raise ValueError("Sprint 6 run namespace must be remediation-1 or remediation-2.")
+    private_root = Path("/private/tmp")
+    return {
+        "run_id": run_id,
+        "run_state": private_root / f"{prefix}-run-state.json",
+        "events": private_root / f"{prefix}-runtime-events.jsonl",
+        "runtime": private_root / f"{prefix}-runtime.json",
+        "capture_dir": private_root / f"{prefix}-synthetic-output",
+    }
+
+
+try:
+    _NAMESPACE = _namespace_configuration(RUN_NAMESPACE)
+except ValueError as exc:
+    raise SystemExit(str(exc)) from exc
+
+RUN_ID = _NAMESPACE["run_id"]
+RUN_STATE = _NAMESPACE["run_state"]
+EVENTS = _NAMESPACE["events"]
+RUNTIME = _NAMESPACE["runtime"]
+CAPTURE_DIR = _NAMESPACE["capture_dir"]
 MAX_REQUESTS = 18
 MAX_GUEST_TURNS = 9
 MAX_CALLS_PER_TURN = 2
@@ -108,7 +137,6 @@ def _load_state() -> dict[str, Any]:
         or not isinstance(state.get("answer_only_receipt_hashes"), list)
         or len(state["answer_only_receipt_hashes"]) != state["answer_only_resumes"]
         or any(not isinstance(item, str) or not re.fullmatch(r"[a-f0-9]{64}", item) for item in state["answer_only_receipt_hashes"])
-        or len(set(state["answer_only_receipt_hashes"])) != len(state["answer_only_receipt_hashes"])
     ):
         raise SystemExit("Sprint 6 run state does not match the approved bounds; API was not started.")
     return state
@@ -148,8 +176,6 @@ def _reserve_answer_only_resume(receipt_id: Any) -> tuple[int, int]:
         state = _load_state()
         if state["guest_turns"] < 1:
             raise RuntimeError("An answer-only resume requires a prior semantic guest turn.")
-        if receipt_hash in state["answer_only_receipt_hashes"]:
-            raise RuntimeError("This answer-only receipt was already reserved; no retry was sent.")
         if state["answer_only_resumes"] >= MAX_ANSWER_ONLY_RESUMES:
             raise RuntimeError("Sprint 6 answer-only resume reservation limit reached.")
         state["answer_only_resumes"] += 1

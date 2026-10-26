@@ -13,6 +13,7 @@ import {
   hasUnresolvedRequest,
   isCurrentGeneration,
   releaseRequest,
+  resolveAnswerOnlyReceipt,
   retryModeForFailure,
   type RetryMode,
 } from "@/shared/chat/chat-state";
@@ -43,6 +44,7 @@ type ChatTurn = {
   appliedDelta?: Record<string, unknown>;
   resumeReceiptId?: string;
   partialSuccess?: boolean;
+  recovered?: boolean;
   briefSnapshot?: GuestBriefSnapshot;
   answerOnlyReceiptId?: string;
   sameIdOnly?: boolean;
@@ -170,25 +172,24 @@ export function GuestChat({
           : item));
         return;
       }
-      setTurns((current) => current.map((item) => {
-        if (item.id === turn.id) {
-          return { ...item, id, answer, receipt: answer.brief_receipt ?? item.receipt,
+      setTurns((current) => {
+        const completed = current.map((item) => item.id === turn.id
+          ? { ...item, id, answer, receipt: answer.brief_receipt ?? item.receipt,
             answerOnlyReceiptId,
             briefSnapshot: answer.guest_brief ?? item.briefSnapshot,
             appliedDelta: answer.applied_delta ?? item.appliedDelta,
             resumeReceiptId: undefined, partialSuccess: false,
+            recovered: false,
             sameIdOnly: false,
             stale: answer.brief_narrative_stale === true
               || (answer.brief_version_used !== undefined && answer.guest_brief !== undefined
                 && answer.brief_version_used !== answer.guest_brief.brief_version),
-            sending: false, error: undefined, retryMode: undefined };
-        }
-        if (answerOnlyReceiptId && item.resumeReceiptId === answerOnlyReceiptId) {
-          return { ...item, resumeReceiptId: undefined,
-            receipt: item.receipt ? { ...item.receipt, answer_status: "completed" } : item.receipt };
-        }
-        return item;
-      }));
+            sending: false, error: undefined, retryMode: undefined }
+          : item);
+        return answerOnlyReceiptId
+          ? resolveAnswerOnlyReceipt(completed, answerOnlyReceiptId, id)
+          : completed;
+      });
     } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       const partial = error instanceof ApiError ? error.partialResult : undefined;
@@ -355,6 +356,9 @@ export function GuestChat({
             <article className="turn" key={`${turn.id}-${turn.question}`}>
               <div className="message message-guest" lang={turn.languageTag ?? "en"} dir="auto"><p>{turn.question}</p></div>
               {turn.sending && <p className="status-note">{activeLabels.sending}</p>}
+              {turn.recovered && <p className="status-note" role="status">
+                This saved answer was completed by a later continuation.
+              </p>}
               {turn.error && (
                 <div className="message message-error" role="status">
                   <p>{turn.partialSuccess
