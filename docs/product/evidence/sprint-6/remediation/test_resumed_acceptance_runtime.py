@@ -22,7 +22,7 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
-    def test_seven_isolated_run_namespaces_are_available(self):
+    def test_eight_isolated_run_namespaces_are_available(self):
         first = runtime._namespace_configuration("remediation-1")
         second = runtime._namespace_configuration("remediation-2")
         third = runtime._namespace_configuration("remediation-3")
@@ -30,6 +30,7 @@ class RuntimeBoundsTests(unittest.TestCase):
         fifth = runtime._namespace_configuration("remediation-5")
         sixth = runtime._namespace_configuration("remediation-6")
         seventh = runtime._namespace_configuration("remediation-7")
+        eighth = runtime._namespace_configuration("remediation-8")
         self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
         self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
         self.assertEqual(third["run_id"], "s6-codex-20261026-remediation-3")
@@ -37,6 +38,7 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertEqual(fifth["run_id"], "s6-codex-20261026-remediation-5")
         self.assertEqual(sixth["run_id"], "s6-codex-20261026-remediation-6")
         self.assertEqual(seventh["run_id"], "s6-codex-20261026-remediation-7")
+        self.assertEqual(eighth["run_id"], "s6-codex-20261026-remediation-8")
         self.assertEqual(fifth["run_state"], Path("/private/tmp/staylead-sprint6-remediation-5-run-state.json"))
         self.assertEqual(fifth["events"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime-events.jsonl"))
         self.assertEqual(fifth["runtime"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime.json"))
@@ -49,16 +51,20 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertEqual(seventh["events"], Path("/private/tmp/staylead-sprint6-remediation-7-runtime-events.jsonl"))
         self.assertEqual(seventh["runtime"], Path("/private/tmp/staylead-sprint6-remediation-7-runtime.json"))
         self.assertEqual(seventh["capture_dir"], Path("/private/tmp/staylead-sprint6-remediation-7-synthetic-output"))
-        namespaces = (first, second, third, fourth, fifth, sixth, seventh)
+        self.assertEqual(eighth["run_state"], Path("/private/tmp/staylead-sprint6-remediation-8-run-state.json"))
+        self.assertEqual(eighth["events"], Path("/private/tmp/staylead-sprint6-remediation-8-runtime-events.jsonl"))
+        self.assertEqual(eighth["runtime"], Path("/private/tmp/staylead-sprint6-remediation-8-runtime.json"))
+        self.assertEqual(eighth["capture_dir"], Path("/private/tmp/staylead-sprint6-remediation-8-synthetic-output"))
+        namespaces = (first, second, third, fourth, fifth, sixth, seventh, eighth)
         for key in ("run_state", "events", "runtime", "capture_dir"):
             self.assertEqual(len({item[key] for item in namespaces}), len(namespaces), key)
         with self.assertRaises(ValueError):
             runtime._namespace_configuration("arbitrary-run")
 
-    def test_namespace_seven_initialization_uses_frozen_caps_and_refuses_overwrite(self):
+    def test_namespace_eight_initialization_uses_frozen_caps_and_refuses_overwrite(self):
         with tempfile.TemporaryDirectory() as directory:
-            state_path = Path(directory) / "ns5-state.json"
-            namespace = runtime._namespace_configuration("remediation-7")
+            state_path = Path(directory) / "ns8-state.json"
+            namespace = runtime._namespace_configuration("remediation-8")
             original_state, original_id = runtime.RUN_STATE, runtime.RUN_ID
             try:
                 runtime.RUN_STATE = state_path
@@ -366,6 +372,7 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertIn('"remediation-5"', source)
         self.assertIn('"remediation-6"', source)
         self.assertIn('"remediation-7"', source)
+        self.assertIn('"remediation-8"', source)
         self.assertIn('const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;', source)
         self.assertIn('const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : `staylead-sprint6-${RUN_NAMESPACE}`;', source)
         self.assertIn("keepBrowserOpen = true", source)

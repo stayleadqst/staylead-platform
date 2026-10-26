@@ -25,18 +25,20 @@ BASE_URL = "http://127.0.0.1:18086"
 
 
 def _namespace_settings(namespace: str) -> dict[str, Any]:
-    if namespace not in {"remediation-4", "remediation-6"}:
-        raise ValueError("Diagnostic namespace must be remediation-4 or remediation-6.")
-    prefix = "staylead-sprint6-remediation-4" if namespace == "remediation-4" else "staylead-sprint6-remediation-6"
+    if namespace not in {"remediation-4", "remediation-6", "remediation-7"}:
+        raise ValueError("Diagnostic namespace must be remediation-4, remediation-6, or remediation-7.")
+    prefix = "staylead-sprint6-remediation-4" if namespace == "remediation-4" else f"staylead-sprint6-{namespace}"
     number = namespace.rsplit("-", 1)[1]
+    anchor_turn = {"4": 6, "6": 2, "7": 8}[number]
+    first_turn = {"4": 7, "6": 3, "7": 9}[number]
     return {
         "namespace": namespace,
         "run_id": f"s6-codex-20261026-{namespace}",
         "state": Path(f"/private/tmp/{prefix}-run-state.json"),
         "events": Path(f"/private/tmp/{prefix}-runtime-events.jsonl"),
         "runtime": Path(f"/private/tmp/{prefix}-runtime.json"),
-        "anchor_turn": 6 if namespace == "remediation-4" else 2,
-        "first_turn": 7 if namespace == "remediation-4" else 3,
+        "anchor_turn": anchor_turn,
+        "first_turn": first_turn,
         "last_turn": 9,
         "output_prefix": "diagnostic-api-turn" if namespace == "remediation-4" else f"namespace{number}-diagnostic-api-turn",
     }
@@ -120,7 +122,12 @@ def _verify_prior_turn_count(actual: int, expected: int) -> None:
         raise ValueError("Resolved DB session guest-turn count does not match selected turn.")
 
 
-def _resolve_session(database_url: str, request_hash: str, expected_guest_turns: int) -> tuple[str, str]:
+def _resolve_session(
+    database_url: str,
+    request_hash: str,
+    expected_guest_turns: int,
+    database_snapshot: dict[str, Any] | None = None,
+) -> tuple[str, str]:
     from sqlalchemy import select
     from staylead_platform.infrastructure.database import create_database_engine
     from staylead_platform.infrastructure.persistence.store import hotels, requests, sessions
@@ -152,6 +159,13 @@ def _resolve_session(database_url: str, request_hash: str, expected_guest_turns:
             if scoped is None or scoped["synthetic"] is not True:
                 raise ValueError("Resolved DB session failed synthetic scope checks.")
             _verify_prior_turn_count(len(prior_requests), expected_guest_turns)
+            if database_snapshot is not None:
+                database_snapshot.update({
+                    "hotel_scope_verified": True,
+                    "synthetic_hotel_verified": True,
+                    "persisted_guest_request_count": len(prior_requests),
+                    "expected_prior_guest_turns": expected_guest_turns,
+                })
             return str(session_id), "HTL-CITY01"
     finally:
         engine.dispose()
@@ -283,10 +297,12 @@ def execute_turn(turn: int) -> dict[str, Any]:
     database_url, secret = config.get("database_url"), config.get("session_signing_secret")
     if not isinstance(database_url, str) or not isinstance(secret, str) or not secret:
         raise ValueError("Private runtime config incomplete.")
+    database_snapshot: dict[str, Any] = {}
     session_id, hotel_id = _resolve_session(
         database_url,
         _anchor_request_hash(settings["events"], settings["run_id"], settings["anchor_turn"]),
         expected_guest_turns=turn - 1,
+        database_snapshot=database_snapshot,
     )
     request_id = str(uuid.uuid4())
     result: dict[str, Any] = {
@@ -298,6 +314,7 @@ def execute_turn(turn: int) -> dict[str, Any]:
         "automatic_retry": False, "ui_or_clipboard_checked": False,
         "full_matrix_pass": False, "http_status": None, "response": None,
         "transport_error": None, "counter_state_after": None,
+        "database_preflight": database_snapshot,
     }
     # An exclusive marker prevents a second request if this process is rerun.
     _write_result(output, {**result, "status": "in_progress"}, exclusive=True)

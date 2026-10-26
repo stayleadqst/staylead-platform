@@ -106,6 +106,42 @@ def test_namespace_six_diagnostic_artifacts_are_isolated_from_namespace_four() -
     assert len(set(ns6 + [ns4])) == 8
 
 
+def test_namespace_seven_allows_only_turn_nine_using_turn_eight_as_anchor() -> None:
+    settings = DIAGNOSTIC._namespace_settings("remediation-7")
+    assert settings["anchor_turn"] == 8
+    assert settings["first_turn"] == 9
+    assert settings["last_turn"] == 9
+    state = valid_state(9)
+    state.update({"run_id": settings["run_id"], "codex_requests": 16})
+    DIAGNOSTIC._preflight_turn(9, state, "remediation-7")
+    with pytest.raises(ValueError):
+        DIAGNOSTIC._preflight_turn(8, state, "remediation-7")
+
+    ns4_path = DIAGNOSTIC._result_path("remediation-4", 9)
+    ns6_path = DIAGNOSTIC._result_path("remediation-6", 9)
+    ns7_path = DIAGNOSTIC._result_path("remediation-7", 9)
+    assert ns4_path.name == "diagnostic-api-turn-09.json"
+    assert ns6_path.name == "namespace6-diagnostic-api-turn-09.json"
+    assert ns7_path.name == "namespace7-diagnostic-api-turn-09.json"
+    assert len({ns4_path, ns6_path, ns7_path}) == 3
+
+
+def test_namespace_seven_anchor_selects_only_its_turn_eight_provider_request(tmp_path: Path) -> None:
+    events = [
+        {"run_id": "s6-codex-20261026-remediation-6", "guest_turn": 2,
+         "stage": "provider_call_started", "turn_request_id_sha256": "a" * 16},
+        {"run_id": "s6-codex-20261026-remediation-7", "guest_turn": 7,
+         "stage": "provider_call_started", "turn_request_id_sha256": "b" * 16},
+        {"run_id": "s6-codex-20261026-remediation-7", "guest_turn": 8,
+         "stage": "provider_call_started", "turn_request_id_sha256": "c" * 16},
+    ]
+    path = tmp_path / "ns7-events.jsonl"
+    path.write_text("\n".join(json.dumps(event) for event in events), encoding="utf-8")
+    assert DIAGNOSTIC._anchor_request_hash(
+        path, "s6-codex-20261026-remediation-7", 8,
+    ) == "c" * 16
+
+
 def test_result_creation_is_private_exclusive_and_never_overwrites(tmp_path: Path) -> None:
     path = tmp_path / "namespace6-diagnostic-api-turn-03.json"
     DIAGNOSTIC._write_result(path, {"status": "in_progress"}, exclusive=True)
