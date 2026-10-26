@@ -1,13 +1,13 @@
 {
-  "state": "reviewed_source_and_evidence_prepublication_checkpoint",
+  "state": "reviewed_native_preparation_source_and_text_evidence_prepublication",
   "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
-  "previous_published_head": "fca86724c4446d82974d939fb17792dda2177a13",
+  "previous_published_head": "f697edb23af5f6d5aeffdbd79d0240ce790e9f5d",
   "prepared_source": {
-    "sha": "e461efd19ba035ee6d628537254fa0e5d32d3f27",
-    "tree": "8a65022be8c64ad791c216bada7d3c024948f7d5"
+    "sha": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+    "tree": "77da592271da3e3cb01ab32bde72468a20b2b461"
   },
-  "reviewed_product_local": "95fcf277aef172924a85c220673352156fdc00bf",
+  "reviewed_product_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
   "mappings": [
     {
       "local": "b3f06bf",
@@ -120,6 +120,16 @@
       "local_sha": "95fcf27",
       "remote_sha": "e461efd19ba035ee6d628537254fa0e5d32d3f27",
       "tree": "8a65022be8c64ad791c216bada7d3c024948f7d5"
+    },
+    {
+      "local_sha": "af4b42f",
+      "remote_sha": "84f0c744d3d9d694098ceb6debad593c691449bd",
+      "tree": "4d9ba6ba456305e0e3c4a15a8137cf107bb24e1e"
+    },
+    {
+      "local_sha": "b666454",
+      "remote_sha": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+      "tree": "77da592271da3e3cb01ab32bde72468a20b2b461"
     }
   ],
   "budget": {
@@ -131,5 +141,11 @@
     "namespace8_approved": false
   },
   "screenshots": "27local only; no image bytes in publication tree/history",
-  "note": "Prepublication snapshot; final text commit/equal-tree receipt recorded outside Git. Not merged/deployed."
+  "note": "Prepublication snapshot; final text commit/equal-tree receipt recorded outside Git. Not merged/deployed.",
+  "cumulative_actual_requests": 97,
+  "NS9_used": 1,
+  "NS9_unused_reserved": 17,
+  "allowance_transferred": false,
+  "screenshots_local_only": 32,
+  "full_matrix_pass": false
 }

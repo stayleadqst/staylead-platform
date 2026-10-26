@@ -1,3 +1,7 @@
+# Latest execution — reviewed b666454; NS9 paused
+
+Current source b666454 is locally verified and reviewed; no remaining scoped code finding. Builder95focused contracts/4S6PG/API, coordinator4final schema tests, independent strict-schema/Ajv/mocktransport checks PASS. Full9actual acceptance remains unproven. NS8closed18/18, NS9paused1/18, cumulative97,17unusedreserved/nottransferred; no livecallsafterNS9blocker. Increment1+transfer17 requested, pending. Screenshots32localonly. See SPRINT_6_ACCEPTANCE.md and native-preparation-{candidate-manifest,local-gates,review}.json. Earlier snapshots below are historical.
+
 ## Current candidate95fcf27 — ready, live allowance pending
 
 A pendingdate/URLqualification fix reviewed byQ, no codefinding. A81contracts/4PG;C77grounded+7scope+37harness+7routing;Q2prompt/2mapping;Ruff/compile/diffPASS. Newmax18batch explicitlyrequested, noapprovalyet/noNS8privatefiles/calls. NS7closed18,cumulative78. See current report; historical records below are superseded onstatus.

@@ -1,0 +1,80 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-8",
+  "run_namespace": "remediation-8",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 8,
+  "request_id_sha256": "fd1e94da28a35414",
+  "question_sha256": "b535a7207d86091ba7f9c39cdaaf810b5fb77e8d2f31d505789daa3bf202c4d2",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "체크인 날짜는 2026-12-10입니다.\n체크아웃 날짜는 2026-12-15입니다.\n숙박은 5박입니다.\n성인 2명입니다.\n어린이는 1명입니다.\n어린이의 나이는 7세입니다.\n숙소 정보에 체크아웃 날짜가 없습니다.",
+    "answer_eligibility": "current",
+    "unknowns": [
+      "숙소 정보에 체크아웃 날짜가 없습니다."
+    ],
+    "evidence": [],
+    "language_preference": {
+      "language_tag": "ko",
+      "source": "explicit",
+      "revision": 8
+    },
+    "presentation": {
+      "language_tag": "ko",
+      "direction": "ltr",
+      "preference_revision": 8,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "brief_receipt": {
+      "status": "applied",
+      "brief_version_before": 5,
+      "brief_version_after": 6,
+      "answer_status": "completed",
+      "brief_version_used": 6
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 6,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-15",
+        "nights": 5
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "4cdb919c4b3c5006"
+          }
+        ]
+      },
+      "pending_fields": [
+        "party.children.member"
+      ]
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-8",
+    "codex_requests": 16,
+    "guest_turns": 8,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "database_preflight": {
+    "hotel_scope_verified": true,
+    "synthetic_hotel_verified": true,
+    "persisted_guest_request_count": 7,
+    "expected_prior_guest_turns": 7
+  },
+  "status": "completed"
+}

@@ -16,6 +16,10 @@ After namespace5 used4requests and exposed repeated label-only output, Hieu expl
 
 After namespace6 exhausted18/18 requests (cumulative60), Hieu explicitly approved **one new namespace7 batch of at most18 Codex requests** on reviewed product536b90d. Preserve all prior counters/evidence, same model/time/output/max2calls, no automatic retries, and local-only screenshots. This does not authorize another implicit batch.
 
+After namespace7 exhausted18/18requests (cumulative78), Hieu explicitly approved **one new namespace8 batch of at most18 Codex requests** on reviewed95fcf27. Keep all earlier counters/evidence and unchanged model/time/output/max2calls/noautomaticretry limits. Screenshotlocal; no further implicit batch.
+
+After namespace8 exhausted18/18 requests (cumulative96), Hieu explicitly approved **one new namespace9 batch of at most18 Codex requests** on reviewed af4b42f. Preserve earlier counters/evidence and the same model/time/output/max2calls/noautomaticretry limits. All screenshots remain local. Following the cost/convergence discussion, the coordinator stops inference at a blocking failure and investigates offline first; unused allowance is not a requirement to spend. No further implicit batch.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.

@@ -1,0 +1,29 @@
+{
+  "provider_requests": 18,
+  "semantic_turns": 9,
+  "cumulative_provider_requests": 96,
+  "automatic_retries": 0,
+  "explicit_resumes": 0,
+  "product_unchanged": true,
+  "product_fingerprint": "bb25884839fd596de63c27df3a8e99df2ed4f545357d8c8b91a2b127f2f3b0b9",
+  "UI_turns": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "API_diagnostic_turns": [
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "full_matrix_pass": false,
+  "observed_failures": [
+    "T2synthetic_notice labelmeaningdrift",
+    "T4spuriouspendingmembermutation",
+    "T6ArabiccommaURLfalserejection/qualification",
+    "T8falseunrelatedunknown/inheritedpendingmember"
+  ]
+}

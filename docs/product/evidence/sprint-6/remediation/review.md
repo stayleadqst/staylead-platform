@@ -1,3 +1,7 @@
+# Latest independent review — native preparation READY
+
+Current source b666454 is locally verified and reviewed; no remaining scoped code finding. Builder95focused contracts/4S6PG/API, coordinator4final schema tests, independent strict-schema/Ajv/mocktransport checks PASS. Full9actual acceptance remains unproven. NS8closed18/18, NS9paused1/18, cumulative97,17unusedreserved/nottransferred; no livecallsafterNS9blocker. Increment1+transfer17 requested, pending. Screenshots32localonly. See SPRINT_6_ACCEPTANCE.md and native-preparation-{candidate-manifest,local-gates,review}.json. Earlier snapshots below are historical.
+
 # Independent remediation review
 
 Reviewer: fresh `/root/remediation_review`, `gpt-6.1-sol/high`, read-only assignment. No provider calls, server starts or product edits by reviewer. C records the returned findings and verdicts here; no separate enforced read-only sandbox was available.

@@ -1,69 +1,62 @@
 # Sprint 6 — acceptance and execution report
 
-**Chưa Done.** #91/#92/#93/#74 **Blocked** vì shared actual semantic/UI DoD; #95 remediation và #94 coordination **In Progress**. Không ghép các lượt đạt từ candidate/batch khác nhau thành một matrix PASS.
+**Chưa Done.** #91/#92/#93/#74 **Blocked** vì shared actual semantic/UI DoD; #95 remediation và #94 coordination **In Progress**. Reviewed source `b666454970829c56ae52d3cfe184b7414c4d8cd4` đã chốt; full nine-turn actual acceptance trên bản này chưa chạy. Không ghép các lượt đạt từ candidate/batch khác nhau thành matrix PASS.
 
 | Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
-| Language / grounding / answer contracts | A — gpt-6-luna/high | Context-bound output536b90d implemented/reviewed; pending-date/source-qualification fix95fcf27 implemented/reviewed | C102contracts/architecture+4PG/API; finaldelta76grounded;Ruff/compile/diffPASS | Actual confirmation on95fcf27;81contracts+4PG/API,37harness+7routingPASS |
-| Consumer / bounded harness | B — gpt-6-luna/high | Recovery implemented; drivera059046 reviewed; NS8 paths prepared offline | 35runtime/helper+7routingPASS; latesthelper20/runtime17; reused36web/15state/build/recovery | No NS8 initialize/inference without new allowance |
-| Independent review | Q — gpt-6.1-sol/high | NS6/NS7 semantic evidence reviewed; 95fcf27 reviewed; no code finding | Captured-output/guard/Ajv probes, state/copy/source review, readonlyPGT8 | No code finding on536; actualNS7T6/T8 constraints remain failed |
-| Integration / delivery | C — root runtime ID/effort unreported | NS7closed18/18; cumulative78; reviewed source95fcf27; publication checkpointfca8672 | Fixed product fingerprint; PG/production browser T1–8 and API diagnosticT9 | Publish code/text; new max18batch requested, pending approval |
+| Language / grounding / preparation | A — gpt-6-luna/high | b666454 implemented, locally verified, independently reviewed | 95 focused contracts; affected S6 PG/API4; Ruff/compile/diff PASS | Actual model/UI confirmation after allowance decision |
+| Consumer / bounded harness | B — gpt-6-luna/high | Namespace10 mapping prepared only; production web unchanged | Runtime17; prior39 harness/7routing; 32 screenshot hashes verified ignored/untracked | No NS10 initialization or calls without explicit allowance transfer |
+| Independent review | Q — gpt-6.1-sol/high | Native-preparation READY, no remaining scoped finding | Strict-schema/Ajv positives and negatives; captured NS9 replay; mocked Codex/Foundry transport | Full actual9case semantics still unproven |
+| Integration / delivery | C — root runtime ID/effort unavailable | Source pinned b666454; NS9 paused after1request | Final schema4tests/diff PASS; prior af4 gates retained | Publish code/text; incremental1+transfer17 requested, pending |
+
+## Story status / AC map
+
+| Story | Status | Established evidence | Missing before Done |
+|---|---|---|---|
+| #91 L1-AC1–5 language state | Blocked | Preference scope/CAS/restart/replay/late-response and same-child continuity; separate revision | Complete fixed-candidate mutation/answer/UI sequence |
+| #92 L2-AC1–4 grounding | Blocked | Source/numeric/URL/injection/revocation/conflict negatives; lexical baseline/per-case observations | Complete actual semantic verdict on current source |
+| #93 L3-AC1–4 presentation | Blocked | Production build/layout/RTL/CJK/Devanagari/races/fallback evidence | Full nine-turn actual UI/copy matrix |
+| #74 B12a-AC1–4 current copy | Blocked | Current/stale/late-state and clipboard success/failure/selection fallback | Full current-candidate actual UI/copy matrix |
+| #95 R1-AC1–5 remediation | In Progress | Concrete captured failures/offline reproducer, bounded correction, scoped review, PG recovery checks | Actual semantics and final delivery gates |
+| #94 C-AC1–3 coordination | In Progress | Owners/leases/handoffs, versions/counters/failures preserved | Final AC verdict and delivery |
+
+No story is newly Done. Existing #95 is P0/E2 in Sprint6, linked to #91/#92/#93/#74/#94 and contains problem, impact, attempts, evidence and AC. Current wire/semantic failures remain within that remediation scope; **no duplicate new story created**. Keep parents/epics/milestone open.
 
 ## Actual results and accounting
 
 | Batch | Actual requests | Evidence / outcome |
 |---|---:|---|
-| Original +NS1+NS2+NS3 | 2+4+6+8=20 | Historical failures/counters retained; no reset |
-| NS4 |18| UI1–6/API7–9, product changed during diagnosis; not fixed-matrixPASS |
-| NS5 |4| T1PASS,T2label-only output rejected; remaining14 transferred once after explicit increment4 |
-| NS6 |18| All9state targetsPASS,7answerPASS/2FAIL; UI1–2/API3–9 only |
-| NS7 |18| Fixedproduct536b90d/harnessa059046; T6qualificationFAIL,T8state+answerFAIL; T9APIonly |
-| **Total** |**78**| Every allowance closed/transferred explicitly; no automatic retry |
+| Original +NS1+NS2+NS3 | 2+4+6+8=20 | Historical failures/counters retained |
+| NS4 |18| UI1–6/API7–9; candidate changed during diagnosis, not fixed-matrix PASS |
+| NS5 |4| T1PASS; T2 label-only rejected; remaining14 transferred once with approved increment4 |
+| NS6 |18| All9state targetsPASS,7answersPASS/2FAIL; UI1–2/API3–9 |
+| NS7 |18| T6 qualification gap, T8 date state/answer failure; T9 API only |
+| NS8 |18| T2 label drift; T4 spurious member pending; T6 URL punctuation rejection; T8 unrelated unknown; UI1–4/API5–9 |
+| NS9 |1| T1 structurally invalid authorization.op; stopped immediately; T2–9 NOT_EXECUTED |
+| **Total** |**97**| No counter reset; no automatic retries; prior explicit receipt resumes retained |
 
-NS6 approved increment4+transfer14; NS7 separately approved new18. NS7 is now exhausted and `authorized_for_live_calls:false`; there is no remaining allowance. Existing requests remain immutable. Same `gpt-6-luna/low`,CodexCLI0.153.4,max2calls/HTTPturn,25s/provider,45s/turn,700-token postcheck. Served-model identity,native pre-generation hard cap,total tokens/billing remain unknown. Default tests/build/startup stay offline; no Grok or judge/translation calls.
+NS9 is paused with `authorized_for_live_calls:false`; **17 unused requests are reserved and have not been transferred**. A smallest increment1+transfer17 into a new maximum18 batch is requested and awaiting explicit approval. No namespace10 private config/state/init/call yet. Stop at the first blocking live failure and investigate offline; unused allowance is not a requirement to spend.
 
-## Namespace7 — fixed-product observed results
+Same requested `gpt-6-luna/low`, CodexCLI0.153.4, max2calls/HTTP turn,25s/provider,45s/turn,700-token postcheck. Served-model identity, native pre-generation hard cap, full tokens/billing and agent token/cache usage remain unavailable. No Grok or extra judge/translation calls. Default tests/build/startup remain offline.
 
-[Manifest](evidence/sprint-6/remediation/namespace7-candidate-manifest.json), [independent semantic review](evidence/sprint-6/remediation/namespace7-semantic-review.json), [UI observations](evidence/sprint-6/remediation/remediation-7-live-run/observations.jsonl), [closed counters](evidence/sprint-6/remediation/namespace7-run-state-closed.json), [runtime events](evidence/sprint-6/remediation/namespace7-runtime-events.jsonl). Product SHA256 `27e0806342f3cfda2cc5e1862f971bcb0a543b891e7280a4eb93ab9acaa06589` stayed unchanged during all18calls.
+## Latest actual evidence
 
-| Turn | Expected / observed | Verdict |
-|---|---|---|
-|1VI|ISO10→13Dec2026,nights3,adults2; breakfastBếnGió/floor1/06:30–09:30+sourceTZ040;current/exactcopy|PASS|
-|2EN|Onechildageunknown/pending, same dates/adults; targeted age question;brief2/rev2,current/exactcopy|PASS|
-|3FR|Samechildage7,checkout14/nights4;brief3/rev3,current/exactcopy|PASS|
-|4JA|Contextualbreakfast040/location/floor/time/TZ;briefunchanged,current/exactcopy|PASS|
-|5ZH|Freeguest-areaWiFi/deskcredentials021;briefunchanged,current/exactcopy|PASS|
-|6AR|40spaces/100000VNDpervehicle/night/noadvancebooking046;exactURLowncitation;RTL/current/exactcopy. URL label contextualizes it without required synthetic/nonfunctional sample qualification|Narrow answer constraintFAIL; state/corefacts/copyPASS|
-|7HI|Asks12or13December2026;keepscheckout14,child7,pendingcheckout;brief4/rev7,current/exactcopy|PASS|
-|8KO|Expectedcheckout15/nights5/pendingclear. Preparation incorrectly emitsclarify against oldpending14; final15claim citescheckin,guard correctlyrejectsHTTP502. KOrev8persists,brief4/checkout14/pendingremain|State+answerFAIL|
-|9short/mixed|API200Koreancourtesy,KOrev8unchanged; preserves actualbrief4/checkout14/pending. Does not repair inheritedT8failure;noUIcopy|Courtesy/observedstatepreservationPASS; globalexpectedbrief5unmet|
+NS8: [manifest](evidence/sprint-6/remediation/namespace8-candidate-manifest.json), [independent review](evidence/sprint-6/remediation/namespace8-semantic-review.json), [comparison](evidence/sprint-6/remediation/namespace8-case-comparison.json), [closed counters](evidence/sprint-6/remediation/namespace8-run-state-closed.json), [summary](evidence/sprint-6/remediation/namespace8-final-summary.json). Nine turns/18requests; no resumes/retries. Product unchanged. T1–3 core answer/state/copy PASS, but T2 label meaning drift. T4 FAQ answer/copy PASS but an unrequested clarify operation added pending member. T5 API core FAQ PASS with inherited wrong state. T6 API502 after an Arabic comma immediately following the exact trusted URL; raw answer qualification also deficient. T7 legitimate date clarification inherited member pending. T8 correctly resolved checkout15/nights5 but inherited wrong member pending and emitted unrelated hotel unknown. T9 preserved actual state, not the global target. Final readonly PG proof is embedded in independent review. No full matrix PASS.
 
-[Read-only PG T8 proof](evidence/sprint-6/remediation/namespace7-turn8-db-observation.json), [T9 diagnostic](evidence/sprint-6/remediation/namespace7-diagnostic-api-turn-09.json), [per-case baseline comparison](evidence/sprint-6/remediation/namespace7-case-comparison.json). No answer-only retry was used; it would not repair the unapplied date mutation. Browser/API/web stopped; sharedPG retained. Maxprovider12.970s/maxHTTP18.421s/maxreportedoutput409tokens. Browser external origin count0 covers browser context only, not server/provider network.
+NS9: [manifest](evidence/sprint-6/remediation/namespace9-candidate-manifest.json), [independent review](evidence/sprint-6/remediation/namespace9-semantic-review.json), [stop decision](evidence/sprint-6/remediation/namespace9-stop-decision.json), [paused counters](evidence/sprint-6/remediation/namespace9-run-state-paused.json). On af4b42f, T1 proposed correct dates/adults/intents/quotes but both authorization.op fields were operation objects rather than enum strings. Parser rejected before M2/preference/receipt; readonly PG found no committed brief/preference/receipt. Changing only those types offline passes parsing and authorization. This diagnostic control is not an accepted live answer. T2–9 were not executed. One request, no retry/resume, no calls after blocker; max provider5.940s/HTTP6.055s/reported output205tokens.
 
-## Corrections and retained evidence
+Historical NS6/7 evidence remains immutable: [NS6 review](evidence/sprint-6/remediation/namespace6-semantic-review.json), [NS7 review](evidence/sprint-6/remediation/namespace7-semantic-review.json), [NS7 comparison](evidence/sprint-6/remediation/namespace7-case-comparison.json).
 
-- Native output schema on e9424bc stopped label-only/empty content; NS6 proved actual adapter completion, but structure alone does not ensure semantic correctness.
-- Context-bound536b90d restricts claim/declaration refs to authoritative nonnull/nonpending fields; runtime rejects nonnullpending refs too. Pendingage requires questionchannel; current pendingcheckout slashpair requires nonnull typedclarification in everybranch. Existing exactoptions/order/numeric/source/URLguards remain. Qclosed all concrete code findings beforeNS7.
-- NS6T2 null-age cite/omitted agequestion and T7translatedoptions rejected correctly. Nonnullpendingref acceptance was a separate offline-found gap, not the observed T7 rejection cause. [NS6review](evidence/sprint-6/remediation/namespace6-semantic-review.json), [case comparison](evidence/sprint-6/remediation/namespace6-case-comparison.json), [finalDB](evidence/sprint-6/remediation/namespace6-final-db-observation.json), [local gates](evidence/sprint-6/remediation/context-bound-output-local-gates.json).
-- Driver reports `driver_checks_passed` separately; `matrix_pass` remains pending semanticreview/false on knownfailure. Explicit `next` requires unique same-turn persisted receipt fingerprint; genericT8error had no receipt so driver stopped. API diagnostic is labeled separately.
+## Implemented corrections / current gates
 
-## Latest reviewed correction —95fcf27
+Reviewed af4b42f introduced current-turn per-operation authorization, same-call intents, source-bound response channels, required pending questions, canonical English labels/source-label context, persisted scope in existing receipt JSON and Unicode terminal URL punctuation handling. Raw quotes are not persisted; no DB migration or new model call. Same-model intent/quotes are not formal semantic proof. See [af4 gates](evidence/sprint-6/remediation/current-turn-local-gates.json); its cumulative96 field is a historical pre-NS9 snapshot.
 
-[Candidate manifest](evidence/sprint-6/remediation/pending-resolution-candidate-manifest.json), [gates](evidence/sprint-6/remediation/pending-resolution-local-gates.json). Preparation now treats a stored pending date endpoint as unresolved: explicit unambiguous current-turn date replaces it via set_dates rather than conflicting with the placeholder. Other pending field operations stay unchanged. Final answer preserves cited source synthetic/nonfunctional URL qualification in requested language. No final guard relaxation, fixture hardcode or extra model call. A81contracts+4PG/API; C77grounded+7finalscope+37harness+7routing;Q2changedprompt+2mappingtests,Ruff/compile/diffPASS. Maximum final instructions2970with64chartag. Actual semantics pending new explicitly approved batch; no codefinding remains.
+Reviewed b666454 adds Hospitality-owned strict native preparation schemas to both low/high preparation paths using existing provider-neutral schema/envelope ports. Authorization.op can only be an operation-name string. Low empty fact selection/no-op stays valid; high preparation rejects empty/committed-only acknowledgement or clarification channels, matching its consumer. Foundry keeps the flat prompt/parser contract. Final answer/source/state guards remain strict; no extra model call or automatic retry.
 
-## AC map / remaining work
-
-| AC group | Established evidence | Missing before Done |
-|---|---|---|
-|L1-AC1–5|Preference scope/CAS/restart/replay/late-response regressions; actual language revisions and samechild continuity|Fixed-candidate complete mutation/answer/UI sequence afterT8fix|
-|L2-AC1–4|Source/numeric/URL/injection/revocation/conflict negatives; lexical baseline and per-case semantic/latency/call comparison|URLqualification and final complete semanticverdict|
-|L3-AC1–4 / B12a-AC1–4|Productionbuild/layout/RTL/CJK/Devanagari/races/clipboardfailure+fallback;actualT1–7exactcopy|Full actual9turnUI/copy matrix|
-|R1-AC1–5 / C-AC1–3|Capturedfailures, diagnostics/privacy, boundedfix/review, owners/counters/versionedmanifest|Finalreview,completeACmapanddelivery|
-
-Existing #95 already has problem,impact,attempts,evidence,AC,epicE2,priorityP0 and affectedlinks #91/#92/#93/#74/#94. Current defects remain in this remediation story; **no duplicate new story added**. Engineering fixes continue in currentSprint under standardized Sprint-Execution. Do not close originalparents/epic/milestone.
+[Current manifest](evidence/sprint-6/remediation/native-preparation-candidate-manifest.json):220 files, SHA256 `c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a`. [Current gates](evidence/sprint-6/remediation/native-preparation-local-gates.json), [independent scoped review](evidence/sprint-6/remediation/native-preparation-review.json). Builder95focused contracts and4affected PG/API PASS; coordinator4final schema tests PASS. Prior native-preparation112contracts/architecture,39harness/7routing; mapping17runtime; Ruff/compile/diff PASS. Counts overlap and must not be summed. Mocked transport proves schema forwarding/envelope cleanup/Foundry compatibility, not actual model compliance. Prior unchanged web36contracts/15state/productionbuild/layout/copy recovery evidence reused.
 
 ## Delivery / privacy
 
-Publication checkpoint before branch update: previous head `fca86724c4446d82974d939fb17792dda2177a13`. Latest reviewed source local95fcf27 maps to GitHub source object `e461efd19ba035ee6d628537254fa0e5d32d3f27`; text evidence commit follows. Final branch-head/equal-tree receipt is recorded outside Git and in PR96. PR96draft stays on `sprint-5-canonical-brief`, unmerged; not deployed. No manualCI/rerun or waitinggate; automatic workflows may run on branchupdate, noCIPASSclaimed.
+Reviewed local source b666454 maps to prepared GitHub source object `eb8be575489bab9b4aa23e1b9e00726b91311d4e`, equal tree `77da592271da3e3cb01ab32bde72468a20b2b461`. At this report's prepublication checkpoint, branch head is f697edb; final publication/fetch receipt is recorded outside Git and in PR96. PR96 stays draft on `sprint-5-canonical-brief`, unmerged/not deployed. No manual CI/rerun or waiting gate; automatic workflows may run on branch update, no CI PASS claimed.
 
-Hieu explicitly chose local-only screenshots after automatic review rejected public image upload. [Local screenshot hash index](evidence/sprint-6/remediation/local-screenshot-index.json) contains text only;27screenshots remainlocal. No raw provider captures,privateconfigs,tokens,secrets or imagebytes may enter publictree/history. No deploy/newpaidresources/oldrepochanges/baselineormainmerge.
+All **32 screenshots remain local**, ignored/untracked, per Hieu's explicit instruction. [Hash index](evidence/sprint-6/remediation/local-screenshot-index.json) is text only. No private captures/configs/secrets/image bytes or local backup refs may be published. No deploy/newpaidresources/old-repo changes/baseline or main merge/parent closure.

@@ -1,5 +1,5 @@
 {
-  "publication_policy": "User explicitly requested local-only screenshots; text hash index may be published. No image bytes in public Git tree/history.",
+  "publication_policy": "User explicitly requested local-only current acceptance screenshots; only this text hash index is published. No new screenshot bytes are in the publication delta/history.",
   "screenshots": [
     {
       "path": "remediation-2-live-run/resume-01.png",
@@ -125,6 +125,32 @@
       "path": "remediation-7-live-run/turn-screenshots/turn-08.png",
       "sha256": "d27b417dc58dbc14b25b232351601cb95d3a7abb65137a1001795d1bc37ec1ce",
       "bytes": 289832
+    },
+    {
+      "path": "remediation-8-live-run/turn-screenshots/turn-01.png",
+      "sha256": "1b9f0e1bafb575187e815287bc770c785c46a98be671426f88f41da99297c585",
+      "bytes": 252270
+    },
+    {
+      "path": "remediation-8-live-run/turn-screenshots/turn-02.png",
+      "sha256": "df894354604830ef8de11e0679d2e7366ac91c0da4b289f86edcc64d2044a8c0",
+      "bytes": 272924
+    },
+    {
+      "path": "remediation-8-live-run/turn-screenshots/turn-03.png",
+      "sha256": "22be3f3f47db19477fd064ce9a6bad4ab0c42c013deabf33cf130678ea1430ef",
+      "bytes": 264960
+    },
+    {
+      "path": "remediation-8-live-run/turn-screenshots/turn-04.png",
+      "sha256": "5cc05913c56bfd6620ccc7501d5b4df98443076de614b5d6e84b920acc7fe4fb",
+      "bytes": 279341
+    },
+    {
+      "path": "remediation-9-live-run/turn-screenshots/turn-01.png",
+      "sha256": "7d17913fba76c5646d8d51663539c6f9981ffe238e2db6eb3a24b20d7a379477",
+      "bytes": 237836,
+      "description": "Namespace 9 turn 1 screenshot: fail-closed preparation-payload rejection; no answer, receipt, or copy control was delivered."
     },
     {
       "path": "resumed-live-run/resume-01.png",
