@@ -9,10 +9,15 @@ import {
   validateLabelBundle,
 } from "../src/shared/chat/presentation.ts";
 
-test("normalizes open language tags and selects RTL for Arabic", () => {
+test("normalizes open language tags and follows explicit script direction before language defaults", () => {
   assert.equal(normalizeLanguageTag(" zh-hant "), "zh-Hant");
   assert.equal(normalizeLanguageTag("x-invalid-tag"), undefined);
   assert.equal(directionForLanguageTag("ar-EG"), "rtl");
+  assert.equal(directionForLanguageTag("az-Arab"), "rtl");
+  assert.equal(directionForLanguageTag("az-Hebr"), "rtl");
+  assert.equal(directionForLanguageTag("en-Hebr"), "rtl");
+  assert.equal(directionForLanguageTag("az-Latn"), "ltr");
+  assert.equal(directionForLanguageTag("ar-Latn"), "ltr");
   assert.equal(directionForLanguageTag("hi-IN"), "ltr");
 });
 

@@ -44,8 +44,12 @@ export function normalizeLanguageTag(value: unknown): string | undefined {
 export function directionForLanguageTag(value: unknown): "ltr" | "rtl" {
   const tag = normalizeLanguageTag(value);
   if (!tag) return "ltr";
-  const language = tag.split("-")[0].toLowerCase();
-  return ["ar", "he", "fa", "ur", "ps", "sd", "ug", "yi"].includes(language) ? "rtl" : "ltr";
+  const parts = tag.split("-");
+  const explicitScript = parts.slice(1).find((part) => /^[A-Z][a-z]{3}$/u.test(part));
+  if (explicitScript) {
+    return ["Arab", "Hebr", "Thaa", "Nkoo", "Adlm", "Rohg", "Syrc"].includes(explicitScript) ? "rtl" : "ltr";
+  }
+  return ["ar", "he", "fa", "ur", "ps", "yi", "sd", "ug"].includes(parts[0].toLowerCase()) ? "rtl" : "ltr";
 }
 
 function isPlainLabel(value: unknown): value is string {

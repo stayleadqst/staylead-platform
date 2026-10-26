@@ -26,7 +26,11 @@ def normalize_language_tag(value: object) -> str | None:
 
 def language_direction(language_tag: str) -> Literal["ltr", "rtl"]:
     rtl = {"Arab", "Hebr", "Thaa", "Nkoo", "Adlm", "Rohg", "Syrc"}
-    return "rtl" if any(part in rtl for part in language_tag.split("-")[1:]) or language_tag.split("-")[0] in {"ar", "he", "fa", "ur", "ps", "yi", "sd", "ug"} else "ltr"
+    parts = language_tag.split("-")
+    explicit_script = next((part for part in parts[1:] if len(part) == 4 and part.isalpha()), None)
+    if explicit_script is not None:
+        return "rtl" if explicit_script.title() in rtl else "ltr"
+    return "rtl" if parts[0] in {"ar", "he", "fa", "ur", "ps", "yi", "sd", "ug"} else "ltr"
 
 
 @dataclass(frozen=True)

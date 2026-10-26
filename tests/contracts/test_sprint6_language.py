@@ -1,9 +1,12 @@
+import pytest
 from staylead_platform.platform.contracts.language import (
     language_direction,
     normalize_language_tag,
 )
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
+    ConversationFailure,
     _numeric_forms,
+    _validate_supported_literals,
 )
 from staylead_platform.platform.conversation.responses.presentation_labels import (
     ENGLISH_LABELS,
@@ -19,12 +22,29 @@ def test_open_language_tags_are_normalized_and_direction_is_script_aware() -> No
     assert normalize_language_tag("not a language") is None
     assert language_direction("ar") == "rtl"
     assert language_direction("zh-Hant") == "ltr"
+    assert language_direction("az-Arab") == "rtl"
+    assert language_direction("en-Hebr") == "rtl"
+    assert language_direction("ar-Latn") == "ltr"
 
 
 def test_unicode_decimal_digits_match_without_punctuation_collisions() -> None:
     assert _numeric_forms("15.50") == _numeric_forms("١٥.٥٠")
     assert _numeric_forms("15.50") != _numeric_forms("1550")
     assert _numeric_forms("1,250") != _numeric_forms("1250")
+
+
+def test_guard_preserves_ordered_date_time_literals_and_accepts_range_endpoints() -> None:
+    breakfast = [{"value": "Breakfast from 06:30-09:30."}]
+    _validate_supported_literals("Breakfast runs from 06:30 until 09:30.", breakfast)
+    _validate_supported_literals("يبدأ الإفطار من ٠٦:٣٠ حتى ٠٩:٣٠.", breakfast)
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        _validate_supported_literals("Breakfast starts at 30:06.", [{"value": "Breakfast starts at 06:30."}])
+
+    date = [{"value": "Check-in date: 2026-12-10."}]
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        _validate_supported_literals("Check-in date: 2026-10-12.", date)
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        _validate_supported_literals("The amount is 15.51.", [{"value": "The amount is 15.50."}])
 
 
 def test_label_bundle_cache_is_atomic_and_invalid_values_fall_back() -> None:

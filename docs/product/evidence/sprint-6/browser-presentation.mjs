@@ -10,6 +10,11 @@ const CASES = [
   { tag: "hi-IN", direction: "ltr", answer: "स्वागत है, आरव! कमरा १२३; नाश्ता 08:30 बजे। https://example.test/stay", copy: "कॉपी" },
   { tag: "fr-FR", direction: "ltr", answer: "Bonjour 李明 — room 123, petit-déjeuner à 08:30. https://example.test/stay", copy: "Copier" },
 ];
+const EXPLICIT_SCRIPT_CASE = {
+  tag: "az-Arab", direction: "rtl",
+  answer: "خوش آمدید، نرگس! اتاق ۱۲۳؛ صبحانه ساعت 08:30. https://example.test/stay",
+  copy: "نسخ",
+};
 
 function session(tag = "zh-Hant", sessionId = "123e4567-e89b-42d3-a456-426614174000") {
   return {
@@ -23,7 +28,7 @@ function session(tag = "zh-Hant", sessionId = "123e4567-e89b-42d3-a456-426614174
   };
 }
 
-async function routeApi(page, { eligibility = "current", languageCase = CASES[1], delaySecondMessage = false } = {}) {
+async function routeApi(page, { eligibility = "current", languageCase = CASES[1], delaySecondMessage = false, includeBrief = false } = {}) {
   let messages = 0;
   let releaseDelayed;
   const messageWaiters = [];
@@ -65,6 +70,9 @@ async function routeApi(page, { eligibility = "current", languageCase = CASES[1]
         },
         answer_eligibility: eligibility,
         evidence: [], unknowns: [], media: [],
+        ...(includeBrief ? { guest_brief: { brief_version: 1,
+          dates: { check_in: null, check_out: null, nights: null },
+          party: { adults: 2, children: [] }, pending_fields: [] } } : {}),
       } });
       if (delaySecondMessage && messages === 2) {
         await new Promise((resolve) => { releaseDelayed = async () => { try { await fulfill(); } catch {} resolve(); }; });
@@ -83,7 +91,7 @@ async function routeApi(page, { eligibility = "current", languageCase = CASES[1]
 }
 
 async function openChat(browser, { mobile = false, eligibility = "current", clipboard = "normal",
-  languageCase = CASES[1], delaySecondMessage = false } = {}) {
+  languageCase = CASES[1], delaySecondMessage = false, includeBrief = false } = {}) {
   const context = await browser.newContext(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true } : {});
   if (clipboard === "normal") await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: baseUrl });
   const page = await context.newPage();
@@ -100,7 +108,7 @@ async function openChat(browser, { mobile = false, eligibility = "current", clip
       Object.defineProperty(window, "getSelection", { configurable: true, value: undefined });
     });
   }
-  const api = await routeApi(page, { eligibility, languageCase, delaySecondMessage });
+  const api = await routeApi(page, { eligibility, languageCase, delaySecondMessage, includeBrief });
   await page.goto(`${baseUrl}/hotels/harbor-city-demo/chat`);
   await page.getByLabel("Your question").waitFor();
   return { context, page, api };
@@ -109,7 +117,8 @@ async function openChat(browser, { mobile = false, eligibility = "current", clip
 const browser = await chromium.launch({ headless: true, channel: "chrome" });
 try {
   const raceOnly = process.env.STAYLEAD_BROWSER_FROM === "races";
-  if (!raceOnly) {
+  const scriptOnly = process.env.STAYLEAD_BROWSER_FROM === "rtl-script";
+  if (!raceOnly && !scriptOnly) {
   for (const languageCase of CASES) {
     for (const mobile of [false, true]) {
       const { context, page } = await openChat(browser, { mobile, languageCase });
@@ -172,6 +181,7 @@ try {
 
   }
 
+  if (!scriptOnly) {
   const { context: pendingOldContext, page: pendingOldPage, api: pendingApi } = await openChat(browser, {
     languageCase: CASES[1], delaySecondMessage: true,
   });
@@ -211,10 +221,35 @@ try {
   await scopePage.waitForLoadState("networkidle");
   assert.equal(await scopePage.locator(".message-assistant").count(), 0);
   await scopeContext.close();
+  }
+
+  if (scriptOnly) {
+    const requestedTag = process.env.STAYLEAD_BROWSER_LANGUAGE ?? "az-Arab";
+    const languageCase = requestedTag === EXPLICIT_SCRIPT_CASE.tag
+      ? EXPLICIT_SCRIPT_CASE
+      : CASES.find((candidate) => candidate.tag === requestedTag);
+    assert.ok(languageCase, `No browser language fixture for ${requestedTag}`);
+    for (const languageCase of [languageCase]) {
+      const { context, page } = await openChat(browser, { languageCase, includeBrief: true });
+      await page.getByLabel("Your question").fill("مرحباً 08:30");
+      await page.getByRole("button", { name: /Send|发送/ }).click();
+      const answerCard = page.locator(".message-assistant").last();
+      await answerCard.locator(".answer-copy-source").waitFor();
+      assert.equal(await page.locator("main.chat-shell").getAttribute("lang"), languageCase.tag);
+      assert.equal(await page.locator("main.chat-shell").getAttribute("dir"), "rtl");
+      const brief = page.locator(`.chat-header > div[lang="${languageCase.tag}"]`);
+      assert.equal(await brief.getAttribute("dir"), "rtl");
+      assert.equal(await answerCard.getAttribute("lang"), languageCase.tag);
+      assert.equal(await answerCard.getAttribute("dir"), "rtl");
+      await context.close();
+    }
+  }
 
   const result = raceOnly
     ? { status: "PASS", mode: "races", checks_run: ["newer-pending-turn-disables-older-answer", "session-scope-navigation-clears-answer", "late-old-scope-response-ignored"] }
-    : { status: "PASS", mode: "full", checks_run: ["six-language-tags", "desktop-and-mobile", "exact-rendered-clipboard-text", "keyboard-activation", "clipboard-selection-fallback", "unsupported-clipboard", "pending-and-stale-answer-blocked", "newer-pending-turn-disables-older-answer", "session-scope-navigation-clears-answer", "late-old-scope-response-ignored", "overflow"] };
+    : scriptOnly ? { status: "PASS", mode: "rtl-script", language: process.env.STAYLEAD_BROWSER_LANGUAGE ?? "az-Arab",
+      checks_run: ["main-brief-answer-direction-consistency"] }
+      : { status: "PASS", mode: "full", checks_run: ["six-language-tags", "desktop-and-mobile", "exact-rendered-clipboard-text", "keyboard-activation", "clipboard-selection-fallback", "unsupported-clipboard", "pending-and-stale-answer-blocked", "newer-pending-turn-disables-older-answer", "session-scope-navigation-clears-answer", "late-old-scope-response-ignored", "overflow"] };
   console.log(JSON.stringify(result));
 } finally {
   await browser.close();

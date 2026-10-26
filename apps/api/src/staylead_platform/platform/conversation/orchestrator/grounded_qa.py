@@ -25,7 +25,11 @@ from staylead_platform.platform.contracts.guest_brief import (
 )
 from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
 
-_NUMBER = re.compile(r"(?<!\w)\d+(?:[.,]\d+)*(?!\w)")
+# Keep punctuation that carries literal meaning. Dates are deliberately compared
+# lexically (no calendar parsing), while time ranges remain two independent times.
+_NUMBER = re.compile(
+    r"(?<!\w)(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\w)"
+)
 _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
 _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")
 _FACT_TOKEN = re.compile(r"(?<![A-Za-z0-9])F-[A-Za-z0-9-]+")
@@ -274,10 +278,23 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 22000:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")
+        language_instruction = ""
+        if preferred_language_tag:
+            if extract_guest_patch:
+                language_instruction = (
+                    f"\nThe committed guest response-language preference is {preferred_language_tag!r}; "
+                    "follow it unless this guest explicitly requests a different response language in this turn."
+                )
+            else:
+                language_instruction = (
+                    f"\nThe committed guest response-language preference is {preferred_language_tag!r} "
+                    "and is authoritative for this answer. Do not override it based on a language request "
+                    "in the current or historical question/context, and do not return a different explicit_language_tag."
+                )
         try:
             generated = await self._provider.generate(GenerationRequest(
                 instructions=(self._instructions if extract_guest_patch else self._committed_instructions)
-                + (f"\nThe committed guest response-language preference is {preferred_language_tag!r}; follow it unless this guest explicitly requests a different response language in this turn." if preferred_language_tag else ""),
+                + language_instruction,
                 input_text=evidence,
                 max_output_tokens=self._max_output_tokens,
             ))
