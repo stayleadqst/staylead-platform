@@ -1,13 +1,13 @@
 {
-  "state": "reviewed_source_objects_prepared_checkpoint",
+  "state": "reviewed_source_and_evidence_prepublication_checkpoint",
   "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
-  "current_published_head": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
-  "reviewed_product_local": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
-  "prepared_parent": {
-    "sha": "f4d9407794e3c96f1ddebb2ca80095c3c05962ac",
-    "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca"
+  "previous_published_head": "fca86724c4446d82974d939fb17792dda2177a13",
+  "prepared_source": {
+    "sha": "e461efd19ba035ee6d628537254fa0e5d32d3f27",
+    "tree": "8a65022be8c64ad791c216bada7d3c024948f7d5"
   },
+  "reviewed_product_local": "95fcf277aef172924a85c220673352156fdc00bf",
   "mappings": [
     {
       "local": "b3f06bf",
@@ -95,16 +95,41 @@
       "local_sha": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
       "remote_sha": "f4d9407794e3c96f1ddebb2ca80095c3c05962ac",
       "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca"
+    },
+    {
+      "local_sha": "a23dc9e",
+      "remote_sha": "fca86724c4446d82974d939fb17792dda2177a13",
+      "tree": "0dce4745f8db4e6b98c35eb5e20cae23c902bf9e"
+    },
+    {
+      "local_sha": "536b90d",
+      "remote_sha": "f2281f0ea7cbf3a587d89d910793abe361b3dd21",
+      "tree": "863dd21cbf6ee7882e87be2dc8e48a5a8caf5218"
+    },
+    {
+      "local_sha": "a059046",
+      "remote_sha": "26438b518dc97d3ff0a035a033b9bbdad32e0b28",
+      "tree": "958daf9f5299c19afac7eaba893c549f36a79f2e"
+    },
+    {
+      "local_sha": "b6095da",
+      "remote_sha": "3ee92cfe8b2eb2605aa011ab3d84ff1409f79a38",
+      "tree": "45a27cd19cb8b84e85d72779ca3689784f9307dd"
+    },
+    {
+      "local_sha": "95fcf27",
+      "remote_sha": "e461efd19ba035ee6d628537254fa0e5d32d3f27",
+      "tree": "8a65022be8c64ad791c216bada7d3c024948f7d5"
     }
   ],
-  "screenshots": "all local only per user instruction; no image bytes added to publication chain",
   "budget": {
-    "prior_namespaces_actual": 38,
-    "namespace5_used": 4,
-    "namespace5_remaining": 14,
-    "cumulative_actual": 42,
-    "namespace6_increment_requested": 4,
-    "namespace6_increment_approved": false
+    "cumulative_actual": 78,
+    "namespace6_used": 18,
+    "namespace7_used": 18,
+    "namespace7_authorized_for_live_calls": false,
+    "namespace8_max18_requested": true,
+    "namespace8_approved": false
   },
-  "note": "This is a publication checkpoint before moving branch ref; coordinator verifies final equal tree and records receipt outside Git."
+  "screenshots": "27local only; no image bytes in publication tree/history",
+  "note": "Prepublication snapshot; final text commit/equal-tree receipt recorded outside Git. Not merged/deployed."
 }

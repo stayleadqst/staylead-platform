@@ -1,95 +1,140 @@
 {
-  "publication_policy": "Hieu explicitly instructed keeping these15screenshots local; publish code and text reports only. No screenshot bytes in remote publication tree/history.",
+  "publication_policy": "User explicitly requested local-only screenshots; text hash index may be published. No image bytes in public Git tree/history.",
   "screenshots": [
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-2-live-run/resume-01.png",
+      "path": "remediation-2-live-run/resume-01.png",
       "sha256": "bded5190f2dbc2024221e4a9121af05271092fccd624aec00f0d54b690430b3d",
-      "bytes": 294987,
-      "availability": "local only"
+      "bytes": 294987
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-2-live-run/turn-screenshots/turn-01.png",
+      "path": "remediation-2-live-run/turn-screenshots/turn-01.png",
       "sha256": "5a5863921853c706044a0c647ee19899b141fec086acf749057a09a43afb29ac",
-      "bytes": 247804,
-      "availability": "local only"
+      "bytes": 247804
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-2-live-run/turn-screenshots/turn-02.png",
+      "path": "remediation-2-live-run/turn-screenshots/turn-02.png",
       "sha256": "357cc657fff5c3902edca54d3a76ce42c85714eb3025dd437a4a744c32826637",
-      "bytes": 292790,
-      "availability": "local only"
+      "bytes": 292790
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-3-live-run/turn-screenshots/turn-01.png",
+      "path": "remediation-3-live-run/turn-screenshots/turn-01.png",
       "sha256": "2d9f954222d91db7df4d8f1fcacc579f3825caca3025ff6b14f33b211a12e0ec",
-      "bytes": 244066,
-      "availability": "local only"
+      "bytes": 244066
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-3-live-run/turn-screenshots/turn-02.png",
+      "path": "remediation-3-live-run/turn-screenshots/turn-02.png",
       "sha256": "f00d97e57134f5e2cc8e752e695ba6b64ce5c81035cd26301126f5482d85b7a9",
-      "bytes": 289529,
-      "availability": "local only"
+      "bytes": 289529
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-3-live-run/turn-screenshots/turn-03.png",
+      "path": "remediation-3-live-run/turn-screenshots/turn-03.png",
       "sha256": "d1c8647c52238bd373aa3e53ae0399a15918c3420b5b87ef6dcaff61ab637b7e",
-      "bytes": 278867,
-      "availability": "local only"
+      "bytes": 278867
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-3-live-run/turn-screenshots/turn-04.png",
+      "path": "remediation-3-live-run/turn-screenshots/turn-04.png",
       "sha256": "96db4c85fb216da66453bf3d5b2244ad28769b97f625f132ab59eea2c6742771",
-      "bytes": 278429,
-      "availability": "local only"
+      "bytes": 278429
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-01.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-01.png",
       "sha256": "19bc7a09d818155e0c946e61e128c1e931a6a406f276d8981a1dc62416725757",
-      "bytes": 248880,
-      "availability": "local only"
+      "bytes": 248880
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-02.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-02.png",
       "sha256": "700a612941e0a135c41e52b50b4f447c8b2fbca1aa6a94429ff352399949f5c0",
-      "bytes": 297067,
-      "availability": "local only"
+      "bytes": 297067
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-03.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-03.png",
       "sha256": "70321c53c221f7db73d14b861eb5b341661aeaf575098445578292dbea5103bd",
-      "bytes": 283383,
-      "availability": "local only"
+      "bytes": 283383
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-04.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-04.png",
       "sha256": "768d351ec95a20895ccb5c73335357bfad7473d4d582090d276614c96a1a7c2d",
-      "bytes": 287909,
-      "availability": "local only"
+      "bytes": 287909
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-05.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-05.png",
       "sha256": "59e64d997337d8ba7eb42a43d04cebcdde7e3f00061902a5a918a60997a9c764",
-      "bytes": 286007,
-      "availability": "local only"
+      "bytes": 286007
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/turn-screenshots/turn-06.png",
+      "path": "remediation-4-live-run/turn-screenshots/turn-06.png",
       "sha256": "191fe01c6db56504700b7c172451ba586b05762def3fcc59f148a7d5315502fb",
-      "bytes": 290268,
-      "availability": "local only"
+      "bytes": 290268
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/resumed-live-run/resume-01.png",
+      "path": "remediation-5-live-run/turn-screenshots/turn-01.png",
+      "sha256": "1b29e7c7f3f38f3557841d38bada1b6575c2e91ca75c8de12e4e0acde2cb1498",
+      "bytes": 258834
+    },
+    {
+      "path": "remediation-5-live-run/turn-screenshots/turn-02.png",
+      "sha256": "050adbdb2ec721685525abfc0d4e1278592ceb18a5518a2c8b5508368d662aff",
+      "bytes": 292700
+    },
+    {
+      "path": "remediation-6-live-run/turn-screenshots/turn-01.png",
+      "sha256": "bf1e812a4a0a628665cd89ab472a24eb628ad2f01980decfbe5bc0d6661257b8",
+      "bytes": 256307
+    },
+    {
+      "path": "remediation-6-live-run/turn-screenshots/turn-02.png",
+      "sha256": "26e21ed93611cf7be820c404f74a547ec150afd36fdaf8500213aefa0924f110",
+      "bytes": 290313
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-01.png",
+      "sha256": "6e63d84d76259320df984e13660ceb1b7261298fed6fc103d505891dea8fc6ef",
+      "bytes": 255886
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-02.png",
+      "sha256": "c90028a59c02786a543b314dcb342ea753c509b13b2cb7a49f4a88c6c309545b",
+      "bytes": 271877
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-03.png",
+      "sha256": "f3c797c1504ab36a200abb6de34f039026ebf8c3f21321b6f49c0298970dd99b",
+      "bytes": 273171
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-04.png",
+      "sha256": "aa7b9ee202fe4d7ae7d4d1a1013ba9733c40f8e8ccbfa0fced7cdaccd1f5464e",
+      "bytes": 287781
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-05.png",
+      "sha256": "73684e1a0107aa9003a1fdca8b28d7df23aa68ed0ae613c2e2c283dac2f6729f",
+      "bytes": 288789
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-06.png",
+      "sha256": "1c4b9a432129a44f8ec42bf4a365bf9e19cde4ea7c9794779798ae02bbda08e3",
+      "bytes": 283796
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-07.png",
+      "sha256": "ca4f2de9aa0019c24eff64b27c5ec86f2d55d08dc8a3ac7dba24d333b77e9b32",
+      "bytes": 289865
+    },
+    {
+      "path": "remediation-7-live-run/turn-screenshots/turn-08.png",
+      "sha256": "d27b417dc58dbc14b25b232351601cb95d3a7abb65137a1001795d1bc37ec1ce",
+      "bytes": 289832
+    },
+    {
+      "path": "resumed-live-run/resume-01.png",
       "sha256": "eeda134ac00efe58186de67ccb1950d2bcb11e033207be253f8aab8eda48be1a",
-      "bytes": 289279,
-      "availability": "local only"
+      "bytes": 289279
     },
     {
-      "path": "docs/product/evidence/sprint-6/remediation/resumed-live-run/turn-screenshots/turn-01.png",
+      "path": "resumed-live-run/turn-screenshots/turn-01.png",
       "sha256": "848139eb7f6bf798da61e7bb1abe0b68bf86c989d8cf34fa1f0c69a243277d2b",
-      "bytes": 252139,
-      "availability": "local only"
+      "bytes": 252139
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "product_commit": "536b90d",
+  "harness_commit": "a059046",
+  "coordinator": {
+    "contracts_architecture_before_final_schema_delta": 102,
+    "PG_API_tests": 4,
+    "final_changed_grounded_contracts": 76,
+    "runtime_and_diagnostic_tests": 35,
+    "routing_tests": 7,
+    "ruff_compile_diff": "PASS"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "focused_backend_tests": 10,
+    "Ajv_probes": "captured T2/T7 reject; corrected alternatives pass; required clarification omission rejects; empty allowlist valid unknown passes",
+    "routing_tests": 7,
+    "runtime_tests": 17,
+    "blocking_findings": 0
+  },
+  "reused_web_evidence": "36 contracts /15state, production build, layout/RTL/races/clipboard recovery remain valid; no product web delta",
+  "no_live_calls_during_fixes": true,
+  "actual_semantic_confirmation": "namespace7 pending; offline checks are not actual semantic PASS"
+}

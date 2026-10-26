@@ -1,0 +1,164 @@
+{
+  "classification": "independent semantic evidence review; synthetic software acceptance",
+  "run_id": "s6-codex-20261026-remediation-7",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "candidate_commit": "a0590465c863242edb2898cf9db7b0ce085cf5b1",
+  "candidate_tree": "958daf9f5299c19afac7eaba893c549f36a79f2e",
+  "product_aggregate_sha256": "27e0806342f3cfda2cc5e1862f971bcb0a543b891e7280a4eb93ab9acaa06589",
+  "product_stability": "coordinator verified this fingerprint unchanged through run completion before product remediation",
+  "verdict": "FAIL: T8 mutation and answer fail; T9 does not reach inherited expected state and has API-only coverage; T6 has a conditional URL-qualification gap",
+  "full_matrix_pass": false,
+  "fully_passing_browser_cases": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7
+  ],
+  "browser_current_render_and_exact_copy_pass_turns": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "browser_failure_turns": [
+    8
+  ],
+  "api_diagnostic_only_turns": [
+    9
+  ],
+  "cases": [
+    {
+      "turn": 1,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Vietnamese; canonical 2026-12-10 to 2026-12-13, 3 nights, 2 adults. Buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cited to 040."
+    },
+    {
+      "turn": 2,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "English revision 2/brief 2 retain dates/adults; one new child has null age and age pending. Delivered answer explicitly asks the child age without inventing an age or charges."
+    },
+    {
+      "turn": 3,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "French revision 3/brief 3; same child d1fb38f0c6baee2c becomes age 7; checkout 2026-12-14 and 4 nights; original check-in/adults retained and age pending cleared."
+    },
+    {
+      "turn": 4,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040; brief 3 unchanged."
+    },
+    {
+      "turn": 5,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Chinese free guest-area Wi-Fi and front-desk credentials answer cites 021; brief unchanged."
+    },
+    {
+      "turn": 6,
+      "state": "PASS",
+      "answer_semantics": "FAIL_CONDITIONAL_URL_QUALIFICATION",
+      "core_facts_and_bindings": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Arabic/RTL; 40 reference covered spaces, 100000 VND per vehicle/night, no advance reservation cite 046; one-vehicle policy agrees with 077. Exact requested URL has its own URL-001 citation and no internal URL appears. However, the label describes it as an acceptance-information link without synthetic/nonfunctional/sample qualification required when contextualized by the pinned matrix."
+    },
+    {
+      "turn": 7,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Hindi asks whether checkout is 12 or 13 December 2026. Canonical checkout remains 2026-12-14, brief becomes 4, checkout is pending; same child age 7 preserved."
+    },
+    {
+      "turn": 8,
+      "state": "FAIL",
+      "language_preference": "PASS",
+      "answer_semantics": "FAIL",
+      "ui_copy": "NO_DELIVERED_ANSWER",
+      "detail": "HTTP 502 unsupported_output. Preparation wrongly treats explicit checkout 2026-12-15 as conflicting and proposes clarification. Final output asserts localized 15 December bound only to check-in and is correctly rejected by the numeric/own-ref guard. Independent exact-request PostgreSQL observation shows brief remains 4, checkout 2026-12-14, 4 nights, checkout still pending; Korean explicit revision 8 persists. Expected checkout 15/nights 5/brief 5 was not committed."
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS_FOR_CURRENT_COURTESY",
+      "observed_state_preservation": "PASS",
+      "pinned_end_to_end_state_target": "NOT_MET_INHERITED_FROM_T8",
+      "ui_copy": "NOT_CHECKED",
+      "detail": "Korean courtesy reply retains explicit Korean revision 8 and preserves observed brief 4/checkout 14/pending checkout/same child age 7. This is not a pass for the matrix expectation of brief 5/checkout 15/pending cleared."
+    }
+  ],
+  "findings": [
+    {
+      "id": "T8_EXPLICIT_DATE_NOT_APPLIED",
+      "severity": "P1",
+      "evidence": [
+        "private synthetic preparation output-15",
+        "namespace7-turn8-db-observation.json"
+      ],
+      "detail": "A clear current checkout date should resolve the prior ambiguity, but preparation selected clarify. Trusted local state remains checkout 14/pending rather than expected 15/resolved."
+    },
+    {
+      "id": "T8_MISBOUND_LOCALIZED_DATE",
+      "severity": "P2",
+      "evidence": [
+        "private synthetic final output-16"
+      ],
+      "detail": "Final text uses 2026/12/15 components in Korean prose while its only own ref is dates.check_in. Correct fail-closed numeric validation leaves no meaningful answer. This is not a native-schema parse failure."
+    },
+    {
+      "id": "T6_URL_CONDITIONAL_QUALIFICATION",
+      "severity": "P2",
+      "evidence": [
+        "live-cases.json turn 6 expected_answer_constraints",
+        "remediation-7-live-run/observations.jsonl turn 6"
+      ],
+      "detail": "Pinned conditional constraint requires contextualized URL to be described as a synthetic nonfunctional sample. The delivered link label supplies a contextual description but omits that qualification. Core values, exact URL, citation, RTL and copy pass. A global synthetic-conversation banner does not expressly qualify this link."
+    }
+  ],
+  "bounds": {
+    "guest_turns": 9,
+    "provider_requests": 18,
+    "provider_requests_per_turn": 2,
+    "answer_only_resumes": 0,
+    "automatic_retries": false,
+    "max_provider_latency_ms": 12969.7,
+    "max_http_latency_ms": 18420.9,
+    "max_reported_output_tokens_per_call": 409,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "allowance_closed": true
+  },
+  "validation_classification": "All delivered answers were recorded fully_validated with zero rejected guest claims. This does not turn the failed T8 or missing semantic constraints into passing results.",
+  "network_scope": "Browser driver records zero external browser requests; provider network traffic was handled by the approved CLI runtime and was not measured by the browser driver.",
+  "sources": [
+    "live-cases.json",
+    "namespace7-candidate-manifest.json",
+    "remediation-7-live-run/observations.jsonl",
+    "remediation-7-live-run/run-result.json",
+    "namespace7-turn8-db-observation.json",
+    "namespace7-diagnostic-api-turn-09.json",
+    "private namespace7 runtime events and synthetic outputs 15/16 (not copied here)"
+  ],
+  "limitations": [
+    "T9 has no browser or clipboard evidence.",
+    "T9 preserves actual failed-T8 state; it does not meet the pinned successful-sequence state.",
+    "Screenshots remain local only.",
+    "Historical namespace6 failure remains unchanged.",
+    "No additional live allowance or provider call is authorized by this review."
+  ],
+  "reviewer_execution": "source/evidence review, offline checks and read-only exact-request synthetic PostgreSQL SELECTs; no provider/model calls or app changes"
+}

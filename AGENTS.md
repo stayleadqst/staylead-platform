@@ -12,6 +12,10 @@ After namespace3 used eight requests to identify the Japanese numeric-boundary d
 
 After namespace4 exhausted18/18 requests (including diagnostic7–9), Hieu explicitly approved **one new batch of at most18 Codex requests** on reviewed product candidate b9abb91. Execute isolated namespace5 with the same model/time/output/per-turn caps; preserve cumulative38 prior requests and all old counters. Screenshots stay local by explicit user instruction; publish only code/text reports. This is not unlimited retry permission.
 
+After namespace5 used4requests and exposed repeated label-only output, Hieu explicitly approved **at most4 additional requests**, combined with its14 unused slots into **one namespace6 max18-request batch** on reviewed product e9424bc. Namespace5 allowance is closed and counters preserved. Same model/time/output/per-turn caps; no automatic retries, no further implicit batch. All screenshots stay local.
+
+After namespace6 exhausted18/18 requests (cumulative60), Hieu explicitly approved **one new namespace7 batch of at most18 Codex requests** on reviewed product536b90d. Preserve all prior counters/evidence, same model/time/output/max2calls, no automatic retries, and local-only screenshots. This does not authorize another implicit batch.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.

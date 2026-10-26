@@ -1,0 +1,31 @@
+{
+  "candidate": "95fcf277aef172924a85c220673352156fdc00bf",
+  "product_fingerprint": "bb25884839fd596de63c27df3a8e99df2ed4f545357d8c8b91a2b127f2f3b0b9",
+  "builder": {
+    "contracts": 81,
+    "PG_API": 4,
+    "ruff_compile_diff": "PASS"
+  },
+  "coordinator": {
+    "changed_grounded_contracts": 77,
+    "final_scope_tests": 7,
+    "harness_python_tests": 37,
+    "routing_tests": 7,
+    "ruff_diff": "PASS"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "changed_prompt_tests": 2,
+    "namespace8_mapping_tests": 2,
+    "syntax_diff": "PASS",
+    "max_final_instructions_64char_tag": 2970,
+    "blocking_findings": 0,
+    "closed_findings": [
+      "pendingreplacementinstruction narrowed to dateendpoints"
+    ]
+  },
+  "reused": "102contracts/architecture and web36/state15/build/recovery prior scopes unchanged",
+  "no_live_provider_calls": true,
+  "limitations": "Offline fake proves applied valid proposal path; model patch decision and translated URL qualifier require actual acceptance"
+}

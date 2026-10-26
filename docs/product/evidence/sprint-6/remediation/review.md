@@ -42,3 +42,19 @@ Namespace5 repeated the empty-content class at turn2 (4requests used,14remaining
 Q independently passed84 focused contracts and17runtime checks, then checked the new Foundry compatibility regression. Ajv validation of the actual output schema rejects label-only,refs-only,whitespace-only unknowns,missing/extra labels, while accepting combined hotel+guest claims,valid unknowns,typed clarification and typed acknowledgement. Native CLI schema support and strict subset were checked in official documentation. Schema size22888bytes,223properties,depth3,2210property/enum chars does not require a refactoring workaround.
 
 Two review findings closed: remove Codex transport-envelope instruction from shared domain prompt to preserve flat Foundry responses; rename telemetry to response_envelope_unwrap_requested because request configuration is not observed result proof. Exact request-controlled Codex envelope parsing rejects missing/extra/malformed envelopes; no arbitrary unwrap or flat fallback. Preparation remains unchanged and permits empty fact selection. Q reports no remaining concrete finding; C99contracts/architecture,4PG/API,17runtime,Ruff/compile/diff PASS. No live model calls during these checks. Actual CLI schema acceptance and answer semantics remain pending.
+
+
+## Context-bound output — 536b90d / a059046
+
+Q reviewed captured NS6T2/T7 semantics: both delivered no answer; all nine state targets pass, seven answer targets pass. Null-age ref rejection and exact-option rejection were correct. Nonnull pending checkout ref acceptance was a separate runtime gap found offline, not the observed T7 failure cause.
+
+A now constrains refs to authoritative nonnull/nonpending fields; pending-age unknown/question is structurally required and prompt-targeted. Current pending checkout plus one slashpair requires nonnull typed clarification in every branch; runtime exact option order/numeric validation remains. Null and pending refs reject at runtime. Q independently10focused tests and9Ajv probes plus final required-question/empty-allowlist probes PASS, no concrete finding. C102contracts/architecture+4PG/API retained; final76grounded contracts+35runtime/helper+7routing,Ruff/compile/diff PASS. These checks do not prove actual model semantics.
+
+B fixed receipt binding to the unique persisted same-turn runtime request hash and separated driver_checks_passed from matrix_pass (null until semantic review; false on known failures). Q independently7Node tests+syntaxPASS,17runtime reused. All findings closed before NS7. NS7 live allowance independently granted by Hieu; actual semantic review pending. No model calls during fixes/review.
+
+
+## Namespace7 actual and95fcf27 prompt correction
+
+NS7 product fixedthrough18requests: T1–5/T7 fullobservedPASS; T6corefacts/URLowncitation/state/copyPASS but contextualURLlabel omits pinnedsynthetic/nonfunctional qualification; T8wrongclarifypreparation instead of explicitset_dates, then unsupported15claim boundonlycheckin correctlyrejected. PGprovedbrief4/checkout14/pending unchanged whileKOrev8persisted. T9APIcourtesy/observedstatepreservationPASSdoesnotrepairT8orprovideUIcopy. FullmatrixFAIL; see namespace7-semantic-review.json.
+
+A changed preparation guidance onlyfor pending dates.check_in/check_out: explicitunambiguous currentdate supersedesunresolvedstoredendpoint, notfalseconflict. Finalprompt preservescitedsource synthetic/nonfunctional qualification, nofixturehardcode. Qfinding narrowedinitialallpendingfieldwordingto datesonly; final2changedtestsPASS, max64taginstructions2970, no remainingcodefinding. Fakevalidpatch regression proves mutation/consumer/guardpath, not actualmodelpatchchoice. BNS8mappingisolated/capsunchanged, Q2mappingtests/syntaxPASS;17runtime/7routingretained. No newinferenceallowanceimplied.

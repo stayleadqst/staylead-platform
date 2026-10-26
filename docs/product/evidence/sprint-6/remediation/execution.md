@@ -1,3 +1,15 @@
+## Current candidate95fcf27 — ready, live allowance pending
+
+A pendingdate/URLqualification fix reviewed byQ, no codefinding. A81contracts/4PG;C77grounded+7scope+37harness+7routing;Q2prompt/2mapping;Ruff/compile/diffPASS. Newmax18batch explicitlyrequested, noapprovalyet/noNS8privatefiles/calls. NS7closed18,cumulative78. See current report; historical records below are superseded onstatus.
+
+## Latest status override — NS7 closed
+
+NS7exhausted18/18requests9turns0resumes/automaticretries; cumulative78. T1–5/T7PASS;T6URLqualificationgap;T8date-resolutionstate+answerFAIL;T9APIcourtesy/observedstatepreservationPASSwithoutUIcopy/globalstatefix. NofullmatrixPASS. Afixing minimalpending-resolution/sourcequalification prompts; Qreviewrequired. No newliveallowance. Prior snapshots below are historical. Current report: SPRINT_6_ACCEPTANCE.md.
+
+## Latest execution override — namespace7
+
+User approved new max18requests after NS6 closed18/18/cumulative60. NS7 executing fixed product536b90d/harnessa059046; no automatic retry, unchanged limits and local screenshots. NS6 all9statePASS,7semanticPASS,2semanticFAIL; T3–9 API only. See current SPRINT_6_ACCEPTANCE and namespace6-semantic-review/case-comparison. Prior counters/decisions below remain historical. No story Done; #91/#92/#93/#74Blocked,#95/#94InProgress. Source ready and reviewed; publication pending.
+
 # Sprint 6 resumed execution — 2026-10-26
 
 Authority: Hieu requested continuing Sprint6 under `docs/execution/Sprint-Execution.md`. Required remediation #95 is in current milestone6/P0/E2; dependent stories remain Blocked until full AC/DoD. No story is Done.
