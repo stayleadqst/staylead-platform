@@ -28,7 +28,7 @@ from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRe
 # Keep punctuation that carries literal meaning. Dates are deliberately compared
 # lexically (no calendar parsing), while time ranges remain two independent times.
 _NUMBER = re.compile(
-    r"(?<!\w)(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\w)"
+    r"(?<!\w)(?:\d+(?:[-/]\d+){2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\w)"
 )
 _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
 _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")

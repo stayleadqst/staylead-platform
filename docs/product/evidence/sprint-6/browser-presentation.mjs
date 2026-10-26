@@ -225,11 +225,11 @@ try {
 
   if (scriptOnly) {
     const requestedTag = process.env.STAYLEAD_BROWSER_LANGUAGE ?? "az-Arab";
-    const languageCase = requestedTag === EXPLICIT_SCRIPT_CASE.tag
+    const selectedLanguageCase = requestedTag === EXPLICIT_SCRIPT_CASE.tag
       ? EXPLICIT_SCRIPT_CASE
       : CASES.find((candidate) => candidate.tag === requestedTag);
-    assert.ok(languageCase, `No browser language fixture for ${requestedTag}`);
-    for (const languageCase of [languageCase]) {
+    assert.ok(selectedLanguageCase, `No browser language fixture for ${requestedTag}`);
+    for (const languageCase of [selectedLanguageCase]) {
       const { context, page } = await openChat(browser, { languageCase, includeBrief: true });
       await page.getByLabel("Your question").fill("مرحباً 08:30");
       await page.getByRole("button", { name: /Send|发送/ }).click();

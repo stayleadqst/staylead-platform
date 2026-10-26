@@ -43,6 +43,13 @@ def test_guard_preserves_ordered_date_time_literals_and_accepts_range_endpoints(
     date = [{"value": "Check-in date: 2026-12-10."}]
     with pytest.raises(ConversationFailure, match="unsupported number"):
         _validate_supported_literals("Check-in date: 2026-10-12.", date)
+    for source, answer in (
+        ("10/12/2026", "12/10/2026"),
+        ("10-12-2026", "12-10-2026"),
+    ):
+        _validate_supported_literals(f"Date: {source}.", [{"value": f"Date: {source}."}])
+        with pytest.raises(ConversationFailure, match="unsupported number"):
+            _validate_supported_literals(f"Date: {answer}.", [{"value": f"Date: {source}."}])
     with pytest.raises(ConversationFailure, match="unsupported number"):
         _validate_supported_literals("The amount is 15.51.", [{"value": "The amount is 15.50."}])
 
