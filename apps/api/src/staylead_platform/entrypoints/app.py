@@ -64,13 +64,16 @@ def create_app(
 
     @app.exception_handler(GuestChatError)
     async def guest_chat_error(_request: Any, exc: GuestChatError) -> JSONResponse:
-        content: dict[str, Any] = {
-            "error": {"code": exc.code, "message": str(exc), "retryable": exc.retryable},
-        }
+        error: dict[str, Any] = {"code": exc.code, "message": str(exc), "retryable": exc.retryable}
+        if (selected_settings.validation_diagnostics
+                and selected_settings.environment.lower() in {"development", "test"}
+                and exc.validation_diagnostics is not None):
+            error["validation_diagnostics"] = exc.validation_diagnostics
+        content: dict[str, Any] = {"error": error}
         partial_result = getattr(exc, "partial_result", None)
         if partial_result is not None:
             content.update(partial_result)
-            content["error"] = {"code": exc.code, "message": str(exc), "retryable": exc.retryable}
+            content["error"] = error
         return JSONResponse(status_code=exc.status, content=content)
 
     @app.get("/health", tags=["health"])

@@ -7,7 +7,7 @@ import json
 import re
 import unicodedata
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel, ValidationError
 
@@ -35,6 +35,44 @@ _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")
 _FACT_TOKEN = re.compile(r"(?<![A-Za-z0-9])F-[A-Za-z0-9-]+")
 _MODEL_FACT_FIELDS = ("fact_id", "topic", "subject", "field", "value", "conditions", "status")
 _LANGUAGE_TAG = re.compile(r"^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$")
+_DIAGNOSTIC_ERROR_TYPE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
+_SAFE_VALIDATION_FIELDS = frozenset({
+    "supported_claims", "text", "fact_ids", "unknowns", "conflicts", "guest_patch", "ops", "op",
+    "set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify",
+    "check_in", "check_out", "count", "age", "member_id", "reason", "guest_claims", "refs",
+    "guest_brief_refs", "explicit_language_tag", "inferred_language_tag", "label_bundle",
+})
+
+
+class ValidationDiagnosticError(TypedDict):
+    loc: list[str | int]
+    type: str
+
+
+class ValidationDiagnostics(TypedDict):
+    code: Literal["model_validation"]
+    error_count: int
+    errors: list[ValidationDiagnosticError]
+
+
+def _validation_diagnostics(error: ValidationError) -> ValidationDiagnostics:
+    """Return bounded schema paths/types only; omit model-provided values and context."""
+    details = error.errors(include_url=False, include_context=False, include_input=False)
+    sanitized: list[ValidationDiagnosticError] = []
+    for item in details[:8]:
+        loc: list[str | int] = []
+        for part in item.get("loc", ())[:12]:
+            if isinstance(part, int) or isinstance(part, str) and part in _SAFE_VALIDATION_FIELDS:
+                loc.append(part)
+            else:
+                loc.append("<key>")
+        error_type = item.get("type")
+        sanitized.append({
+            "loc": loc,
+            "type": error_type if isinstance(error_type, str) and _DIAGNOSTIC_ERROR_TYPE.fullmatch(error_type)
+            else "validation_error",
+        })
+    return {"code": "model_validation", "error_count": len(details), "errors": sanitized}
 
 
 def _clean_language_tag(value: object) -> str | None:
@@ -58,10 +96,14 @@ def _complete_usage_sum(results: list[GenerationResult], metric: str) -> int | N
 
 
 class ConversationFailure(RuntimeError):
-    def __init__(self, code: str, message: str, *, retryable: bool = False) -> None:
+    def __init__(
+        self, code: str, message: str, *, retryable: bool = False,
+        validation_diagnostics: ValidationDiagnostics | None = None,
+    ) -> None:
         super().__init__(message)
         self.code = code
         self.retryable = retryable
+        self.validation_diagnostics = validation_diagnostics
 
 
 @dataclass(frozen=True)
@@ -306,7 +348,11 @@ class GroundedQAOrchestrator:
         try:
             payload = self._response_schema.model_validate_json(generated.text)
         except (ValidationError, ValueError) as exc:
-            raise ConversationFailure("invalid_model_output", "The model returned an invalid answer.") from exc
+            diagnostics = _validation_diagnostics(exc) if isinstance(exc, ValidationError) else None
+            raise ConversationFailure(
+                "invalid_model_output", "The model returned an invalid answer.",
+                validation_diagnostics=diagnostics,
+            ) from exc
         facts_by_id = {fact["fact_id"]: fact for fact in relevant_facts}
         cited: list[str] = []
         rendered_claims: list[str] = []

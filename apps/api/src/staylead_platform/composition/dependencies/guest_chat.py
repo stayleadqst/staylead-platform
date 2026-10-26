@@ -86,14 +86,20 @@ SESSION_TTL = timedelta(hours=24)
 MEDIA_MAX_BYTES = {"image/png": 5 * 1024 * 1024, "video/mp4": 20 * 1024 * 1024, "text/vtt": 256 * 1024}
 
 
+def _validation_diagnostics_enabled(settings: Settings) -> bool:
+    return bool(settings.validation_diagnostics) and settings.environment.lower() in {"development", "test"}
+
+
 class GuestChatError(RuntimeError):
     def __init__(self, status: int, code: str, message: str, *, retryable: bool = False,
-                 partial_result: dict[str, Any] | None = None) -> None:
+                 partial_result: dict[str, Any] | None = None,
+                 validation_diagnostics: dict[str, Any] | None = None) -> None:
         super().__init__(message)
         self.status = status
         self.code = code
         self.retryable = retryable
         self.partial_result = partial_result
+        self.validation_diagnostics = validation_diagnostics
 
 
 def build_provider(settings: Settings) -> AIProvider | None:
@@ -877,15 +883,20 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "storage_unavailable")
             raise GuestChatError(503, "storage_unavailable", "Request storage is unavailable.", retryable=True) from exc
         except ConversationFailure as exc:
+            diagnostics = exc.validation_diagnostics if _validation_diagnostics_enabled(self._settings) else None
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
                     receipt_id=request_id, brief_version_used=mutation.brief.brief_version,
                     code=exc.code, message=str(exc), deadline=deadline,
+                    validation_diagnostics=diagnostics,
                 ) from exc
             await self._fail_request(session_id, request_id, exc.code)
             status = 503 if exc.code == "provider_failure" else 502
-            raise GuestChatError(status, exc.code, str(exc), retryable=exc.retryable) from exc
+            raise GuestChatError(
+                status, exc.code, str(exc), retryable=exc.retryable,
+                validation_diagnostics=diagnostics,
+            ) from exc
         except ScopeError as exc:
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
@@ -937,6 +948,7 @@ class GuestChatApplication:
     async def _partial_failure(
         self, *, session_id: str, hotel_id: str, request_id: str, receipt_id: str,
         brief_version_used: int, code: str, message: str, deadline: float, status: int = 502,
+        validation_diagnostics: dict[str, Any] | None = None,
     ) -> GuestChatError:
         brief = await asyncio.to_thread(
             get_guest_brief, self._engine, session_id=session_id, hotel_id=hotel_id,
@@ -972,12 +984,17 @@ class GuestChatApplication:
             },
             "answer_eligibility": "pending",
         }
+        if validation_diagnostics is not None:
+            partial["error"]["validation_diagnostics"] = validation_diagnostics
         partial = await asyncio.to_thread(
             complete_partial_request, self._engine, session_id=session_id, hotel_id=hotel_id,
             request_id=request_id, response=partial, brief_receipt_id=receipt_id,
             brief_version_used=brief_version_used, timeout_seconds=0.5,
         )
-        return GuestChatError(status, code, message, retryable=True, partial_result=partial)
+        return GuestChatError(
+            status, code, message, retryable=True, partial_result=partial,
+            validation_diagnostics=validation_diagnostics,
+        )
 
     async def _resolve_apply_outcome_unknown(
         self, *, session_id: str, hotel_id: str, request_id: str, deadline: float,

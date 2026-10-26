@@ -1,5 +1,9 @@
 # Staylead Platform — mandatory working context
 
+## Sprint6 resumed — current user instruction 2026-10-26
+
+Hieu explicitly requested continuing Sprint6 under [Sprint-Execution.md](docs/execution/Sprint-Execution.md), copied unchanged from the supplied standardized guide. Required blocker work belongs in the current sprint: #95 is now milestone6/P0/E2 and must be executed to unblock #91/#92/#93/#74/#94. The previous deferral/stopped handoff is historical, superseded by this resumed execution request. Coordinator owns engineering decisions, fixes, necessary bounded retries, assignment and verification; do not passively defer a solvable engineering blocker or wait for a subagent's confirmation. Preserve full AC/DoD and current project authorization boundaries. Reuse validated work; keep prior failure artifacts/counters intact. Existing model/provider/time/output caps remain unchanged, no Grok/new paid resources/deploy/manual CI/baseline PR merge. Coding uses Luna builders and fresh independent review before Done.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.
