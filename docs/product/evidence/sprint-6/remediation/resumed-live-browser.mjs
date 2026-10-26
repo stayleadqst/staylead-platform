@@ -16,7 +16,11 @@ import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { shouldOfferOperatorResume } from "./operator-resume-routing.mjs";
+import {
+  canAdvanceAfterKnownPartial,
+  matchesRuntimeReceiptRequest,
+  shouldOfferOperatorResume,
+} from "./operator-resume-routing.mjs";
 import { safeAnswerTrace } from "./safe-answer-trace.mjs";
 
 const { chromium } = await import(pathToFileURL(
@@ -26,7 +30,7 @@ const { chromium } = await import(pathToFileURL(
 const ROOT = process.cwd();
 const MATRIX_PATH = path.join(ROOT, "docs/product/evidence/sprint-6/live-cases.json");
 const RUN_NAMESPACE = process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1";
-requireCheck(["remediation-1", "remediation-2", "remediation-3", "remediation-4", "remediation-5", "remediation-6"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1, remediation-2, remediation-3, remediation-4, remediation-5, or remediation-6");
+requireCheck(["remediation-1", "remediation-2", "remediation-3", "remediation-4", "remediation-5", "remediation-6", "remediation-7"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1, remediation-2, remediation-3, remediation-4, remediation-5, remediation-6, or remediation-7");
 const RUN_ID = `s6-codex-20261026-${RUN_NAMESPACE}`;
 const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;
 const OUTPUT = path.join(ROOT, "docs/product/evidence/sprint-6/remediation", OUTPUT_DIR);
@@ -153,6 +157,8 @@ function runtimeSnapshot(turn) {
       answer_only_resumes: parsed.answer_only_resumes,
       max_codex_requests: parsed.max_codex_requests,
       max_guest_turns: parsed.max_guest_turns,
+    max_calls_per_turn: parsed.max_calls_per_turn,
+    authorized_for_live_calls: parsed.authorized_for_live_calls === true,
     };
   } catch {
     state = { unavailable: true };
@@ -165,6 +171,7 @@ function runtimeSnapshot(turn) {
       .map((item) => ({
         stage: item.stage,
         guest_turn: item.guest_turn,
+        turn_request_id_sha256: item.turn_request_id_sha256,
         resume_reservation: item.resume_reservation,
         answer_only_resume: item.answer_only_resume,
         receipt_sha256: item.receipt_sha256,
@@ -278,8 +285,9 @@ let stopReason = null;
 let introducedChildHash = null;
 let keepBrowserOpen = false;
 let resumeObservationIndex = 0;
+const failedTurns = [];
 
-async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) {
+async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId, httpStatus) {
   keepBrowserOpen = true;
   let activePartialApi = partialApi;
   let activeReceiptId = rawReceiptId;
@@ -287,7 +295,7 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
   try {
     while (true) {
       const command = await terminal.question(
-        `Turn ${turnCase.turn} is partial. Type continue to click the existing answer-only button, snapshot, or close: `,
+        `Turn ${turnCase.turn} is partial. Type continue to use the existing answer-only button, next to record FAIL and advance without a request, snapshot, or close: `,
       );
       const normalized = command.trim().toLowerCase();
       if (normalized === "snapshot") {
@@ -299,8 +307,50 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) 
         keepBrowserOpen = false;
         return { ok: false, reason: "operator closed paused browser" };
       }
+      if (normalized === "next") {
+        const runtime = runtimeSnapshot(turnCase.turn);
+        const state = runtime.state;
+        const receiptHash = hashIdentifier(activeReceiptId);
+        const canAdvance = canAdvanceAfterKnownPartial({
+          responseReceived: true,
+          httpStatus,
+          apiStatus: activePartialApi.status,
+          receiptStatus: activePartialApi.brief_receipt?.status,
+          receiptId: activeReceiptId,
+          receiptMatchesRuntimeRequest: matchesRuntimeReceiptRequest({
+            receiptIdHash: activePartialApi.brief_receipt?.request_id_sha256,
+            runtimeEvents: runtime.events,
+            turn: turnCase.turn,
+          }),
+          persistedState: state,
+          expectedRunId: RUN_ID,
+          turn: turnCase.turn,
+          nextPinnedTurnAvailable: matrix.turns[turnCase.turn]?.turn === turnCase.turn + 1,
+        });
+        if (!canAdvance) {
+          console.log("Cannot advance: this is not a known partial response with a matching persisted receipt and current capped run state. No request was sent.");
+          continue;
+        }
+        const decision = {
+          run_id: RUN_ID,
+          turn: turnCase.turn,
+          action: "operator_advanced_after_known_partial_without_resume",
+          result: "failed",
+          failure: "partial_success answer remained incomplete",
+          http_status: httpStatus,
+          receipt_id_sha256: receiptHash,
+          counters: state,
+          next_pinned_turn: turnCase.turn + 1,
+          http_request_sent_by_command: false,
+          observed_at_utc: new Date().toISOString(),
+        };
+        await fs.appendFile(path.join(OUTPUT, "operator-decisions.jsonl"), JSON.stringify(decision) + "\n", { mode: 0o600 });
+        failedTurns.push(turnCase.turn);
+        keepBrowserOpen = false;
+        return { ok: true, next: true, api: activePartialApi };
+      }
       if (normalized !== "continue") {
-        console.log("No command submitted. Only continue, snapshot, or close is accepted.");
+        console.log("No command submitted. Only continue, next, snapshot, or close is accepted.");
         continue;
       }
       if (activePartialApi.status !== "partial_success" || typeof activeReceiptId !== "string" || !activeReceiptId) {
@@ -530,10 +580,14 @@ try {
       responseReceived: Boolean(response), httpStatus, apiStatus: api.status, receiptId: operatorResumeReceiptId,
     });
     if (resumablePartial) {
-      const resumed = await pauseForExplicitAnswerResume(turnCase, api, operatorResumeReceiptId);
+      const resumed = await pauseForExplicitAnswerResume(turnCase, api, operatorResumeReceiptId, httpStatus);
       if (!resumed.ok) {
         stopReason = resumed.reason;
         break;
+      }
+      if (resumed.next) {
+        api = resumed.api;
+        continue;
       }
       api = resumed.api;
       rendered = resumed.rendered;
@@ -577,9 +631,14 @@ try {
   }
   await fs.writeFile(path.join(OUTPUT, "run-result.json"), JSON.stringify({
     run_id: RUN_ID,
-    result: stopReason ? "stopped_with_preserved_partial_evidence_browser_held_open" : "completed_matrix_pending_semantic_review",
+    result: stopReason ? "stopped_with_preserved_partial_evidence_browser_held_open" :
+      failedTurns.length ? "completed_with_recorded_failed_turns_pending_semantic_review" :
+        "completed_matrix_pending_semantic_review",
     turns_observed: (await fs.readFile(observationsPath, "utf8")).trim().split("\n").filter(Boolean).length,
     stop_reason: stopReason,
+    failed_turns: [...failedTurns],
+    driver_checks_passed: !stopReason && failedTurns.length === 0,
+    matrix_pass: failedTurns.length > 0 ? false : null,
     automatic_retry_or_resume_used: false,
     non_provider_external_network_calls: "unmeasured_by_browser_driver",
     external_browser_requests: { scope: "browser-context-only", count: externalBrowserRequests.length, origin_and_url_hashes: externalBrowserRequests },
@@ -636,6 +695,9 @@ try {
     result: "driver_exception_preserved_partial_evidence_browser_held_open",
     turns_observed: observedTurns.trim() ? observedTurns.trim().split("\n").filter(Boolean).length : 0,
     stop_reason: stopReason,
+    failed_turns: [...failedTurns],
+    driver_checks_passed: false,
+    matrix_pass: failedTurns.length > 0 ? false : null,
     exception_class: crashEvidence.exception_class,
     screenshot: crashEvidence.screenshot,
     automatic_retry_or_resume_used: false,

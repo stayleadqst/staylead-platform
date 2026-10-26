@@ -1,4 +1,4 @@
-"""One-shot API diagnostic for an existing namespace-4 acceptance session.
+"""One-shot API diagnostic for explicitly selected existing acceptance sessions.
 
 Invoke only for a coordinator-selected turn. No server is started and no
 request is retried. Existing output for a turn makes that turn non-rerunnable.
@@ -19,13 +19,35 @@ from typing import Any
 
 EVIDENCE = Path(__file__).resolve().parent
 MATRIX_PATH = EVIDENCE.parent / "live-cases.json"
-RUNTIME_PATH = Path("/private/tmp/staylead-sprint6-remediation-4-runtime.json")
-STATE_PATH = Path("/private/tmp/staylead-sprint6-remediation-4-run-state.json")
-EVENTS_PATH = Path("/private/tmp/staylead-sprint6-remediation-4-runtime-events.jsonl")
-RUN_ID = "s6-codex-20261026-remediation-4"
 MATRIX_ID = "staylead-s6-nine-turn-multilingual-20261026-v1"
 MAX_REQUESTS, MAX_TURNS, MAX_CALLS_PER_TURN = 18, 9, 2
 BASE_URL = "http://127.0.0.1:18086"
+
+
+def _namespace_settings(namespace: str) -> dict[str, Any]:
+    if namespace not in {"remediation-4", "remediation-6"}:
+        raise ValueError("Diagnostic namespace must be remediation-4 or remediation-6.")
+    prefix = "staylead-sprint6-remediation-4" if namespace == "remediation-4" else "staylead-sprint6-remediation-6"
+    number = namespace.rsplit("-", 1)[1]
+    return {
+        "namespace": namespace,
+        "run_id": f"s6-codex-20261026-{namespace}",
+        "state": Path(f"/private/tmp/{prefix}-run-state.json"),
+        "events": Path(f"/private/tmp/{prefix}-runtime-events.jsonl"),
+        "runtime": Path(f"/private/tmp/{prefix}-runtime.json"),
+        "anchor_turn": 6 if namespace == "remediation-4" else 2,
+        "first_turn": 7 if namespace == "remediation-4" else 3,
+        "last_turn": 9,
+        "output_prefix": "diagnostic-api-turn" if namespace == "remediation-4" else f"namespace{number}-diagnostic-api-turn",
+    }
+
+
+DIAGNOSTIC_NAMESPACE = os.environ.get("STAYLEAD_S6_DIAGNOSTIC_NAMESPACE", "remediation-4")
+_SETTINGS = _namespace_settings(DIAGNOSTIC_NAMESPACE)
+RUN_ID = _SETTINGS["run_id"]
+STATE_PATH = _SETTINGS["state"]
+EVENTS_PATH = _SETTINGS["events"]
+RUNTIME_PATH = _SETTINGS["runtime"]
 
 
 def _hash(value: str) -> str:
@@ -50,11 +72,12 @@ def _matrix_turn(turn: int) -> dict[str, Any]:
     return case
 
 
-def _preflight_turn(turn: int, state: dict[str, Any]) -> None:
-    if turn not in (7, 8, 9):
-        raise ValueError("Only turns 7, 8, and 9 are supported.")
-    if state.get("run_id") != RUN_ID:
-        raise ValueError("Namespace-4 run identity mismatch.")
+def _preflight_turn(turn: int, state: dict[str, Any], namespace: str | None = None) -> None:
+    settings = _namespace_settings(namespace or DIAGNOSTIC_NAMESPACE)
+    if not settings["first_turn"] <= turn <= settings["last_turn"]:
+        raise ValueError("Turn is outside the selected diagnostic namespace's remaining-turn range.")
+    if state.get("run_id") != settings["run_id"]:
+        raise ValueError("Diagnostic run identity mismatch.")
     if state.get("guest_turns") != turn - 1:
         raise ValueError("Guest-turn counter does not match selected turn.")
     if state.get("max_guest_turns") != MAX_TURNS or state.get("max_codex_requests") != MAX_REQUESTS:
@@ -64,23 +87,32 @@ def _preflight_turn(turn: int, state: dict[str, Any]) -> None:
         raise ValueError("Persistent request counter invalid or exhausted.")
     if state.get("max_calls_per_turn") != MAX_CALLS_PER_TURN:
         raise ValueError("Per-turn provider cap mismatch.")
+    if state.get("authorized_for_live_calls") is not True:
+        raise ValueError("Persistent run state is not authorized for live calls.")
 
 
-def _turn_six_request_hash() -> str:
+def _anchor_request_hash(events_path: Path, run_id: str, anchor_turn: int) -> str:
     fingerprints = set()
-    for line in EVENTS_PATH.read_text(encoding="utf-8").splitlines():
+    for line in events_path.read_text(encoding="utf-8").splitlines():
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
         fingerprint = event.get("turn_request_id_sha256")
-        if (event.get("run_id") == RUN_ID and event.get("guest_turn") == 6
+        if (event.get("run_id") == run_id and event.get("guest_turn") == anchor_turn
                 and event.get("stage") == "provider_call_started"
                 and isinstance(fingerprint, str) and re.fullmatch(r"[a-f0-9]{16,64}", fingerprint)):
             fingerprints.add(fingerprint)
     if len(fingerprints) != 1:
-        raise ValueError("Namespace-4 turn-six request fingerprint missing or ambiguous.")
+        raise ValueError("Selected namespace anchor request fingerprint missing or ambiguous.")
     return next(iter(fingerprints))
+
+
+def _result_path(namespace: str, turn: int) -> Path:
+    settings = _namespace_settings(namespace)
+    if not settings["first_turn"] <= turn <= settings["last_turn"]:
+        raise ValueError("Turn is outside the selected diagnostic namespace's remaining-turn range.")
+    return EVIDENCE / f"{settings['output_prefix']}-{turn:02d}.json"
 
 
 def _verify_prior_turn_count(actual: int, expected: int) -> None:
@@ -238,25 +270,29 @@ def _write_result(path: Path, value: dict[str, Any], *, exclusive: bool) -> None
 
 
 def execute_turn(turn: int) -> dict[str, Any]:
-    if turn not in (7, 8, 9):
-        raise ValueError("Only turns 7, 8, and 9 are supported.")
-    output = EVIDENCE / f"diagnostic-api-turn-{turn:02d}.json"
+    settings = _namespace_settings(DIAGNOSTIC_NAMESPACE)
+    if not settings["first_turn"] <= turn <= settings["last_turn"]:
+        raise ValueError("Turn is outside the selected diagnostic namespace's remaining-turn range.")
+    output = _result_path(DIAGNOSTIC_NAMESPACE, turn)
     if output.exists():
         raise ValueError("Evidence already exists for this turn; refusing repeat.")
-    state = _read_json(STATE_PATH)
-    _preflight_turn(turn, state)
+    state = _read_json(settings["state"])
+    _preflight_turn(turn, state, DIAGNOSTIC_NAMESPACE)
     case = _matrix_turn(turn)
-    config = _read_json(RUNTIME_PATH)
+    config = _read_json(settings["runtime"])
     database_url, secret = config.get("database_url"), config.get("session_signing_secret")
     if not isinstance(database_url, str) or not isinstance(secret, str) or not secret:
         raise ValueError("Private runtime config incomplete.")
     session_id, hotel_id = _resolve_session(
-        database_url, _turn_six_request_hash(), expected_guest_turns=turn - 1,
+        database_url,
+        _anchor_request_hash(settings["events"], settings["run_id"], settings["anchor_turn"]),
+        expected_guest_turns=turn - 1,
     )
     request_id = str(uuid.uuid4())
     result: dict[str, Any] = {
         "classification": "DIAGNOSTIC realAPI/PG/Codex",
-        "run_id": RUN_ID, "matrix_id": MATRIX_ID, "turn": turn,
+        "run_id": settings["run_id"], "run_namespace": DIAGNOSTIC_NAMESPACE,
+        "matrix_id": MATRIX_ID, "turn": turn,
         "request_id_sha256": _hash(request_id)[:16],
         "question_sha256": _hash(case["utterance"]),
         "automatic_retry": False, "ui_or_clipboard_checked": False,
@@ -290,7 +326,7 @@ def execute_turn(turn: int) -> dict[str, Any]:
     finally:
         result["status"] = "completed" if result["http_status"] is not None else "transport_error"
         try:
-            after = _read_json(STATE_PATH)
+            after = _read_json(settings["state"])
             result["counter_state_after"] = {
                 key: after.get(key) for key in
                 ("run_id", "codex_requests", "guest_turns", "max_codex_requests", "max_guest_turns")
@@ -303,7 +339,7 @@ def execute_turn(turn: int) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--turn", required=True, type=int, choices=(7, 8, 9))
+    parser.add_argument("--turn", required=True, type=int, choices=range(3, 10))
     args = parser.parse_args()
     try:
         result = execute_turn(args.turn)
@@ -313,7 +349,7 @@ def main() -> int:
     print(json.dumps({key: result[key] for key in
                       ("classification", "run_id", "turn", "status", "http_status", "request_id_sha256",
                        "counter_state_after")}, indent=2))
-    print(f"Redacted evidence: {EVIDENCE / f'diagnostic-api-turn-{args.turn:02d}.json'}")
+    print(f"Redacted evidence: {_result_path(DIAGNOSTIC_NAMESPACE, args.turn)}")
     return 0
 
 
