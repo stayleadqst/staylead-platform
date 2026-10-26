@@ -6,6 +6,7 @@ import asyncio
 import json
 import re
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypedDict
 
@@ -25,10 +26,11 @@ from staylead_platform.platform.contracts.guest_brief import (
 )
 from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
 
-# Keep punctuation that carries literal meaning. Dates are deliberately compared
-# lexically (no calendar parsing), while time ranges remain two independent times.
+# Keep punctuation that carries literal meaning. Numeric boundaries stop only
+# adjacent digits so CJK text and attached units cannot truncate the literal.
+# Dates are lexical (no parsing); time ranges remain two independent times.
 _NUMBER = re.compile(
-    r"(?<!\w)(?:\d+(?:[-/]\d+){2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\w)"
+    r"(?<!\d)(?:\d+(?:[-/]\d+){2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\d)"
 )
 _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
 _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")
@@ -212,6 +214,7 @@ class GroundedQAOrchestrator:
         selection_instructions: str,
         committed_selection_instructions: str,
         selection_schema: type[BaseModel],
+        claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
         max_output_tokens: int = 700,
     ) -> None:
         self._provider = provider
@@ -222,6 +225,7 @@ class GroundedQAOrchestrator:
         self._selection_instructions = selection_instructions
         self._committed_selection_instructions = committed_selection_instructions
         self._selection_schema = selection_schema
+        self._claim_formatter = claim_formatter
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
 
     async def answer(
@@ -371,10 +375,22 @@ class GroundedQAOrchestrator:
             tokens = _FACT_TOKEN.findall(claim.text)
             if tokens != references or (references and set(references) != set(claim_ids)):
                 raise ConversationFailure("invalid_model_output", "A supported claim includes invalid evidence references.")
-            _validate_supported_literals(claim.text, [facts_by_id[item] for item in claim_ids])
+            cited_claim_facts = [facts_by_id[item] for item in claim_ids]
+            _validate_supported_literals(claim.text, cited_claim_facts)
+            formatted_text = (
+                self._claim_formatter(claim.text, cited_claim_facts)
+                if self._claim_formatter is not None else claim.text
+            )
+            if not isinstance(formatted_text, str):
+                raise ConversationFailure("invalid_model_output", "The claim formatter returned invalid text.")
+            formatted_references = _FACT_REFERENCE.findall(formatted_text)
+            formatted_tokens = _FACT_TOKEN.findall(formatted_text)
+            if formatted_tokens != formatted_references or formatted_references != references:
+                raise ConversationFailure("invalid_model_output", "The claim formatter changed evidence references.")
+            _validate_supported_literals(formatted_text, cited_claim_facts)
             cited.extend(claim_ids)
             labels = " ".join(f"[{fact_id}]" for fact_id in claim_ids)
-            rendered_claims.append(claim.text if references else f"{claim.text} {labels}")
+            rendered_claims.append(formatted_text if references else f"{formatted_text} {labels}")
         for text in (*payload.unknowns, *payload.conflicts):
             _validate_untrusted_field(text, facts_by_id)
         raw_brief_refs = getattr(payload, "guest_brief_refs", ())

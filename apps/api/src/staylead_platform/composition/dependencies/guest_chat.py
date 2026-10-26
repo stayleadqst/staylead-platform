@@ -15,6 +15,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from staylead_platform.composition.configuration.settings import Settings
+from staylead_platform.domains.hospitality.grounded_claim_format import format_grounded_claim
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     COMMITTED_FACT_SELECTION_INSTRUCTIONS,
     COMMITTED_GROUNDED_QA_INSTRUCTIONS,
@@ -146,6 +147,7 @@ def create_guest_chat_application(
             selection_instructions=FACT_SELECTION_INSTRUCTIONS,
             committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
             selection_schema=FactSelection,
+            claim_formatter=format_grounded_claim,
             max_output_tokens=settings.ai_max_output_tokens,
         )
     return GuestChatApplication(settings, database, orchestrator, media_repository)

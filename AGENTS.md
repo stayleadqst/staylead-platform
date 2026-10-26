@@ -6,6 +6,8 @@ Hieu explicitly requested continuing Sprint6 under [Sprint-Execution.md](docs/ex
 
 After the resumed diagnosis used four requests and crossed a candidate correction, Hieu explicitly approved **one additional acceptance batch of at most 18 Codex requests**, with the same model, max two calls per HTTP turn, timeouts and output cap. Use a distinct namespace, keep prior counters and cumulative usage, pin the fixed candidate before execution, and do not treat this as an unlimited retry allowance.
 
+After that namespace2 batch used six requests to expose the child-count binding failure, Hieu explicitly approved **at most six additional requests**, combined with its twelve unused requests into **one fresh maximum18-request namespace3 batch** on the reviewed fixed candidate. Close namespace2's remaining allowance so the twelve slots cannot be consumed twice; preserve its counters/evidence. All model/time/output/per-turn limits remain unchanged. This is not permission for another unbounded batch.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.

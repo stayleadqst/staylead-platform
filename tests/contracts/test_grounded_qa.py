@@ -1,8 +1,13 @@
 import asyncio
 import json
-from dataclasses import replace
+from collections.abc import Callable
+from dataclasses import asdict, replace
+from typing import Any
 
 import pytest
+from staylead_platform.domains.hospitality.grounded_claim_format import (
+    format_grounded_claim,
+)
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     COMMITTED_FACT_SELECTION_INSTRUCTIONS,
     COMMITTED_GROUNDED_QA_INSTRUCTIONS,
@@ -96,6 +101,7 @@ def build(
     provider: FakeProvider,
     facts: MemoryFacts | None = None,
     retriever: KnowledgeRetriever | None = None,
+    claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
         provider=provider,
@@ -106,6 +112,7 @@ def build(
         selection_instructions=FACT_SELECTION_INSTRUCTIONS,
         committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
         selection_schema=FactSelection,
+        claim_formatter=claim_formatter,
     )
 
 
@@ -501,6 +508,151 @@ def test_claim_fact_ids_are_rendered_as_server_controlled_citations() -> None:
     ))
     assert answer.answer.endswith("[F-HTL-CITY01-040]")
     assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
+    assert answer.answer == "The buffet is at floor 1 and runs from 06:30 to 09:30. [F-HTL-CITY01-040]"
+
+
+def test_hospitality_formatter_receives_only_cited_facts_and_adds_timezone() -> None:
+    facts = MemoryFacts()
+    facts.facts.append(KnowledgeFact(
+        fact_id="F-HTL-CITY01-041", hotel_id="HTL-CITY01", topic="front_desk",
+        subject="hotel", field="desk_hours", value="Front desk is open 06:30-09:30.",
+        conditions={"timezone": "America/New_York"}, status="confirmed",
+        valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-1", "source_version": "1", "section": "Front desk"},
+    ))
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "朝食は06:30～09:30に提供されます。", "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    formatter_inputs: list[list[str]] = []
+
+    def record_cited_facts(text: str, cited_facts: list[dict[str, Any]]) -> str:
+        formatter_inputs.append([fact["fact_id"] for fact in cited_facts])
+        return format_grounded_claim(text, cited_facts)
+
+    answer = asyncio.run(build(provider, facts, claim_formatter=record_cited_facts).answer(
+        hotel_id="HTL-CITY01", question="朝食は何時ですか", history=[],
+        prefetched_facts=[asdict(fact) for fact in facts.facts if fact.hotel_id == "HTL-CITY01"],
+    ))
+
+    assert formatter_inputs == [["F-HTL-CITY01-040"]]
+    assert "(Asia/Ho_Chi_Minh)" in answer.answer
+    assert "America/New_York" not in answer.answer
+    assert answer.answer.endswith("[F-HTL-CITY01-040]")
+
+
+@pytest.mark.parametrize(
+    ("suffix", "message"),
+    [(" 999", "unsupported number"), (" https://example.invalid/pay", "unsupported URL")],
+)
+def test_claim_formatter_cannot_introduce_unsupported_literals(suffix: str, message: str) -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast hours are listed in the hotel record.",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+
+    def inject_literal(text: str, _cited_facts: list[dict[str, Any]]) -> str:
+        return f"{text}{suffix}"
+
+    with pytest.raises(ConversationFailure, match=message):
+        asyncio.run(build(provider, claim_formatter=inject_literal).answer(
+            hotel_id="HTL-CITY01", question="What are breakfast hours?", history=[],
+        ))
+
+
+@pytest.mark.parametrize(
+    ("time_text", "accepted"),
+    [("06:30～09:30に", True), ("06:30～09:31に", False)],
+)
+def test_japanese_suffix_preserves_complete_time_literals(time_text: str, accepted: bool) -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": f"朝食は{time_text}提供されます [F-HTL-CITY01-040].",
+            "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    if accepted:
+        answer = asyncio.run(build(provider).answer(
+            hotel_id="HTL-CITY01", question="朝食は何時ですか", history=[],
+        ))
+        assert time_text in answer.answer
+    else:
+        with pytest.raises(ConversationFailure, match="unsupported number"):
+            asyncio.run(build(provider).answer(
+                hotel_id="HTL-CITY01", question="朝食は何時ですか", history=[],
+            ))
+
+
+@pytest.mark.parametrize(
+    ("text", "accepted"),
+    [
+        ("チェックインは2026-12-10、宿泊は2名です。", True),
+        ("チェックインは2026-12-11、宿泊は3名です。", False),
+    ],
+)
+def test_cjk_suffix_preserves_guest_date_and_count_literals(text: str, accepted: bool) -> None:
+    brief = GuestBriefSnapshot(1, {
+        "dates": {"check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3},
+        "party": {"adults": 2, "children": []},
+    })
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{"text": text, "refs": ["dates.check_in", "party.adults"]}],
+    })
+    if accepted:
+        answer = asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="詳しく教えて", history=[], brief=brief,
+            selected_fact_ids=(),
+        ))
+        assert answer.answer == text
+    else:
+        with pytest.raises(ConversationFailure, match="unsupported number"):
+            asyncio.run(build(provider).answer_committed_turn(
+                hotel_id="HTL-CITY01", question="詳しく教えて", history=[], brief=brief,
+                selected_fact_ids=(),
+            ))
+
+
+@pytest.mark.parametrize(
+    ("claim_text", "accepted"),
+    [
+        ("The fee is 100000VND.", True),
+        ("The fee is VND100000.", True),
+        ("The fee is 100001VND.", False),
+        ("The fee is VND100001.", False),
+        ("The fee is 41 per guest.", False),
+    ],
+)
+def test_numeric_literals_remain_complete_next_to_ascii_units(claim_text: str, accepted: bool) -> None:
+    facts = MemoryFacts()
+    facts.facts.append(KnowledgeFact(
+        fact_id="F-HTL-CITY01-041", hotel_id="HTL-CITY01", topic="payment",
+        subject="booking", field="deposit", value="Deposit is 100000 VND.",
+        conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-1", "source_version": "1", "section": "Payment"},
+    ))
+    provider = FakeProvider(answer={
+        "supported_claims": [{"text": claim_text, "fact_ids": ["F-HTL-CITY01-041"]}],
+        "unknowns": [], "conflicts": [],
+    })
+    if accepted:
+        answer = asyncio.run(build(provider, facts).answer(
+            hotel_id="HTL-CITY01", question="What is the deposit?", history=[],
+            selected_fact_ids=("F-HTL-CITY01-041",),
+        ))
+        assert claim_text in answer.answer
+    else:
+        with pytest.raises(ConversationFailure, match="unsupported number"):
+            asyncio.run(build(provider, facts).answer(
+                hotel_id="HTL-CITY01", question="What is the deposit?", history=[],
+                selected_fact_ids=("F-HTL-CITY01-041",),
+            ))
 
 
 def test_answer_model_payload_projects_only_semantic_fact_fields() -> None:

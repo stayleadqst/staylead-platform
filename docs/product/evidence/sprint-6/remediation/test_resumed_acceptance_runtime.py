@@ -22,17 +22,22 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
-    def test_three_isolated_run_namespaces_are_available(self):
+    def test_four_isolated_run_namespaces_are_available(self):
         first = runtime._namespace_configuration("remediation-1")
         second = runtime._namespace_configuration("remediation-2")
         third = runtime._namespace_configuration("remediation-3")
+        fourth = runtime._namespace_configuration("remediation-4")
         self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
         self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
         self.assertEqual(third["run_id"], "s6-codex-20261026-remediation-3")
+        self.assertEqual(fourth["run_id"], "s6-codex-20261026-remediation-4")
         for key in ("run_state", "events", "runtime", "capture_dir"):
             self.assertNotEqual(first[key], second[key], key)
             self.assertNotEqual(first[key], third[key], key)
+            self.assertNotEqual(first[key], fourth[key], key)
             self.assertNotEqual(second[key], third[key], key)
+            self.assertNotEqual(second[key], fourth[key], key)
+            self.assertNotEqual(third[key], fourth[key], key)
         with self.assertRaises(ValueError):
             runtime._namespace_configuration("arbitrary-run")
 

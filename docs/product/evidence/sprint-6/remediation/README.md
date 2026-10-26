@@ -1,11 +1,12 @@
 # Sprint 6 resumed acceptance harness
 
 This directory contains a bounded acceptance run harness. Original run
-artifacts remain immutable. The harness allows three isolated namespaces:
-`remediation-1` (frozen), `remediation-2` (the paused 6/18 run), and
-`remediation-3` (prepared only; awaiting explicit incremental-budget approval).
+artifacts remain immutable. The harness allows four isolated namespaces:
+`remediation-1` (frozen), `remediation-2` (paused at 6/18),
+`remediation-3` (paused at 8/18), and `remediation-4` (prepared only; awaiting
+explicit incremental-budget approval).
 The default remains `remediation-1`; no approval is inferred by adding support
-for `remediation-3`. All namespaces use the pinned matrix
+for `remediation-4`. All namespaces use the pinned matrix
 `staylead-s6-nine-turn-multilingual-20261026-v1`.
 
 ## Frozen run bounds
@@ -87,18 +88,24 @@ answer-only UI control once; it also accepts `snapshot` and `close`. It never
 retries a receipt automatically. C decides every continuation explicitly. No
 session token is written to evidence.
 
-`remediation-3` is prepared for a possible fixed-candidate batch only after
-explicit approval of the incremental request budget. Namespace 2 has 6/18
-requests spent, leaving 12; the proposed transfer of those 12 plus 6 newly
-approved requests would give namespace 3 a fresh 18-request cap and a combined
-maximum of 24 across namespaces 2 and 3. This proposal does not authorize or
-initialize namespace 3. Its isolated paths are
+`remediation-3` is paused after 8/18 requests. `remediation-4` is prepared for
+a possible fixed-candidate batch only after explicit approval of the
+incremental request budget. The proposal is to transfer namespace 3's unused
+10 requests plus 8 newly approved requests, giving namespace 4 a fresh
+18-request cap and a combined maximum of 26 across namespaces 3 and 4. This
+proposal does not authorize or initialize namespace 4. Namespace 3's isolated
+paths remain
 `/private/tmp/staylead-sprint6-remediation-3-run-state.json`,
 `/private/tmp/staylead-sprint6-remediation-3-runtime-events.jsonl`,
 `/private/tmp/staylead-sprint6-remediation-3-runtime.json`,
 `/private/tmp/staylead-sprint6-remediation-3-synthetic-output/`, and
-`remediation-3-live-run/` under this directory. Do not initialize or use them
-until approval and the fixed candidate are confirmed.
+`remediation-3-live-run/` under this directory. Namespace 4's isolated paths
+are `/private/tmp/staylead-sprint6-remediation-4-run-state.json`,
+`/private/tmp/staylead-sprint6-remediation-4-runtime-events.jsonl`,
+`/private/tmp/staylead-sprint6-remediation-4-runtime.json`,
+`/private/tmp/staylead-sprint6-remediation-4-synthetic-output/`, and
+`remediation-4-live-run/`. Do not initialize or use namespace 4 until approval
+and the fixed candidate are confirmed.
 
 ## Optional synthetic JSON capture
 
