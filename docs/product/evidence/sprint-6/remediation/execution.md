@@ -1,3 +1,7 @@
+# Latest — fixed-candidate nine-case acceptance PASS; final delivery pending
+
+Productb666454/220files unchanged. NS10all9actualdesktopUI/semantic/state/current/exactcopyPASS;independentreadonlyPGfinalbrief5/checkout15/nights5/samechild7/pendingclear/KOrev8.18requests,0retry/resume,cumulative115,noallowanceremains. FinalfocusedmockedproductionbrowserL3AC2/4PASS,nonewproduct/modelcalls.43PNGsremainlocal. See current SPRINT_6_ACCEPTANCE.md, final-ac-map.json, final-delivery-review.json. Publish/fetchverify thenclose6scopedissues;parents/epic/milestonestayopen. Earlier status snapshots below are historical.
+
 # Latest execution — reviewed b666454; NS9 paused
 
 Current source b666454 is locally verified and reviewed; no remaining scoped code finding. Builder95focused contracts/4S6PG/API, coordinator4final schema tests, independent strict-schema/Ajv/mocktransport checks PASS. Full9actual acceptance remains unproven. NS8closed18/18, NS9paused1/18, cumulative97,17unusedreserved/nottransferred; no livecallsafterNS9blocker. Increment1+transfer17 requested, pending. Screenshots32localonly. See SPRINT_6_ACCEPTANCE.md and native-preparation-{candidate-manifest,local-gates,review}.json. Earlier snapshots below are historical.

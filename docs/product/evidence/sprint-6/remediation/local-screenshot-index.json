@@ -2,6 +2,61 @@
   "publication_policy": "User explicitly requested local-only current acceptance screenshots; only this text hash index is published. No new screenshot bytes are in the publication delta/history.",
   "screenshots": [
     {
+      "path": "remediation-10-live-run/final-desktop.png",
+      "sha256": "a05c586cd2e640cc618e4b2593f08b287fe1c43c63336e76b5eb0303163b1246",
+      "bytes": 256495
+    },
+    {
+      "path": "remediation-10-live-run/final-mobile.png",
+      "sha256": "2ea71cb87229acd5e882b265102afcf6cb1129916dab185ba71ac35ecf0bdc89",
+      "bytes": 98650
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-01.png",
+      "sha256": "dd681f82af2f411ab55ced02a6d41794668dd243487032cb9e21d34af6c32049",
+      "bytes": 252605
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-02.png",
+      "sha256": "2e90a3152f8ecb957eb7118436e7c7e212fd194937890ea65dfd8ed491c67a87",
+      "bytes": 268726
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-03.png",
+      "sha256": "c4951907c6fe71e0e47086d9bde200e7407bc7014c9b9afc179c72722af7addb",
+      "bytes": 263842
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-04.png",
+      "sha256": "7fe235daa70da1493ff3b0f0dfa3f307e327c41f681d713be1e1fd1bc938532c",
+      "bytes": 276089
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-05.png",
+      "sha256": "1b93e50111dce6c178d1c0f03b16a7e1bbed97463108c46a04debd718cf776a8",
+      "bytes": 283107
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-06.png",
+      "sha256": "949b08c0ef8c22e4b7f447a24d891e57281b3c750c549548947978f664bd8213",
+      "bytes": 288628
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-07.png",
+      "sha256": "1d3337284ea93373363d27b371a32b6ade4276b20b27c028e8a5133d1c5512c0",
+      "bytes": 278410
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-08.png",
+      "sha256": "b3a2a5938ceec1e95ade67f1029eb93383a34bcae8860c9ea6dbecd925207804",
+      "bytes": 261658
+    },
+    {
+      "path": "remediation-10-live-run/turn-screenshots/turn-09.png",
+      "sha256": "a05c586cd2e640cc618e4b2593f08b287fe1c43c63336e76b5eb0303163b1246",
+      "bytes": 256495
+    },
+    {
       "path": "remediation-2-live-run/resume-01.png",
       "sha256": "bded5190f2dbc2024221e4a9121af05271092fccd624aec00f0d54b690430b3d",
       "bytes": 294987

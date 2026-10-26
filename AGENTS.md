@@ -20,6 +20,8 @@ After namespace7 exhausted18/18requests (cumulative78), Hieu explicitly approved
 
 After namespace8 exhausted18/18 requests (cumulative96), Hieu explicitly approved **one new namespace9 batch of at most18 Codex requests** on reviewed af4b42f. Preserve earlier counters/evidence and the same model/time/output/max2calls/noautomaticretry limits. All screenshots remain local. Following the cost/convergence discussion, the coordinator stops inference at a blocking failure and investigates offline first; unused allowance is not a requirement to spend. No further implicit batch.
 
+After namespace9 stopped at the first blocker using1request (cumulative97), Hieu explicitly approved **increment1 plus transfer17 unused slots** into **one namespace10 max18-request batch** on reviewed b666454. Namespace9 unused allowance is closed/transferred exactly once; counters preserved. Same model/time/output/max2calls, stop at first blocking failure, no automatic retries, screenshots local. This does not authorize a further implicit batch.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.

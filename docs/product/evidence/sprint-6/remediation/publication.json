@@ -1,8 +1,8 @@
 {
-  "state": "reviewed_native_preparation_source_and_text_evidence_prepublication",
+  "state": "final_requirements_verified_ready_for_evidence_publication",
   "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
-  "previous_published_head": "f697edb23af5f6d5aeffdbd79d0240ce790e9f5d",
+  "previous_published_head": "e7e4bbdad86aea81d5a288f5bfbd1589d32a0852",
   "prepared_source": {
     "sha": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
     "tree": "77da592271da3e3cb01ab32bde72468a20b2b461"
@@ -142,10 +142,24 @@
   },
   "screenshots": "27local only; no image bytes in publication tree/history",
   "note": "Prepublication snapshot; final text commit/equal-tree receipt recorded outside Git. Not merged/deployed.",
-  "cumulative_actual_requests": 97,
+  "cumulative_actual_requests": 115,
   "NS9_used": 1,
-  "NS9_unused_reserved": 17,
-  "allowance_transferred": false,
-  "screenshots_local_only": 32,
-  "full_matrix_pass": false
+  "NS9_unused_reserved": 0,
+  "allowance_transferred": true,
+  "screenshots_local_only": 43,
+  "full_matrix_pass": true,
+  "NS9_transferred_requests": 17,
+  "NS10_requests": 18,
+  "NS10_turns": 9,
+  "NS10_live_disabled": true,
+  "remaining_allowance": 0,
+  "final_requirements_review": "final-delivery-review.json",
+  "scoped_issues_to_complete": [
+    91,
+    92,
+    93,
+    74,
+    95,
+    94
+  ]
 }
