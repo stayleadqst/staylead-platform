@@ -1,24 +1,24 @@
 # Sprint 6 — acceptance and execution report
 
-**All scoped requirements PASS; final publication and six issue transitions pending.** Reviewed product `b666454970829c56ae52d3cfe184b7414c4d8cd4` passed the complete actual nine-turn matrix unchanged. Independent review and focused offline consumer proofs pass. See [25-AC map](evidence/sprint-6/remediation/final-ac-map.json) and [final independent readiness review](evidence/sprint-6/remediation/final-delivery-review.json). No engineering blocker remains; final delivery follows publication/fetch verification.
+**Sprint 6 Done trong phạm vi đã chọn. #91/#92/#93/#74/#95/#94 đã đóng completed; không còn story Blocked.** Reviewed product `b666454970829c56ae52d3cfe184b7414c4d8cd4` passed the complete actual nine-turn matrix unchanged. Independent review and focused offline consumer proofs pass. See [25-AC map](evidence/sprint-6/remediation/final-ac-map.json) and [final independent readiness review](evidence/sprint-6/remediation/final-delivery-review.json). All25AC rows PASS. [Delivery receipt](evidence/sprint-6/remediation/final-delivery-receipt.json) records published/fetched equal-tree acceptance and six completed issue transitions.
 
 | Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
 | Language / grounding / preparation | A — gpt-6-luna/high | b666454 implemented, verified, reviewed | 95 focused contracts; affected S6 PG/API4; Ruff/compile/diff PASS | None; requirements verified |
 | Presentation / current copy | B — gpt-6-luna/high | Unchanged production web; final UI AC proofs complete | Actual9current/exactcopy; historical-locale/502 proofs PASS;43local screenshot hashes verified | None; requirements verified |
-| Independent review | Q — gpt-6.1-sol/high | Source, actual matrix, PostgreSQL and final consumer proofs reviewed | Full9semantic/state/source/numbers/labels/current/copy PASS;220files unchanged | Final publication/closure receipt belongs to C |
-| Integration / delivery | C — root runtime ID/effort unavailable | All requirement evidence ready; final delivery in progress | AC map, budgets, versions, privacy checked | Publish/fetch exact tree, then close six scoped issues |
+| Independent review | Q — gpt-6.1-sol/high | Source, actual matrix, PostgreSQL and final consumer proofs PASS | Full9semantic/state/source/numbers/labels/current/copy PASS;220files unchanged | Delivered; receipt records equality and closure |
+| Integration / delivery | C — root runtime ID/effort unavailable | All requirements verified and delivered | AC map, budgets, versions, privacy checked | Done; publication equality and six closures recorded |
 
 ## Story status / AC map
 
 | Story | Acceptance verdict | Evidence / final delivery |
 |---|---|---|
-| #91 L1-AC1–5 language state | PASS | Scoped preference/revision/restart/replay/receipt tests; actual explicit changes1–8 and short/mixed keepsKO8 |
-| #92 L2-AC1–4 grounding | PASS | Source/numeric/URL/authority negatives; pinned lexical/actual comparison and independent semantic verdict |
-| #93 L3-AC1–4 presentation | PASS | Actual scripts/RTL; reusable mobile proof; final old-locale/history/outage browser assertions |
-| #74 B12a-AC1–4 current copy | PASS | Nine actual desktop exact-copy/current checks; offline mobile/keyboard/failure/unsupported/selection/races |
-| #95 R1-AC1–5 remediation | Requirements PASS; delivery pending | Concrete captured diagnosis, strict correction, recovery evidence, reviewed actual matrix; final publication pending |
-| #94 C-AC1–3 coordination | Requirements PASS; delivery pending | Owners/handoffs, all evidence/failures/counters and AC map; final issue transitions pending |
+| #91 L1-AC1–5 language state | Done / PASS | Scoped preference/revision/restart/replay/receipt tests; actual explicit changes1–8 and short/mixed keepsKO8 |
+| #92 L2-AC1–4 grounding | Done / PASS | Source/numeric/URL/authority negatives; pinned lexical/actual comparison and independent semantic verdict |
+| #93 L3-AC1–4 presentation | Done / PASS | Actual scripts/RTL; reusable mobile proof; final old-locale/history/outage browser assertions |
+| #74 B12a-AC1–4 current copy | Done / PASS | Nine actual desktop exact-copy/current checks; offline mobile/keyboard/failure/unsupported/selection/races |
+| #95 R1-AC1–5 remediation | Done / PASS | Concrete captured diagnosis, strict correction, recovery evidence, reviewed actual matrix; publication/fetch equality and closure verified |
+| #94 C-AC1–3 coordination | Done / PASS | Owners/handoffs, all evidence/failures/counters and AC map; six issue transitions completed |
 
 Existing #95 is P0/E2 in Sprint6, linked to #91/#92/#93/#74/#94 with problem, impact, attempts, evidence and AC. Required fixes were executed in the current sprint; **no duplicate new story** was created. Original parents #24–#27, epic and milestone retain their wider obligations and stay open.
 
@@ -72,6 +72,6 @@ Requested gpt-6-luna/low, CodexCLI0.153.4,25s/provider,45s/turn,700-token postch
 
 ## Delivery / scope / privacy
 
-Reviewed local b666454 maps to published source `eb8be575489bab9b4aa23e1b9e00726b91311d4e`, tree `77da592271da3e3cb01ab32bde72468a20b2b461`. Previously fetched/equal-tree evidence head `e7e4bbdad86aea81d5a288f5bfbd1589d32a0852`; this final evidence package follows. Final branch-head/equal-tree/issue receipt is recorded outside Git and in PR96. PR96 remains on `sprint-5-canonical-brief`, draft/unmerged/not deployed. No main/baseline PR merge, parent/epic/milestone closure, deploy, paid-resource creation, old-repo changes or manualCI/rerun/wait gate. Automatic workflows may run on branch updates; no CI PASS claimed.
+Reviewed local b666454 maps to published source `eb8be575489bab9b4aa23e1b9e00726b91311d4e`, tree `77da592271da3e3cb01ab32bde72468a20b2b461`. Acceptance/code/text published at `1333eb2c911f69d5dbc2cad1ba411a8629cb5ec8`, tree `6b6cbe9cadabbdb31f589c5b5900909a30400c86`, fetched/equal-tree verified before all six scoped issues were closed completed. This status-only update records the completed transitions. Final branch-head/equal-tree/issue receipt is recorded outside Git and in PR96. PR96 remains on `sprint-5-canonical-brief`, draft/unmerged/not deployed. No main/baseline PR merge, parent/epic/milestone closure, deploy, paid-resource creation, old-repo changes or manualCI/rerun/wait gate. Automatic workflows may run on branch updates; no CI PASS claimed.
 
 All43Sprint6 screenshots remain **local, ignored and untracked** by explicit user instruction. [Hash index](evidence/sprint-6/remediation/local-screenshot-index.json) is text only. No screenshot bytes/private captures/configs/secrets/local backup refs are published. Synthetic authored-source software acceptance does not establish real-hotel, production provider or all-language quality. M1–M6 boundaries and all wider parent obligations remain intact.

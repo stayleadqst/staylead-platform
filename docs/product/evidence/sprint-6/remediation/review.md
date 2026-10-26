@@ -1,3 +1,7 @@
+# Final — Sprint6 scoped delivery DONE
+
+All25AC rowsPASS, NS10nineactualcasesPASS, sourceunchanged,115cumulative requests/noallowanceremains. Acceptance1333eb2 fetched/equal-tree verified; sixscopedissues91/92/93/74/95/94 closedcompleted. final-delivery-receipt.json records verified publication and transitions. All43PNGsremainlocal; PR96draft/Sprint5baseunmerged/notdeployed. Parents/epic/milestonestayopen. Currentreportfinal; snapshotsbelowhistorical.
+
 # Latest — fixed-candidate nine-case acceptance PASS; final delivery pending
 
 Productb666454/220files unchanged. NS10all9actualdesktopUI/semantic/state/current/exactcopyPASS;independentreadonlyPGfinalbrief5/checkout15/nights5/samechild7/pendingclear/KOrev8.18requests,0retry/resume,cumulative115,noallowanceremains. FinalfocusedmockedproductionbrowserL3AC2/4PASS,nonewproduct/modelcalls.43PNGsremainlocal. See current SPRINT_6_ACCEPTANCE.md, final-ac-map.json, final-delivery-review.json. Publish/fetchverify thenclose6scopedissues;parents/epic/milestonestayopen. Earlier status snapshots below are historical.

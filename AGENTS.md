@@ -22,6 +22,8 @@ After namespace8 exhausted18/18 requests (cumulative96), Hieu explicitly approve
 
 After namespace9 stopped at the first blocker using1request (cumulative97), Hieu explicitly approved **increment1 plus transfer17 unused slots** into **one namespace10 max18-request batch** on reviewed b666454. Namespace9 unused allowance is closed/transferred exactly once; counters preserved. Same model/time/output/max2calls, stop at first blocking failure, no automatic retries, screenshots local. This does not authorize a further implicit batch.
 
+Sprint6 selected scope is complete: #91/#92/#93/#74/#95/#94 closed completed after local gates, independent source/consumer review, unchanged-candidate actual9turn UI/copy/semantic PASS and published/fetched equal-tree acceptance1333eb2. Total115Codexrequests; all allowances closed, no further live permission. All43Sprint6 screenshots stay local. Delivery remains on sprint-6-multilingual/PR96 against Sprint5, unmerged/notdeployed; parent/epic/milestone obligations remain open. Do not reopen completed scoped work without a new evidenced defect.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.

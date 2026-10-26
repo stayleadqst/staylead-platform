@@ -1,5 +1,5 @@
 {
-  "state": "final_requirements_verified_ready_for_evidence_publication",
+  "state": "scoped_sprint6_delivered_done",
   "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
   "previous_published_head": "e7e4bbdad86aea81d5a288f5bfbd1589d32a0852",
@@ -154,12 +154,18 @@
   "NS10_live_disabled": true,
   "remaining_allowance": 0,
   "final_requirements_review": "final-delivery-review.json",
-  "scoped_issues_to_complete": [
+  "acceptance_published_head": "1333eb2c911f69d5dbc2cad1ba411a8629cb5ec8",
+  "acceptance_published_tree": "6b6cbe9cadabbdb31f589c5b5900909a30400c86",
+  "acceptance_equal_tree_fetch_verified": true,
+  "completed_issues": [
     91,
     92,
     93,
     74,
     95,
     94
-  ]
+  ],
+  "final_delivery_receipt": "final-delivery-receipt.json",
+  "remaining_scoped_blockers": [],
+  "final_AC_rows_PASS": 25
 }

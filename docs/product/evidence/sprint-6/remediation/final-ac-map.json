@@ -2,7 +2,7 @@
   "candidate_product_source_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
   "candidate_published_source": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
   "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
-  "status": "REQUIREMENTS_PASS_READY_FOR_FINAL_PUBLICATION",
+  "status": "PASS_DELIVERED",
   "rows": [
     {
       "story": 91,
@@ -260,13 +260,14 @@
       "story": 95,
       "ac": "R1-AC5",
       "expected": "Local gates/review/ACmap and delivery complete before dependent story closure",
-      "observed": "All scoped requirement evidence and fixed-product independent review pass; final publication equality and six issue transitions are the final coordinator delivery step, recorded in external receipt",
+      "observed": "Reviewed acceptance/code/text published at1333eb2 and fetched/equal-tree verified before all6scopedissues closed completed; receipt records transitions; parent/epic/milestone preserved",
       "evidence": [
         "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json",
         "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
-        "docs/product/SPRINT_6_ACCEPTANCE.md"
+        "docs/product/SPRINT_6_ACCEPTANCE.md",
+        "docs/product/evidence/sprint-6/remediation/final-delivery-receipt.json"
       ],
-      "status": "READY_FOR_FINAL_PUBLICATION"
+      "status": "PASS"
     },
     {
       "story": 94,
@@ -297,12 +298,13 @@
       "story": 94,
       "ac": "C-AC3",
       "expected": "Final AC evidence/versions/usage/failures and delivery status accurately reported; parent scope preserved",
-      "observed": "All scoped requirement evidence and fixed-product independent review pass; final publication equality and six issue transitions are the final coordinator delivery step, recorded in external receipt",
+      "observed": "Reviewed acceptance/code/text published at1333eb2 and fetched/equal-tree verified before all6scopedissues closed completed; receipt records transitions; parent/epic/milestone preserved",
       "evidence": [
         "docs/product/SPRINT_6_ACCEPTANCE.md",
-        "docs/product/evidence/sprint-6/remediation/publication.json"
+        "docs/product/evidence/sprint-6/remediation/publication.json",
+        "docs/product/evidence/sprint-6/remediation/final-delivery-receipt.json"
       ],
-      "status": "READY_FOR_FINAL_PUBLICATION"
+      "status": "PASS"
     }
   ],
   "verification_notes": [
@@ -311,5 +313,6 @@
     "Race-only log only establishes its three executed race assertions, not skipped mobile/clipboard fields.",
     "Historical failures/counters remain immutable; no screenshot bytes or private secrets published."
   ],
-  "delivery_sequence": "Final reviewed evidence package is published and fetched/equal-tree verified before six scoped GitHub issues are closed; external receipt records final head and transitions."
+  "delivery_sequence": "Final reviewed evidence package is published and fetched/equal-tree verified before six scoped GitHub issues are closed; external receipt records final head and transitions.",
+  "delivery_receipt": "final-delivery-receipt.json"
 }
