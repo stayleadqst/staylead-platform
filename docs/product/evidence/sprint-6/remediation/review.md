@@ -1,0 +1,30 @@
+# Independent remediation review
+
+Reviewer: fresh `/root/remediation_review`, `gpt-6.1-sol/high`, read-only assignment. No provider calls, server starts or product edits by reviewer. C records the returned findings and verdicts here; no separate enforced read-only sandbox was available.
+
+Final pre-live candidate: `9929c33a77eb1354e8468b5130d2b36df12e919e`, tree `ecdcde712379330852bea2bad95beb461cf0dd60`. Reviewer confirmed ready for the explicitly approved namespace2 batch, with no remaining blocking code finding. This is readiness, not semantic acceptance.
+
+| Finding | Disposition / verification |
+|---|---|
+| P1: sanitized receipt removed the ID used by continuation | Raw receipt retained in memory only; public evidence hashes it. Actual explicit T1 continuation later returned200. |
+| P1: HTTP502 exited before partial-success recovery | Partial receipt routing precedes generic HTTP failure; four actual routing tests pass. |
+| P2: capture initially inherited umask before chmod | Exclusive no-follow creation with0600, directory0700/symlink refusal; permission tests pass. |
+| Observed actual guard rejection | Schema parsed. Semantically correct slash dates differed from canonical ISO literals; prompt now preserves exact canonical/source date/time/numeric literals. Guard unchanged. Historic rejected schema field remains unknown. |
+| Recovery composer lock | Matching only parent resumeReceiptId left older unknown answer-only siblings unresolved. Reconcile same-receipt siblings, preserve historical answers; production-browser mocked distinct-continuation proof passes. |
+| P2: completed turn exclusion used old client ID | Resolver now excludes actual new request ID; changed-ID test passes. |
+| Hardcoded English prefix in requested-language answer | Removed from answer prose; typed guest_claims/refs and canonical brief/receipt provenance remain. VI exact-text/refs regression passes. |
+| Driver exception attribution / orphan response waits | Uses current RUN_ID, handles response promise rejection immediately, saves screenshot/result and holds browser without sending another request. |
+| Unsupported network-zero claim | New observer records browser-context external origin/hash/count. Server network metric explicitly remains unmeasured. |
+
+Independent focused checks reported:37 backend,15 chat-state,14 runtime,4 routing tests, Node syntax and diff checks PASS. C separately verified41 backend contracts,14 runtime,4 routing tests and backend Ruff/compile. Relevant PostgreSQL10 PASS. B verified36 web contracts/lint/typecheck/productionbuild, with actual production-browser mocked recovery proof; C confirmed the build is newer than changed web sources.
+
+Actual semantic verdict for namespace2: pending recorded observations and fresh reviewer assessment.
+
+## URL correction and bounded diagnostic follow-up
+
+- Q independently passed64 focused backend tests and source-removal/index restriction probes for URL retention. Only exact same-hotel preliminary URL evidence inside candidate index survives selector omission; final current-source and claim-own-citation guards remain.
+- C passed68 backend contracts and Ruff on559a3d2. Diagnostic helper passed14 tests; actual read-only PG preflight caught a wrong table import and demonstrated failedT6 has a request record without a user-message row. Fixed in0227; Q rechecked imports/counts/hashes and found no blocking issue. No model calls occurred during failed preflight.
+- Q reviewed NS5 path-only preparation:16 tests, unchanged9/18/2 caps, distinct paths, refuseoverwrite and JavaScript syntax passed. No NS5 private files initialized; no calls authorized by preparation.
+- Q classified diagnosticT7 state PASS but answer FAIL: choices13/14 are wrong for guest12/13, not a numeric false positive. Typed pending-date clarification must bind options to the exact current utterance and year to nonpending check-in; ordinary unknown guards stay strict.
+- Q classifiedT8 state PASS, overall semantic degraded by unsolicited false breakfast/Wi-Fi unknowns. Current-turn scope correction is required; HTTP200 alone is insufficient.
+- Q approved investigating a typed fixed courtesy intent forT9 while preserving empty-output rejection. A number-free arbitrary sentence can still assert hotel facts; do not claim numeric filters formally prove translation semantics. Final actual semantic review remains necessary.

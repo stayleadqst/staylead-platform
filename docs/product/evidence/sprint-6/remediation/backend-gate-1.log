@@ -1,0 +1,3 @@
+$ apps/api/.venv/bin/python -m pytest tests/contracts/test_grounded_qa.py tests/contracts/test_sprint6_validation_diagnostics.py tests/contracts/test_sprint6_language.py -q
+.........................................                                [100%]
+41 passed in 0.61s

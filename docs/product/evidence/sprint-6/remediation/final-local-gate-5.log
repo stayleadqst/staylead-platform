@@ -1,0 +1,1 @@
+$ apps/api/.venv/bin/python -m compileall -q apps/api/src

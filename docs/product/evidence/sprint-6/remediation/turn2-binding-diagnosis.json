@@ -1,0 +1,22 @@
+{
+  "candidate": "9929c33a77eb1354e8468b5130d2b36df12e919e",
+  "turn": 2,
+  "initial_error": "unsupported_output",
+  "initial_failing_contract": "guestclaim includes1child but refs onlyparty.adults; its ownrefs support2adults, notchildcount",
+  "calendar_party_values": "semantically correct; binding missing, not an invented child count",
+  "safe_independent_content": [
+    "canonicalISO date guestclaim",
+    "pending-child-age clarification"
+  ],
+  "initial_output_sha256": "1f46df89068c8594b3075ef45b542a9414e31bb91379677b3522d7c6229c1929",
+  "explicit_resume": "HTTP502unsupported_output; exact failing field not retained, no retroactive claim",
+  "counters": {
+    "semantic_turns": 2,
+    "provider_requests": 6,
+    "operator_resumes": 1,
+    "automatic_retries": 0
+  },
+  "coordinator_decision": "stop inference; implement committed-answer safe-portion behavior underarchitecture\u00a73, strict validation perclaim, no refs augmentation, preserve failures; Q agreed narrow boundary",
+  "fixed_candidate_matrix_pass": false,
+  "at_utc": "2026-10-26T03:41:20.925993+00:00"
+}

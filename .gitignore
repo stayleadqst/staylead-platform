@@ -26,3 +26,7 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Sprint6 acceptance screenshots stay local by explicit Hieu instruction.
+/docs/product/evidence/sprint-6/remediation/**/turn-screenshots/*.png
+/docs/product/evidence/sprint-6/remediation/**/resume-*.png

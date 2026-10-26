@@ -1,0 +1,17 @@
+{
+  "run_id": "s6-codex-20261026-remediation-1",
+  "max_codex_requests": 18,
+  "codex_requests": 4,
+  "max_guest_turns": 9,
+  "guest_turns": 1,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 1,
+  "answer_only_receipt_hashes": [
+    "22cef36a1758c98e1bdbf6f8b6b6f431bfef21bf38ad90466255f6d7027f8037"
+  ],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": true,
+  "authority": "current-user-resume-issue-95",
+  "created_at_utc": "2026-10-26T03:17:17Z"
+}

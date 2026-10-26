@@ -1,0 +1,72 @@
+{
+  "state": "objects_prepared_ref_not_updated",
+  "branch": "sprint-6-multilingual",
+  "remote_ref_expected": "f877fff0a23633e4940ac5b9266370fc8fc03c17",
+  "prepared_parent": {
+    "sha": "8479b8eaeca4f437577afa5596e4c05bbe7bbc65",
+    "tree": "d62789acc400e8b082844aa399f516406b406923"
+  },
+  "mappings": [
+    {
+      "local": "b3f06bf",
+      "published": "8f9ce98da9fb3014ccd82a5782ff83e713bdd2e0",
+      "tree": "01628656be17efcc40cd8b2f66c2160bf4a8360b"
+    },
+    {
+      "local": "adc6bb3",
+      "published": "5bcb0ababd26cd6f250a1a68a75cfebd6b391147",
+      "tree": "8f625d6123aea7c1120b4115fc69a62478669295"
+    },
+    {
+      "local": "70b4641",
+      "published": "8b39563bee587d76e245293e9bf8f8bbf599596a",
+      "tree": "274c2e0e11b2da2deb17e27f47af2c1c91317eb4"
+    },
+    {
+      "local": "7ed3fc6",
+      "published": "cf15768690308660c05c18be7c2dc793f5f34042",
+      "tree": "c5ed29d8132b905b425f6df5ba26c75bc60c2b53"
+    },
+    {
+      "local": "e05ae3d",
+      "published": "b2e9558683eccdc7045e5c7fc55ba8840566725d",
+      "tree": "ab9c4c4ff2d69d3359f4c427be1d4759cbbff617"
+    },
+    {
+      "local": "9929c33",
+      "published": "e337be9c304bf78c328a6f2867fac0620181c176",
+      "tree": "ecdcde712379330852bea2bad95beb461cf0dd60"
+    },
+    {
+      "local": "2f10af8",
+      "published": "f429e1b4fe626d6fbeeecc8d6196439cb583c03b",
+      "tree": "368b3cf5478507f092b040645caca757b588bac7"
+    },
+    {
+      "local": "a9338e0",
+      "published": "3993e89a14653ca96f12d67e162e7518052676f7",
+      "tree": "b917c1a8610fcf82081a9f894b19620b922eb904"
+    },
+    {
+      "local": "9e8e16b",
+      "published": "8db5176beabfd8e09b9c3ea0e1ee35ddde403ac9",
+      "tree": "5535ec69c4db2750e6b6812af6da11478735346e"
+    },
+    {
+      "local": "f52e74c",
+      "published": "6e5cfa6b292c4d2ec960e5cfd37cc302218de5ef",
+      "tree": "1c0b1d414218d1fc723aeb22d8fe7696f44436db"
+    },
+    {
+      "local_sha": "559a3d295fadb230ce84e6e0a61ac2533077eee2",
+      "remote_sha": "725b46e449b634e5151153e0bdc303688ce1ccb9",
+      "tree": "f7b29eff74e9b3d495e1d14ea6713eaf735a6b4e"
+    },
+    {
+      "local_sha": "0227b9b",
+      "remote_sha": "8479b8eaeca4f437577afa5596e4c05bbe7bbc65",
+      "tree": "d62789acc400e8b082844aa399f516406b406923"
+    }
+  ],
+  "note": "Git data API commit identities differ; every prepared tree is equal to its local candidate. No ref update yet. Local d87e674 and subsequent evidence/source pending."
+}

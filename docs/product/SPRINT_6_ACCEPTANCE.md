@@ -1,89 +1,76 @@
 # Sprint 6 — Hội thoại đa ngôn ngữ và brief nhất quán
 
-**Kết quả: đã triển khai và kiểm chứng offline; Sprint6 vẫn Blocked, không có story nào được đánh dấu Done.** Batch model thật dừng ở lượt1 do structured-answer validation; lượt2–9 chưa chạy. Đã tạo [S6-R1 #95](https://github.com/stayleadqst/staylead-platform/issues/95) trong product backlog cho sprint sau, P0/E2, có problem/impact/attempts/evidence/AC/links. Không tự retry inference.
+**Đang thực thi; chưa có story Done.** Implementation đã có và các lỗi đã xác minh đang được sửa trong Sprint 6 qua #95 (P0, Epic E2). Chưa hoàn thành chuỗi nghiệm thu 9 lượt UI/copy trên một candidate cố định. Quyết định defer trước đây đã được thay bằng yêu cầu tiếp tục theo [Sprint-Execution.md](../execution/Sprint-Execution.md); giữ [báo cáo lịch sử](evidence/sprint-6/remediation/historical-acceptance-report.md) để đối chiếu.
 
-## Work / owner / stage / verification / next action
-
-| Work | Owner / actual model / effort | Stage / candidate | Verification | Blocker / next action |
+| Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
-| #91 preference và state invariants | A /root/backend, gpt-6-luna/high | Implemented, offline verified; Blocked | PG scope/CAS/no-op/restart/replay; language-only giữ brief version; actual T1 vi/rev1 và briefv1 persist | Shared model matrix chưa hoàn tất; #95 |
-| #92 cross-language grounding / guards | A, gpt-6-luna/high | Implemented, offline verified; Blocked | Guard ngày/giờ/số Unicode; source regressions; pinned actual-PG lexical baseline | Không có delivered grounded answer; model semantic comparison chưa kiểm chứng; #95 |
-| #93 presentation / RTL / labels | B /root/frontend, gpt-6-luna/high; A producer | Implemented, offline verified; Blocked | Desktop/mobile multilingual, explicit-script RTL parity, atomic labels/fallback; Q kiểm schema→fallback correction | Chinese/Arabic/Hindi/etc actual model presentation chưa chạy; #95 |
-| #74 current eligible copy | B, gpt-6-luna/high | Implemented, offline verified; Blocked | Actual Chrome clipboard/keyboard, exact rendered text, pending/stale/old-scope/late gates, failure/unsupported fallback | Current answer từ shared live matrix chưa có; #95 |
-| #94 coordination/integration | C /root, exact runtime model ID/effort unavailable | Ownership/contracts/integration/report complete; Sprint goal Blocked | Candidate pin, bounds, PG/browser, findings/fixes, evidence/status/backlog | Giữ core Open/Blocked; không đóng parent/epic/milestone |
-| Acceptance infrastructure | /root/acceptance_helper, gpt-6-luna/high | Prepared, offline tested; C executed | Persistent9turn/18request/max2counter, redaction, baseline, read-only snapshot, driver | Helper không tự inference |
-| Independent review | Fresh /root/sprint6_review, gpt-6.1-sol/high | Code findings closed; shared DoD Blocked | [Review](evidence/sprint-6/review.md), direct probes và final37focused tests | Không nhận semantic PASS hoặc actual live success |
+| #91 preference/state | A — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Scope/CAS/restart/replay; thực tế đổi vi→en→fr→ja→zh→ar→hi→ko, brief và child identity được giữ | Nghiệm thu đầy đủ answer/UI/copy; short/mixed chưa có delivered answer |
+| #92 grounding/guards | A — gpt-6-luna/high | Implemented; correction đang thực thi | JA numeric/timezone đã đạt thực tế; URL fix tại 559a3d2 qua review; strict source/numeric guards giữ nguyên | Typed clarification cho ngày mơ hồ; kiểm false unknown và câu trả lời courtesy |
+| #93 presentation/RTL/labels | B — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Desktop/mobile/script/RTL/labels/races; actual UI/copy T1–5 | Hoàn tất presentation trong matrix cố định |
+| #74 current eligible copy | B — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Exact clipboard T1–5; recovery/pending/stale/scope/failure paths | Không thay diagnostic API bằng bằng chứng UI/copy |
+| #95 remediation | A+B — gpt-6-luna/high | In Progress, current Sprint 6 | Schema, receipt recovery, safe portion, Japanese boundaries/timezone, URL retrieval đã sửa | Clarification và acknowledgement contract đang sửa; sau đó review và nghiệm thu |
+| #94 coordination | C — runtime model/effort unavailable | In Progress | Candidate/source pin, bounds, evidence, local gates và điều tra | Tích hợp, final AC map và publication |
+| Independent review | Q — gpt-6.1-sol/high | URL/helper đã review; review sửa tiếp theo đang chuẩn bị | 64 backend tests và 14 helper tests độc lập đạt | Chưa có full-matrix semantic PASS |
 
-## Candidates / source / runtime
+## Kết quả actual-model và counters
 
-- Baseline remote S5 `d5d824125867d008f004300899f408aa75245e04`, tree `c8f24adcffe27b1ec86cf0c7cff57b7668210c5c`, khớp local S5 c073580. Chỉ nhánh mới `sprint-6-multilingual` được phát triển; PR83/89 và main không merge/reset.
-- Actual failed batch: `e66647a24d5c81b60b3496a74ef7f4217c85a4c4`; [manifest214files](evidence/sprint-6/candidate-manifest.json), fingerprint `391b09ae203ef3922c1ec54cac54373e52ee200d0690a3a7df4f868699c197c9`. Product fingerprint không đổi trong batch.
-- Final offline product: `5ac41db7646c49d2fc2acce5387781f4fa67ee9e`; [final manifest](evidence/sprint-6/final-candidate-manifest.json), fingerprint `55a4ab00e0d75cb850585d6ac2ce71b9f2c1f50687e936ce4ed15029376a16cc`. Không có live rerun trên candidate này.
-- Corpus authored synthetic knowledge-v1 + một nguồn URL synthetic test mới; URL nonfunctional, không phải hotel/operator approval thật. Không sửa/promote các internal/unapproved URLs. [Overlay/hash/parser checks](evidence/sprint-6/harness-check.json), [database initialization](evidence/sprint-6/database-initialization.json).
-- Existing PG18 server dùng database test và acceptance mới riêng biệt, không sửa database sprint cũ. Khởi tạo cluster riêng từng bị sandbox chặn và host hết shared-memory IDs; giải quyết bằng database cô lập trên server hiện có, không chỉnh host IPC hay dừng server dùng chung.
-- CodexCLI0.153.4, requested gpt-6-luna/low qua adapter local/test; actual served model unreported. Không production account service. [Boundary/model/prompt/matrix hashes](evidence/sprint-6/live-boundary.json).
+Mỗi namespace tối đa 18 requests, hai calls/HTTP turn, 25s/provider, 45s/turn và 700-token postcheck; không automatic retry. Requested model `gpt-6-luna/low`, Codex CLI 0.153.4, existing authentication. Actual served model, billing và total tokens không được CLI báo; native hard output cap chưa xác minh. Các số input/output được giữ theo từng invocation trong events, không suy ra chi phí.
 
-## Actual batch — expected / observed
+| Run | Candidate / kết quả | Provider requests | Semantic turns / explicit resumes |
+|---|---|---:|---|
+| Original | e66647: schema parse thất bại; historic exact field unknown vì không giữ raw | 2 | 1 / 0 |
+| Namespace 1 | 70b→7ed: sửa ISO date prompt; explicit answer recovery trả current VI và exact copy; consumer lock được tìm thấy | 4 | 1 / 1 |
+| Namespace 2 | 9929: T1 đạt; T2 thiếu child-count ref nên guard từ chối; continuation cũng bị từ chối | 6 | 2 / 1 |
+| Namespace 3 | a933: T1–3 trả answer; T1 thiếu timezone; T4 bị false rejection với Japanese suffix | 8 | 4 / 0 |
+| Namespace 4 | f52 UI T1–6, sau đó 0227 API diagnostic T7–9; xem chi tiết dưới | 18 | 9 / 0 |
+| **Cộng dồn** | Không reset, không dùng trùng allowance | **38** | Không cộng các namespace thành một matrix PASS |
 
-[Matrix](evidence/sprint-6/live-cases.json):9guestturns, tối đa18requests, max2/turn,25s/provider,45s/turn,700token postcheck, không automatic retry/resume/judge. Native hard pre-generation output cap chưa được xác minh.
+Hieu đã cho phép namespace2 tối đa18; bổ sung6 cộng12 còn lại thành namespace3; bổ sung8 cộng10 còn lại thành namespace4. Allowance cũ được đóng khi chuyển, counters giữ nguyên. Namespace4 hiện hết18/18, đã khóa live calls; **chưa có allowance cho namespace5**.
 
-| Turn | Expected | Observed / verdict |
+## Namespace 4 — expected / observed
+
+[UI observations](evidence/sprint-6/remediation/remediation-4-live-run/observations.jsonl), [case comparison với lexical baseline](evidence/sprint-6/remediation/namespace4-case-comparison.json), [runtime events](evidence/sprint-6/remediation/namespace4-runtime-events.jsonl), [closed counters](evidence/sprint-6/remediation/namespace4-run-state-closed.json).
+
+| Turn | Observed | Đánh giá |
 |---|---|---|
-| 1 VI | Preference vi/rev1; dates10→13Dec2026, nights3, adults2; grounded breakfast tại Bến Gió tầng1,06:30–09:30; current copy | Preference/brief/receipt đúng đã persist. Hai model calls returned; final answer bị schema parse từ chối, HTTP502/partial_success. Không delivered answer/citations/current copy. **FAIL acceptance**, không có semantic verdict về raw answer. |
-| 2 EN | Add child missing age, giữ dates/adults, rev2 | Chưa chạy |
-| 3 FR | Same child age7, checkout14, rev3 | Chưa chạy |
-| 4 JA | “Bữa sáng đó” contextual FAQ, rev4, brief không đổi | Chưa chạy |
-| 5 Chinese | Grounded Wi-Fi, giữ IDs/age/dates, render/copy, rev5 | Chưa chạy |
-| 6 AR | RTL, exact parking numbers/approved synthetic URL, rev6 | Chưa chạy |
-| 7 HI | Ambiguous checkout clarification, old dates giữ nguyên, pending field, rev7 | Chưa chạy |
-| 8 KO | Explicit checkout15, same child/age, rev8 | Chưa chạy |
-| 9 short/mixed | Giữ KO/rev8 và brief | Chưa chạy |
+| 1 VI | Dates 10→13 December 2026, nights3, adults2; breakfast đúng nguồn/time/timezone; current/exact copy | Đạt case trên f52 |
+| 2 EN | Add một trẻ chưa rõ tuổi; đúng pending age, briefv2/rev2; current/exact copy | Đạt case trên f52 |
+| 3 FR | Cùng trẻ age7, checkout14/nights4, briefv3/rev3; current/exact copy | Core đạt; có câu hỏi thêm không cần thiết |
+| 4 JA | Context breakfast, 06:30–09:30 và Asia/Ho_Chi_Minh; brief không tăng; current/exact copy | Đạt case trên f52 |
+| 5 Chinese | Wi-Fi miễn phí và credentials tại desk; dates/member không đổi; current/exact copy | Đạt case trên f52; screenshot desktop không tự chứng minh mobile |
+| 6 Arabic | Lưu ar/rev6; parking40/100000 đúng nhưng URL claim không cite URL fact; HTTP502 | Guard từ chối đúng. Selector bỏ supporting URL dù preliminary retrieval/index có; đã sửa tại559 |
+| 7 Hindi, API only | hi/rev7; checkout14 giữ nguyên, pending checkout, briefv4; same child age7. Unknown hỏi sai lựa chọn13/14, chứa ngày không có numeric provenance; HTTP502 | State đạt; answer không đạt. Không retry. Typed clarification đang sửa |
+| 8 Korean, API only | ko/rev8; checkout15/nights5, briefv5, pending clear; same child age7; HTTP200 | State đạt; answer thêm false/irrelevant breakfast/Wi-Fi unknowns nên không full semantic PASS |
+| 9 short/mixed, API only | Model output rỗng ở mọi content array, chỉ có labels; HTTP502 invalid_model_output | Không có delivered answer; thiếu kênh courtesy acknowledgement. Read-only PG xác nhận ko/rev8, briefv5 và cùng child age7 không đổi sau turn |
 
-Actual [observations](evidence/sprint-6/live-run/observations.jsonl), [stop result](evidence/sprint-6/live-run/run-result.json), [runtime events](evidence/sprint-6/runtime-events.jsonl), [persisted exact error](evidence/sprint-6/failed-request-diagnosis.json), [read-only PG snapshot](evidence/sprint-6/codex-db-observation.json).
+T7–9 dùng [one-shot helper](evidence/sprint-6/remediation/diagnostic_api_turn.py), mỗi lượt một POST, không retry, evidence allowlist và exclusive0600. [T7](evidence/sprint-6/remediation/diagnostic-api-turn-07.json), [T8](evidence/sprint-6/remediation/diagnostic-api-turn-08.json), [T9](evidence/sprint-6/remediation/diagnostic-api-turn-09.json). Helper đã được sửa lỗi preflight bảng/count trước khi gửi HTTP: failed T6 có request record nhưng không có user-message row. Lần ImportError không gọi model hay thay counters. Chẩn đoán API không chứng minh UI/clipboard; namespace4 có đổi product nên không phải fixed-candidate PASS.
 
-Error `invalid_model_output / The model returned an invalid answer.` xác định failure tại `model_validate_json`. Raw rejected output và validation locations/types không được giữ, chỉ hash/length/usage: exact field/root cause **unknown**. Không quy failure cho numeric guard, labels hoặc model semantics khi chưa có evidence. Đây không phải timeout/output-cap failure theo telemetry.
+## Các sửa đổi đã kiểm chứng
 
-Usage: **1/9 turns,2/18 requests,2 returned results,0 automatic retries/resumes**; input15635/output259tokens, total/billing unavailable. Provider5.038/5.567s; HTTPturn10.759s. Counter chưa hết; không reset hoặc coi phần còn lại là một fresh batch. S5 Codex8/Grok8 frozen, không inference Grok. Agent token/cache/reasoning/billing metrics unavailable.
+- Nested schema và canonical ISO/source literals; optional malformed labels fallback vẫn giữ core schema strict.
+- Consumer dọn đúng pending sibling cùng answer-only receipt, giữ historical answers và mở lại composer. Production-browser proof với API mock đạt, không thêm model calls.
+- Committed answer chỉ bỏ nguyên guest claim numeric-invalid khi còn nội dung an toàn có nghĩa đã được kiểm độc lập; không sửa text, thêm/mượn refs hoặc nới schema/source/URL/unknown/conflict guards. Citation-only content vẫn bị từ chối. PG/API safe-portion trace và same-ID replay đạt.
+- Numeric tokenizer xử lý Japanese/CJK/Devanagari/Arabic và ASCII units; equivalent Unicode digits được chấp nhận, unequal values bị từ chối. Hospitality formatter chỉ bổ sung timezone từ đúng cited fact/window và revalidate literals; actual Japanese case đã đạt.
+- URL supporting fact chỉ được giữ khi exact URL cùng xuất hiện trong question và same-hotel preliminary fact, ID nằm trong candidate index; current-source fetch và final claim-own-citation guard tiếp tục áp dụng. Foreign/guest-only/nonidentical/revoked cases không được nâng quyền.
 
-## Local quality / review findings
+Latest product URL fix `559a3d2`, helper-only correction `0227b9b`; [diagnostic pin](evidence/sprint-6/remediation/namespace4-diagnostic-boundary.json). C chạy **68 backend contracts + Ruff PASS**; Q chạy64 focused backend và source probes PASS. Helper14 tests + actual read-only PG resolver PASS. Các gates trước vẫn hợp lệ theo phạm vi: 10 PG regressions, safe-portion PG/API replay, Japanese timezone PG composition, 15 runtime checks; B36 web contracts/15 state/lint/typecheck/build và browser recovery proof. Chỉ chạy lại phần bị thay đổi; chưa ghi PASS cho code đang sửa.
 
-- C integrated backend run:114passed/1failed ở mocked freshness contract cũ; test cần mock thêm persisted-language read và assert mới `answer_eligibility`. Đã sửa test seam, production fail-closed không đổi; A affected freshness6/language3/PG2passed. [Initial full log](evidence/sprint-6/backend-final-tests.log) được giữ, không gọi đó là full-suite PASS.
-- Sau findings: backend guard/prompt focused34passed, generic-date recheck28passed; final optional-label fix37focusedpassed. Q độc lập xác nhận37 và6schema/cache probes. Chỉ chạy impacted checks sau sửa, không lặp suite không liên quan.
-- C Ruff toàn backend/tests PASS; compile76backend source files trong memory PASS; builders Ruff/compile files sửa PASS. [Lint](evidence/sprint-6/backend-final-lint.log), [local summary](evidence/sprint-6/local-gates-summary.json).
-- B web35contracts, lint/typecheck/build PASS; RTL cut presentation3tests + lint/typecheck/build PASS. Public build config chỉ domain=hospitality, guest contract1. Builder không lưu raw command logs; report phân biệt báo cáo builder và các browser checks C trực tiếp chạy.
-- Actual Chrome trên production build:6script/text cases × desktop/mobile đã qua các assertions text/clipboard/keyboard/lang/dir/overflow, denied/unsupported fallback và pending/stale trước khi harness race assertion lỗi. Race checks sau đó PASS riêng; final focused az-Arab main/brief/answer direction PASS. [Harness](evidence/sprint-6/browser-presentation.mjs), [prefix log](evidence/sprint-6/browser-presentation-final.log), [race log](evidence/sprint-6/browser-races-identity-final.log), [RTL log](evidence/sprint-6/browser-rtl-script-corrected.log).
-- Giữ lịch sử harness failures: browser-cache mismatch, English fallback warning expectation, async count, dynamic last-card locator, focused-probe TDZ. Đã sửa harness; không dùng lỗi này để nhận lỗi sản phẩm. Race-only log cũ in thừa các full-matrix booleans: chỉ3race assertions của invocation đó là evidence; corrected harness summary đã giới hạn checks_run. Không claim một full browser invocation PASS.
-- Q phát hiện/sửa4code gaps: ordered time/date literal identity (sửa đầu ISO-only chưa đủ, đã thay generic ordered three-part span); explicit-script RTL precedence; final committed preference authority; wrong-typed optional labels fail trước fallback. Final Q không còn code finding. Lỗi labels được chứng minh/sửa offline; **không chứng minh** nguyên nhân actual rejected JSON hay live recovery.
+Raw synthetic model output chỉ ở private scratch, opt-in, tối đa64KiB,0600; không publish. Diagnostics mặc định tắt, dev/test only, paths/types/counts allowlist. Giữ M1–M6 và default tests/build/startup offline.
 
-## AC traceability — không đồng nhất offline evidence với Done
+## AC map và next action
 
-| Scoped AC | Expected / observed evidence | Remaining |
+| AC group | Evidence đã có | Còn thiếu trước Done |
 |---|---|---|
-| L1-AC1 | Open tag validation; scoped PG preference; actual VI explicit/rev1 committed | Các language turns khác chưa chạy |
-| L1-AC2 | Prompt precedence/short-mixed rules; current state persists | Actual short/mixed T9 chưa kiểm |
-| L1-AC3 | Language-only producer PG không tăng brief version; separate preference revision | Actual switches T4–6 chưa kiểm |
-| L1-AC4 | Replay historical metadata/stale eligibility; final prompt authoritative; existing receipt recovery regressions | Actual multi-language recovery/answer chưa đạt |
-| L1-AC5 | Fresh engine/application đọc persisted preference; no-op/CAS tests | Real later-turn generation chưa chạy |
-| L2-AC1 | Source authority unchanged; expected facts pinned, current PG lexical trace | No actual grounded delivered answer |
-| L2-AC2 | Source/revoke/scope/injection regressions trong backend checks, không đổi filters | Không claim model semantic acceptance |
-| L2-AC3 | Q direct positive/negative Unicode/time/date/decimal probes PASS | Không claim actual AR/Hindi numerical answer |
-| L2-AC4 | [Current-matrix baseline](evidence/sprint-6/codex-retrieval-baseline-current-matrix.json): expected-fact lexical coverage T1/T4/T5=100%,T6=50% (parking missing);0LLMcalls | Actual contextual completeness/usefulness/false-rejection/unknown/conflict chưa đánh giá được; schema rejection1, actual grounded output0 |
-| L3-AC1 | Actual offline production browser text/script/viewport/clipboard checks | Actual Chinese/etc model presentation chưa chạy |
-| L3-AC2 | Client/server script parity tests + az-Arab production main/brief/answer PASS; historical copy/race gates | Actual sequential switching chưa đạt |
-| L3-AC3 | Final schema→resolver malformed bundles fallback; valid cache atomic; core claim schema vẫn strict;37tests+6probes | Final candidate chưa live |
-| L3-AC4 | Deterministic English fallback disclosure, last cache, clipboard error paths verified offline | Actual failure yielded partial result; no current answer |
-| B12a-AC1–2 | Real Chromium exact rendered clipboard, keyboard desktop/mobile, denied/unsupported selection outcomes | Shared semantic matrix chưa đạt |
-| B12a-AC3–4 | Pending/stale/old-turn/scope/late gates verified offline, no model call for clipboard | Current eligible model answer chưa có |
-| C-AC1–3 | Contracts/leases/model roles, finding ownership, fixed candidate/evidence/limits and #95 backlog report | Integrated goal và all scoped AC/DoD còn Blocked |
+| L1-AC1–5 | State/scope/CAS/restart/replay/late preference; actual language switching và same-child/date invariants | Full answer/UI recovery sequence trên fixed candidate; [snapshot sau T9](evidence/sprint-6/remediation/namespace4-final-db-observation.json) đã xác nhận state không đổi |
+| L2-AC1–4 | Source/numeric negatives, pinned expectedfacts/lexical baseline, actual contextual JA/Chinese; per-case comparison | Clarification provenance, URL actual recheck, false unknown correction và complete semantic verdict |
+| L3-AC1–4 / B12a-AC1–4 | Production layout/scripts/RTL/races/clipboard failure; current copy T1–5 | Full actual UI/presentation/copy matrix |
+| R1-AC1–3 | Concrete captured failures, privacy guards, safe portion/recovery proof | Typed clarification/courtesy correction + targeted tests/review |
+| R1-AC4–5 / C-AC1–3 | Owners/contracts/bounds, failures preserved, local gates | Fixed-candidate actual matrix, final review/map và delivery |
 
-## Delivery / remaining work
+Không tạo story trùng: existing #95 có problem/impact/attempts/evidence/AC/E2/P0/affected links và được xử lý ngay trong Sprint6. #91/#92/#93/#74 giữ Blocked, #95/#94 In Progress. A sửa contract, B chuẩn bị namespace mapping nhưng không initialize hoặc inference, Q review; C tích hợp và chuẩn bị next acceptance cụ thể. Chỉ xin thêm budget khi bản sửa đã đủ reviewable; không tự tăng cap.
 
-Implementation và offline fixes đã commit trên `sprint-6-multilingual`; final evidence/report được publish cùng nhánh và stacked draft PR base `sprint-5-canonical-brief`. Exact published head/PR link được ghi trên #94. Không merge/deploy hoặc đóng parents/epics/milestone khi shared DoD còn Blocked. Không dispatch/rerun CI hoặc dùng chờ CI làm gate; automatic workflows có thể chạy khi publish/PR update, không nhận CI PASS khi chưa kiểm.
+Draft PR96 vẫn base `sprint-5-canonical-brief`, chưa merge. Các local commits sau f877 chưa cập nhật remote branch ref; GitHub objects đã chuẩn bị một phần không đồng nghĩa đã push. Không deploy, tạo paid resources, manual CI hoặc đóng parent/epic/milestone. Automatic workflows có thể chạy khi cập nhật PR; không có claim CI PASS.
 
-#95 giữ P0/E2/Draft, không gán milestone hoặc tự thực thi sprint sau. Next owner cần diagnostic capture/reproducer đủ xác định structural failure và một fresh acceptance allowance tường minh, rồi chạy/check toàn matrix trên fixed candidate. User stories #91/#92/#93/#74 và coordination#94 giữ Open/Blocked; chỉ Done khi đầy đủ scoped AC/DoD.
+## Screenshot publication decision
 
-C đã dừng riêng acceptance API18086 và web13016 sau snapshot; không dừng shared PostgreSQL server. Dữ liệu và counters giữ nguyên để điều tra. Secrets chỉ ở local private runtime config, không đưa lên repository/GitHub/evidence.
-
-## Verified publication
-
-[Draft PR #96](https://github.com/stayleadqst/staylead-platform/pull/96), base `sprint-5-canonical-brief`; không merge/deploy. CLI push không có noninteractive credential, nên publish qua connected GitHub Git-data API. [Local/published commit mapping](evidence/sprint-6/publication.json) ghi cả bảy candidate; mọi published tree khớp exact local tree. Initial published evidence head `dd958a4e34d7127e368e3a2fc113ea31070ac99f` khớp local `b3e77edd99ee212147edac7dff4ae2cccb735f42`, tree `06c2c34a1bf694c2c55e9f1b897859ae6ba0c345`. Failed live candidate e66647 tương đương published `ebb0ae942ca4bc658902c32be8f3806d1eb290ea`; final offline product5ac41 tương đương published `b7f488759428b7705095136a2341b82c6a0af5c4`. Publication-note-only commit không đổi product fingerprint; final published head ghi trên #94. CI có thể tự chạy sau publication/PR update; không kiểm hay nhận CI PASS.
+Hieu yêu cầu giữ15 screenshot nghiệm thu local và chỉ publish code/báo cáo. [Index với hash](evidence/sprint-6/remediation/local-screenshot-index.json) giữ đối chiếu, không chứa ảnh. Automatic approval review đã từ chối upload ảnh vào repository public; không dùng workaround để upload. Bản local được giữ nguyên, ảnh không thuộc remote publication tree hoặc history.
