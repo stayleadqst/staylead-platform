@@ -755,3 +755,52 @@ def test_committed_guest_claims_preserve_canonical_date_and_number_literals() ->
     ))
     assert "2026-12-10 to 2026-12-13, 3 nights, for 2 adults" in answer.answer
     assert "exact `YYYY-MM-DD`" in provider.calls[0].instructions
+
+
+def test_committed_answer_returns_only_independently_safe_guest_claims() -> None:
+    brief = GuestBriefSnapshot(2, {
+        "dates": {"check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3},
+        "party": {"adults": 2, "children": [{"member_id": "child-a", "age": None}]},
+    }, ("party.children.child-a.age",))
+    provider = FakeProvider(answer={
+        "supported_claims": [],
+        "unknowns": ["What is the child's age?"],
+        "conflicts": [],
+        "guest_claims": [
+            {"text": "Your check-in is 2026-12-10 and check-out is 2026-12-13.",
+             "refs": ["dates.check_in", "dates.check_out"]},
+            {"text": "Your party is 2 adults and 1 child.", "refs": ["party.adults"]},
+        ],
+        "guest_brief_refs": ["dates.check_in", "dates.check_out"],
+    })
+
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="Confirm my stay and who is coming?", history=[],
+        brief=brief, selected_fact_ids=(),
+    ))
+
+    assert answer.calls == 1
+    assert len(provider.calls) == 1
+    assert answer.answer == (
+        "Your check-in is 2026-12-10 and check-out is 2026-12-13.\n"
+        "What is the child's age?"
+    )
+    assert answer.guest_claims == ({
+        "text": "Your check-in is 2026-12-10 and check-out is 2026-12-13.",
+        "refs": ["dates.check_in", "dates.check_out"],
+    },)
+    assert answer.guest_brief_refs == ("dates.check_in", "dates.check_out")
+    assert answer.rejected_guest_claims == 1
+
+    bad_url_provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": ["What is the child's age?"], "conflicts": [],
+        "guest_claims": [
+            {"text": "Your check-in is 2026-12-10.", "refs": ["dates.check_in"]},
+            {"text": "Pay the balance at https://example.invalid/pay/999.", "refs": ["party.adults"]},
+        ],
+    })
+    with pytest.raises(ConversationFailure, match="unsupported URL"):
+        asyncio.run(build(bad_url_provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Confirm my stay and payment?", history=[],
+            brief=brief, selected_fact_ids=(),
+        ))

@@ -54,8 +54,11 @@ def _namespace_configuration(namespace: str) -> dict[str, Any]:
     elif namespace == "remediation-2":
         prefix = "staylead-sprint6-remediation-2"
         run_id = "s6-codex-20261026-remediation-2"
+    elif namespace == "remediation-3":
+        prefix = "staylead-sprint6-remediation-3"
+        run_id = "s6-codex-20261026-remediation-3"
     else:
-        raise ValueError("Sprint 6 run namespace must be remediation-1 or remediation-2.")
+        raise ValueError("Sprint 6 run namespace must be remediation-1, remediation-2, or remediation-3.")
     private_root = Path("/private/tmp")
     return {
         "run_id": run_id,
@@ -279,6 +282,19 @@ def _is_pinned_synthetic_turn(turn_number: int, question: Any) -> bool:
         return False
 
 
+def _provider_input_matches_pinned_turn(turn_number: int, input_text: Any) -> bool:
+    """Inspect only an in-memory bounded JSON question for answer-only capture."""
+    if not isinstance(input_text, str) or len(input_text.encode("utf-8")) > 1024 * 1024:
+        return False
+    try:
+        payload = json.loads(input_text)
+    except (json.JSONDecodeError, UnicodeEncodeError):
+        return False
+    if not isinstance(payload, dict):
+        return False
+    return _is_pinned_synthetic_turn(turn_number, payload.get("question"))
+
+
 def _codex_version(executable: str) -> str:
     try:
         result = subprocess.run(
@@ -308,6 +324,9 @@ def _observed_provider(provider: Any, cli_version: str) -> Any:
         started = time.monotonic()
         input_bytes = request.input_text.encode("utf-8")
         instruction_bytes = request.instructions.encode("utf-8")
+        synthetic_pinned = turn.get("synthetic_pinned") is True
+        if turn.get("answer_only_resume") is True:
+            synthetic_pinned = _provider_input_matches_pinned_turn(turn["guest_turn"], request.input_text)
         common = {
             "provider_mode": "codex_cli",
             "run_id": RUN_ID,
@@ -315,7 +334,7 @@ def _observed_provider(provider: Any, cli_version: str) -> Any:
             "guest_turn": turn["guest_turn"],
             "turn_request_id_sha256": _identifier_hash(turn.get("request_id")),
             "turn_call": turn["calls"],
-            "synthetic_pinned": turn.get("synthetic_pinned") is True,
+            "synthetic_pinned": synthetic_pinned,
             "answer_only_resume": turn.get("answer_only_resume") is True,
             "resume_reservation": turn.get("resume_reservation"),
             "requested_model": metadata.get("model", "gpt-6-luna"),

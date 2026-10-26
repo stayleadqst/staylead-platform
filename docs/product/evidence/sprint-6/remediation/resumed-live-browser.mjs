@@ -17,6 +17,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import { shouldOfferOperatorResume } from "./operator-resume-routing.mjs";
+import { safeAnswerTrace } from "./safe-answer-trace.mjs";
 
 const { chromium } = await import(pathToFileURL(
   "/Users/ccvn/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs",
@@ -25,12 +26,12 @@ const { chromium } = await import(pathToFileURL(
 const ROOT = process.cwd();
 const MATRIX_PATH = path.join(ROOT, "docs/product/evidence/sprint-6/live-cases.json");
 const RUN_NAMESPACE = process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1";
-requireCheck(["remediation-1", "remediation-2"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1 or remediation-2");
+requireCheck(["remediation-1", "remediation-2", "remediation-3"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1, remediation-2, or remediation-3");
 const RUN_ID = `s6-codex-20261026-${RUN_NAMESPACE}`;
-const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : "remediation-2-live-run";
+const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;
 const OUTPUT = path.join(ROOT, "docs/product/evidence/sprint-6/remediation", OUTPUT_DIR);
 const BASE_URL = process.env.STAYLEAD_S6_WEB_URL ?? "http://127.0.0.1:13016";
-const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : "staylead-sprint6-remediation-2";
+const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : `staylead-sprint6-${RUN_NAMESPACE}`;
 const RUNTIME_STATE = `/private/tmp/${PRIVATE_PREFIX}-run-state.json`;
 const RUNTIME_EVENTS = `/private/tmp/${PRIVATE_PREFIX}-runtime-events.jsonl`;
 
@@ -131,6 +132,7 @@ function safeApiResponse(value) {
     } : null,
     presentation: safePresentation(value.presentation),
     answer_eligibility: value.answer_eligibility ?? null,
+    trace: safeAnswerTrace(value.trace),
     validation_diagnostics: safeValidationDiagnostics(value.error?.validation_diagnostics),
     guest_brief: safeBrief(value.guest_brief),
     brief_receipt: receipt,

@@ -1,11 +1,12 @@
 # Sprint 6 resumed acceptance harness
 
 This directory contains a bounded acceptance run harness. Original run
-artifacts remain immutable. The harness allows only two isolated namespaces:
-`remediation-1` (the previous resumed run, now frozen) and `remediation-2` (a
-new independent run). The default is `remediation-1`; set
-`STAYLEAD_S6_RUN_NAMESPACE=remediation-2` for a future authorized batch. Both
-use the pinned matrix `staylead-s6-nine-turn-multilingual-20261026-v1`.
+artifacts remain immutable. The harness allows three isolated namespaces:
+`remediation-1` (frozen), `remediation-2` (the paused 6/18 run), and
+`remediation-3` (prepared only; awaiting explicit incremental-budget approval).
+The default remains `remediation-1`; no approval is inferred by adding support
+for `remediation-3`. All namespaces use the pinned matrix
+`staylead-s6-nine-turn-multilingual-20261026-v1`.
 
 ## Frozen run bounds
 
@@ -86,6 +87,19 @@ answer-only UI control once; it also accepts `snapshot` and `close`. It never
 retries a receipt automatically. C decides every continuation explicitly. No
 session token is written to evidence.
 
+`remediation-3` is prepared for a possible fixed-candidate batch only after
+explicit approval of the incremental request budget. Namespace 2 has 6/18
+requests spent, leaving 12; the proposed transfer of those 12 plus 6 newly
+approved requests would give namespace 3 a fresh 18-request cap and a combined
+maximum of 24 across namespaces 2 and 3. This proposal does not authorize or
+initialize namespace 3. Its isolated paths are
+`/private/tmp/staylead-sprint6-remediation-3-run-state.json`,
+`/private/tmp/staylead-sprint6-remediation-3-runtime-events.jsonl`,
+`/private/tmp/staylead-sprint6-remediation-3-runtime.json`,
+`/private/tmp/staylead-sprint6-remediation-3-synthetic-output/`, and
+`remediation-3-live-run/` under this directory. Do not initialize or use them
+until approval and the fixed candidate are confirmed.
+
 ## Optional synthetic JSON capture
 
 Default capture is off. For a run explicitly approved to retain synthetic model
@@ -99,19 +113,23 @@ STAYLEAD_S6_SYNTHETIC_MATRIX_ID=staylead-s6-nine-turn-multilingual-20261026-v1
 
 Only valid JSON output up to 64 KiB is accepted, and only when that request's
 guest utterance exactly matches the corresponding turn in the pinned matrix.
-Each provider attempt is written once, with mode 0600, under
-the namespace-specific private capture directory. Each file
-contains the exact output text, parsed JSON, turn/attempt IDs, byte count/hash,
-and request/prompt hashes. These are private scratch artifacts and must not be
-copied into public evidence. Oversized, non-JSON, non-matrix, or duplicate
-capture is refused. No prompts, utterances, credentials, signed tokens, DSNs,
-or raw configuration are added to normal event logs.
+For answer-only resumes, the runtime reads `request.input_text` only in
+memory, parses its JSON `question`, and enables capture only on an exact match
+to the pinned utterance for the current semantic turn. That input, prompt, and
+token are never written. Each provider attempt is written once, with mode 0600,
+under the namespace-specific private capture directory. Each file contains the
+exact output text, parsed JSON, turn/attempt IDs, byte count/hash, and
+request/prompt hashes. These are private scratch artifacts and must not be
+copied into public evidence. Oversized, malformed, non-JSON, non-matrix, or
+duplicate capture is refused. No prompts, utterances, credentials, signed
+tokens, DSNs, or raw configuration are added to normal event logs.
 
 ## Offline checks
 
 ```sh
 python3 docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py -v
 node --test docs/product/evidence/sprint-6/remediation/test_operator_resume_routing.mjs
+node --test docs/product/evidence/sprint-6/remediation/test_safe_answer_trace.mjs
 node --check docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs
 ```
 

@@ -747,6 +747,8 @@ class GuestChatApplication:
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
                     "provider_request_ids": list(answer.provider_request_ids), "calls": answer.calls,
+                    "guest_claims_rejected": answer.rejected_guest_claims,
+                    "answer_validation": "safe_portion" if answer.rejected_guest_claims else "fully_validated",
                     "usage": {"input_tokens": answer.usage.input_tokens,
                               "output_tokens": answer.usage.output_tokens,
                               "total_tokens": answer.usage.total_tokens},

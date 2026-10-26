@@ -99,11 +99,13 @@ class ConversationFailure(RuntimeError):
     def __init__(
         self, code: str, message: str, *, retryable: bool = False,
         validation_diagnostics: ValidationDiagnostics | None = None,
+        reason: str | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
         self.retryable = retryable
         self.validation_diagnostics = validation_diagnostics
+        self.reason = reason
 
 
 @dataclass(frozen=True)
@@ -121,6 +123,7 @@ class ConversationAnswer:
     provider_request_ids: tuple[str, ...]
     guest_patch: GuestBriefProposal | None = None
     guest_claims: tuple[dict[str, Any], ...] = ()
+    rejected_guest_claims: int = 0
     brief_version_used: int | None = None
     brief_dependent: bool = False
     guest_brief_refs: tuple[str, ...] = ()
@@ -147,11 +150,15 @@ def _validate_supported_literals(answer: str, cited_facts: list[dict[str, Any]])
         for fact in cited_facts
     ], ensure_ascii=False)
     without_citations = re.sub(r"\[F-[A-Za-z0-9-]+\]", "", answer)
-    if _numeric_forms(without_citations) - _numeric_forms(trusted):
-        raise ConversationFailure("unsupported_output", "The model returned an unsupported number.")
     evidence_urls = {url.rstrip(".,;:!?)") for url in _URL.findall(trusted)}
     if any(url.rstrip(".,;:!?)") not in evidence_urls for url in _URL.findall(answer)):
-        raise ConversationFailure("unsupported_output", "The model returned an unsupported URL.")
+        raise ConversationFailure(
+            "unsupported_output", "The model returned an unsupported URL.", reason="unsupported_url",
+        )
+    if _numeric_forms(without_citations) - _numeric_forms(trusted):
+        raise ConversationFailure(
+            "unsupported_output", "The model returned an unsupported number.", reason="unsupported_number",
+        )
 
 
 def _validate_untrusted_field(text: str, facts_by_id: dict[str, dict[str, Any]]) -> None:
@@ -374,18 +381,32 @@ class GroundedQAOrchestrator:
         raw_guest_claims = getattr(payload, "guest_claims", ())
         if (raw_brief_refs or raw_guest_claims) and brief is None:
             raise ConversationFailure("invalid_model_output", "The model referenced a guest brief that was not supplied.")
-        guest_claims = _validated_guest_claims(raw_guest_claims, brief) if brief is not None else ()
+        rejected_guest_claims = 0
+        rejected_guest_claim_failure: ConversationFailure | None = None
+        if brief is not None:
+            guest_claims, rejected_guest_claims, rejected_guest_claim_failure = _validated_guest_claims(
+                raw_guest_claims, brief,
+                discard_unsupported_literals=not extract_guest_patch,
+            )
+        else:
+            guest_claims = ()
         claim_refs = tuple(dict.fromkeys(ref for claim in guest_claims for ref in claim["refs"]))
         declared_refs = _validated_brief_refs(raw_brief_refs, brief) if brief is not None else ()
         brief_refs = tuple(dict.fromkeys((*declared_refs, *claim_refs)))
         cited = list(dict.fromkeys(cited))
         proposed_patch = getattr(payload, "guest_patch", None) if extract_guest_patch else None
         patch_has_operations = bool(getattr(proposed_patch, "ops", None))
-        if (not rendered_claims and not guest_claims and not payload.unknowns
-                and not payload.conflicts and not patch_has_operations):
+        rendered_guest_claims = [claim["text"] for claim in guest_claims]
+        has_meaningful_text = any(
+            part.strip() for part in (
+                *rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts,
+            )
+        )
+        if not has_meaningful_text and not patch_has_operations:
+            if rejected_guest_claim_failure is not None:
+                raise rejected_guest_claim_failure
             raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
-        rendered_guest_claims = [claim["text"] for claim in guest_claims]
         answer_parts = [*rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts]
         answer_text = "\n".join(answer_parts)
         usage = Usage(
@@ -409,6 +430,7 @@ class GroundedQAOrchestrator:
             provider_request_ids=tuple(item.request_id for item in provider_results if item.request_id),
             guest_patch=_proposal(proposed_patch) if patch_has_operations else selected_patch,
             guest_claims=guest_claims,
+            rejected_guest_claims=rejected_guest_claims,
             brief_version_used=brief.brief_version if brief_refs and brief is not None else None,
             brief_dependent=bool(brief_refs),
             guest_brief_refs=brief_refs,
@@ -554,19 +576,28 @@ def _validated_brief_refs(
 
 
 def _validated_guest_claims(
-    claims: Any, brief: GuestBriefSnapshot | None,
-) -> tuple[dict[str, Any], ...]:
+    claims: Any, brief: GuestBriefSnapshot | None, *, discard_unsupported_literals: bool = False,
+) -> tuple[tuple[dict[str, Any], ...], int, ConversationFailure | None]:
     if not claims:
-        return ()
+        return (), 0, None
     if brief is None:
         raise ConversationFailure("invalid_model_output", "Guest claims require a supplied canonical brief.")
     validated: list[dict[str, Any]] = []
+    rejected = 0
+    first_rejection: ConversationFailure | None = None
     for claim in claims:
         refs = _validated_brief_refs(claim.refs, brief)
         values = [_brief_ref_value(ref, brief) for ref in refs]
-        _validate_supported_literals(claim.text, [{"value": value} for value in values])
+        try:
+            _validate_supported_literals(claim.text, [{"value": value} for value in values])
+        except ConversationFailure as exc:
+            if not discard_unsupported_literals or exc.reason != "unsupported_number":
+                raise
+            rejected += 1
+            first_rejection = first_rejection or exc
+            continue
         validated.append({"text": claim.text, "refs": list(refs)})
-    return tuple(validated)
+    return tuple(validated), rejected, first_rejection
 
 
 def _brief_ref_value(ref: str, brief: GuestBriefSnapshot) -> Any:

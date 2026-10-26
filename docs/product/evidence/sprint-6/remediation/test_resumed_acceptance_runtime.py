@@ -22,13 +22,17 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
-    def test_only_two_isolated_run_namespaces_are_available(self):
+    def test_three_isolated_run_namespaces_are_available(self):
         first = runtime._namespace_configuration("remediation-1")
         second = runtime._namespace_configuration("remediation-2")
+        third = runtime._namespace_configuration("remediation-3")
         self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
         self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
+        self.assertEqual(third["run_id"], "s6-codex-20261026-remediation-3")
         for key in ("run_state", "events", "runtime", "capture_dir"):
             self.assertNotEqual(first[key], second[key], key)
+            self.assertNotEqual(first[key], third[key], key)
+            self.assertNotEqual(second[key], third[key], key)
         with self.assertRaises(ValueError):
             runtime._namespace_configuration("arbitrary-run")
 
@@ -251,6 +255,34 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertTrue(runtime._is_pinned_synthetic_turn(1, question))
         self.assertFalse(runtime._is_pinned_synthetic_turn(1, question + " altered"))
 
+    def test_answer_only_capture_requires_exact_provider_input_question_match(self):
+        matrix = json.loads((Path(__file__).resolve().parents[1] / "live-cases.json").read_text(encoding="utf-8"))
+        question = matrix["turns"][1]["utterance"]
+        self.assertTrue(runtime._provider_input_matches_pinned_turn(2, json.dumps({"question": question})))
+        self.assertFalse(runtime._provider_input_matches_pinned_turn(2, json.dumps({"question": question + " changed"})))
+        self.assertFalse(runtime._provider_input_matches_pinned_turn(2, json.dumps({"question": matrix["turns"][0]["utterance"]})))
+        self.assertFalse(runtime._provider_input_matches_pinned_turn(2, "not-json"))
+        self.assertFalse(runtime._provider_input_matches_pinned_turn(2, json.dumps([question])))
+        self.assertFalse(runtime._provider_input_matches_pinned_turn(2, "x" * (1024 * 1024 + 1)))
+        with tempfile.TemporaryDirectory() as directory:
+            env = {
+                "STAYLEAD_S6_CAPTURE_SYNTHETIC_JSON": "1",
+                "STAYLEAD_S6_SYNTHETIC_MATRIX_ID": runtime.MATRIX_ID,
+            }
+            with patch.object(runtime, "CAPTURE_DIR", Path(directory)), patch.dict(os.environ, env, clear=True):
+                for index, input_text in enumerate((json.dumps({"question": question}), json.dumps({"question": question + " changed"})), start=1):
+                    allowed = runtime._provider_input_matches_pinned_turn(2, input_text)
+                    result = runtime._capture_synthetic_json('{"answer":"synthetic output"}', {
+                        "guest_turn": 2, "attempt": index, "synthetic_pinned": allowed, "answer_only_resume": True,
+                        "request_shape": {"input_sha256": "a" * 64, "instructions_sha256": "b" * 64},
+                    })
+                    self.assertEqual(result["capture_status"], "captured_private" if index == 1 else "disabled")
+            capture_file = Path(directory) / "output-01.json"
+            self.assertEqual(capture_file.stat().st_mode & 0o777, 0o600)
+            capture_record = json.loads(capture_file.read_text(encoding="utf-8"))
+            self.assertNotIn(question, capture_file.read_text(encoding="utf-8"))
+            self.assertNotIn("input_text", capture_record)
+
     def test_no_startup_provider_call_without_explicit_live_gate(self):
         with patch.dict(os.environ, {}, clear=True):
             with self.assertRaises(SystemExit):
@@ -259,7 +291,8 @@ class RuntimeBoundsTests(unittest.TestCase):
     def test_browser_driver_does_not_submit_after_failure_and_snapshots_copy_counters(self):
         source = Path(__file__).with_name("resumed-live-browser.mjs").read_text(encoding="utf-8")
         self.assertIn('process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1"', source)
-        self.assertIn('"remediation-2-live-run"', source)
+        self.assertIn('`${RUN_NAMESPACE}-live-run`', source)
+        self.assertIn('"remediation-3"', source)
         self.assertIn("keepBrowserOpen = true", source)
         self.assertIn("this driver will not submit another turn", source)
         self.assertIn('result: "driver_exception_preserved_partial_evidence_browser_held_open"', source)
