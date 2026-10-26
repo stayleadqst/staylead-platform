@@ -1,5 +1,6 @@
 """Structured answer wire schema registered by Hospitality composition."""
 
+import re
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -61,7 +62,15 @@ class HospitalityGroundedAnswer(BaseModel):
         return value
 
 
-def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, object]:
+_CHECKOUT_CHOICE = re.compile(r"(?<!\d)(\d{1,2})\s*/\s*(\d{1,2})(?!\d)")
+
+
+def committed_answer_output_schema(
+    label_keys: tuple[str, ...],
+    allowed_guest_refs: tuple[str, ...] = (),
+    pending_fields: tuple[str, ...] = (),
+    question: str = "",
+) -> dict[str, object]:
     """Build Codex's final-answer schema with at least one substantive channel."""
     if (
         len(set(label_keys)) != len(label_keys)
@@ -75,6 +84,15 @@ def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, obj
     def string_array(*, maximum: int) -> dict[str, object]:
         return {"type": "array", "items": text(max_length=2000), "minItems": 0, "maxItems": maximum}
 
+    guest_refs: dict[str, object] = {
+        "type": "array", "items": text(max_length=128),
+        "minItems": 1 if allowed_guest_refs else 0,
+        "maxItems": 10 if allowed_guest_refs else 0,
+    }
+    if allowed_guest_refs:
+        guest_refs["items"] = {"type": "string", "enum": list(allowed_guest_refs)}
+    else:
+        guest_refs["maxItems"] = 0
     properties: dict[str, object] = {
         "supported_claims": {
             "type": "array", "minItems": 0, "maxItems": 20,
@@ -93,12 +111,15 @@ def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, obj
             "items": {
                 "type": "object", "properties": {
                     "text": text(),
-                    "refs": {"type": "array", "items": text(max_length=128), "minItems": 1, "maxItems": 10},
+                    "refs": dict(guest_refs),
                 },
                 "required": ["text", "refs"], "additionalProperties": False,
             },
         },
-        "guest_brief_refs": {"type": "array", "items": text(max_length=128), "minItems": 0, "maxItems": 20},
+        "guest_brief_refs": (
+            {"type": "array", "items": {"type": "string", "enum": list(allowed_guest_refs)}, "minItems": 0, "maxItems": 20}
+            if allowed_guest_refs else {"type": "array", "items": text(max_length=128), "minItems": 0, "maxItems": 0}
+        ),
         "guest_clarification": {
             "anyOf": [
                 {"type": "object", "properties": {
@@ -125,8 +146,33 @@ def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, obj
             "additionalProperties": False,
         },
     }
+    if not allowed_guest_refs:
+        properties["guest_claims"]["maxItems"] = 0  # type: ignore[index]
+    choice_matches = _CHECKOUT_CHOICE.findall(question)
+    checkout_choices = list(choice_matches[0]) if (
+        "dates.check_out" in pending_fields and len(choice_matches) == 1
+        and choice_matches[0][0] != choice_matches[0][1]
+    ) else []
+    clarification = properties["guest_clarification"]
+    if isinstance(clarification, dict):
+        variants = clarification["anyOf"]
+        clarification_object = next(item for item in variants if item.get("type") == "object")
+        if checkout_choices:
+            clarification_object["properties"]["options"]["items"] = {
+                "type": "string", "enum": checkout_choices,
+            }
+            properties["guest_clarification"] = clarification_object
+        else:
+            properties["guest_clarification"] = {"type": "null"}
+    if "party.children." in " ".join(pending_fields) and any(
+        ref.endswith(".age") for ref in pending_fields
+    ):
+        properties["unknowns"]["minItems"] = 1  # type: ignore[index]
     branches: list[dict[str, object]] = []
-    for channel in ("supported_claims", "guest_claims", "unknowns", "conflicts"):
+    channels = ["supported_claims", "unknowns", "conflicts"]
+    if allowed_guest_refs:
+        channels.append("guest_claims")
+    for channel in channels:
         branch_properties = {key: dict(value) for key, value in properties.items()}
         branch_properties[channel] = dict(branch_properties[channel])
         branch_properties[channel]["minItems"] = 1  # type: ignore[index]
@@ -134,13 +180,18 @@ def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, obj
             "type": "object", "properties": branch_properties,
             "required": list(properties), "additionalProperties": False,
         })
-    for channel in ("guest_clarification", "conversational_acknowledgement"):
+    for channel in ("conversational_acknowledgement",):
         branch_properties = {key: dict(value) for key, value in properties.items()}
         nullable = branch_properties[channel]
         if isinstance(nullable, dict):
             branch_properties[channel] = next(item for item in nullable["anyOf"] if item.get("type") == "object")
         branches.append({
             "type": "object", "properties": branch_properties,
+            "required": list(properties), "additionalProperties": False,
+        })
+    if checkout_choices:
+        branches.append({
+            "type": "object", "properties": {key: dict(value) for key, value in properties.items()},
             "required": list(properties), "additionalProperties": False,
         })
     return {

@@ -259,7 +259,9 @@ class GroundedQAOrchestrator:
             [Any, str, dict[str, Any] | None, tuple[str, ...]],
             tuple[str, tuple[str, ...]] | None,
         ] | None = None,
-        committed_output_schema_factory: Callable[[tuple[str, ...]], dict[str, Any]] | None = None,
+        committed_output_schema_factory: Callable[
+            [tuple[str, ...], tuple[str, ...], tuple[str, ...], str], dict[str, Any]
+        ] | None = None,
         response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
     ) -> None:
@@ -397,8 +399,14 @@ class GroundedQAOrchestrator:
                     "in the current or historical question/context, and do not return a different explicit_language_tag."
                 )
         try:
+            allowed_brief_refs = _known_nonpending_brief_refs(brief)
             response_schema = (
-                self._committed_output_schema_factory(missing_label_keys)
+                self._committed_output_schema_factory(
+                    missing_label_keys,
+                    allowed_brief_refs,
+                    brief.pending_fields if brief is not None else (),
+                    question,
+                )
                 if not extract_guest_patch and self._committed_output_schema_factory is not None
                 else None
             )
@@ -689,9 +697,26 @@ def _validated_brief_refs(
     for child in brief.data.get("party", {}).get("children", []):
         member_id = child.get("member_id")
         allowed[f"party.children.{member_id}.age"] = child.get("age")
-    if any(ref not in allowed or allowed[ref] is None for ref in refs):
+    pending = set(brief.pending_fields)
+    if any(ref not in allowed or allowed[ref] is None or ref in pending for ref in refs):
         raise ConversationFailure("invalid_model_output", "The model referenced a missing guest brief field.")
     return tuple(refs)
+
+
+def _known_nonpending_brief_refs(brief: GuestBriefSnapshot | None) -> tuple[str, ...]:
+    if brief is None:
+        return ()
+    pending = set(brief.pending_fields)
+    values = {
+        "dates.check_in": brief.data.get("dates", {}).get("check_in"),
+        "dates.check_out": brief.data.get("dates", {}).get("check_out"),
+        "dates.nights": brief.data.get("dates", {}).get("nights"),
+        "party.adults": brief.data.get("party", {}).get("adults"),
+        "party.children.count": len(brief.data.get("party", {}).get("children", [])),
+    }
+    for child in brief.data.get("party", {}).get("children", []):
+        values[f"party.children.{child.get('member_id')}.age"] = child.get("age")
+    return tuple(sorted(ref for ref, value in values.items() if value is not None and ref not in pending))
 
 
 def _validated_guest_claims(

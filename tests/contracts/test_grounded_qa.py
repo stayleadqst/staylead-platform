@@ -923,6 +923,18 @@ def _checkout_pending_brief() -> GuestBriefSnapshot:
     }, ("dates.check_out",))
 
 
+def test_non_null_pending_guest_ref_is_rejected_at_runtime() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_brief_refs": ["dates.check_out"],
+    })
+    with pytest.raises(ConversationFailure, match="missing guest brief field"):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Confirm my checkout", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+
 def test_typed_checkout_clarification_accepts_only_source_choices_and_nonpending_year() -> None:
     provider = FakeProvider(answer={
         "supported_claims": [], "unknowns": [], "conflicts": [],
@@ -1008,7 +1020,7 @@ def test_committed_output_schema_requires_substantive_response_and_exact_labels(
     assert schema["additionalProperties"] is False
     response = schema["properties"]["response"]
     branches = response["anyOf"]
-    assert len(branches) == 6
+    assert len(branches) == 4
     expected_properties = {
         "supported_claims", "unknowns", "conflicts", "guest_claims", "guest_brief_refs",
         "guest_clarification", "conversational_acknowledgement", "label_bundle",
@@ -1023,12 +1035,46 @@ def test_committed_output_schema_requires_substantive_response_and_exact_labels(
         assert labels["required"] == ["send", "copy"]
         assert labels["additionalProperties"] is False
     assert branches[0]["properties"]["supported_claims"]["minItems"] == 1
-    assert branches[1]["properties"]["guest_claims"]["minItems"] == 1
-    assert branches[2]["properties"]["unknowns"]["minItems"] == 1
-    assert branches[3]["properties"]["conflicts"]["minItems"] == 1
-    assert branches[4]["properties"]["guest_clarification"]["type"] == "object"
-    assert branches[5]["properties"]["conversational_acknowledgement"]["type"] == "object"
-    assert branches[2]["properties"]["unknowns"]["items"]["pattern"] == r"\S"
+    assert branches[1]["properties"]["unknowns"]["minItems"] == 1
+    assert branches[2]["properties"]["conflicts"]["minItems"] == 1
+    assert branches[3]["properties"]["conversational_acknowledgement"]["type"] == "object"
+    assert branches[0]["properties"]["guest_claims"]["maxItems"] == 0
+    assert branches[0]["properties"]["guest_clarification"]["type"] == "null"
+    assert branches[1]["properties"]["unknowns"]["items"]["pattern"] == r"\S"
+
+
+def test_committed_output_schema_bounds_refs_options_and_pending_child_age() -> None:
+    schema = committed_answer_output_schema(
+        ("send",),
+        ("dates.check_in", "party.adults"),
+        ("dates.check_out", "party.children.child-a.age"),
+        "I mean 12/13 December for checkout.",
+    )
+    branches = schema["properties"]["response"]["anyOf"]
+    for branch in branches:
+        props = branch["properties"]
+        assert props["guest_brief_refs"]["items"]["enum"] == ["dates.check_in", "party.adults"]
+        assert props["guest_claims"]["items"]["properties"]["refs"]["items"]["enum"] == [
+            "dates.check_in", "party.adults",
+        ]
+        assert props["unknowns"]["minItems"] == 1
+    clarification = branches[-1]["properties"]["guest_clarification"]
+    assert clarification["properties"]["options"]["items"]["enum"] == ["12", "13"]
+    assert all(
+        branch["properties"]["guest_clarification"]["type"] == "object"
+        for branch in branches
+    ), "a known pending checkout choice requires the typed clarification in every branch"
+
+
+def test_committed_output_schema_disables_guest_refs_without_safe_allowlist() -> None:
+    schema = committed_answer_output_schema(("send",), (), ("dates.check_out",), "No choice")
+    for branch in schema["properties"]["response"]["anyOf"]:
+        props = branch["properties"]
+        assert props["guest_brief_refs"]["maxItems"] == 0
+        assert props["guest_claims"]["maxItems"] == 0
+        assert props["guest_claims"]["items"]["properties"]["refs"]["minItems"] == 0
+        assert props["guest_claims"]["items"]["properties"]["refs"]["maxItems"] == 0
+        assert props["guest_clarification"]["type"] == "null"
 
 
 def test_committed_output_schema_rejects_dynamic_label_keys() -> None:
