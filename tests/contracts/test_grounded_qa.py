@@ -25,6 +25,10 @@ from staylead_platform.domains.hospitality.schemas.guest_brief import (
     validate_guest_patch_authorization,
     validate_preparation_metadata,
 )
+from staylead_platform.domains.hospitality.schemas.preparation_output import (
+    fact_selection_output_schema,
+    preparation_answer_output_schema,
+)
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
     validate_pending_guest_clarification,
 )
@@ -119,6 +123,8 @@ def build(
     committed_output_schema_factory: Callable[[tuple[str, ...]], dict[str, Any]] | None = None,
     response_envelope_key: str | None = None,
     committed_answer_validator: Callable[..., None] | None = None,
+    preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
+    preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
         provider=provider,
@@ -134,6 +140,8 @@ def build(
         committed_output_schema_factory=committed_output_schema_factory,
         response_envelope_key=response_envelope_key,
         committed_answer_validator=committed_answer_validator,
+        preparation_selection_schema_factory=preparation_selection_schema_factory,
+        preparation_answer_schema_factory=preparation_answer_schema_factory,
     )
 
 
@@ -1227,6 +1235,47 @@ def test_committed_output_schema_is_sent_only_for_final_answer_call() -> None:
     assert provider.calls[1].response_schema is not None
     assert provider.calls[1].response_schema["required"] == ["response"]
     assert provider.calls[1].response_envelope_key == "response"
+
+
+def test_preparation_schema_is_attached_to_low_overlap_selection_and_accepts_flat_adapter_output() -> None:
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    prepared = asyncio.run(build(
+        provider, preparation_selection_schema_factory=fact_selection_output_schema,
+        response_envelope_key="response",
+    ).prepare_turn(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[],
+        brief=GuestBriefSnapshot(0, {"dates": {}, "party": {}}, ()),
+    ))
+    assert len(provider.calls) == 1
+    assert provider.calls[0].response_schema == fact_selection_output_schema()
+    assert provider.calls[0].response_envelope_key == "response"
+    assert prepared.selected_fact_ids == ("F-HTL-CITY01-040",)
+
+
+def test_preparation_schema_is_attached_to_high_overlap_answer_without_wrapping_flat_response() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": "Breakfast is served at 06:30-09:30.", "fact_ids": ["F-HTL-CITY01-040"],
+        }],
+        "unknowns": [], "conflicts": [], "guest_patch": None,
+        "guest_patch_authorizations": [], "turn_intents": ["hotel_information"],
+        "guest_claims": [], "guest_clarification": None,
+        "conversational_acknowledgement": None, "guest_brief_refs": [],
+        "explicit_language_tag": None, "inferred_language_tag": None, "label_bundle": {},
+    })
+    facts = MemoryFacts()
+    answer = asyncio.run(build(
+        provider, facts, preparation_answer_schema_factory=preparation_answer_output_schema,
+        response_envelope_key="response",
+    ).answer(
+        hotel_id="HTL-CITY01", question="Tell me the breakfast hours.", history=[],
+        prefetched_facts=[asdict(fact) for fact in facts.facts if fact.hotel_id == "HTL-CITY01"],
+        extract_guest_patch=True,
+    ))
+    assert len(provider.calls) == 1
+    assert provider.calls[0].response_schema == preparation_answer_output_schema((), ())
+    assert provider.calls[0].response_envelope_key == "response"
+    assert "06:30" in answer.answer
 
 
 def test_committed_output_schema_scopes_hotel_channels_to_current_turn_intent() -> None:

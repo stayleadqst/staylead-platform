@@ -32,6 +32,10 @@ from staylead_platform.domains.hospitality.schemas.guest_brief import (
     validate_guest_brief_proposal,
     validate_preparation_metadata,
 )
+from staylead_platform.domains.hospitality.schemas.preparation_output import (
+    fact_selection_output_schema,
+    preparation_answer_output_schema,
+)
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
     validate_pending_guest_clarification,
 )
@@ -161,6 +165,8 @@ def create_guest_chat_application(
             claim_formatter=format_grounded_claim,
             clarification_validator=validate_pending_guest_clarification,
             committed_output_schema_factory=committed_answer_output_schema,
+            preparation_selection_schema_factory=fact_selection_output_schema,
+            preparation_answer_schema_factory=preparation_answer_output_schema,
             preparation_metadata_validator=validate_preparation_metadata,
             committed_answer_validator=validate_committed_turn_channels,
             response_envelope_key="response",

@@ -22,9 +22,10 @@ a pure FAQ or when no edit was requested. The patch is a proposal, never applied
 For this current question, classify one or more `turn_intents`: `hotel_information`, `guest_state`,
 `guest_edit`, `courtesy`. History may resolve references but cannot authorize a new edit or request intent.
 For each patch op, return exactly one `guest_patch_authorizations` item with its zero-based operation_index,
-same op, exact canonical target_fields, intent `explicit_request` (or `clarification` for clarify), and an
-exact nonempty `current_turn_quote` copied from this question. Return [] when there are no ops. Never quote
-history as authorization."""
+the operation-name string only in `op` (for example `set_dates`, never the operation object), exact
+canonical target_fields, intent `explicit_request` (or `clarification` for clarify), and an exact nonempty
+`current_turn_quote` copied from this question. Return [] when there are no ops. Never quote history as
+authorization."""
 
 GROUNDED_QA_INSTRUCTIONS = """You are the guest information assistant for the one named property in the evidence.
 Answer the guest's question directly in the language they used. The evidence may use another language.

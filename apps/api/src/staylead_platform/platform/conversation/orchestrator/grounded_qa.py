@@ -278,6 +278,8 @@ class GroundedQAOrchestrator:
         committed_output_schema_factory: Callable[
             [tuple[str, ...], tuple[str, ...], tuple[str, ...], str, tuple[str, ...], tuple[str, ...]], dict[str, Any]
         ] | None = None,
+        preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
+        preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
         preparation_metadata_validator: Callable[
             [Any, GuestBriefProposal | None, str], tuple[tuple[str, ...], tuple[dict[str, Any], ...]]
         ] | None = None,
@@ -296,6 +298,8 @@ class GroundedQAOrchestrator:
         self._claim_formatter = claim_formatter
         self._clarification_validator = clarification_validator
         self._committed_output_schema_factory = committed_output_schema_factory
+        self._preparation_selection_schema_factory = preparation_selection_schema_factory
+        self._preparation_answer_schema_factory = preparation_answer_schema_factory
         self._preparation_metadata_validator = preparation_metadata_validator
         self._committed_answer_validator = committed_answer_validator
         self._response_envelope_key = response_envelope_key
@@ -340,6 +344,10 @@ class GroundedQAOrchestrator:
                 "guest_brief_patch_enabled": extract_guest_patch,
             }, ensure_ascii=False, separators=(",", ":"))
             try:
+                selection_schema = (
+                    self._preparation_selection_schema_factory()
+                    if extract_guest_patch and self._preparation_selection_schema_factory is not None else None
+                )
                 selected = await self._provider.generate(GenerationRequest(
                     instructions=(
                         self._selection_instructions
@@ -347,6 +355,8 @@ class GroundedQAOrchestrator:
                     ),
                     input_text=selection_input,
                     max_output_tokens=140,
+                    response_schema=selection_schema,
+                    response_envelope_key=(self._response_envelope_key if selection_schema is not None else None),
                 ))
                 provider_results.append(selected)
                 selection = self._selection_schema.model_validate_json(selected.text)
@@ -430,7 +440,9 @@ class GroundedQAOrchestrator:
         try:
             allowed_brief_refs = _known_nonpending_brief_refs(brief)
             response_schema = (
-                self._committed_output_schema_factory(
+                self._preparation_answer_schema_factory(missing_label_keys, label_bundle_keys)
+                if extract_guest_patch and self._preparation_answer_schema_factory is not None
+                else self._committed_output_schema_factory(
                     missing_label_keys,
                     allowed_brief_refs,
                     brief.pending_fields if brief is not None else (),
@@ -657,9 +669,15 @@ class GroundedQAOrchestrator:
                 "label_source_texts": label_source_texts or {},
             }, ensure_ascii=False, separators=(",", ":"))
             try:
+                selection_schema = (
+                    self._preparation_selection_schema_factory()
+                    if self._preparation_selection_schema_factory is not None else None
+                )
                 selected = await self._provider.generate(GenerationRequest(
                     instructions=self._selection_instructions,
                     input_text=selection_input, max_output_tokens=self._max_output_tokens,
+                    response_schema=selection_schema,
+                    response_envelope_key=(self._response_envelope_key if selection_schema is not None else None),
                 ))
                 payload = self._selection_schema.model_validate_json(selected.text)
                 allowed_ids = {item["fact_id"] for item in retrieved.candidate_index}
