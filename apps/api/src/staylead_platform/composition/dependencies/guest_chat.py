@@ -27,9 +27,13 @@ from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
     committed_answer_output_schema,
 )
-from staylead_platform.domains.hospitality.schemas.guest_brief import validate_guest_brief_proposal
+from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    validate_committed_turn_channels,
+    validate_guest_brief_proposal,
+    validate_preparation_metadata,
+)
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
-    validate_checkout_clarification,
+    validate_pending_guest_clarification,
 )
 from staylead_platform.infrastructure.ai_provider import FoundryGrokConfig, FoundryGrokProvider
 from staylead_platform.infrastructure.codex_provider import CodexCLIProvider
@@ -78,6 +82,7 @@ from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
 )
 from staylead_platform.platform.conversation.responses.presentation_labels import (
     LABEL_KEYS,
+    label_source_texts,
     labels_fallback,
     missing_label_keys,
     resolve_label_bundle,
@@ -154,8 +159,10 @@ def create_guest_chat_application(
             committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
             selection_schema=FactSelection,
             claim_formatter=format_grounded_claim,
-            clarification_validator=validate_checkout_clarification,
+            clarification_validator=validate_pending_guest_clarification,
             committed_output_schema_factory=committed_answer_output_schema,
+            preparation_metadata_validator=validate_preparation_metadata,
+            committed_answer_validator=validate_committed_turn_channels,
             response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,
         )
@@ -598,6 +605,25 @@ class GuestChatApplication:
                         raise GuestChatError(404, "brief_receipt_unavailable", "The saved trip update is not available for this chat.")
                     if saved_receipt["receipt"].answer_status != "failed":
                         raise GuestChatError(409, "brief_resume_unavailable", "This trip update does not need an answer resume.")
+                    saved_answer_payload = saved_receipt.get("answer_payload")
+                    saved_turn_intents = (
+                        saved_answer_payload.get("turn_intents")
+                        if isinstance(saved_answer_payload, dict) else None
+                    )
+                    saved_authorized_targets = (
+                        saved_answer_payload.get("authorized_targets")
+                        if isinstance(saved_answer_payload, dict) else None
+                    )
+                    if (
+                        not isinstance(saved_turn_intents, list) or not saved_turn_intents
+                        or any(not isinstance(item, str) for item in saved_turn_intents)
+                        or not isinstance(saved_authorized_targets, list)
+                        or any(not isinstance(item, str) for item in saved_authorized_targets)
+                    ):
+                        raise GuestChatError(
+                            409, "brief_resume_unavailable",
+                            "The saved answer is missing its current-turn scope and cannot be resumed safely.",
+                        )
                     resumed_receipt = saved_receipt["receipt"]
                     committed_brief = await asyncio.to_thread(
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
@@ -610,6 +636,9 @@ class GuestChatApplication:
                         preferred_language_tag=(current_language_row or {}).get("language_tag"),
                         missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
                         label_bundle_keys=LABEL_KEYS,
+                        label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                        turn_intents=tuple(saved_turn_intents),
+                        authorized_targets=tuple(saved_authorized_targets),
                     )
                 else:
                     committed_brief = await asyncio.to_thread(
@@ -624,6 +653,7 @@ class GuestChatApplication:
                         preferred_language_tag=(current_language_row or {}).get("language_tag"),
                         missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
                         label_bundle_keys=LABEL_KEYS,
+                        label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
                     )
                     requested_tag = normalize_language_tag(prepared.explicit_language_tag)
                     inferred_tag = normalize_language_tag(prepared.inferred_language_tag)
@@ -652,6 +682,11 @@ class GuestChatApplication:
                             session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
                             expected_brief_version=committed_brief.brief_version,
                             source_utterance_id=source_utterance_id, source_utterance=transcript_question,
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=tuple(dict.fromkeys(
+                                target for authorization in prepared.patch_authorizations
+                                for target in authorization.get("target_fields", ())
+                            )),
                         )
                         validated = validate_guest_brief_proposal(committed_brief, prepared.guest_patch)
                         apply_attempted = True
@@ -696,6 +731,9 @@ class GuestChatApplication:
                             preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
                             missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
                             label_bundle_keys=LABEL_KEYS,
+                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=brief_context.authorized_targets,
                         )
                     elif prepared.provisional_answer is not None:
                         if language_race:
@@ -706,6 +744,9 @@ class GuestChatApplication:
                                 preferred_language_tag=current_language["language_tag"],
                                 missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
                                 label_bundle_keys=LABEL_KEYS,
+                                label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                                turn_intents=prepared.turn_intents,
+                                authorized_targets=brief_context.authorized_targets if brief_context else (),
                             )
                         else:
                             answer = prepared.provisional_answer
@@ -717,6 +758,9 @@ class GuestChatApplication:
                             preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
                             missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
                             label_bundle_keys=LABEL_KEYS,
+                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=brief_context.authorized_targets if brief_context else (),
                         )
                 # The orchestrator sets this only when its structured output cites
                 # validated canonical brief fields. A supplied brief alone does not

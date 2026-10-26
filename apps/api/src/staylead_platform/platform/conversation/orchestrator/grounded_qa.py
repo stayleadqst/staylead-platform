@@ -33,6 +33,7 @@ _NUMBER = re.compile(
     r"(?<!\d)(?:\d+(?:[-/]\d+){2}|\d{1,2}:\d{2}(?::\d{2})?|\d+(?:[.,]\d+)*)(?!\d)"
 )
 _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
+_URL_SENTENCE_END = ".,;:!?)\u060c\u061b\u3001\u3002"
 _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")
 _FACT_TOKEN = re.compile(r"(?<![A-Za-z0-9])F-[A-Za-z0-9-]+")
 _MODEL_FACT_FIELDS = ("fact_id", "topic", "subject", "field", "value", "conditions", "status")
@@ -43,7 +44,8 @@ _SAFE_VALIDATION_FIELDS = frozenset({
     "set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify",
     "check_in", "check_out", "count", "age", "member_id", "reason", "guest_claims", "refs",
     "guest_brief_refs", "guest_clarification", "field", "options", "conversational_acknowledgement", "intent",
-    "explicit_language_tag", "inferred_language_tag", "label_bundle",
+    "explicit_language_tag", "inferred_language_tag", "label_bundle", "turn_intents",
+    "guest_patch_authorizations", "operation_index", "target_fields", "current_turn_quote",
 })
 
 
@@ -134,6 +136,8 @@ class ConversationAnswer:
     inferred_language_tag: str | None = None
     label_bundle: dict[str, str] = field(default_factory=dict)
     acknowledgement: str | None = None
+    turn_intents: tuple[str, ...] = ()
+    patch_authorizations: tuple[dict[str, Any], ...] = ()
 
 
 def _numeric_forms(text: str) -> set[str]:
@@ -154,8 +158,8 @@ def _validate_supported_literals(answer: str, cited_facts: list[dict[str, Any]])
         for fact in cited_facts
     ], ensure_ascii=False)
     without_citations = re.sub(r"\[F-[A-Za-z0-9-]+\]", "", answer)
-    evidence_urls = {url.rstrip(".,;:!?)") for url in _URL.findall(trusted)}
-    if any(url.rstrip(".,;:!?)") not in evidence_urls for url in _URL.findall(answer)):
+    evidence_urls = set(_URL.findall(trusted))
+    if any(not _url_matches_trusted_token(url, evidence_urls) for url in _URL.findall(answer)):
         raise ConversationFailure(
             "unsupported_output", "The model returned an unsupported URL.", reason="unsupported_url",
         )
@@ -163,6 +167,17 @@ def _validate_supported_literals(answer: str, cited_facts: list[dict[str, Any]])
         raise ConversationFailure(
             "unsupported_output", "The model returned an unsupported number.", reason="unsupported_number",
         )
+
+
+def _url_matches_trusted_token(candidate: str, trusted_urls: set[str]) -> bool:
+    if candidate in trusted_urls:
+        return True
+    trimmed = candidate
+    while trimmed and trimmed[-1] in _URL_SENTENCE_END:
+        trimmed = trimmed[:-1]
+        if trimmed in trusted_urls:
+            return True
+    return False
 
 
 def _question_url_fact_ids(
@@ -173,7 +188,7 @@ def _question_url_fact_ids(
     Retrieval supplies current guest-visible facts. The ID must also be in the candidate
     index, and the exact URL must occur in both question and fact. Claims still cite it.
     """
-    question_urls = {url.rstrip(".,;:!?)") for url in _URL.findall(question)}
+    question_urls = _URL.findall(question)
     if not question_urls:
         return set()
     matched: set[str] = set()
@@ -185,7 +200,8 @@ def _question_url_fact_ids(
             str(fact.get("value", "")),
             json.dumps(fact.get("conditions", {}), ensure_ascii=False),
         ))
-        if question_urls.intersection(url.rstrip(".,;:!?)") for url in _URL.findall(trusted)):
+        trusted_urls = set(_URL.findall(trusted))
+        if any(_url_matches_trusted_token(url, trusted_urls) for url in question_urls):
             matched.add(fact_id)
     return matched
 
@@ -256,12 +272,16 @@ class GroundedQAOrchestrator:
         selection_schema: type[BaseModel],
         claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
         clarification_validator: Callable[
-            [Any, str, dict[str, Any] | None, tuple[str, ...]],
+            [Any, str, dict[str, Any] | None, tuple[str, ...], tuple[str, ...]],
             tuple[str, tuple[str, ...]] | None,
         ] | None = None,
         committed_output_schema_factory: Callable[
-            [tuple[str, ...], tuple[str, ...], tuple[str, ...], str], dict[str, Any]
+            [tuple[str, ...], tuple[str, ...], tuple[str, ...], str, tuple[str, ...], tuple[str, ...]], dict[str, Any]
         ] | None = None,
+        preparation_metadata_validator: Callable[
+            [Any, GuestBriefProposal | None, str], tuple[tuple[str, ...], tuple[dict[str, Any], ...]]
+        ] | None = None,
+        committed_answer_validator: Callable[[Any, tuple[str, ...], tuple[str, ...], tuple[str, ...]], None] | None = None,
         response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
     ) -> None:
@@ -276,6 +296,8 @@ class GroundedQAOrchestrator:
         self._claim_formatter = claim_formatter
         self._clarification_validator = clarification_validator
         self._committed_output_schema_factory = committed_output_schema_factory
+        self._preparation_metadata_validator = preparation_metadata_validator
+        self._committed_answer_validator = committed_answer_validator
         self._response_envelope_key = response_envelope_key
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
 
@@ -289,6 +311,9 @@ class GroundedQAOrchestrator:
         preferred_language_tag: str | None = None,
         missing_label_keys: tuple[str, ...] = (),
         label_bundle_keys: tuple[str, ...] = (),
+        label_source_texts: dict[str, str] | None = None,
+        turn_intents: tuple[str, ...] = (),
+        authorized_targets: tuple[str, ...] = (),
     ) -> ConversationAnswer:
         provider_results: list[GenerationResult] = []
         retrieved = None
@@ -370,6 +395,8 @@ class GroundedQAOrchestrator:
             "preferred_language_tag": preferred_language_tag,
             "missing_label_keys": list(missing_label_keys),
             "label_bundle_keys": list(label_bundle_keys),
+            "label_source_texts": label_source_texts or {},
+            "turn_intents": list(turn_intents),
         }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 18000:
             evidence = json.dumps({
@@ -382,6 +409,8 @@ class GroundedQAOrchestrator:
                 "preferred_language_tag": preferred_language_tag,
                 "missing_label_keys": list(missing_label_keys),
                 "label_bundle_keys": list(label_bundle_keys),
+                "label_source_texts": label_source_texts or {},
+                "turn_intents": list(turn_intents),
             }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 22000:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")
@@ -406,6 +435,8 @@ class GroundedQAOrchestrator:
                     allowed_brief_refs,
                     brief.pending_fields if brief is not None else (),
                     question,
+                    turn_intents,
+                    authorized_targets,
                 )
                 if not extract_guest_patch and self._committed_output_schema_factory is not None
                 else None
@@ -431,6 +462,42 @@ class GroundedQAOrchestrator:
                 "invalid_model_output", "The model returned an invalid answer.",
                 validation_diagnostics=diagnostics,
             ) from exc
+        answer_turn_intents = tuple(getattr(payload, "turn_intents", ()))
+        patch_authorizations = tuple(
+            item.model_dump(mode="json") for item in getattr(payload, "guest_patch_authorizations", ())
+        )
+        preparation_patch = None
+        if extract_guest_patch and self._preparation_metadata_validator is not None:
+            preparation_patch = _proposal(getattr(payload, "guest_patch", None))
+            try:
+                answer_turn_intents, patch_authorizations = self._preparation_metadata_validator(
+                    payload, preparation_patch, question,
+                )
+            except ValueError as exc:
+                raise ConversationFailure(
+                    "invalid_model_output", "The model returned invalid preparation metadata."
+                ) from exc
+        if (
+            extract_guest_patch and preparation_patch is None
+            and self._committed_answer_validator is not None
+        ):
+            try:
+                self._committed_answer_validator(
+                    payload, answer_turn_intents, brief.pending_fields if brief else (), (),
+                )
+            except ValueError as exc:
+                raise ConversationFailure(
+                    "invalid_model_output", "The model returned content outside this turn's scope."
+                ) from exc
+        if not extract_guest_patch and self._committed_answer_validator is not None:
+            try:
+                self._committed_answer_validator(
+                    payload, turn_intents, brief.pending_fields if brief else (), authorized_targets,
+                )
+            except ValueError as exc:
+                raise ConversationFailure(
+                    "invalid_model_output", "The model returned content outside this turn's scope."
+                ) from exc
         facts_by_id = {fact["fact_id"]: fact for fact in relevant_facts}
         cited: list[str] = []
         rendered_claims: list[str] = []
@@ -471,6 +538,7 @@ class GroundedQAOrchestrator:
                     question,
                     brief.data if brief is not None else None,
                     brief.pending_fields if brief is not None else (),
+                    authorized_targets,
                 )
                 if self._clarification_validator is not None else None
             )
@@ -557,6 +625,8 @@ class GroundedQAOrchestrator:
             brief_dependent=bool(brief_refs or guest_clarification is not None),
             guest_brief_refs=brief_refs,
             acknowledgement=acknowledgement,
+            turn_intents=answer_turn_intents,
+            patch_authorizations=patch_authorizations,
             explicit_language_tag=_clean_language_tag(getattr(payload, "explicit_language_tag", None)),
             inferred_language_tag=_clean_language_tag(getattr(payload, "inferred_language_tag", None)),
             label_bundle=label_bundle,
@@ -569,6 +639,7 @@ class GroundedQAOrchestrator:
         preferred_language_tag: str | None = None,
         missing_label_keys: tuple[str, ...] = (),
         label_bundle_keys: tuple[str, ...] = (),
+        label_source_texts: dict[str, str] | None = None,
     ) -> PreparedGuestTurn:
         """Combine low-overlap selection with patch understanding in call one."""
         retrieved = await asyncio.to_thread(
@@ -583,6 +654,7 @@ class GroundedQAOrchestrator:
                 "guest_brief": _brief_projection(brief),
                 "guest_brief_patch_enabled": True,
                 "preferred_language_tag": preferred_language_tag,
+                "label_source_texts": label_source_texts or {},
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selected = await self._provider.generate(GenerationRequest(
@@ -599,6 +671,9 @@ class GroundedQAOrchestrator:
                     *_question_url_fact_ids(question, hotel_id, tuple(retrieved.facts), allowed_ids),
                 )))
                 patch = _proposal(getattr(payload, "guest_patch", None))
+                turn_intents, patch_authorizations = self._validated_preparation_metadata(
+                    payload, patch, question,
+                )
                 return PreparedGuestTurn(
                     provisional_answer=None, guest_patch=patch,
                     selected_fact_ids=selected_ids, source_utterance_id=source_utterance_id,
@@ -612,6 +687,8 @@ class GroundedQAOrchestrator:
                     total_tokens=selected.usage.total_tokens,
                     explicit_language_tag=_clean_language_tag(payload.explicit_language_tag),
                     inferred_language_tag=_clean_language_tag(payload.inferred_language_tag),
+                    turn_intents=turn_intents,
+                    patch_authorizations=patch_authorizations,
                 )
             except (ProviderError, TimeoutError, ConversationFailure):
                 raise
@@ -623,6 +700,7 @@ class GroundedQAOrchestrator:
             preferred_language_tag=preferred_language_tag,
             missing_label_keys=missing_label_keys,
             label_bundle_keys=label_bundle_keys,
+            label_source_texts=label_source_texts,
         )
         return PreparedGuestTurn(
             provisional_answer=answer, guest_patch=answer.guest_patch,
@@ -635,6 +713,8 @@ class GroundedQAOrchestrator:
             total_tokens=answer.usage.total_tokens,
             explicit_language_tag=answer.explicit_language_tag,
             inferred_language_tag=answer.inferred_language_tag,
+            turn_intents=answer.turn_intents,
+            patch_authorizations=answer.patch_authorizations,
         )
 
     async def answer_committed_turn(
@@ -644,6 +724,9 @@ class GroundedQAOrchestrator:
         preferred_language_tag: str | None = None,
         missing_label_keys: tuple[str, ...] = (),
         label_bundle_keys: tuple[str, ...] = (),
+        turn_intents: tuple[str, ...] = (),
+        label_source_texts: dict[str, str] | None = None,
+        authorized_targets: tuple[str, ...] = (),
     ) -> ConversationAnswer:
         """Generate the final grounded answer from committed brief state, without patch use."""
         return await self.answer(
@@ -652,7 +735,21 @@ class GroundedQAOrchestrator:
             preferred_language_tag=preferred_language_tag,
             missing_label_keys=missing_label_keys,
             label_bundle_keys=label_bundle_keys,
+            turn_intents=turn_intents,
+            authorized_targets=authorized_targets,
+            label_source_texts=label_source_texts,
         )
+
+    def _validated_preparation_metadata(
+        self, payload: Any, patch: GuestBriefProposal | None, question: str,
+    ) -> tuple[tuple[str, ...], tuple[dict[str, Any], ...]]:
+        if self._preparation_metadata_validator is None:
+            intents = tuple(getattr(payload, "turn_intents", ()))
+            authorizations = tuple(
+                item.model_dump(mode="json") for item in getattr(payload, "guest_patch_authorizations", ())
+            )
+            return intents, authorizations
+        return self._preparation_metadata_validator(payload, patch, question)
 
     @staticmethod
     def _remaining(deadline: float | None) -> float | None:

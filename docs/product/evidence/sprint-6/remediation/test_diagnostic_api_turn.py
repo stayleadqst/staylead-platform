@@ -142,6 +142,52 @@ def test_namespace_seven_anchor_selects_only_its_turn_eight_provider_request(tmp
     ) == "c" * 16
 
 
+def test_namespace_eight_allows_only_turns_five_to_nine_using_turn_four_as_anchor() -> None:
+    settings = DIAGNOSTIC._namespace_settings("remediation-8")
+    assert settings["anchor_turn"] == 4
+    assert settings["first_turn"] == 5
+    assert settings["last_turn"] == 9
+    state = valid_state(5)
+    state.update({"run_id": settings["run_id"], "codex_requests": 8})
+    for turn in range(5, 10):
+        state["guest_turns"] = turn - 1
+        before = state.copy()
+        DIAGNOSTIC._preflight_turn(turn, state, "remediation-8")
+        assert state == before
+        state["guest_turns"] = turn
+        state["codex_requests"] += 1
+    assert state["guest_turns"] == 9
+    assert state["codex_requests"] == 13
+    with pytest.raises(ValueError):
+        DIAGNOSTIC._preflight_turn(4, state, "remediation-8")
+
+
+def test_namespace_eight_anchor_and_artifacts_are_isolated(tmp_path: Path) -> None:
+    events = [
+        {"run_id": "s6-codex-20261026-remediation-7", "guest_turn": 8,
+         "stage": "provider_call_started", "turn_request_id_sha256": "a" * 16},
+        {"run_id": "s6-codex-20261026-remediation-8", "guest_turn": 3,
+         "stage": "provider_call_started", "turn_request_id_sha256": "b" * 16},
+        {"run_id": "s6-codex-20261026-remediation-8", "guest_turn": 4,
+         "stage": "provider_call_started", "turn_request_id_sha256": "c" * 16},
+        {"run_id": "s6-codex-20261026-remediation-8", "guest_turn": 4,
+         "stage": "provider_call_started", "turn_request_id_sha256": "c" * 16},
+    ]
+    path = tmp_path / "ns8-events.jsonl"
+    path.write_text("\n".join(json.dumps(event) for event in events), encoding="utf-8")
+    assert DIAGNOSTIC._anchor_request_hash(
+        path, "s6-codex-20261026-remediation-8", 4,
+    ) == "c" * 16
+
+    artifacts = {
+        DIAGNOSTIC._result_path(namespace, 9)
+        for namespace in ("remediation-4", "remediation-6", "remediation-7", "remediation-8")
+    }
+    assert len(artifacts) == 4
+    assert DIAGNOSTIC._result_path("remediation-8", 5).name == "namespace8-diagnostic-api-turn-05.json"
+    assert DIAGNOSTIC._result_path("remediation-8", 9).name == "namespace8-diagnostic-api-turn-09.json"
+
+
 def test_result_creation_is_private_exclusive_and_never_overwrites(tmp_path: Path) -> None:
     path = tmp_path / "namespace6-diagnostic-api-turn-03.json"
     DIAGNOSTIC._write_result(path, {"status": "in_progress"}, exclusive=True)

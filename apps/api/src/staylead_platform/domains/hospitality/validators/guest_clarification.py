@@ -65,3 +65,51 @@ def validate_checkout_clarification(
     if not set(option_forms) <= set(forms) or not set(forms) <= allowed:
         return None
     return text, refs
+
+
+def validate_pending_guest_clarification(
+    clarification: Any,
+    question: str,
+    brief_data: dict[str, Any] | None,
+    pending_fields: tuple[str, ...],
+    authorized_targets: tuple[str, ...] = (),
+) -> tuple[str, tuple[str, ...]] | None:
+    """Validate a typed current-turn question for an authorized pending field."""
+    if not isinstance(clarification, GuestClarification):
+        return None
+    date_endpoint_is_authorized = clarification.field in authorized_targets or (
+        clarification.field in {"dates.check_in", "dates.check_out"}
+        and any(field in authorized_targets for field in ("dates.check_in", "dates.check_out"))
+    )
+    if clarification.field in {"dates.check_in", "dates.check_out"}:
+        if clarification.field not in pending_fields or not date_endpoint_is_authorized:
+            return None
+        if clarification.field == "dates.check_out" and _CHECKOUT_CHOICE.search(question):
+            return validate_checkout_clarification(clarification, question, brief_data, pending_fields)
+        if clarification.options:
+            return None
+        text = clarification.text.strip()
+        if (
+            not text or len(text) > 500 or _URL.search(text) or _FACT_TOKEN.search(text)
+            or _number_tokens(text)
+            or any(char in text for char in "<>{}/")
+            or any(unicodedata.category(char) in {"Cc", "Cf"} for char in text)
+        ):
+            return None
+        return text, ()
+    if (
+        clarification.field not in pending_fields
+        or clarification.field not in authorized_targets
+        or clarification.field.endswith(".age")
+        or clarification.options
+    ):
+        return None
+    text = clarification.text.strip()
+    if (
+        not text or len(text) > 500 or _URL.search(text) or _FACT_TOKEN.search(text)
+        or _number_tokens(text)
+        or any(char in text for char in "<>{}/")
+        or any(unicodedata.category(char) in {"Cc", "Cf"} for char in text)
+    ):
+        return None
+    return text, ()

@@ -25,12 +25,12 @@ BASE_URL = "http://127.0.0.1:18086"
 
 
 def _namespace_settings(namespace: str) -> dict[str, Any]:
-    if namespace not in {"remediation-4", "remediation-6", "remediation-7"}:
-        raise ValueError("Diagnostic namespace must be remediation-4, remediation-6, or remediation-7.")
+    if namespace not in {"remediation-4", "remediation-6", "remediation-7", "remediation-8"}:
+        raise ValueError("Diagnostic namespace must be remediation-4, remediation-6, remediation-7, or remediation-8.")
     prefix = "staylead-sprint6-remediation-4" if namespace == "remediation-4" else f"staylead-sprint6-{namespace}"
     number = namespace.rsplit("-", 1)[1]
-    anchor_turn = {"4": 6, "6": 2, "7": 8}[number]
-    first_turn = {"4": 7, "6": 3, "7": 9}[number]
+    anchor_turn = {"4": 6, "6": 2, "7": 8, "8": 4}[number]
+    first_turn = {"4": 7, "6": 3, "7": 9, "8": 5}[number]
     return {
         "namespace": namespace,
         "run_id": f"s6-codex-20261026-{namespace}",

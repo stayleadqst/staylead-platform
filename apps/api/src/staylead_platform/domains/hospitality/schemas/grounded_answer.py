@@ -5,7 +5,12 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
+from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    GuestPatchAuthorization,
+    GuestTurnIntent,
+    HospitalityGuestBriefPatch,
+    required_pending_clarification_fields,
+)
 
 
 class GroundedClaim(BaseModel):
@@ -21,10 +26,10 @@ class GuestBriefClaim(BaseModel):
 
 
 class GuestClarification(BaseModel):
-    """A typed question about an explicit, still-pending checkout date choice."""
+    """A typed question about a current pending guest field."""
 
     field: str = Field(min_length=1, max_length=64)
-    options: list[str] = Field(min_length=2, max_length=2)
+    options: list[str] = Field(default_factory=list, max_length=2)
     text: str = Field(min_length=1, max_length=500)
 
 
@@ -40,6 +45,8 @@ class HospitalityGroundedAnswer(BaseModel):
     unknowns: list[str] = Field(default_factory=list, max_length=20)
     conflicts: list[str] = Field(default_factory=list, max_length=10)
     guest_patch: HospitalityGuestBriefPatch | None = None
+    guest_patch_authorizations: list[GuestPatchAuthorization] = Field(default_factory=list, max_length=12)
+    turn_intents: list[GuestTurnIntent] = Field(default_factory=list, max_length=4)
     guest_claims: list[GuestBriefClaim] = Field(default_factory=list, max_length=20)
     guest_clarification: GuestClarification | None = None
     conversational_acknowledgement: ConversationalAcknowledgement | None = None
@@ -70,6 +77,8 @@ def committed_answer_output_schema(
     allowed_guest_refs: tuple[str, ...] = (),
     pending_fields: tuple[str, ...] = (),
     question: str = "",
+    turn_intents: tuple[str, ...] = (),
+    authorized_targets: tuple[str, ...] = (),
 ) -> dict[str, object]:
     """Build Codex's final-answer schema with at least one substantive channel."""
     if (
@@ -124,7 +133,7 @@ def committed_answer_output_schema(
             "anyOf": [
                 {"type": "object", "properties": {
                     "field": {"type": "string", "enum": ["dates.check_out"]},
-                    "options": {"type": "array", "items": text(max_length=16), "minItems": 2, "maxItems": 2},
+                    "options": {"type": "array", "items": text(max_length=16), "minItems": 0, "maxItems": 2},
                     "text": text(max_length=500),
                 }, "required": ["field", "options", "text"], "additionalProperties": False},
                 {"type": "null"},
@@ -153,14 +162,24 @@ def committed_answer_output_schema(
         "dates.check_out" in pending_fields and len(choice_matches) == 1
         and choice_matches[0][0] != choice_matches[0][1]
     ) else []
+    clarification_fields = list(required_pending_clarification_fields(pending_fields, authorized_targets))
     clarification = properties["guest_clarification"]
     if isinstance(clarification, dict):
         variants = clarification["anyOf"]
         clarification_object = next(item for item in variants if item.get("type") == "object")
-        if checkout_choices:
-            clarification_object["properties"]["options"]["items"] = {
-                "type": "string", "enum": checkout_choices,
+        if clarification_fields:
+            clarification_object["properties"]["field"] = {
+                "type": "string", "enum": clarification_fields,
             }
+            if checkout_choices and "dates.check_out" in clarification_fields:
+                clarification_object["properties"]["options"] = {
+                    "type": "array", "items": {"type": "string", "enum": checkout_choices},
+                    "minItems": 2, "maxItems": 2,
+                }
+            else:
+                clarification_object["properties"]["options"] = {
+                    "type": "array", "items": text(max_length=16), "minItems": 0, "maxItems": 0,
+                }
             properties["guest_clarification"] = clarification_object
         else:
             properties["guest_clarification"] = {"type": "null"}
@@ -168,8 +187,28 @@ def committed_answer_output_schema(
         ref.endswith(".age") for ref in pending_fields
     ):
         properties["unknowns"]["minItems"] = 1  # type: ignore[index]
+    if "hotel_information" not in turn_intents:
+        properties["supported_claims"]["maxItems"] = 0  # type: ignore[index]
+        properties["conflicts"]["maxItems"] = 0  # type: ignore[index]
+        pending_can_be_asked = any(
+            field == "dates.check_out" or field.endswith(".age") for field in pending_fields
+        )
+        missing_guest_state = (
+            "guest_state" in turn_intents and not allowed_guest_refs
+            and not authorized_targets and not pending_fields
+        )
+        properties["unknowns"]["maxItems"] = 1 if pending_can_be_asked or missing_guest_state else 0  # type: ignore[index]
     branches: list[dict[str, object]] = []
     channels = ["supported_claims", "unknowns", "conflicts"]
+    if "hotel_information" not in turn_intents:
+        pending_can_be_asked = any(
+            field == "dates.check_out" or field.endswith(".age") for field in pending_fields
+        )
+        missing_guest_state = (
+            "guest_state" in turn_intents and not allowed_guest_refs
+            and not authorized_targets and not pending_fields
+        )
+        channels = ["unknowns"] if pending_can_be_asked or missing_guest_state else []
     if allowed_guest_refs:
         channels.append("guest_claims")
     for channel in channels:
@@ -180,7 +219,7 @@ def committed_answer_output_schema(
             "type": "object", "properties": branch_properties,
             "required": list(properties), "additionalProperties": False,
         })
-    for channel in ("conversational_acknowledgement",):
+    for channel in (("conversational_acknowledgement",) if "courtesy" in turn_intents else ()):
         branch_properties = {key: dict(value) for key, value in properties.items()}
         nullable = branch_properties[channel]
         if isinstance(nullable, dict):
@@ -189,7 +228,7 @@ def committed_answer_output_schema(
             "type": "object", "properties": branch_properties,
             "required": list(properties), "additionalProperties": False,
         })
-    if checkout_choices:
+    if clarification_fields:
         branches.append({
             "type": "object", "properties": {key: dict(value) for key, value in properties.items()},
             "required": list(properties), "additionalProperties": False,

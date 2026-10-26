@@ -18,7 +18,11 @@ from sqlalchemy.exc import OperationalError
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.entrypoints.app import create_app
 from staylead_platform.infrastructure.database import create_database_engine
-from staylead_platform.infrastructure.persistence.store import apply_migrations
+from staylead_platform.infrastructure.persistence.store import (
+    apply_migrations,
+    get_guest_brief,
+    get_guest_brief_receipt,
+)
 from staylead_platform.infrastructure.source_connectors.knowledge_v1 import (
     import_fixture_pack,
 )
@@ -77,9 +81,20 @@ class BriefConsumerProvider:
 
         if "candidate_index" in payload:
             candidates = payload.get("candidate_index", [])
-            result: dict[str, Any] = {"fact_ids": [candidates[0]["fact_id"]] if candidates else []}
+            result: dict[str, Any] = {
+                "fact_ids": [candidates[0]["fact_id"]] if candidates else [],
+                "turn_intents": ["hotel_information", "guest_edit"] if operations else ["hotel_information"],
+            }
             if operations:
                 result["guest_patch"] = {"ops": operations}
+                result["guest_patch_authorizations"] = [
+                    {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
+                     "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027" if "May 11" not in question else "May 11 through May 14, 2027"},
+                    {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+                     "intent": "explicit_request", "current_turn_quote": "two adults"},
+                    {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
+                     "intent": "explicit_request", "current_turn_quote": "one child age 9"},
+                ]
                 self.patch_proposed = True
             return self._result(result)
 
@@ -89,7 +104,16 @@ class BriefConsumerProvider:
 
         if operations:
             result = {"supported_claims": [], "unknowns": ["Your trip details were saved."],
-                      "conflicts": [], "guest_patch": {"ops": operations}}
+                      "conflicts": [], "guest_patch": {"ops": operations},
+                      "turn_intents": ["hotel_information", "guest_edit"],
+                      "guest_patch_authorizations": [
+                          {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
+                           "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027" if "May 11" not in question else "May 11 through May 14, 2027"},
+                          {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+                           "intent": "explicit_request", "current_turn_quote": "two adults"},
+                          {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
+                           "intent": "explicit_request", "current_turn_quote": "one child age 9"},
+                      ]}
             self.patch_proposed = True
             return self._result(result)
 
@@ -100,6 +124,9 @@ class BriefConsumerProvider:
             supported = [{"text": "The hotel record includes the requested information.", "fact_ids": [fact_id]}]
         unknowns = [] if supported else ["That detail is not in the available hotel records."]
         result = {"supported_claims": supported, "unknowns": unknowns, "conflicts": []}
+        if patch_enabled:
+            result["turn_intents"] = ["hotel_information"]
+            result["guest_patch_authorizations"] = []
         brief = payload.get("guest_brief") or {}
         if "nights" in question.lower() and brief.get("data", {}).get("dates", {}).get("nights") is not None:
             nights = brief["data"]["dates"]["nights"]
@@ -111,6 +138,48 @@ class BriefConsumerProvider:
             text=json.dumps(value), provider="fake", deployment="consumer-test", model="offline-fake",
             request_id=f"consumer-{self.calls}",
             usage=Usage() if self.unknown_usage else Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+        )
+
+
+class UnscopedPreparationPatchProvider:
+    """Returns a structurally valid edit without classifying this turn as an edit."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+        self.inputs: list[dict[str, Any]] = []
+
+    async def generate(self, request: GenerationRequest):
+        self.calls += 1
+        payload = json.loads(request.input_text)
+        self.inputs.append(payload)
+        candidates = payload.get("candidate_index", [])
+        question = payload["question"]
+        if candidates:
+            value = {
+                "fact_ids": [candidates[0]["fact_id"]], "turn_intents": ["hotel_information"],
+                "guest_patch": {"ops": [{"op": "set_dates", "check_in": "2027-05-10", "check_out": "2027-05-13"}]},
+                "guest_patch_authorizations": [{
+                    "operation_index": 0, "op": "set_dates",
+                    "target_fields": ["dates.check_in", "dates.check_out"],
+                    "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027",
+                }],
+            }
+        else:
+            value = {
+                "supported_claims": [], "unknowns": [], "conflicts": [],
+                "turn_intents": ["hotel_information"],
+                "guest_patch": {"ops": [{"op": "set_adults", "count": 2}]},
+                "guest_patch_authorizations": [{
+                    "operation_index": 0, "op": "set_adults", "target_fields": ["party.adults"],
+                    "intent": "explicit_request", "current_turn_quote": question,
+                }],
+            }
+            if request.response_envelope_key:
+                value = {request.response_envelope_key: value}
+        return GenerationResult(
+            text=json.dumps(value), provider="fake", deployment="unscoped-preparation",
+            model="offline-fake", request_id=f"unscoped-{self.calls}",
+            usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
         )
 
 
@@ -168,6 +237,46 @@ def test_mixed_edit_commits_before_answer_and_brief_remains_available_after_hist
     assert last_answer_input["guest_brief"]["brief_version"] == 1
 
 
+def test_preparation_rejects_unscoped_patch_before_m2_or_brief_mutation(engine) -> None:
+    provider = UnscopedPreparationPatchProvider()
+    client, session = _client(engine, provider)
+    request_id = str(uuid.uuid4())
+    question = "Please set my dates to May 10 through May 13, 2027 for two adults."
+    before = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01")
+
+    response = _post(client, session, {"request_id": request_id, "question": question})
+
+    assert response.status_code == 502, (response.text, provider.inputs)
+    assert response.json()["error"]["code"] == "invalid_retrieval_selection"
+    assert provider.calls == 1, "invalid preparation metadata must be rejected before committed-answer M2"
+    after = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01")
+    assert after == before
+    assert after.brief_version == 0
+    assert after.pending_fields == ()
+    assert get_guest_brief_receipt(
+        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,
+    ) is None
+
+
+def test_high_overlap_preparation_rejects_unscoped_patch_as_invalid_model_output(engine) -> None:
+    provider = UnscopedPreparationPatchProvider()
+    client, session = _client(engine, provider)
+    request_id = str(uuid.uuid4())
+    question = "Breakfast buffet at Ben Gio, floor 1, 06:30-09:30?"
+    before = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01")
+
+    response = _post(client, session, {"request_id": request_id, "question": question})
+
+    assert response.status_code == 502, (response.text, provider.inputs)
+    assert response.json()["error"]["code"] == "invalid_model_output", provider.inputs
+    assert "candidate_index" not in provider.inputs[0], "the regression must exercise direct high-overlap preparation"
+    assert provider.calls == 1, "invalid high-overlap preparation must fail before a second model call"
+    assert get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01") == before
+    assert get_guest_brief_receipt(
+        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,
+    ) is None
+
+
 def test_unknown_provider_usage_remains_unavailable_in_api_trace(engine) -> None:
     provider = BriefConsumerProvider(unknown_usage=True)
     client, session = _client(engine, provider)
@@ -216,6 +325,11 @@ def test_postcommit_failure_replays_same_id_and_resumes_without_resubmitting_edi
     assert partial["guest_brief"]["brief_version"] == 1
     assert partial["brief_receipt"]["status"] == "partial_success"
     assert partial["answer_status"] == "failed"
+    persisted_scope = get_guest_brief_receipt(
+        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,
+    )["answer_payload"]
+    assert persisted_scope["turn_intents"] == ["hotel_information", "guest_edit"]
+    assert persisted_scope["authorized_targets"] == ["dates.check_in", "dates.check_out", "party.adults", "party.children"]
     failed_calls = provider.calls
 
     replay = _post(client, session, {"request_id": request_id, "question": EDIT})
@@ -237,6 +351,7 @@ def test_postcommit_failure_replays_same_id_and_resumes_without_resubmitting_edi
     assert resume_inputs
     assert all(item.get("guest_brief_patch_enabled") is False for item in resume_inputs)
     assert all("set my dates" not in item.get("instructions", "").lower() for item in resume_inputs)
+    assert resume_inputs[-1].get("turn_intents") == ["hotel_information", "guest_edit"]
 
 
 def test_lost_apply_ack_returns_partial_and_same_id_recovery_never_duplicates_child(engine) -> None:

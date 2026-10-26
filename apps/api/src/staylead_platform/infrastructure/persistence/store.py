@@ -1182,7 +1182,7 @@ def get_guest_brief_receipt(
         ))).mappings().first()
         return {
             "brief": _brief_snapshot(current), "receipt": _brief_receipt(row),
-            "answer_payload": dict(row["answer_payload"] or {}),
+            "answer_payload": row["answer_payload"] if isinstance(row["answer_payload"], dict) else {},
             "brief_dependent": bool(row["brief_dependent"]),
         }
 
@@ -1284,6 +1284,10 @@ def apply_guest_brief_patch(
             source_utterance_id=context.source_utterance_id,
             source_fields=list(mutation.source_fields), answer_status="pending",
             brief_version_used=after if changed else None, brief_dependent=changed,
+            answer_payload={
+                "turn_intents": list(context.turn_intents),
+                "authorized_targets": list(context.authorized_targets),
+            },
             created_at=checked_at,
         ))
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
@@ -1307,12 +1311,23 @@ def record_guest_brief_answer(
     """Persist a terminal receipt outcome; completion freshness is checked separately."""
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
+        existing_payload = connection.execute(select(guest_brief_receipts.c.answer_payload).where(and_(
+            guest_brief_receipts.c.request_id == context.request_id,
+            guest_brief_receipts.c.session_id == context.session_id,
+            guest_brief_receipts.c.hotel_id == context.hotel_id,
+        ))).scalar_one_or_none() or {}
+        if not isinstance(existing_payload, dict):
+            existing_payload = {}
         updated = connection.execute(update(guest_brief_receipts).where(and_(
             guest_brief_receipts.c.request_id == context.request_id,
             guest_brief_receipts.c.session_id == context.session_id,
             guest_brief_receipts.c.hotel_id == context.hotel_id,
         )).values(answer_status=answer_status, brief_version_used=brief_version_used,
-                  answer_payload=answer_payload, brief_dependent=True))
+                  answer_payload={
+                      **answer_payload,
+                      "turn_intents": list(existing_payload.get("turn_intents", context.turn_intents)),
+                      "authorized_targets": list(existing_payload.get("authorized_targets", context.authorized_targets)),
+                  }, brief_dependent=True))
         if updated.rowcount != 1:
             raise ScopeError("guest brief receipt scope is invalid")
 
@@ -1635,9 +1650,20 @@ def complete_request(
             ))
             receipt_exists = connection.scalar(receipt_query)
             if receipt_exists is not None:
+                saved_payload = connection.execute(select(guest_brief_receipts.c.answer_payload).where(and_(
+                    guest_brief_receipts.c.request_id == (brief_receipt_id or request_id),
+                    guest_brief_receipts.c.session_id == session_id,
+                    guest_brief_receipts.c.hotel_id == hotel_id,
+                ))).scalar_one_or_none() or {}
+                if not isinstance(saved_payload, dict):
+                    saved_payload = {}
                 receipt_values: dict[str, Any] = {
                     "answer_status": "completed",
-                    "answer_payload": {"answer": answer},
+                    "answer_payload": {
+                        "answer": answer,
+                        "turn_intents": list(saved_payload.get("turn_intents", ())),
+                        "authorized_targets": list(saved_payload.get("authorized_targets", ())),
+                    },
                     "brief_dependent": brief_dependent,
                 }
                 if brief_version_used is not None:
@@ -1730,8 +1756,14 @@ def complete_partial_request(
         receipt = connection.execute(receipt_query).mappings().first()
         if receipt is None:
             raise ScopeError("guest brief receipt scope is invalid")
+        saved_receipt_payload = receipt["answer_payload"] if isinstance(receipt["answer_payload"], dict) else {}
         receipt_values: dict[str, Any] = {
-            "answer_status": "failed", "answer_payload": result,
+            "answer_status": "failed",
+            "answer_payload": {
+                "response": result,
+                "turn_intents": list(saved_receipt_payload.get("turn_intents", ())),
+                "authorized_targets": list(saved_receipt_payload.get("authorized_targets", ())),
+            },
             "brief_dependent": brief_version_used is not None,
         }
         if brief_version_used is not None:
@@ -1775,7 +1807,11 @@ def complete_partial_request(
             guest_brief_receipts.c.request_id == receipt_id,
             guest_brief_receipts.c.session_id == session_id,
             guest_brief_receipts.c.hotel_id == hotel_id,
-        )).values(answer_payload=result))
+        )).values(answer_payload={
+            "response": result,
+            "turn_intents": list(saved_receipt_payload.get("turn_intents", ())),
+            "authorized_targets": list(saved_receipt_payload.get("authorized_targets", ())),
+        }))
         updated = connection.execute(update(requests).where(and_(
             requests.c.session_id == session_id,
             requests.c.hotel_id == hotel_id,

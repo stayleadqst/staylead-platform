@@ -54,6 +54,7 @@ class LanguageProvider:
             candidates = payload.get("candidate_index", [])
             value: dict[str, Any] = {
                 "fact_ids": [item["fact_id"] for item in candidates[:1]],
+                "turn_intents": ["hotel_information"],
                 "explicit_language_tag": tag,
                 "inferred_language_tag": None,
             }
@@ -65,6 +66,8 @@ class LanguageProvider:
                 "supported_claims": [],
                 "unknowns": ["Je ne peux pas confirmer." if tag == "fr" else "確認できません。"],
                 "conflicts": [],
+                "turn_intents": ["hotel_information"],
+                "guest_patch_authorizations": [],
                 "guest_claims": [],
                 "guest_brief_refs": [],
                 "explicit_language_tag": tag,
@@ -100,6 +103,15 @@ class SafePortionProvider:
                 value: dict[str, Any] = {
                     "fact_ids": [item["fact_id"] for item in candidates[:1]],
                     "guest_patch": {"ops": operations},
+                    "turn_intents": ["guest_edit", "guest_state"],
+                    "guest_patch_authorizations": [
+                        {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
+                         "intent": "explicit_request", "current_turn_quote": "stay from December 10 to 13"},
+                        {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+                         "intent": "explicit_request", "current_turn_quote": "two adults"},
+                        {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
+                         "intent": "explicit_request", "current_turn_quote": "one child"},
+                    ],
                     "explicit_language_tag": "vi",
                     "inferred_language_tag": None,
                 }
@@ -108,6 +120,15 @@ class SafePortionProvider:
                     "supported_claims": [], "unknowns": [], "conflicts": [],
                     "guest_patch": {"ops": operations}, "guest_claims": [],
                     "guest_brief_refs": [], "explicit_language_tag": "vi",
+                    "turn_intents": ["guest_edit", "guest_state"],
+                    "guest_patch_authorizations": [
+                        {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
+                         "intent": "explicit_request", "current_turn_quote": "stay from December 10 to 13"},
+                        {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+                         "intent": "explicit_request", "current_turn_quote": "two adults"},
+                        {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
+                         "intent": "explicit_request", "current_turn_quote": "one child"},
+                    ],
                     "inferred_language_tag": None,
                 }
         else:
@@ -147,6 +168,7 @@ class JapaneseTimezoneProvider:
             ]
             value: dict[str, Any] = {
                 "fact_ids": fact_ids,
+                "turn_intents": ["hotel_information"],
                 "explicit_language_tag": "ja",
                 "inferred_language_tag": None,
             }
@@ -190,6 +212,7 @@ class ClarificationAcknowledgementProvider:
             if "12/13" in question:
                 value: dict[str, Any] = {
                     "fact_ids": [], "explicit_language_tag": "hi", "inferred_language_tag": None,
+                    "turn_intents": ["guest_edit", "guest_state"],
                     "guest_patch": {"ops": [{
                         "op": "set_dates", "check_in": "2026-12-10",
                     }, {
@@ -200,18 +223,34 @@ class ClarificationAcknowledgementProvider:
                         "op": "clarify", "field": "dates.check_out",
                         "reason": "Confirm which checkout date the guest means.",
                     }]},
+                    "guest_patch_authorizations": [
+                        {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in"],
+                         "intent": "explicit_request", "current_turn_quote": "चेक-इन 2026-12-10"},
+                        {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+                         "intent": "explicit_request", "current_turn_quote": "2 वयस्क"},
+                        {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
+                         "intent": "explicit_request", "current_turn_quote": "7 वर्ष का बच्चा"},
+                        {"operation_index": 3, "op": "clarify", "target_fields": ["dates.check_out"],
+                         "intent": "clarification", "current_turn_quote": "12/13 दिसंबर"},
+                    ],
                 }
             elif "2026-12-15" in question:
                 value = {
                     "fact_ids": [],
+                    "turn_intents": ["guest_edit", "guest_state"],
                     "explicit_language_tag": "ko" if "한국어" in question else None,
                     "inferred_language_tag": None,
                     "guest_patch": {"ops": [{
                         "op": "set_dates", "check_out": "2026-12-15",
                     }]},
+                    "guest_patch_authorizations": [{
+                        "operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_out"],
+                        "intent": "explicit_request", "current_turn_quote": "चेक-आउट तारीख 2026-12-15",
+                    }],
                 }
             else:
-                value = {"fact_ids": [], "explicit_language_tag": None, "inferred_language_tag": None}
+                value = {"fact_ids": [], "turn_intents": ["courtesy"],
+                         "explicit_language_tag": None, "inferred_language_tag": None}
         elif payload.get("guest_brief_patch_enabled") is False:
             missing = payload.get("missing_label_keys", [])
             if "12/13" in question:

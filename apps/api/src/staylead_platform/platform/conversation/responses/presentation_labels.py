@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Iterable
 from threading import Lock
 
 LABEL_KEYS = (
@@ -25,7 +26,15 @@ _CACHE: dict[str, dict[str, str]] = {}
 _LOCK = Lock()
 
 
+def label_source_texts(keys: Iterable[str]) -> dict[str, str]:
+    """Return approved English source text for requested, known UI label keys."""
+    requested = {key for key in keys if isinstance(key, str)}
+    return {key: ENGLISH_LABELS[key] for key in LABEL_KEYS if key in requested}
+
+
 def missing_label_keys(language_tag: str) -> list[str]:
+    if language_tag.split("-")[0].lower() == "en":
+        return []
     with _LOCK:
         cached = _CACHE.get(language_tag, {})
         return [key for key in LABEL_KEYS if key not in cached]
@@ -33,6 +42,8 @@ def missing_label_keys(language_tag: str) -> list[str]:
 
 def resolve_label_bundle(language_tag: str, proposed: object) -> dict[str, str]:
     """Accept and cache a complete missing-key bundle atomically, else return safe fallback."""
+    if language_tag.split("-")[0].lower() == "en":
+        return dict(ENGLISH_LABELS)
     with _LOCK:
         cached = dict(_CACHE.get(language_tag, {}))
         missing = [key for key in LABEL_KEYS if key not in cached]

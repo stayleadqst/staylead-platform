@@ -11,6 +11,8 @@ from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
 from staylead_platform.platform.conversation.responses.presentation_labels import (
     ENGLISH_LABELS,
     LABEL_KEYS,
+    label_source_texts,
+    missing_label_keys,
     resolve_label_bundle,
 )
 
@@ -61,3 +63,17 @@ def test_label_bundle_cache_is_atomic_and_invalid_values_fall_back() -> None:
     invalid["copy"] = "<b>copy</b>"
     assert resolve_label_bundle("ar", invalid) == ENGLISH_LABELS
     assert resolve_label_bundle("ar", {"copy": "نسخ"}) == ENGLISH_LABELS
+
+
+def test_english_labels_always_use_the_approved_source_text() -> None:
+    proposed = {key: f"paraphrased {key}" for key in LABEL_KEYS}
+    for language_tag in ("en", "en-US"):
+        assert missing_label_keys(language_tag) == []
+        assert resolve_label_bundle(language_tag, proposed) == ENGLISH_LABELS
+
+
+def test_label_source_texts_projects_only_requested_known_labels() -> None:
+    assert label_source_texts(("synthetic_notice", "copy", "not_a_label", 7)) == {
+        "copy": ENGLISH_LABELS["copy"],
+        "synthetic_notice": ENGLISH_LABELS["synthetic_notice"],
+    }
