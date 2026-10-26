@@ -1,0 +1,26 @@
+{
+  "candidate": "e66647a24d5c81b60b3496a74ef7f4217c85a4c4",
+  "verdict": "BLOCKED",
+  "turns_observed": 1,
+  "provider_requests": 2,
+  "delivered_answers": 0,
+  "http_status": 502,
+  "status": "partial_success",
+  "error_code": "invalid_model_output",
+  "failure_boundary": "response_schema.model_validate_json",
+  "rejected_field_or_value": "unknown; bodies not retained",
+  "verified_actual_state": {
+    "language_tag": "vi",
+    "preference_revision": 1,
+    "brief_version": 1,
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-13",
+    "nights": 3,
+    "adults": 2
+  },
+  "input_tokens_sum": 15635,
+  "output_tokens_sum": 259,
+  "provider_total_tokens": null,
+  "additional_offline_gap": "malformed label types fail answer schema before fallback",
+  "reviewer_provider_calls": 0
+}

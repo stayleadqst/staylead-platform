@@ -1,0 +1,11 @@
+{
+  "result": "stopped_with_preserved_partial_evidence",
+  "turns_observed": 1,
+  "stop_reason": "turn 1 returned HTTP 502",
+  "automatic_retry_or_resume_used": false,
+  "non_provider_external_network_calls": 0,
+  "provider_network_activity": "handled by the approved Codex CLI runtime; not measured by the browser script",
+  "semantic_verdict": "not_assigned_by_browser_script",
+  "reviewer_decision_required": true,
+  "completed_at_utc": "2026-10-26T02:24:38.481Z"
+}

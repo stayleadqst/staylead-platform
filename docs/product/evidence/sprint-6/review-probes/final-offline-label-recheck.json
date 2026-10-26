@@ -1,0 +1,14 @@
+{
+  "candidate": "5ac41db7646c49d2fc2acce5387781f4fa67ee9e",
+  "tree": "70d31d88b360abac8843a0511330acad8ae68e27",
+  "focused_backend_tests": 37,
+  "malformed_optional_bundle_cache_preservation_probes": 6,
+  "all_passed": true,
+  "malformed_core_rejected": true,
+  "known_label_gap": "closed_offline",
+  "identified_code_findings_remaining": 0,
+  "shared_actual_model_DoD": "BLOCKED",
+  "live_run_on_final_candidate": false,
+  "historical_failed_payload_cause": "unknown",
+  "provider_calls_by_reviewer": 0
+}
