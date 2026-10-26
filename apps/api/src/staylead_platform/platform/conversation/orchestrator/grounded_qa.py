@@ -398,7 +398,7 @@ class GroundedQAOrchestrator:
         patch_has_operations = bool(getattr(proposed_patch, "ops", None))
         rendered_guest_claims = [claim["text"] for claim in guest_claims]
         has_meaningful_text = any(
-            part.strip() for part in (
+            _FACT_REFERENCE.sub("", part).strip() for part in (
                 *rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts,
             )
         )

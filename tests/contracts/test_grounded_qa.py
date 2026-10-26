@@ -804,3 +804,25 @@ def test_committed_answer_returns_only_independently_safe_guest_claims() -> None
             hotel_id="HTL-CITY01", question="Confirm my stay and payment?", history=[],
             brief=brief, selected_fact_ids=(),
         ))
+
+
+@pytest.mark.parametrize("field", ["supported_claims", "unknowns", "conflicts"])
+def test_citation_only_text_does_not_make_rejected_guest_claim_safe(field: str) -> None:
+    brief = GuestBriefSnapshot(1, {
+        "dates": {"check_in": None, "check_out": None, "nights": None},
+        "party": {"adults": 2, "children": []},
+    })
+    answer = {
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{"text": "2 adults and 1 child.", "refs": ["party.adults"]}],
+    }
+    if field == "supported_claims":
+        answer[field] = [{"text": "   ", "fact_ids": ["F-HTL-CITY01-040"]}]
+    else:
+        answer[field] = ["[F-HTL-CITY01-040]"]
+    provider = FakeProvider(answer=answer)
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Who is staying?", history=[], brief=brief,
+            selected_fact_ids=("F-HTL-CITY01-040",),
+        ))

@@ -78,6 +78,59 @@ class LanguageProvider:
         )
 
 
+class SafePortionProvider:
+    """Offline fixture for persisted committed-answer safe-portion behavior."""
+
+    def __init__(self) -> None:
+        self.inputs: list[dict[str, Any]] = []
+        self.calls = 0
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        self.calls += 1
+        payload = json.loads(request.input_text)
+        self.inputs.append({**payload, "instructions": request.instructions})
+        if payload.get("guest_brief_patch_enabled") is True:
+            operations = [
+                {"op": "set_dates", "check_in": "2026-12-10", "check_out": "2026-12-13"},
+                {"op": "set_adults", "count": 2},
+                {"op": "add_child", "age": None},
+            ]
+            if "candidate_index" in payload:
+                candidates = payload.get("candidate_index", [])
+                value: dict[str, Any] = {
+                    "fact_ids": [item["fact_id"] for item in candidates[:1]],
+                    "guest_patch": {"ops": operations},
+                    "explicit_language_tag": "vi",
+                    "inferred_language_tag": None,
+                }
+            else:
+                value = {
+                    "supported_claims": [], "unknowns": [], "conflicts": [],
+                    "guest_patch": {"ops": operations}, "guest_claims": [],
+                    "guest_brief_refs": [], "explicit_language_tag": "vi",
+                    "inferred_language_tag": None,
+                }
+        else:
+            value = {
+                "supported_claims": [],
+                "unknowns": ["Độ tuổi của trẻ là bao nhiêu?"],
+                "conflicts": [],
+                "guest_claims": [
+                    {"text": "Tôi sẽ lưu trú từ 2026-12-10 đến 2026-12-13.",
+                     "refs": ["dates.check_in", "dates.check_out"]},
+                    {"text": "Có 2 người lớn và 1 trẻ em.", "refs": ["party.adults"]},
+                ],
+                "guest_brief_refs": ["dates.check_in", "dates.check_out"],
+                "explicit_language_tag": None,
+                "inferred_language_tag": None,
+            }
+        return GenerationResult(
+            text=json.dumps(value, ensure_ascii=False), provider="fake", deployment="s6-safe-portion",
+            model="offline-fake", request_id=f"safe-portion-{self.calls}",
+            usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+        )
+
+
 def test_preference_survives_restart_replay_and_old_answer_stays_historical(engine) -> None:
     provider = LanguageProvider()
     settings = Settings(
@@ -139,3 +192,60 @@ def test_preference_survives_restart_replay_and_old_answer_stays_historical(engi
     assert current["presentation"]["language_tag"] == "ja"
     assert current["guest_brief"]["brief_version"] == 0
     assert any(item.get("preferred_language_tag") == "ja" for item in provider.inputs)
+
+
+def test_committed_safe_portion_trace_and_answer_persist_across_same_id_replay(engine) -> None:
+    provider = SafePortionProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-six-safe-portion-test-signing-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "harbor-city-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    endpoint = f"/v1/guest/sessions/{session['session_id']}/messages"
+    request_id = str(uuid.uuid4())
+    body = {
+        "request_id": request_id,
+        "question": "Please answer in Vietnamese and save my stay from December 10 to 13 for two adults and one child.",
+    }
+
+    response = client.post(endpoint, headers=headers, json=body)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["status"] == "completed"
+    assert result["trace"]["calls"] == 2
+    assert result["trace"]["guest_claims_rejected"] == 1
+    assert result["trace"]["answer_validation"] == "safe_portion"
+    assert result["answer"] == (
+        "Tôi sẽ lưu trú từ 2026-12-10 đến 2026-12-13.\n"
+        "Độ tuổi của trẻ là bao nhiêu?"
+    )
+    assert result["guest_claims"] == [{
+        "text": "Tôi sẽ lưu trú từ 2026-12-10 đến 2026-12-13.",
+        "refs": ["dates.check_in", "dates.check_out"],
+    }]
+    assert result["guest_brief"]["brief_version"] == 1
+    assert result["guest_brief"]["dates"] == {
+        "check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3,
+    }
+    assert result["guest_brief"]["party"]["adults"] == 2
+    assert len(result["guest_brief"]["party"]["children"]) == 1
+    assert result["guest_brief"]["party"]["children"][0]["age"] is None
+    assert result["language_preference"] == {"language_tag": "vi", "source": "explicit", "revision": 1}
+    assert result["brief_receipt"]["answer_status"] == "completed"
+    assert provider.calls == 2
+
+    replay = client.post(endpoint, headers=headers, json=body)
+    assert replay.status_code == 200, replay.text
+    replayed = replay.json()
+    assert replayed["answer"] == result["answer"]
+    assert replayed["guest_claims"] == result["guest_claims"]
+    assert replayed["trace"]["guest_claims_rejected"] == 1
+    assert replayed["trace"]["answer_validation"] == "safe_portion"
+    assert replayed["guest_brief"]["brief_version"] == 1
+    assert replayed["language_preference"]["language_tag"] == "vi"
+    assert replayed["brief_receipt"]["answer_status"] == "completed"
+    assert provider.calls == 2, "same-ID replay must use persisted answer and trace without another model call"
