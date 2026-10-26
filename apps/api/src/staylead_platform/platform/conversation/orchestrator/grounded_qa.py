@@ -163,6 +163,31 @@ def _validate_supported_literals(answer: str, cited_facts: list[dict[str, Any]])
         )
 
 
+def _question_url_fact_ids(
+    question: str, hotel_id: str, facts: tuple[dict[str, Any], ...], allowed_ids: set[str],
+) -> set[str]:
+    """Keep preliminary same-hotel URL evidence available after semantic selection.
+
+    Retrieval supplies current guest-visible facts. The ID must also be in the candidate
+    index, and the exact URL must occur in both question and fact. Claims still cite it.
+    """
+    question_urls = {url.rstrip(".,;:!?)") for url in _URL.findall(question)}
+    if not question_urls:
+        return set()
+    matched: set[str] = set()
+    for fact in facts:
+        fact_id = fact.get("fact_id")
+        if fact.get("hotel_id") != hotel_id or fact_id not in allowed_ids:
+            continue
+        trusted = " ".join((
+            str(fact.get("value", "")),
+            json.dumps(fact.get("conditions", {}), ensure_ascii=False),
+        ))
+        if question_urls.intersection(url.rstrip(".,;:!?)") for url in _URL.findall(trusted)):
+            matched.add(fact_id)
+    return matched
+
+
 def _validate_untrusted_field(text: str, facts_by_id: dict[str, dict[str, Any]]) -> None:
     """Check model-authored unknown/conflict prose before it reaches the guest."""
     references = _FACT_REFERENCE.findall(text)
@@ -278,6 +303,9 @@ class GroundedQAOrchestrator:
                 selected_ids = set(selection.fact_ids)
                 if len(selected_ids) != len(selection.fact_ids) or not selected_ids <= allowed_ids:
                     raise ConversationFailure("invalid_retrieval_selection", "The model selected invalid evidence.")
+                selected_ids |= _question_url_fact_ids(
+                    question, hotel_id, tuple(retrieved.facts), allowed_ids,
+                )
                 if extract_guest_patch and getattr(selection, "guest_patch", None) is not None:
                     # If called through the standard one-call API, keep going to the answer call.
                     # prepare_turn uses the selector result directly to reserve call two for post-commit.
@@ -487,6 +515,10 @@ class GroundedQAOrchestrator:
                 selected_ids = tuple(dict.fromkeys(payload.fact_ids))
                 if len(selected_ids) != len(payload.fact_ids) or not set(selected_ids) <= allowed_ids:
                     raise ConversationFailure("invalid_retrieval_selection", "The model selected invalid evidence.")
+                selected_ids = tuple(dict.fromkeys((
+                    *selected_ids,
+                    *_question_url_fact_ids(question, hotel_id, tuple(retrieved.facts), allowed_ids),
+                )))
                 patch = _proposal(getattr(payload, "guest_patch", None))
                 return PreparedGuestTurn(
                     provisional_answer=None, guest_patch=patch,

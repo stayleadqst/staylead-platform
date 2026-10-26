@@ -128,6 +128,113 @@ def test_low_overlap_multilingual_question_gets_scoped_semantic_selection() -> N
     assert "06:30" in answer.answer and "09:30" in answer.answer
 
 
+def _url_retriever(*, include_url_fact: bool = True, url_hotel_id: str = "HTL-CITY01") -> KnowledgeRetriever:
+    repository = MemoryFacts()
+    url_fact = KnowledgeFact(
+        fact_id="F-HTL-CITY01-001", hotel_id=url_hotel_id, topic="parking",
+        subject="parking", field="booking_url", value="https://approved.example/parking",
+        conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-1", "source_version": "1", "section": "Parking"},
+    )
+    selector_facts = [
+        KnowledgeFact(
+            fact_id=f"F-HTL-CITY01-{suffix}", hotel_id="HTL-CITY01", topic="parking",
+            subject="parking", field=field, value=value, conditions={}, status="confirmed",
+            valid_from="2026-10-01", valid_to="2027-09-30",
+            provenance={"source_id": "SRC-1", "source_version": "1", "section": "Parking"},
+        )
+        for suffix, field, value in (("046", "capacity", "40 vehicles"), ("077", "reservation", "No reservation required."))
+    ]
+    repository.facts.extend(selector_facts)
+    if include_url_fact:
+        repository.facts.append(url_fact)
+    retriever = KnowledgeRetriever(repository)
+    all_preliminary = [KnowledgeRetriever._wire(fact) for fact in repository.facts]
+    candidate_facts = [*all_preliminary]
+    if not include_url_fact:
+        candidate_facts.append(KnowledgeRetriever._wire(url_fact))
+    retriever.retrieve = lambda hotel_id, question, context, timeout_seconds=None: RetrievalResult(
+        hotel_id=hotel_id,
+        facts=tuple(all_preliminary),
+        conflicts=(),
+        query_terms=3,
+        term_coverage=0.1,
+        candidate_index=tuple({
+            "fact_id": fact["fact_id"], "subject": fact["subject"],
+            "topic": fact["topic"], "field": fact["field"],
+        } for fact in candidate_facts),
+    )  # type: ignore[method-assign]
+    return retriever
+
+
+def test_exact_approved_question_url_fact_survives_semantic_selector_omission() -> None:
+    url = "https://approved.example/parking"
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-046", "F-HTL-CITY01-077"], answer={
+        "supported_claims": [{"text": f"Use {url} [F-HTL-CITY01-001].", "fact_ids": ["F-HTL-CITY01-001"]}],
+        "unknowns": [], "conflicts": [],
+    })
+    answer = asyncio.run(build(provider, retriever=_url_retriever()).answer(
+        hotel_id="HTL-CITY01", question=f"Is parking available? Use {url}", history=[],
+    ))
+
+    assert answer.calls == 2
+    assert answer.answer == f"Use {url} [F-HTL-CITY01-001]."
+    selection = json.loads(provider.calls[0].input_text)
+    assert "F-HTL-CITY01-001" not in provider.selection_ids
+    assert {fact["fact_id"] for fact in json.loads(provider.calls[1].input_text)["facts"]} >= {
+        "F-HTL-CITY01-001", "F-HTL-CITY01-046", "F-HTL-CITY01-077",
+    }
+    assert selection["candidate_index"]
+    assert [fact["fact_id"] for fact in answer.citations] == ["F-HTL-CITY01-001"]
+
+
+def test_question_url_context_does_not_let_claim_borrow_uncited_url_fact() -> None:
+    url = "https://approved.example/parking"
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-046", "F-HTL-CITY01-077"], answer={
+        "supported_claims": [{
+            "text": f"Use {url} [F-HTL-CITY01-046].", "fact_ids": ["F-HTL-CITY01-046"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    with pytest.raises(ConversationFailure, match="unsupported URL"):
+        asyncio.run(build(provider, retriever=_url_retriever()).answer(
+            hotel_id="HTL-CITY01", question=f"Is parking available? Use {url}", history=[],
+        ))
+
+
+def test_semantically_related_but_nonidentical_question_url_does_not_retain_fact() -> None:
+    url = "https://approved.example/parking"
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-046", "F-HTL-CITY01-077"], answer={
+        "supported_claims": [{
+            "text": f"Use {url} [F-HTL-CITY01-001].", "fact_ids": ["F-HTL-CITY01-001"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(provider, retriever=_url_retriever()).answer(
+            hotel_id="HTL-CITY01", question="Use https://approved.example/parking-new", history=[],
+        ))
+
+
+@pytest.mark.parametrize("include_url_fact,url_hotel_id", [(False, "HTL-CITY01"), (True, "HTL-BEACH02")])
+def test_guest_only_or_foreign_question_url_fact_is_not_promoted(
+    include_url_fact: bool, url_hotel_id: str,
+) -> None:
+    url = "https://approved.example/parking"
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-046", "F-HTL-CITY01-077"], answer={
+        "supported_claims": [{
+            "text": f"Use {url} [F-HTL-CITY01-001].", "fact_ids": ["F-HTL-CITY01-001"],
+        }],
+        "unknowns": [], "conflicts": [],
+    })
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(provider, retriever=_url_retriever(
+            include_url_fact=include_url_fact, url_hotel_id=url_hotel_id,
+        )).answer(
+            hotel_id="HTL-CITY01", question=f"Use this link: {url}", history=[],
+        ))
+
+
 def test_answer_only_empty_fact_selection_clears_preliminary_retrieval_and_omits_patch_grammar() -> None:
     provider = FakeProvider(selection_ids=[], answer={
         "supported_claims": [],
