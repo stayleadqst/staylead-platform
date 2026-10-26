@@ -174,6 +174,86 @@ class JapaneseTimezoneProvider:
         )
 
 
+class ClarificationAcknowledgementProvider:
+    """Offline fixture for bounded clarification, scope, acknowledgement, and replay."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+        self.inputs: list[dict[str, Any]] = []
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        self.calls += 1
+        payload = json.loads(request.input_text)
+        question = payload.get("question", "")
+        self.inputs.append({**payload, "instructions": request.instructions})
+        if "candidate_index" in payload:
+            if "12/13" in question:
+                value: dict[str, Any] = {
+                    "fact_ids": [], "explicit_language_tag": "hi", "inferred_language_tag": None,
+                    "guest_patch": {"ops": [{
+                        "op": "set_dates", "check_in": "2026-12-10",
+                    }, {
+                        "op": "set_adults", "count": 2,
+                    }, {
+                        "op": "add_child", "age": 7,
+                    }, {
+                        "op": "clarify", "field": "dates.check_out",
+                        "reason": "Confirm which checkout date the guest means.",
+                    }]},
+                }
+            elif "2026-12-15" in question:
+                value = {
+                    "fact_ids": [],
+                    "explicit_language_tag": "ko" if "한국어" in question else None,
+                    "inferred_language_tag": None,
+                    "guest_patch": {"ops": [{
+                        "op": "set_dates", "check_out": "2026-12-15",
+                    }]},
+                }
+            else:
+                value = {"fact_ids": [], "explicit_language_tag": None, "inferred_language_tag": None}
+        elif payload.get("guest_brief_patch_enabled") is False:
+            missing = payload.get("missing_label_keys", [])
+            if "12/13" in question:
+                value = {
+                    "supported_claims": [], "unknowns": [], "conflicts": [],
+                    "guest_clarification": {
+                        "field": "dates.check_out", "options": ["12", "13"],
+                        "text": "कृपया 12 या 13 में से सही चेक-आउट तारीख बताएं।",
+                    },
+                    "guest_claims": [], "guest_brief_refs": [],
+                    "explicit_language_tag": None, "inferred_language_tag": None,
+                    "label_bundle": {key: f"label-{key}" for key in missing},
+                }
+            elif "2026-12-15" in question:
+                value = {
+                    "supported_claims": [], "unknowns": [], "conflicts": [],
+                    "guest_claims": [{
+                        "text": "चेक-आउट 2026-12-15 है।", "refs": ["dates.check_out"],
+                    }],
+                    "guest_brief_refs": [], "explicit_language_tag": None,
+                    "inferred_language_tag": None,
+                    "label_bundle": {key: f"label-{key}" for key in missing},
+                }
+            else:
+                value = {
+                    "supported_claims": [], "unknowns": [], "conflicts": [],
+                    "guest_claims": [], "guest_brief_refs": [],
+                    "conversational_acknowledgement": {
+                        "intent": "thanks_acknowledged", "text": "कोई बात नहीं।",
+                    },
+                    "explicit_language_tag": None, "inferred_language_tag": None,
+                    "label_bundle": {key: f"label-{key}" for key in missing},
+                }
+        else:
+            raise AssertionError("Unexpected preparation answer request")
+        return GenerationResult(
+            text=json.dumps(value, ensure_ascii=False), provider="fake", deployment="s6-channels",
+            model="offline-fake", request_id=f"s6-channels-{self.calls}",
+            usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+        )
+
+
 def test_preference_survives_restart_replay_and_old_answer_stays_historical(engine) -> None:
     provider = LanguageProvider()
     settings = Settings(
@@ -325,3 +405,80 @@ def test_japanese_time_answer_gets_cited_hotel_timezone_through_composition(engi
     assert any(item["fact_id"] == "F-HTL-CITY01-040" for item in result["evidence"])
     assert provider.calls <= 2
     assert result["trace"]["calls"] <= 2
+
+
+def test_checkout_clarification_and_thanks_survive_api_same_id_replay(engine) -> None:
+    provider = ClarificationAcknowledgementProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-six-typed-clarification-signing-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "harbor-city-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    endpoint = f"/v1/guest/sessions/{session['session_id']}/messages"
+
+    first_body = {
+        "request_id": str(uuid.uuid4()),
+        "question": (
+            "हिंदी में उत्तर दें। चेक-इन 2026-12-10 है, 2 वयस्क और 7 वर्ष का बच्चा है। "
+            "मैं 12/13 दिसंबर को चेक-आउट करना चाहता हूँ।"
+        ),
+    }
+    first = client.post(endpoint, headers=headers, json=first_body)
+    assert first.status_code == 200, first.text
+    clarified = first.json()
+    assert clarified["language_preference"] == {"language_tag": "hi", "source": "explicit", "revision": 1}
+    assert clarified["guest_brief"]["brief_version"] == 1
+    assert clarified["guest_brief"]["dates"]["check_out"] is None
+    assert clarified["guest_brief"]["pending_fields"] == ["dates.check_out"]
+    assert clarified["answer"] == "कृपया 12 या 13 में से सही चेक-आउट तारीख बताएं।"
+    assert clarified["unknowns"] == [clarified["answer"]]
+    assert clarified["answer_eligibility"] == "current"
+    assert clarified["brief_receipt"]["answer_status"] == "completed"
+    assert clarified["trace"]["calls"] == 2
+    assert provider.calls == 2
+
+    second_body = {
+        "request_id": str(uuid.uuid4()),
+        "question": "चेक-आउट तारीख 2026-12-15 है।",
+    }
+    second = client.post(endpoint, headers=headers, json=second_body)
+    assert second.status_code == 200, second.text
+    resolved = second.json()
+    assert resolved["language_preference"] == {"language_tag": "hi", "source": "explicit", "revision": 1}
+    assert resolved["guest_brief"]["brief_version"] == 2
+    assert resolved["guest_brief"]["dates"] == {
+        "check_in": "2026-12-10", "check_out": "2026-12-15", "nights": 5,
+    }
+    assert resolved["guest_brief"]["pending_fields"] == []
+    assert resolved["guest_brief"]["party"]["children"][0]["age"] == 7
+    assert resolved["answer"] == "चेक-आउट 2026-12-15 है।"
+    assert resolved["trace"]["calls"] == 2
+    assert provider.calls == 4
+
+    third_body = {"request_id": str(uuid.uuid4()), "question": "OK, 고마워"}
+    third = client.post(endpoint, headers=headers, json=third_body)
+    assert third.status_code == 200, third.text
+    thanked = third.json()
+    assert thanked["language_preference"] == {"language_tag": "hi", "source": "explicit", "revision": 1}
+    assert thanked["guest_brief"]["brief_version"] == 2
+    assert thanked["answer"] == "कोई बात नहीं।"
+    assert thanked["trace"]["calls"] == 2
+    assert provider.calls == 6
+
+    replay = client.post(endpoint, headers=headers, json=third_body)
+    assert replay.status_code == 200, replay.text
+    replayed = replay.json()
+    assert replayed["answer"] == thanked["answer"]
+    assert replayed["language_preference"] == thanked["language_preference"]
+    assert replayed["guest_brief"]["brief_version"] == thanked["guest_brief"]["brief_version"]
+    assert replayed["trace"]["calls"] == 2
+    assert provider.calls == 6, "same-ID replay must return persisted acknowledgement without another model call"
+
+    old_clarification = client.post(endpoint, headers=headers, json=first_body)
+    assert old_clarification.status_code == 200, old_clarification.text
+    assert old_clarification.json()["answer_eligibility"] == "stale"
+    assert provider.calls == 6, "replaying a stale clarification must not call the provider"

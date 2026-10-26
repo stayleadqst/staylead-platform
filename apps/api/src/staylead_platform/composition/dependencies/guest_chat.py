@@ -25,6 +25,9 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
 from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
 from staylead_platform.domains.hospitality.schemas.guest_brief import validate_guest_brief_proposal
+from staylead_platform.domains.hospitality.validators.guest_clarification import (
+    validate_checkout_clarification,
+)
 from staylead_platform.infrastructure.ai_provider import FoundryGrokConfig, FoundryGrokProvider
 from staylead_platform.infrastructure.codex_provider import CodexCLIProvider
 from staylead_platform.infrastructure.database import create_database_engine
@@ -148,6 +151,7 @@ def create_guest_chat_application(
             committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
             selection_schema=FactSelection,
             claim_formatter=format_grounded_claim,
+            clarification_validator=validate_checkout_clarification,
             max_output_tokens=settings.ai_max_output_tokens,
         )
     return GuestChatApplication(settings, database, orchestrator, media_repository)

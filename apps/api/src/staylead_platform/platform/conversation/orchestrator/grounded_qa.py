@@ -42,7 +42,8 @@ _SAFE_VALIDATION_FIELDS = frozenset({
     "supported_claims", "text", "fact_ids", "unknowns", "conflicts", "guest_patch", "ops", "op",
     "set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify",
     "check_in", "check_out", "count", "age", "member_id", "reason", "guest_claims", "refs",
-    "guest_brief_refs", "explicit_language_tag", "inferred_language_tag", "label_bundle",
+    "guest_brief_refs", "guest_clarification", "field", "options", "conversational_acknowledgement", "intent",
+    "explicit_language_tag", "inferred_language_tag", "label_bundle",
 })
 
 
@@ -132,6 +133,7 @@ class ConversationAnswer:
     explicit_language_tag: str | None = None
     inferred_language_tag: str | None = None
     label_bundle: dict[str, str] = field(default_factory=dict)
+    acknowledgement: str | None = None
 
 
 def _numeric_forms(text: str) -> set[str]:
@@ -198,6 +200,19 @@ def _validate_untrusted_field(text: str, facts_by_id: dict[str, dict[str, Any]])
     _validate_supported_literals(text, cited_facts)
 
 
+def _validate_conversational_acknowledgement(text: str, *, question: str) -> str:
+    candidate = text.strip()
+    if (
+        not candidate or len(candidate) > 160 or _URL.search(candidate)
+        or _FACT_TOKEN.search(candidate) or _FACT_REFERENCE.search(candidate)
+        or _numeric_forms(candidate) or any(char in candidate for char in "<>/{}")
+        or any(unicodedata.category(char) in {"Cc", "Cf"} for char in candidate)
+        or _URL.search(question) or _numeric_forms(question)
+    ):
+        raise ConversationFailure("invalid_model_output", "The conversational acknowledgement is not nonfactual.")
+    return candidate
+
+
 def _model_fact_projection(fact: dict[str, Any]) -> dict[str, Any]:
     """Send only semantic evidence fields to M3; retain the full row server-side."""
     return {key: fact.get(key) for key in _MODEL_FACT_FIELDS}
@@ -240,6 +255,10 @@ class GroundedQAOrchestrator:
         committed_selection_instructions: str,
         selection_schema: type[BaseModel],
         claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
+        clarification_validator: Callable[
+            [Any, str, dict[str, Any] | None, tuple[str, ...]],
+            tuple[str, tuple[str, ...]] | None,
+        ] | None = None,
         max_output_tokens: int = 700,
     ) -> None:
         self._provider = provider
@@ -251,6 +270,7 @@ class GroundedQAOrchestrator:
         self._committed_selection_instructions = committed_selection_instructions
         self._selection_schema = selection_schema
         self._claim_formatter = claim_formatter
+        self._clarification_validator = clarification_validator
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
 
     async def answer(
@@ -421,6 +441,23 @@ class GroundedQAOrchestrator:
             rendered_claims.append(formatted_text if references else f"{formatted_text} {labels}")
         for text in (*payload.unknowns, *payload.conflicts):
             _validate_untrusted_field(text, facts_by_id)
+        raw_guest_clarification = getattr(payload, "guest_clarification", None)
+        if raw_guest_clarification is not None and extract_guest_patch:
+            raise ConversationFailure("invalid_model_output", "Guest clarifications belong to committed answers only.")
+        guest_clarification, clarification_refs = None, ()
+        if raw_guest_clarification is not None:
+            validated_clarification = (
+                self._clarification_validator(
+                    raw_guest_clarification,
+                    question,
+                    brief.data if brief is not None else None,
+                    brief.pending_fields if brief is not None else (),
+                )
+                if self._clarification_validator is not None else None
+            )
+            if validated_clarification is None:
+                raise ConversationFailure("invalid_model_output", "The guest clarification is not valid for this conversation.")
+            guest_clarification, clarification_refs = validated_clarification
         raw_brief_refs = getattr(payload, "guest_brief_refs", ())
         raw_guest_claims = getattr(payload, "guest_claims", ())
         if (raw_brief_refs or raw_guest_claims) and brief is None:
@@ -436,14 +473,30 @@ class GroundedQAOrchestrator:
             guest_claims = ()
         claim_refs = tuple(dict.fromkeys(ref for claim in guest_claims for ref in claim["refs"]))
         declared_refs = _validated_brief_refs(raw_brief_refs, brief) if brief is not None else ()
-        brief_refs = tuple(dict.fromkeys((*declared_refs, *claim_refs)))
+        brief_refs = tuple(dict.fromkeys((*declared_refs, *claim_refs, *clarification_refs)))
         cited = list(dict.fromkeys(cited))
         proposed_patch = getattr(payload, "guest_patch", None) if extract_guest_patch else None
         patch_has_operations = bool(getattr(proposed_patch, "ops", None))
+        raw_acknowledgement = getattr(payload, "conversational_acknowledgement", None)
+        acknowledgement = None
+        if raw_acknowledgement is not None:
+            if (
+                extract_guest_patch or rendered_claims or payload.unknowns or payload.conflicts
+                or raw_guest_clarification is not None or raw_guest_claims or raw_brief_refs
+                or getattr(payload, "guest_patch", None) is not None
+            ):
+                raise ConversationFailure("invalid_model_output", "A conversational acknowledgement must be the only substantive output.")
+            if raw_acknowledgement.intent != "thanks_acknowledged":
+                raise ConversationFailure("invalid_model_output", "The conversational intent is unsupported.")
+            acknowledgement = _validate_conversational_acknowledgement(
+                raw_acknowledgement.text, question=question,
+            )
         rendered_guest_claims = [claim["text"] for claim in guest_claims]
         has_meaningful_text = any(
             _FACT_REFERENCE.sub("", part).strip() for part in (
                 *rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts,
+                *([guest_clarification] if guest_clarification is not None else []),
+                *([acknowledgement] if acknowledgement is not None else []),
             )
         )
         if not has_meaningful_text and not patch_has_operations:
@@ -451,7 +504,13 @@ class GroundedQAOrchestrator:
                 raise rejected_guest_claim_failure
             raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
-        answer_parts = [*rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts]
+        answer_unknowns = (
+            *payload.unknowns,
+            *((guest_clarification,) if guest_clarification is not None else ()),
+        )
+        answer_parts = [*rendered_claims, *rendered_guest_claims, *answer_unknowns, *payload.conflicts]
+        if acknowledgement is not None:
+            answer_parts.append(acknowledgement)
         answer_text = "\n".join(answer_parts)
         usage = Usage(
             input_tokens=_complete_usage_sum(provider_results, "input_tokens"),
@@ -463,7 +522,7 @@ class GroundedQAOrchestrator:
         return ConversationAnswer(
             answer=answer_text,
             citations=tuple(cited_facts),
-            unknowns=tuple(payload.unknowns),
+            unknowns=answer_unknowns,
             provider=generated.provider,
             deployment=generated.deployment,
             model=generated.model,
@@ -475,9 +534,10 @@ class GroundedQAOrchestrator:
             guest_patch=_proposal(proposed_patch) if patch_has_operations else selected_patch,
             guest_claims=guest_claims,
             rejected_guest_claims=rejected_guest_claims,
-            brief_version_used=brief.brief_version if brief_refs and brief is not None else None,
-            brief_dependent=bool(brief_refs),
+            brief_version_used=brief.brief_version if (brief_refs or guest_clarification is not None) and brief is not None else None,
+            brief_dependent=bool(brief_refs or guest_clarification is not None),
             guest_brief_refs=brief_refs,
+            acknowledgement=acknowledgement,
             explicit_language_tag=_clean_language_tag(getattr(payload, "explicit_language_tag", None)),
             inferred_language_tag=_clean_language_tag(getattr(payload, "inferred_language_tag", None)),
             label_bundle=label_bundle,

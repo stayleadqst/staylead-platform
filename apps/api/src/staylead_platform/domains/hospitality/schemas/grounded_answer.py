@@ -1,5 +1,7 @@
 """Structured answer wire schema registered by Hospitality composition."""
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
@@ -17,12 +19,29 @@ class GuestBriefClaim(BaseModel):
     refs: list[str] = Field(min_length=1, max_length=10)
 
 
+class GuestClarification(BaseModel):
+    """A typed question about an explicit, still-pending checkout date choice."""
+
+    field: str = Field(min_length=1, max_length=64)
+    options: list[str] = Field(min_length=2, max_length=2)
+    text: str = Field(min_length=1, max_length=500)
+
+
+class ConversationalAcknowledgement(BaseModel):
+    """A bounded translation of one nonfactual social intent."""
+
+    intent: Literal["thanks_acknowledged"]
+    text: str = Field(min_length=1, max_length=160)
+
+
 class HospitalityGroundedAnswer(BaseModel):
     supported_claims: list[GroundedClaim] = Field(default_factory=list, max_length=20)
     unknowns: list[str] = Field(default_factory=list, max_length=20)
     conflicts: list[str] = Field(default_factory=list, max_length=10)
     guest_patch: HospitalityGuestBriefPatch | None = None
     guest_claims: list[GuestBriefClaim] = Field(default_factory=list, max_length=20)
+    guest_clarification: GuestClarification | None = None
+    conversational_acknowledgement: ConversationalAcknowledgement | None = None
     guest_brief_refs: list[str] = Field(default_factory=list, max_length=20)
     explicit_language_tag: str | None = Field(default=None, max_length=64)
     inferred_language_tag: str | None = Field(default=None, max_length=64)

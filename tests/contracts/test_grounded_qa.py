@@ -18,6 +18,9 @@ from staylead_platform.domains.hospitality.schemas.fact_selection import FactSel
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
 )
+from staylead_platform.domains.hospitality.validators.guest_clarification import (
+    validate_checkout_clarification,
+)
 from staylead_platform.platform.contracts.ai_provider import (
     GenerationRequest,
     GenerationResult,
@@ -113,6 +116,7 @@ def build(
         committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
         selection_schema=FactSelection,
         claim_formatter=claim_formatter,
+        clarification_validator=validate_checkout_clarification,
     )
 
 
@@ -905,6 +909,182 @@ def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_pa
     assert "Preserve cited fact number/date/time literals exactly." in instruction_text
     assert "`supported_claims` is an array of up to 20 objects" in instruction_text
     assert "`unknowns` has up to 20 strings; `conflicts` up to 10 strings" in instruction_text
+
+
+def _checkout_pending_brief() -> GuestBriefSnapshot:
+    return GuestBriefSnapshot(4, {
+        "dates": {"check_in": "2026-12-10", "check_out": "2026-12-14", "nights": 4},
+        "party": {"adults": 2, "children": [{"member_id": "child-a", "age": 7}]},
+    }, ("dates.check_out",))
+
+
+def test_typed_checkout_clarification_accepts_only_source_choices_and_nonpending_year() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_clarification": {
+            "field": "dates.check_out", "options": ["12", "13"],
+            "text": "कृपया 12 या 13 दिसंबर 2026 में से सही चेक-आउट तारीख बताएं।",
+        },
+    })
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="हिंदी में उत्तर दें। मैं 12/13 दिसंबर को चेक-आउट करना चाहता हूँ।",
+        history=[], brief=_checkout_pending_brief(), selected_fact_ids=(), preferred_language_tag="hi",
+    ))
+
+    assert answer.calls == 1
+    assert answer.unknowns == ("कृपया 12 या 13 दिसंबर 2026 में से सही चेक-आउट तारीख बताएं।",)
+    assert answer.answer == answer.unknowns[0]
+    assert answer.brief_version_used == 4
+    assert answer.brief_dependent is True
+    assert answer.guest_brief_refs == ("dates.check_in",)
+
+
+def test_typed_checkout_clarification_without_year_still_tracks_pending_brief_version() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_clarification": {
+            "field": "dates.check_out", "options": ["12", "13"],
+            "text": "कृपया 12 या 13 में से सही चेक-आउट तारीख बताएं।",
+        },
+    })
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="हिंदी में उत्तर दें। मैं 12/13 दिसंबर को चेक-आउट करना चाहता हूँ।",
+        history=[], brief=_checkout_pending_brief(), selected_fact_ids=(), preferred_language_tag="hi",
+    ))
+
+    assert answer.brief_dependent is True
+    assert answer.brief_version_used == 4
+    assert answer.guest_brief_refs == (), "the pending checkout must not be cited as confirmed data"
+
+
+@pytest.mark.parametrize("options,text", [
+    (["13", "14"], "कृपया 13 या 14 दिसंबर 2026 में से सही तारीख बताएं।"),
+    (["12", "13"], "कृपया 12 या 13 दिसंबर 2027 में से तारीख बताएं।"),
+    (["12", "13"], "कृपया 12 दिसंबर 2026 में से तारीख बताएं।"),
+])
+def test_typed_checkout_clarification_rejects_invented_or_missing_literals(
+    options: list[str], text: str,
+) -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_clarification": {"field": "dates.check_out", "options": options, "text": text},
+    })
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="I mean 12/13 December for checkout.", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+
+@pytest.mark.parametrize("text", [
+    "कृपया 12.13 में से सही तारीख बताएं।",
+    "कृपया 12:13 में से सही तारीख बताएं।",
+    "कृपया 2026-13-12 या 2026 में से तारीख चुनें।",
+    "कृपया 2026-12-13 या 2026 में से तारीख चुनें।",
+])
+def test_typed_checkout_clarification_preserves_complete_ordered_numeric_literals(text: str) -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_clarification": {
+            "field": "dates.check_out", "options": ["12", "13"], "text": text,
+        },
+    })
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="I mean 12/13 December for checkout.", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+
+def test_typed_checkout_clarification_requires_pending_field_and_current_turn_source() -> None:
+    payload = {
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_clarification": {
+            "field": "dates.check_out", "options": ["12", "13"],
+            "text": "Please confirm 12 or 13 December 2026.",
+        },
+    }
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(FakeProvider(answer=payload)).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Please confirm the checkout date.", history=[
+                {"role": "user", "content": "I mean 12/13 December."},
+            ], brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+    confirmed = GuestBriefSnapshot(5, _checkout_pending_brief().data)
+    with pytest.raises(ConversationFailure):
+        asyncio.run(build(FakeProvider(answer=payload)).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="I mean 12/13 December for checkout.", history=[],
+            brief=confirmed, selected_fact_ids=(),
+        ))
+
+
+def test_ordinary_unknown_numeric_guard_is_unchanged_for_checkout_questions() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": ["Please confirm 12 or 13 December 2026."],
+        "conflicts": [],
+    })
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="I mean 12/13 December for checkout.", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+
+def test_conversational_acknowledgement_is_typed_and_must_be_sole_nonfactual_content() -> None:
+    acknowledgement = {
+        "intent": "thanks_acknowledged", "text": "도움이 되었다니 다행입니다. 고맙습니다."
+    }
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "conversational_acknowledgement": acknowledgement,
+    })
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="OK, 고마워", history=[],
+        brief=_checkout_pending_brief(), selected_fact_ids=(), preferred_language_tag="ko",
+    ))
+    assert answer.answer == acknowledgement["text"]
+    assert answer.acknowledgement == acknowledgement["text"]
+    assert answer.calls == 1
+
+    for invalid in (
+        {**acknowledgement, "intent": "hotel_fact"},
+        {**acknowledgement, "text": "도움이 되었습니다. 객실은 2개입니다."},
+        {**acknowledgement, "text": "도움이 되었습니다. https://example.invalid"},
+    ):
+        bad_provider = FakeProvider(answer={
+            "supported_claims": [], "unknowns": [], "conflicts": [],
+            "conversational_acknowledgement": invalid,
+        })
+        with pytest.raises(ConversationFailure):
+            asyncio.run(build(bad_provider).answer_committed_turn(
+                hotel_id="HTL-CITY01", question="OK, 고마워", history=[],
+                brief=_checkout_pending_brief(), selected_fact_ids=(),
+            ))
+
+    mixed_provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": ["The hotel offers free breakfast."], "conflicts": [],
+        "conversational_acknowledgement": acknowledgement,
+    })
+    with pytest.raises(ConversationFailure, match="only substantive output"):
+        asyncio.run(build(mixed_provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="OK, 고마워", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
+
+
+def test_conversational_acknowledgement_cannot_answer_numeric_or_url_question() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "conversational_acknowledgement": {
+            "intent": "thanks_acknowledged", "text": "확인했습니다."
+        },
+    })
+    with pytest.raises(ConversationFailure, match="nonfactual"):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Is the fee 100000 VND?", history=[],
+            brief=_checkout_pending_brief(), selected_fact_ids=(),
+        ))
 
 
 def test_high_overlap_prepare_returns_provisional_answer_and_patch_in_first_call() -> None:
