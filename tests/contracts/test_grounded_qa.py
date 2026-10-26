@@ -643,6 +643,7 @@ def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_pa
     assert "never cite a missing, null, or pending field" in instruction_text
     assert "The server attaches approved media" in instruction_text
     assert "Keep unknowns/conflicts concise" in instruction_text
+    assert "Preserve cited fact number/date/time literals exactly." in instruction_text
     assert "`supported_claims` is an array of up to 20 objects" in instruction_text
     assert "`unknowns` has up to 20 strings; `conflicts` up to 10 strings" in instruction_text
 
@@ -678,15 +679,17 @@ def test_answer_brief_refs_are_validated_and_pure_faq_stays_independent() -> Non
     })
     dependent_provider = FakeProvider(answer={
         "supported_claims": [], "unknowns": [], "conflicts": [],
-        "guest_claims": [{"text": "Your stay is 3 nights.", "refs": ["dates.nights"]}],
+        "guest_claims": [{"text": "Tạm trú của bạn là 3 đêm.", "refs": ["dates.nights"]}],
     })
     dependent = asyncio.run(build(dependent_provider).answer_committed_turn(
-        hotel_id="HTL-CITY01", question="How many nights?", history=[], brief=brief,
+        hotel_id="HTL-CITY01", question="Tôi ở mấy đêm?", history=[], brief=brief,
+        preferred_language_tag="vi",
     ))
     assert dependent.brief_dependent is True
     assert dependent.brief_version_used == 3
     assert dependent.guest_brief_refs == ("dates.nights",)
-    assert "From your saved stay details: Your stay is 3 nights." in dependent.answer
+    assert dependent.answer == "Tạm trú của bạn là 3 đêm."
+    assert dependent.guest_claims == ({"text": dependent.answer, "refs": ["dates.nights"]},)
 
     faq_provider = FakeProvider(answer={
         "supported_claims": [{

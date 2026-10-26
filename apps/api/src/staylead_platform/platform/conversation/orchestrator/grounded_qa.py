@@ -385,7 +385,7 @@ class GroundedQAOrchestrator:
                 and not payload.conflicts and not patch_has_operations):
             raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
-        rendered_guest_claims = [f"From your saved stay details: {claim['text']}" for claim in guest_claims]
+        rendered_guest_claims = [claim["text"] for claim in guest_claims]
         answer_parts = [*rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts]
         answer_text = "\n".join(answer_parts)
         usage = Usage(
