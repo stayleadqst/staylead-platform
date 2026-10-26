@@ -22,24 +22,45 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
-    def test_four_isolated_run_namespaces_are_available(self):
+    def test_five_isolated_run_namespaces_are_available(self):
         first = runtime._namespace_configuration("remediation-1")
         second = runtime._namespace_configuration("remediation-2")
         third = runtime._namespace_configuration("remediation-3")
         fourth = runtime._namespace_configuration("remediation-4")
+        fifth = runtime._namespace_configuration("remediation-5")
         self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
         self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
         self.assertEqual(third["run_id"], "s6-codex-20261026-remediation-3")
         self.assertEqual(fourth["run_id"], "s6-codex-20261026-remediation-4")
+        self.assertEqual(fifth["run_id"], "s6-codex-20261026-remediation-5")
+        self.assertEqual(fifth["run_state"], Path("/private/tmp/staylead-sprint6-remediation-5-run-state.json"))
+        self.assertEqual(fifth["events"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime-events.jsonl"))
+        self.assertEqual(fifth["runtime"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime.json"))
+        self.assertEqual(fifth["capture_dir"], Path("/private/tmp/staylead-sprint6-remediation-5-synthetic-output"))
+        namespaces = (first, second, third, fourth, fifth)
         for key in ("run_state", "events", "runtime", "capture_dir"):
-            self.assertNotEqual(first[key], second[key], key)
-            self.assertNotEqual(first[key], third[key], key)
-            self.assertNotEqual(first[key], fourth[key], key)
-            self.assertNotEqual(second[key], third[key], key)
-            self.assertNotEqual(second[key], fourth[key], key)
-            self.assertNotEqual(third[key], fourth[key], key)
+            self.assertEqual(len({item[key] for item in namespaces}), len(namespaces), key)
         with self.assertRaises(ValueError):
             runtime._namespace_configuration("arbitrary-run")
+
+    def test_namespace_five_initialization_uses_frozen_caps_and_refuses_overwrite(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state_path = Path(directory) / "ns5-state.json"
+            namespace = runtime._namespace_configuration("remediation-5")
+            original_state, original_id = runtime.RUN_STATE, runtime.RUN_ID
+            try:
+                runtime.RUN_STATE = state_path
+                runtime.RUN_ID = namespace["run_id"]
+                runtime._initialize_state("offline-test-only")
+                first_bytes = state_path.read_bytes()
+                state = json.loads(first_bytes)
+                self.assertEqual(state["run_id"], namespace["run_id"])
+                self.assertEqual((state["max_guest_turns"], state["max_codex_requests"], state["max_calls_per_turn"]), (9, 18, 2))
+                with self.assertRaises(SystemExit):
+                    runtime._initialize_state("second-initialization-must-refuse")
+                self.assertEqual(state_path.read_bytes(), first_bytes)
+            finally:
+                runtime.RUN_STATE, runtime.RUN_ID = original_state, original_id
 
     def test_fresh_namespace_and_frozen_limits(self):
         self.assertEqual(runtime.RUN_ID, "s6-codex-20261026-remediation-1")
@@ -298,6 +319,9 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertIn('process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1"', source)
         self.assertIn('`${RUN_NAMESPACE}-live-run`', source)
         self.assertIn('"remediation-3"', source)
+        self.assertIn('"remediation-5"', source)
+        self.assertIn('const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;', source)
+        self.assertIn('const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : `staylead-sprint6-${RUN_NAMESPACE}`;', source)
         self.assertIn("keepBrowserOpen = true", source)
         self.assertIn("this driver will not submit another turn", source)
         self.assertIn('result: "driver_exception_preserved_partial_evidence_browser_held_open"', source)

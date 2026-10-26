@@ -60,8 +60,11 @@ def _namespace_configuration(namespace: str) -> dict[str, Any]:
     elif namespace == "remediation-4":
         prefix = "staylead-sprint6-remediation-4"
         run_id = "s6-codex-20261026-remediation-4"
+    elif namespace == "remediation-5":
+        prefix = "staylead-sprint6-remediation-5"
+        run_id = "s6-codex-20261026-remediation-5"
     else:
-        raise ValueError("Sprint 6 run namespace must be remediation-1, remediation-2, remediation-3, or remediation-4.")
+        raise ValueError("Sprint 6 run namespace must be remediation-1, remediation-2, remediation-3, remediation-4, or remediation-5.")
     private_root = Path("/private/tmp")
     return {
         "run_id": run_id,
