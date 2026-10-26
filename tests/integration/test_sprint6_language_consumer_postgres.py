@@ -131,6 +131,49 @@ class SafePortionProvider:
         )
 
 
+class JapaneseTimezoneProvider:
+    def __init__(self) -> None:
+        self.calls = 0
+        self.inputs: list[dict[str, Any]] = []
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        self.calls += 1
+        payload = json.loads(request.input_text)
+        self.inputs.append({**payload, "instructions": request.instructions})
+        if "candidate_index" in payload:
+            fact_ids = [
+                item["fact_id"] for item in payload.get("candidate_index", [])
+                if item.get("fact_id") == "F-HTL-CITY01-040"
+            ]
+            value: dict[str, Any] = {
+                "fact_ids": fact_ids,
+                "explicit_language_tag": "ja",
+                "inferred_language_tag": None,
+            }
+        else:
+            fact_ids = [
+                item["fact_id"] for item in payload.get("facts", [])
+                if item.get("fact_id") == "F-HTL-CITY01-040"
+            ]
+            value = {
+                "supported_claims": ([{
+                    "text": "朝食は06:30～09:30に提供されます。",
+                    "fact_ids": fact_ids,
+                }] if fact_ids else []),
+                "unknowns": [] if fact_ids else ["朝食の時間は確認できません。"],
+                "conflicts": [],
+                "guest_claims": [],
+                "guest_brief_refs": [],
+                "explicit_language_tag": "ja" if payload.get("guest_brief_patch_enabled") else None,
+                "inferred_language_tag": None,
+            }
+        return GenerationResult(
+            text=json.dumps(value, ensure_ascii=False), provider="fake", deployment="s6-timezone",
+            model="offline-fake", request_id=f"japanese-timezone-{self.calls}",
+            usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+        )
+
+
 def test_preference_survives_restart_replay_and_old_answer_stays_historical(engine) -> None:
     provider = LanguageProvider()
     settings = Settings(
@@ -249,3 +292,36 @@ def test_committed_safe_portion_trace_and_answer_persist_across_same_id_replay(e
     assert replayed["language_preference"]["language_tag"] == "vi"
     assert replayed["brief_receipt"]["answer_status"] == "completed"
     assert provider.calls == 2, "same-ID replay must use persisted answer and trace without another model call"
+
+
+def test_japanese_time_answer_gets_cited_hotel_timezone_through_composition(engine) -> None:
+    provider = JapaneseTimezoneProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-six-japanese-timezone-test-signing-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "harbor-city-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    response = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/messages",
+        headers={"Authorization": f"Bearer {session['access_token']}"},
+        json={
+            "request_id": str(uuid.uuid4()),
+            "question": "Please answer in Japanese: what time is breakfast?",
+        },
+    )
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["language_preference"] == {"language_tag": "ja", "source": "explicit", "revision": 1}
+    assert result["presentation"]["language_tag"] == "ja"
+    assert result["answer_eligibility"] == "current"
+    assert result["guest_brief"]["brief_version"] == 0
+    assert result["answer"] == (
+        "朝食は06:30～09:30に提供されます。 (Asia/Ho_Chi_Minh) [F-HTL-CITY01-040]"
+    )
+    assert result["answer"].endswith("[F-HTL-CITY01-040]")
+    assert any(item["fact_id"] == "F-HTL-CITY01-040" for item in result["evidence"])
+    assert provider.calls <= 2
+    assert result["trace"]["calls"] <= 2
