@@ -28,3 +28,9 @@ Actual semantic verdict for namespace2: pending recorded observations and fresh 
 - Q classified diagnosticT7 state PASS but answer FAIL: choices13/14 are wrong for guest12/13, not a numeric false positive. Typed pending-date clarification must bind options to the exact current utterance and year to nonpending check-in; ordinary unknown guards stay strict.
 - Q classifiedT8 state PASS, overall semantic degraded by unsolicited false breakfast/Wi-Fi unknowns. Current-turn scope correction is required; HTTP200 alone is insufficient.
 - Q approved investigating a typed fixed courtesy intent forT9 while preserving empty-output rejection. A number-free arbitrary sentence can still assert hotel facts; do not claim numeric filters formally prove translation semantics. Final actual semantic review remains necessary.
+
+## Final clarification and courtesy candidate — b9abb91
+
+Q found and closed two defects: digit-set parsing accepted decimal/clock/reordered full dates; a no-year pending clarification was incorrectly brief-independent. Final complete-token validation rejects those forms,13/14 andyear2027; source12/13 with allowedyear or noyear passes. A domain-specific validator is injected by composition; the neutral default rejects, and preparation may not emit committed clarification. No-year clarification is brief-dependent at version4 without a pending value reference. PG replay after resolution at the same language revision is stale and adds no provider call.
+
+Q independently passed77 focused tests and targeted boundary probes, confirmed maximum language-tag prompt2995<3000, and reported no remaining blocking code finding. C passed82 contracts/architecture plus4 PostgreSQL/API tests, Ruff, compile and diff checks. Actual provider scope/courtesy translation semantics remain unverified until the authorized fixed-candidate matrix. No live model calls during these checks.

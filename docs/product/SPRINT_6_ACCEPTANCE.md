@@ -5,12 +5,12 @@
 | Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
 | #91 preference/state | A — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Scope/CAS/restart/replay; thực tế đổi vi→en→fr→ja→zh→ar→hi→ko, brief và child identity được giữ | Nghiệm thu đầy đủ answer/UI/copy; short/mixed chưa có delivered answer |
-| #92 grounding/guards | A — gpt-6-luna/high | Implemented; correction đang thực thi | JA numeric/timezone đã đạt thực tế; URL fix tại 559a3d2 qua review; strict source/numeric guards giữ nguyên | Typed clarification cho ngày mơ hồ; kiểm false unknown và câu trả lời courtesy |
+| #92 grounding/guards | A — gpt-6-luna/high | Implemented; correction đang thực thi | JA numeric/timezone đã đạt thực tế; URL fix tại 559a3d2 qua review; strict source/numeric guards giữ nguyên | Typed clarification/courtesy đã sửa và review; còn actual-model semantic verification |
 | #93 presentation/RTL/labels | B — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Desktop/mobile/script/RTL/labels/races; actual UI/copy T1–5 | Hoàn tất presentation trong matrix cố định |
 | #74 current eligible copy | B — gpt-6-luna/high | Implemented, offline verified; Blocked shared DoD | Exact clipboard T1–5; recovery/pending/stale/scope/failure paths | Không thay diagnostic API bằng bằng chứng UI/copy |
-| #95 remediation | A+B — gpt-6-luna/high | In Progress, current Sprint 6 | Schema, receipt recovery, safe portion, Japanese boundaries/timezone, URL retrieval đã sửa | Clarification và acknowledgement contract đang sửa; sau đó review và nghiệm thu |
+| #95 remediation | A+B — gpt-6-luna/high | In Progress, current Sprint 6 | Schema, receipt recovery, safe portion, Japanese boundaries/timezone, URL retrieval đã sửa | Contract sửa tại b9abb91 đã qua gates/review; đang chờ allowance để nghiệm thu |
 | #94 coordination | C — runtime model/effort unavailable | In Progress | Candidate/source pin, bounds, evidence, local gates và điều tra | Tích hợp, final AC map và publication |
-| Independent review | Q — gpt-6.1-sol/high | URL/helper đã review; review sửa tiếp theo đang chuẩn bị | 64 backend tests và 14 helper tests độc lập đạt | Chưa có full-matrix semantic PASS |
+| Independent review | Q — gpt-6.1-sol/high | b9abb91 đã review, không còn blocking code finding | 64 backend tests và 14 helper tests độc lập đạt | Chưa có full-matrix semantic PASS |
 
 ## Kết quả actual-model và counters
 
@@ -39,7 +39,7 @@ Hieu đã cho phép namespace2 tối đa18; bổ sung6 cộng12 còn lại thàn
 | 4 JA | Context breakfast, 06:30–09:30 và Asia/Ho_Chi_Minh; brief không tăng; current/exact copy | Đạt case trên f52 |
 | 5 Chinese | Wi-Fi miễn phí và credentials tại desk; dates/member không đổi; current/exact copy | Đạt case trên f52; screenshot desktop không tự chứng minh mobile |
 | 6 Arabic | Lưu ar/rev6; parking40/100000 đúng nhưng URL claim không cite URL fact; HTTP502 | Guard từ chối đúng. Selector bỏ supporting URL dù preliminary retrieval/index có; đã sửa tại559 |
-| 7 Hindi, API only | hi/rev7; checkout14 giữ nguyên, pending checkout, briefv4; same child age7. Unknown hỏi sai lựa chọn13/14, chứa ngày không có numeric provenance; HTTP502 | State đạt; answer không đạt. Không retry. Typed clarification đang sửa |
+| 7 Hindi, API only | hi/rev7; checkout14 giữ nguyên, pending checkout, briefv4; same child age7. Unknown hỏi sai lựa chọn13/14, chứa ngày không có numeric provenance; HTTP502 | State đạt; answer không đạt. Không retry. Typed clarification đã sửa; actual recheck pending |
 | 8 Korean, API only | ko/rev8; checkout15/nights5, briefv5, pending clear; same child age7; HTTP200 | State đạt; answer thêm false/irrelevant breakfast/Wi-Fi unknowns nên không full semantic PASS |
 | 9 short/mixed, API only | Model output rỗng ở mọi content array, chỉ có labels; HTTP502 invalid_model_output | Không có delivered answer; thiếu kênh courtesy acknowledgement. Read-only PG xác nhận ko/rev8, briefv5 và cùng child age7 không đổi sau turn |
 
@@ -53,9 +53,17 @@ T7–9 dùng [one-shot helper](evidence/sprint-6/remediation/diagnostic_api_turn
 - Numeric tokenizer xử lý Japanese/CJK/Devanagari/Arabic và ASCII units; equivalent Unicode digits được chấp nhận, unequal values bị từ chối. Hospitality formatter chỉ bổ sung timezone từ đúng cited fact/window và revalidate literals; actual Japanese case đã đạt.
 - URL supporting fact chỉ được giữ khi exact URL cùng xuất hiện trong question và same-hotel preliminary fact, ID nằm trong candidate index; current-source fetch và final claim-own-citation guard tiếp tục áp dụng. Foreign/guest-only/nonidentical/revoked cases không được nâng quyền.
 
-Latest product URL fix `559a3d2`, helper-only correction `0227b9b`; [diagnostic pin](evidence/sprint-6/remediation/namespace4-diagnostic-boundary.json). C chạy **68 backend contracts + Ruff PASS**; Q chạy64 focused backend và source probes PASS. Helper14 tests + actual read-only PG resolver PASS. Các gates trước vẫn hợp lệ theo phạm vi: 10 PG regressions, safe-portion PG/API replay, Japanese timezone PG composition, 15 runtime checks; B36 web contracts/15 state/lint/typecheck/build và browser recovery proof. Chỉ chạy lại phần bị thay đổi; chưa ghi PASS cho code đang sửa.
+Latest product URL fix `559a3d2`, helper-only correction `0227b9b`; [diagnostic pin](evidence/sprint-6/remediation/namespace4-diagnostic-boundary.json). C chạy **68 backend contracts + Ruff PASS**; Q chạy64 focused backend và source probes PASS. Helper14 tests + actual read-only PG resolver PASS. Các gates trước vẫn hợp lệ theo phạm vi: 10 PG regressions, safe-portion PG/API replay, Japanese timezone PG composition, 15 runtime checks; B36 web contracts/15 state/lint/typecheck/build và browser recovery proof. Chỉ chạy lại phần bị thay đổi; không ghi actual semantic PASS từ offline tests.
 
 Raw synthetic model output chỉ ở private scratch, opt-in, tối đa64KiB,0600; không publish. Diagnostics mặc định tắt, dev/test only, paths/types/counts allowlist. Giữ M1–M6 và default tests/build/startup offline.
+
+## Candidate sửa cuối trước nghiệm thu tiếp
+
+`b9abb9105ff59a7faa96ec1ebe87e76a592fa79a`, [manifest](evidence/sprint-6/remediation/clarification-candidate-manifest.json), [local gates](evidence/sprint-6/remediation/clarification-local-gates.json). C trực tiếp chạy **82 contracts/architecture, 4 PostgreSQL/API tests, Ruff và compile PASS**. Q độc lập chạy77 focused tests và các negative probes; hai finding punctuation và no-year freshness đã được sửa, không còn blocking code finding. Final instructions với language tag64 ký tự là2995, dưới3000.
+
+Hospitality validator qua neutral callback chỉ chấp nhận clarification cho checkout đang pending; options phải giữ đúng hai thành phần slash pair trong **current utterance**, giữ thứ tự. Chỉ được mượn year từ check-in không pending. Decimal/clock/full-date/reordered values,13/14 vàyear2027 bị từ chối; không nới generic unknown/hotel/URL guard. Clarification luôn gắn brief version dù không render year, không cite pending checkout như confirmed value; replay sau resolution thành stale và không thêm provider call.
+
+Typed acknowledgement chỉ mang intent `thanks_acknowledged`, bounded text, sole-content và không số/URL/ID. Empty output vẫn bị từ chối. Prompt dùng history để resolve current reference, không trả lại FAQ cũ. Tests kiểm contract/literal/persistence; tính đúng nghĩa của bản dịch courtesy và việc model tuân thủ current-turn scope vẫn cần actual semantic review. Không coi bộ lọc literal là bằng chứng hình thức cho mọi factual assertion.
 
 ## AC map và next action
 
@@ -64,10 +72,10 @@ Raw synthetic model output chỉ ở private scratch, opt-in, tối đa64KiB,060
 | L1-AC1–5 | State/scope/CAS/restart/replay/late preference; actual language switching và same-child/date invariants | Full answer/UI recovery sequence trên fixed candidate; [snapshot sau T9](evidence/sprint-6/remediation/namespace4-final-db-observation.json) đã xác nhận state không đổi |
 | L2-AC1–4 | Source/numeric negatives, pinned expectedfacts/lexical baseline, actual contextual JA/Chinese; per-case comparison | Clarification provenance, URL actual recheck, false unknown correction và complete semantic verdict |
 | L3-AC1–4 / B12a-AC1–4 | Production layout/scripts/RTL/races/clipboard failure; current copy T1–5 | Full actual UI/presentation/copy matrix |
-| R1-AC1–3 | Concrete captured failures, privacy guards, safe portion/recovery proof | Typed clarification/courtesy correction + targeted tests/review |
+| R1-AC1–3 | Concrete captured failures, privacy guards, safe portion/recovery proof | Actual semantic confirmation của clarification/courtesy trên candidate mới |
 | R1-AC4–5 / C-AC1–3 | Owners/contracts/bounds, failures preserved, local gates | Fixed-candidate actual matrix, final review/map và delivery |
 
-Không tạo story trùng: existing #95 có problem/impact/attempts/evidence/AC/E2/P0/affected links và được xử lý ngay trong Sprint6. #91/#92/#93/#74 giữ Blocked, #95/#94 In Progress. A sửa contract, B chuẩn bị namespace mapping nhưng không initialize hoặc inference, Q review; C tích hợp và chuẩn bị next acceptance cụ thể. Chỉ xin thêm budget khi bản sửa đã đủ reviewable; không tự tăng cap.
+Không tạo story trùng: existing #95 có problem/impact/attempts/evidence/AC/E2/P0/affected links và được xử lý ngay trong Sprint6. #91/#92/#93/#74 giữ Blocked, #95/#94 In Progress. A đã sửa contract và Q đã review; B chuẩn bị namespace mapping nhưng chưa initialize hoặc inference. C đã yêu cầu phép cho đúng một batch mới tối đa18 requests trên candidate cố định b9abb91; đang tiếp tục code/text publication trong khi chờ, không tự tăng cap.
 
 Draft PR96 vẫn base `sprint-5-canonical-brief`, chưa merge. Các local commits sau f877 chưa cập nhật remote branch ref; GitHub objects đã chuẩn bị một phần không đồng nghĩa đã push. Không deploy, tạo paid resources, manual CI hoặc đóng parent/epic/milestone. Automatic workflows có thể chạy khi cập nhật PR; không có claim CI PASS.
 

@@ -1,10 +1,12 @@
 {
-  "state": "objects_prepared_ref_not_updated",
+  "state": "reviewed_objects_prepared_ref_update_pending",
+  "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
   "remote_ref_expected": "f877fff0a23633e4940ac5b9266370fc8fc03c17",
+  "reviewed_product_local": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
   "prepared_parent": {
-    "sha": "8479b8eaeca4f437577afa5596e4c05bbe7bbc65",
-    "tree": "d62789acc400e8b082844aa399f516406b406923"
+    "sha": "746fdcbc72cc01ec2aa9447545fa6dbc728b2115",
+    "tree": "90c69d158f37dec47b72a521706d11095c303715"
   },
   "mappings": [
     {
@@ -66,7 +68,25 @@
       "local_sha": "0227b9b",
       "remote_sha": "8479b8eaeca4f437577afa5596e4c05bbe7bbc65",
       "tree": "d62789acc400e8b082844aa399f516406b406923"
+    },
+    {
+      "local_sha": "d87e674",
+      "remote_sha": "d2b73d703ea71529d91bb2433f262990a1c77f5b",
+      "tree": "903a40e629b67f87628a3959a0de50bf927a9af8"
+    },
+    {
+      "local_sha": "749ff48",
+      "remote_sha": "91104bb9e0f1326791dd3d94845df6b2d6f49e4c",
+      "tree": "34e0166907389ba8795b21d31c4256e5592bcc0d",
+      "local_unpublished_image_commit": "a6b7e08",
+      "note": "Remote parent is d87 equivalent; a6b7 image commit never created/referenced in remote chain. Screenshot bytes excluded."
+    },
+    {
+      "local_sha": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
+      "remote_sha": "746fdcbc72cc01ec2aa9447545fa6dbc728b2115",
+      "tree": "90c69d158f37dec47b72a521706d11095c303715"
     }
   ],
-  "note": "Git data API commit identities differ; every prepared tree is equal to its local candidate. No ref update yet. Local d87e674 and subsequent evidence/source pending."
+  "screenshots": "Local only by explicit Hieu instruction;15image bytes excluded. Local a6b7e08 containing images not included in remote parent chain.",
+  "final_ref_receipt": "Coordinator verifies remote ref and equal tree after metadata commit; final task response records publication outcome."
 }
