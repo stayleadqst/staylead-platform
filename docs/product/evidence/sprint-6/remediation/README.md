@@ -1,0 +1,102 @@
+# Sprint 6 resumed acceptance harness
+
+This directory contains a fresh, bounded acceptance run harness. The original
+run artifacts remain under `../` and are immutable evidence. The new run ID is
+`s6-codex-20261026-remediation-1`; it starts with independent counters and uses
+the pinned matrix `staylead-s6-nine-turn-multilingual-20261026-v1`.
+
+## Frozen run bounds
+
+- 9 semantic guest turns, 18 Codex requests maximum, 2 Codex requests per HTTP turn.
+- Provider timeout 25 seconds, full turn timeout 45 seconds, 700 output tokens.
+- No automatic retries, automatic answer-only resumes, replay, or hidden reset.
+- An answer-only resume is permitted only after C explicitly types `continue`
+  while the pinned partial-success receipt and existing Continue control are
+  visible, and only when the API was started with
+  `STAYLEAD_S6_OPERATOR_RESUME=1`. It reserves a separate resume counter and
+  hashed receipt, does not consume a guest-turn slot, and still consumes any
+  actual provider request from the unchanged global 18-request cap. Duplicate
+  receipt continuation is refused. The matrix advances only after the resumed
+  answer passes the current case's semantic and clipboard checks.
+- A failed browser turn is recorded with HTTP status, sanitized response metadata,
+  and screenshot. The browser stays open for C's explicit recovery decision; the
+  driver never submits another turn after a failure. The run remains bounded by
+  the same persistent server counters during any operator-led recovery.
+- A fresh browser profile creates a new unique guest session. Do not reuse the
+  previous run's browser profile, database session, or state file.
+
+## C-owned execution commands
+
+The runtime and browser are prepared only; this helper does not create state,
+start a server, or call a model. Once C is ready to execute the separately
+authorized resumed run, initialize the new counter file exactly once:
+
+```sh
+apps/api/.venv/bin/python docs/product/evidence/sprint-6/remediation/resumed_acceptance_runtime.py \
+  --initialize-state --authority "current-user-resume-issue-95"
+```
+
+Then, after C has installed the private configuration at
+`/private/tmp/staylead-sprint6-remediation-runtime.json` and confirmed the
+candidate build is ready, start the production API with the public settings:
+
+```sh
+STAYLEAD_LIVE_EVAL=1 STAYLEAD_VALIDATION_DIAGNOSTICS=true \
+STAYLEAD_S6_OPERATOR_RESUME=1 \
+PYTHONPATH=apps/api/src apps/api/.venv/bin/python \
+  docs/product/evidence/sprint-6/remediation/resumed_acceptance_runtime.py \
+  --host 127.0.0.1 --port 18086
+```
+
+The web production server remains C-owned at `http://127.0.0.1:13016`. In a
+separate terminal, the visible Chrome driver command is:
+
+```sh
+STAYLEAD_S6_HEADLESS=0 STAYLEAD_S6_WEB_URL=http://127.0.0.1:13016 \
+  node docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs
+```
+
+The browser harness refuses to overwrite its output directory. Each turn is
+appended to `resumed-live-run/observations.jsonl`; every turn gets a screenshot,
+including transport and HTTP failures. Copy is checked against the exact
+rendered `.answer-copy-source` text and the persistent request/turn counters are
+compared before and after copy to catch any extra provider call. Error metadata
+retains only a safe error code and the allowlisted validation location/type
+structure from `error.validation_diagnostics`.
+
+If a turn fails, the driver pauses and keeps Chrome visible. For a
+`partial_success` with its receipt, it accepts `continue` to click the existing
+answer-only UI control once; it also accepts `snapshot` and `close`. It never
+retries a receipt automatically. C decides every continuation explicitly. No
+session token is written to evidence.
+
+## Optional synthetic JSON capture
+
+Default capture is off. For a run explicitly approved to retain synthetic model
+JSON for offline schema replay, set both exact opt-in variables on the API
+process:
+
+```sh
+STAYLEAD_S6_CAPTURE_SYNTHETIC_JSON=1 \
+STAYLEAD_S6_SYNTHETIC_MATRIX_ID=staylead-s6-nine-turn-multilingual-20261026-v1
+```
+
+Only valid JSON output up to 64 KiB is accepted, and only when that request's
+guest utterance exactly matches the corresponding turn in the pinned matrix.
+Each provider attempt is written once, with mode 0600, under
+`/private/tmp/staylead-sprint6-remediation-synthetic-output/`. Each file
+contains the exact output text, parsed JSON, turn/attempt IDs, byte count/hash,
+and request/prompt hashes. These are private scratch artifacts and must not be
+copied into public evidence. Oversized, non-JSON, non-matrix, or duplicate
+capture is refused. No prompts, utterances, credentials, signed tokens, DSNs,
+or raw configuration are added to normal event logs.
+
+## Offline checks
+
+```sh
+python3 docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py -v
+node --check docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs
+```
+
+These are local boundary checks only; they do not start the API, open Chrome,
+or make provider calls.
