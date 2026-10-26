@@ -1,0 +1,225 @@
+{
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "status": "pinned_expected_cases_not_executed",
+  "conversation": "one session; turns remain sequential; no resume, replay, retry, or reload between turns",
+  "hotel_id": "HTL-CITY01",
+  "classification": "synthetic software acceptance; does not establish real-hotel or operator approval",
+  "limits": {
+    "max_guest_turns": 9,
+    "max_codex_requests": 18,
+    "max_codex_requests_per_turn": 2,
+    "automatic_retries": false,
+    "resume_or_replay_requests": false,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "prior_sprint5_grok_attempts_frozen": 8,
+    "sprint5_codex_allowance_reused": false,
+    "non_provider_external_network_calls": false,
+    "provider_network_requests": "real Codex CLI requests, subject to fresh live-run approval and persistent caps"
+  },
+  "corpus": {
+    "baseline_pack": "fixtures/hospitality/knowledge-v1",
+    "baseline_fact": {
+      "fact_id": "F-HTL-CITY01-040",
+      "source_id": "SRC-HTL-CITY01-FOOD",
+      "source_version": "1.0",
+      "value": "Bữa sáng tự chọn tại Bến Gió, tầng 1.",
+      "conditions": {
+        "window": "06:30-09:30",
+        "closed_days": [],
+        "timezone": "Asia/Ho_Chi_Minh"
+      },
+      "valid_from": "2026-10-01",
+      "valid_to": "2027-09-30",
+      "synthetic": true,
+      "guest_approved_source": true
+    },
+    "other_baseline_facts": [
+      {
+        "fact_id": "F-HTL-CITY01-021",
+        "source_id": "SRC-HTL-CITY01-AMENITY",
+        "purpose": "Wi-Fi availability and where credentials are given"
+      },
+      {
+        "fact_id": "F-HTL-CITY01-046",
+        "source_id": "SRC-HTL-CITY01-TRANSPORT",
+        "expected_values": {
+          "covered_reference_spaces": 40,
+          "fee_vnd_per_vehicle_per_night": 100000,
+          "reservation_guarantee": false
+        }
+      }
+    ],
+    "sprint6_authored_url_overlay": {
+      "fixture_dir": "fixtures/hospitality/sprint6-acceptance",
+      "builder": "fixtures/hospitality/sprint6-acceptance/build_corpus.py",
+      "source_id": "SRC-HTL-CITY01-S6-URL",
+      "fact_id": "F-HTL-CITY01-S6-URL-001",
+      "url": "https://sprint6.example.invalid/HTL-CITY01/info",
+      "source_is_synthetic": true,
+      "guest_approved_for_test_fixture": true,
+      "url_functional": false,
+      "real_hotel_or_operator_approval": false,
+      "baseline_internal_url_facts_remain_unapproved": [
+        "F-HTL-CITY01-038",
+        "F-HTL-CITY01-101"
+      ],
+      "aggregate_hashes": "harness-check.json"
+    }
+  },
+  "offline_retrieval_probe": {
+    "script": "docs/product/evidence/sprint-6/original-query-retrieval-probe.py",
+    "output": "docs/product/evidence/sprint-6/codex-retrieval-baseline.json",
+    "requires": "temporary overlay imported into local PostgreSQL",
+    "llm_calls": 0,
+    "measurements": ["per-turn expected fact coverage", "missing expected facts", "term_coverage", "candidate_fact_ids", "conflicts"]
+  },
+  "turns": [
+    {
+      "turn": 1,
+      "input_language": "vi",
+      "utterance": "Tôi muốn ở từ 10 đến 13 tháng 12 năm 2026 cho 2 người lớn. Vui lòng trả lời bằng tiếng Việt. Bữa sáng bắt đầu lúc mấy giờ và phục vụ ở đâu?",
+      "explicit_preference": "vi",
+      "expected_presentation": {"language_tag": "vi", "direction": "ltr", "preference_revision": 1},
+      "expected_preference_state": {"language_tag": "vi", "source": "explicit", "revision": 1},
+      "expected_brief_version": 1,
+      "expected_state": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "adults": 2,
+        "children": [],
+        "nights": 3
+      },
+      "expected_facts": ["F-HTL-CITY01-040"],
+      "expected_answer_constraints": ["preserve dates and adult count", "state buffet at Bến Gió, floor 1, 06:30-09:30 Asia/Ho_Chi_Minh"]
+    },
+    {
+      "turn": 2,
+      "input_language": "en",
+      "utterance": "Switch to English. Add one child to this stay; I don't know the child's age yet.",
+      "explicit_preference": "en",
+      "expected_presentation": {"language_tag": "en", "direction": "ltr", "preference_revision": 2},
+      "expected_preference_state": {"language_tag": "en", "source": "explicit", "revision": 2},
+      "expected_brief_version": 2,
+      "expected_state": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "adults": 2,
+        "children": [{"identity": "one new child; age unknown", "age": null}],
+        "pending_field": "child age"
+      },
+      "expected_answer_constraints": ["ask for the child's age", "do not drop dates/adults", "do not invent age or charges"]
+    },
+    {
+      "turn": 3,
+      "input_language": "fr",
+      "utterance": "Réponds en français. Cet enfant a 7 ans ; modifie le départ au 14 décembre 2026.",
+      "explicit_preference": "fr",
+      "expected_presentation": {"language_tag": "fr", "direction": "ltr", "preference_revision": 3},
+      "expected_preference_state": {"language_tag": "fr", "source": "explicit", "revision": 3},
+      "expected_brief_version": 3,
+      "expected_state": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "adults": 2,
+        "children": [{"identity": "same child introduced in turn 2", "age": 7}],
+        "nights": 4,
+        "pending_child_age": false
+      },
+      "expected_answer_constraints": ["keep the same child identity", "preserve age 7", "preserve check-in and adults"]
+    },
+    {
+      "turn": 4,
+      "input_language": "ja",
+      "utterance": "日本語で回答してください。朝食は何時からで、どこで提供されますか？",
+      "explicit_preference": "ja",
+      "expected_presentation": {"language_tag": "ja", "direction": "ltr", "preference_revision": 4},
+      "expected_preference_state": {"language_tag": "ja", "source": "explicit", "revision": 4},
+      "expected_brief_version": 3,
+      "expected_state_change": false,
+      "expected_facts": ["F-HTL-CITY01-040"],
+      "expected_answer_constraints": ["contextual FAQ grounded in the current hotel corpus", "preserve 06:30-09:30 and Asia/Ho_Chi_Minh", "do not mutate the brief"]
+    },
+    {
+      "turn": 5,
+      "input_language": "zh",
+      "utterance": "请改用中文。客房区有免费 Wi-Fi 吗？网络名称和密码在哪里获取？",
+      "explicit_preference": "zh",
+      "expected_presentation": {"language_tag": "zh", "direction": "ltr", "preference_revision": 5},
+      "expected_preference_state": {"language_tag": "zh", "source": "explicit", "revision": 5},
+      "expected_brief_version": 3,
+      "expected_state_change": false,
+      "expected_facts": ["F-HTL-CITY01-021"],
+      "expected_answer_constraints": ["answer in Chinese", "Wi-Fi is free in guest areas", "network name and password are obtained at the desk", "do not mutate the brief"]
+    },
+    {
+      "turn": 6,
+      "input_language": "ar",
+      "utterance": "أجب بالعربية. مواقف السيارات: كم العدد المرجعي والرسوم لكل مركبة في الليلة؟ واحتفظ بالرابط كما هو: https://sprint6.example.invalid/HTL-CITY01/info",
+      "explicit_preference": "ar",
+      "expected_presentation": {"language_tag": "ar", "direction": "rtl", "preference_revision": 6},
+      "expected_preference_state": {"language_tag": "ar", "source": "explicit", "revision": 6},
+      "expected_brief_version": 3,
+      "expected_state_change": false,
+      "expected_facts": ["F-HTL-CITY01-046", "F-HTL-CITY01-S6-URL-001"],
+      "expected_exact_values": {
+        "spaces": 40,
+        "fee": "100000 VND per vehicle per night",
+        "reservation_guaranteed": false,
+        "url": "https://sprint6.example.invalid/HTL-CITY01/info"
+      },
+      "expected_answer_constraints": ["answer in Arabic with RTL presentation", "preserve exact number and URL code points", "describe URL as synthetic nonfunctional sample if contextualized", "make no network request", "do not expose the two internal unapproved sample URLs", "do not mutate the brief"]
+    },
+    {
+      "turn": 7,
+      "input_language": "hi",
+      "utterance": "हिंदी में उत्तर दें। मैं 12/13 दिसंबर को चेक-आउट करना चाहता हूँ।",
+      "explicit_preference": "hi",
+      "expected_presentation": {"language_tag": "hi", "direction": "ltr", "preference_revision": 7},
+      "expected_preference_state": {"language_tag": "hi", "source": "explicit", "revision": 7},
+      "expected_brief_version": 4,
+      "expected_state": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "children": [{"identity": "same child", "age": 7}],
+        "pending_question": "checkout date clarification",
+        "pending_fields": ["dates.check_out"],
+        "ambiguous_date_request_committed": false
+      },
+      "expected_answer_constraints": ["ask whether 12/13 means 12 or 13 December 2026", "do not change committed checkout", "preserve child and age", "record dates.check_out as pending; canonical brief version becomes 4"]
+    },
+    {
+      "turn": 8,
+      "input_language": "ko",
+      "utterance": "한국어로 답해주세요. 체크아웃 날짜는 2026년 12월 15일입니다.",
+      "explicit_preference": "ko",
+      "expected_presentation": {"language_tag": "ko", "direction": "ltr", "preference_revision": 8},
+      "expected_preference_state": {"language_tag": "ko", "source": "explicit", "revision": 8},
+      "expected_brief_version": 5,
+      "expected_state": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-15",
+        "adults": 2,
+        "children": [{"identity": "same child", "age": 7}],
+        "nights": 5,
+        "checkout_clarification_resolved": true,
+        "pending_fields": []
+      },
+      "expected_answer_constraints": ["commit the explicit checkout date", "preserve check-in, adults, child identity, and age", "answer in Korean"]
+    },
+    {
+      "turn": 9,
+      "input_language": "mixed/en-ko",
+      "utterance": "OK, 고마워",
+      "explicit_preference": null,
+      "expected_presentation": {"language_tag": "ko", "direction": "ltr", "preference_revision": 8},
+      "expected_preference_state": {"language_tag": "ko", "source": "explicit", "revision": 8},
+      "expected_brief_version": 5,
+      "expected_state_change": false,
+      "expected_answer_constraints": ["retain explicit Korean preference despite short/mixed input", "do not infer a new language preference", "do not reset or mutate the brief"]
+    }
+  ],
+  "brief_version_sequence": [1, 2, 3, 3, 3, 3, 4, 5, 5],
+  "preference_revision_sequence": [1, 2, 3, 4, 5, 6, 7, 8, 8]
+}

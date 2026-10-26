@@ -90,6 +90,8 @@ class PreparedGuestTurn:
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
+    explicit_language_tag: str | None = None
+    inferred_language_tag: str | None = None
 
 
 @dataclass(frozen=True)

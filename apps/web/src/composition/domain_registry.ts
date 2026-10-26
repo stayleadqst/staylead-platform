@@ -11,6 +11,7 @@ export type GuestBriefRendererProps = Readonly<{
   brief: unknown;
   receipt?: unknown;
   delta?: unknown;
+  labels?: Readonly<Record<string, string>>;
 }>;
 
 export type DomainRegistration = Readonly<{

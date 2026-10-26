@@ -348,8 +348,8 @@ def test_schema_four_upgrade_preserves_existing_session_and_source(engine) -> No
         connection.exec_driver_sql("DROP TABLE guest_briefs")
         connection.exec_driver_sql("DELETE FROM schema_versions WHERE version > 4")
     assert schema_version(engine) == 4
-    assert apply_migrations(engine) == 5
-    assert schema_version(engine) == 5
+    assert apply_migrations(engine) == 6
+    assert schema_version(engine) == 6
     assert get_guest_brief(engine, session_id=session_id, hotel_id=hotel_id).brief_version == 0
     assert get_session(engine, session_id)["hotel_id"] == hotel_id
     with engine.connect() as connection:

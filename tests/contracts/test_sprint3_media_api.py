@@ -115,12 +115,17 @@ def test_freshness_uses_saved_request_and_rejects_client_supplied_evidence(monke
     monkeypatch.setattr(guest_chat_module, "get_completed_response", lambda *args, **kwargs: {
         "freshness": {"eligible": False, "status": "stale"},
     })
+    # Freshness now also compares the saved answer's language-preference revision.
+    # Keep this API contract test isolated from persistence just like its saved-answer fixture.
+    monkeypatch.setattr(guest_chat_module, "get_language_preference", lambda *args, **kwargs: None)
     client = make_client(monkeypatch)
     path = f"/v1/guest/sessions/{SESSION_ID}/freshness"
     headers = {"Authorization": f"Bearer {token()}"}
     stale = client.post(path, headers=headers, json={"request_id": "turn-1"})
     forged = client.post(path, headers=headers, json={"request_id": "turn-1", "evidence": []})
-    assert stale.status_code == 200 and stale.json() == {"status": "stale"}
+    assert stale.status_code == 200 and stale.json() == {
+        "status": "stale", "answer_eligibility": "stale",
+    }
     assert forged.status_code == 422
 
 

@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from dataclasses import dataclass
+import unicodedata
+from dataclasses import dataclass, field
 from typing import Any
 
 from pydantic import BaseModel, ValidationError
@@ -29,6 +30,20 @@ _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
 _FACT_REFERENCE = re.compile(r"\[(F-[A-Za-z0-9-]+)\]")
 _FACT_TOKEN = re.compile(r"(?<![A-Za-z0-9])F-[A-Za-z0-9-]+")
 _MODEL_FACT_FIELDS = ("fact_id", "topic", "subject", "field", "value", "conditions", "status")
+_LANGUAGE_TAG = re.compile(r"^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$")
+
+
+def _clean_language_tag(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    candidate = value.strip()
+    if not candidate or len(candidate) > 64 or not _LANGUAGE_TAG.fullmatch(candidate):
+        return None
+    parts = candidate.split("-")
+    normalized = [parts[0].lower()]
+    for part in parts[1:]:
+        normalized.append(part.upper() if len(part) == 2 and part.isalpha() else part.title() if len(part) == 4 and part.isalpha() else part.lower())
+    return "-".join(normalized)
 
 
 def _complete_usage_sum(results: list[GenerationResult], metric: str) -> int | None:
@@ -63,10 +78,21 @@ class ConversationAnswer:
     brief_version_used: int | None = None
     brief_dependent: bool = False
     guest_brief_refs: tuple[str, ...] = ()
+    explicit_language_tag: str | None = None
+    inferred_language_tag: str | None = None
+    label_bundle: dict[str, str] = field(default_factory=dict)
 
 
 def _numeric_forms(text: str) -> set[str]:
-    return {re.sub(r"\D", "", item) for item in _NUMBER.findall(text) if re.search(r"\d", item)}
+    forms: set[str] = set()
+    for item in _NUMBER.findall(text):
+        canonical = "".join(
+            str(unicodedata.decimal(char)) if char.isdecimal() else char
+            for char in item
+        )
+        if any(char.isdecimal() for char in item):
+            forms.add(canonical)
+    return forms
 
 
 def _validate_supported_literals(answer: str, cited_facts: list[dict[str, Any]]) -> None:
@@ -152,6 +178,9 @@ class GroundedQAOrchestrator:
         extract_guest_patch: bool = False,
         selected_fact_ids: tuple[str, ...] | None = None,
         prefetched_facts: list[dict[str, Any]] | None = None,
+        preferred_language_tag: str | None = None,
+        missing_label_keys: tuple[str, ...] = (),
+        label_bundle_keys: tuple[str, ...] = (),
     ) -> ConversationAnswer:
         provider_results: list[GenerationResult] = []
         retrieved = None
@@ -227,6 +256,9 @@ class GroundedQAOrchestrator:
             "conflicts": list(conflicts),
             "guest_brief": _brief_projection(brief),
             "guest_brief_patch_enabled": extract_guest_patch,
+            "preferred_language_tag": preferred_language_tag,
+            "missing_label_keys": list(missing_label_keys),
+            "label_bundle_keys": list(label_bundle_keys),
         }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 18000:
             evidence = json.dumps({
@@ -236,12 +268,16 @@ class GroundedQAOrchestrator:
                 "conflicts": list(conflicts),
                 "guest_brief": _brief_projection(brief),
                 "guest_brief_patch_enabled": extract_guest_patch,
+                "preferred_language_tag": preferred_language_tag,
+                "missing_label_keys": list(missing_label_keys),
+                "label_bundle_keys": list(label_bundle_keys),
             }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 22000:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")
         try:
             generated = await self._provider.generate(GenerationRequest(
-                instructions=self._instructions if extract_guest_patch else self._committed_instructions,
+                instructions=(self._instructions if extract_guest_patch else self._committed_instructions)
+                + (f"\nThe committed guest response-language preference is {preferred_language_tag!r}; follow it unless this guest explicitly requests a different response language in this turn." if preferred_language_tag else ""),
                 input_text=evidence,
                 max_output_tokens=self._max_output_tokens,
             ))
@@ -311,12 +347,18 @@ class GroundedQAOrchestrator:
             brief_version_used=brief.brief_version if brief_refs and brief is not None else None,
             brief_dependent=bool(brief_refs),
             guest_brief_refs=brief_refs,
+            explicit_language_tag=_clean_language_tag(getattr(payload, "explicit_language_tag", None)),
+            inferred_language_tag=_clean_language_tag(getattr(payload, "inferred_language_tag", None)),
+            label_bundle=dict(getattr(payload, "label_bundle", {}) or {}),
         )
 
     async def prepare_turn(
         self, *, hotel_id: str, question: str, history: list[dict[str, str]],
         brief: GuestBriefSnapshot, deadline: float | None = None,
         source_utterance_id: str | None = None,
+        preferred_language_tag: str | None = None,
+        missing_label_keys: tuple[str, ...] = (),
+        label_bundle_keys: tuple[str, ...] = (),
     ) -> PreparedGuestTurn:
         """Combine low-overlap selection with patch understanding in call one."""
         retrieved = await asyncio.to_thread(
@@ -330,6 +372,7 @@ class GroundedQAOrchestrator:
                 "candidate_index": list(retrieved.candidate_index),
                 "guest_brief": _brief_projection(brief),
                 "guest_brief_patch_enabled": True,
+                "preferred_language_tag": preferred_language_tag,
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selected = await self._provider.generate(GenerationRequest(
@@ -353,6 +396,8 @@ class GroundedQAOrchestrator:
                     input_tokens=selected.usage.input_tokens,
                     output_tokens=selected.usage.output_tokens,
                     total_tokens=selected.usage.total_tokens,
+                    explicit_language_tag=_clean_language_tag(payload.explicit_language_tag),
+                    inferred_language_tag=_clean_language_tag(payload.inferred_language_tag),
                 )
             except (ProviderError, TimeoutError, ConversationFailure):
                 raise
@@ -361,6 +406,9 @@ class GroundedQAOrchestrator:
         answer = await self.answer(
             hotel_id=hotel_id, question=question, history=history, deadline=deadline,
             brief=brief, extract_guest_patch=True, prefetched_facts=list(retrieved.facts),
+            preferred_language_tag=preferred_language_tag,
+            missing_label_keys=missing_label_keys,
+            label_bundle_keys=label_bundle_keys,
         )
         return PreparedGuestTurn(
             provisional_answer=answer, guest_patch=answer.guest_patch,
@@ -371,17 +419,25 @@ class GroundedQAOrchestrator:
             provider_request_ids=answer.provider_request_ids,
             input_tokens=answer.usage.input_tokens, output_tokens=answer.usage.output_tokens,
             total_tokens=answer.usage.total_tokens,
+            explicit_language_tag=answer.explicit_language_tag,
+            inferred_language_tag=answer.inferred_language_tag,
         )
 
     async def answer_committed_turn(
         self, *, hotel_id: str, question: str, history: list[dict[str, str]],
         brief: GuestBriefSnapshot, deadline: float | None = None,
         selected_fact_ids: tuple[str, ...] | None = None,
+        preferred_language_tag: str | None = None,
+        missing_label_keys: tuple[str, ...] = (),
+        label_bundle_keys: tuple[str, ...] = (),
     ) -> ConversationAnswer:
         """Generate the final grounded answer from committed brief state, without patch use."""
         return await self.answer(
             hotel_id=hotel_id, question=question, history=history, deadline=deadline,
             brief=brief, extract_guest_patch=False, selected_fact_ids=selected_fact_ids,
+            preferred_language_tag=preferred_language_tag,
+            missing_label_keys=missing_label_keys,
+            label_bundle_keys=label_bundle_keys,
         )
 
     @staticmethod

@@ -40,7 +40,7 @@ body {
 .chat-transcript { display: flex; min-height: 350px; max-height: min(58vh, 700px); flex-direction: column; gap: 20px; overflow-y: auto; padding: 28px clamp(16px, 4vw, 36px); }
 .status-note { margin: 0; color: #69736c; font-size: 14px; }
 .turn { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.message { max-width: min(100%, 680px); border-radius: 16px; padding: 15px 18px; line-height: 1.6; overflow-wrap: anywhere; }
+.message { max-width: min(100%, 680px); border-radius: 16px; padding: 15px 18px; line-height: 1.6; overflow-wrap: anywhere; unicode-bidi: plaintext; }
 .message p { margin: 0; white-space: pre-wrap; }
 .message-guest { align-self: flex-end; border-bottom-right-radius: 5px; background: #235845; color: #fff; }
 .message-assistant { border: 1px solid #e8ebe5; border-bottom-left-radius: 5px; background: #f8faf7; color: #202922; }
@@ -50,6 +50,10 @@ body {
 .media-evidence figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 12px; color: #33443a; font-size: 13px; }
 .media-evidence figcaption .text-button { padding: 0; }
 .answer-text { white-space: pre-wrap; }
+.answer-copy-source { unicode-bidi: plaintext; }
+.answer-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline; }
+.answer-actions .text-button { margin-top: 0; }
+.copy-status { display: block; min-height: 1.25em; color: #53645a; font-size: 12px; }
 .message-error { border: 1px solid #e8c6b9; background: #fff7f3; color: #713d2b; }
 .brief-receipt, .brief-delta { max-width: min(100%, 680px); border: 1px solid #dce6dd; border-radius: 12px; padding: 10px 13px; background: #fbfcfa; color: #34473b; font-size: 13px; }
 .brief-receipt summary, .brief-delta summary { color: #315f4d; font-weight: 700; cursor: pointer; }
@@ -78,6 +82,9 @@ body {
 .send-button:hover:not(:disabled) { background: #174432; }
 .send-button:disabled { background: #aebbb3; cursor: not-allowed; }
 .composer-hint { margin: 8px 0 0; color: #727c75; font-size: 12px; }
+
+[dir="rtl"] .message-guest { border-bottom-right-radius: 16px; border-bottom-left-radius: 5px; }
+[dir="rtl"] .message-assistant { border-bottom-left-radius: 16px; border-bottom-right-radius: 5px; }
 
 @media (max-width: 560px) {
   .theme-hospitality { padding: 22px 12px 32px; }

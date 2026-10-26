@@ -28,6 +28,7 @@ import {
   fetchGuestMedia,
   sendGuestMessage,
 } from "@/shared/api/client";
+import { copyPlainText, directionForLanguageTag, hasCompleteLabelBundle, labelsForLanguage, normalizeLanguageTag, type CopyResult } from "@/shared/chat/presentation";
 
 type ChatTurn = {
   id: string;
@@ -45,6 +46,8 @@ type ChatTurn = {
   briefSnapshot?: GuestBriefSnapshot;
   answerOnlyReceiptId?: string;
   sameIdOnly?: boolean;
+  languageTag?: string;
+  scopeSessionId?: string;
 };
 
 function requestId() {
@@ -142,6 +145,18 @@ export function GuestChat({
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       acceptBrief(answer.guest_brief, currentGeneration);
+      if (answer.presentation) {
+        labelsForLanguage(answer.presentation.language_tag, answer.presentation.labels);
+      }
+      if (answer.language_preference) {
+        setSession((current) => {
+          if (!current) return current;
+          const currentRevision = current.language_preference?.revision ?? -1;
+          return answer.language_preference!.revision < currentRevision
+            ? current
+            : { ...current, language_preference: answer.language_preference };
+        });
+      }
       if (answer.status === "partial_success") {
         const partialReceipt = answer.brief_receipt ?? null;
         setTurns((current) => current.map((item) => item.id === turn.id
@@ -218,8 +233,9 @@ export function GuestChat({
         target,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      const serverStale = response.answer_eligibility === "stale" || response.presentation?.freshness === "stale";
       setTurns((current) => current.map((item) => item.id === turnId
-        ? { ...item, stale: result.status === "stale", freshnessError: undefined }
+        ? { ...item, stale: serverStale || result.status === "stale", freshnessError: undefined }
         : item));
     } catch {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
@@ -268,7 +284,11 @@ export function GuestChat({
     event.preventDefault();
     const text = question.trim();
     if (!text || !canStartRequest(Boolean(session), activeRequest.current === generation.current, unresolvedRequest)) return;
-    const turn: ChatTurn = { id: requestId(), question: text, sending: true };
+    const turn: ChatTurn = {
+      id: requestId(), question: text, sending: true,
+      languageTag: session?.language_preference?.language_tag ?? "en",
+      scopeSessionId: session?.session_id,
+    };
     setTurns((current) => [...current, turn]);
     setQuestion("");
     void (async () => {
@@ -299,19 +319,32 @@ export function GuestChat({
     const resumeTurn: ChatTurn = {
       id: requestId(), question: "Continue the answer using the saved trip details.",
       sending: true, answerOnlyReceiptId: turn.resumeReceiptId,
+      scopeSessionId: session.session_id,
     };
     setTurns((current) => [...current, resumeTurn]);
     void deliver(resumeTurn, resumeTurn.id, turn.resumeReceiptId);
   }
 
+  const activeLanguageTag = session?.language_preference?.language_tag ?? "en";
+  const activeLabels = labelsForLanguage(activeLanguageTag);
+  const showEnglishLabelFallback = normalizeLanguageTag(activeLanguageTag)?.split("-")[0].toLowerCase() !== "en"
+    && !hasCompleteLabelBundle(activeLanguageTag);
+
   return (
-    <main className="chat-shell">
+    <main className="chat-shell" lang={session?.language_preference?.language_tag ?? "en"}
+      dir={directionForLanguageTag(session?.language_preference?.language_tag ?? "en")}>
       <header className="chat-header">
         <Link className="back-link" href="/">{brand}</Link>
-        <p className="synthetic-label">{syntheticDisclosure}</p>
+        <p className="synthetic-label">{activeLabels.synthetic_notice || syntheticDisclosure}</p>
+        {showEnglishLabelFallback && <p className="status-note" lang="en" dir="ltr" role="note">
+          Some interface labels are shown in English because translations are unavailable.
+        </p>}
         <h1>{hotelName}</h1>
-        <p className="chat-intro">Ask this AI assistant about the hotel. It will show the records used and anything it could not confirm.</p>
-        {guestBrief && guestBrief.brief_version > 0 && <GuestBriefRenderer brief={guestBrief} />}
+        <p className="chat-intro">{activeLabels.ai_notice}</p>
+        {guestBrief && guestBrief.brief_version > 0 && <div lang={session?.language_preference?.language_tag ?? "en"}
+          dir={directionForLanguageTag(session?.language_preference?.language_tag ?? "en")}>
+          <GuestBriefRenderer brief={guestBrief} labels={activeLabels} />
+        </div>}
       </header>
 
       <section className="chat-panel" aria-label={`Chat with ${hotelName}`}>
@@ -320,11 +353,13 @@ export function GuestChat({
           {!turns.length && session && <p className="status-note">Ask a question about {hotelName} to get started.</p>}
           {turns.map((turn) => (
             <article className="turn" key={`${turn.id}-${turn.question}`}>
-              <div className="message message-guest"><p>{turn.question}</p></div>
-              {turn.sending && <p className="status-note">Checking hotel records…</p>}
+              <div className="message message-guest" lang={turn.languageTag ?? "en"} dir="auto"><p>{turn.question}</p></div>
+              {turn.sending && <p className="status-note">{activeLabels.sending}</p>}
               {turn.error && (
                 <div className="message message-error" role="status">
-                  <p>{turn.error}</p>
+                  <p>{turn.partialSuccess
+                    ? activeLabels.partial_success
+                    : turn.error}</p>
                   {turn.partialSuccess && turn.resumeReceiptId && (
                     <button className="text-button" type="button" onClick={() => resumeAnswer(turn)} disabled={busy || !session}>
                       Continue the answer using the updated trip details
@@ -332,7 +367,7 @@ export function GuestChat({
                   )}
                   {turn.retryMode && turn.retryMode !== "none" && (
                     <button className="text-button" type="button" onClick={() => retry(turn)} disabled={busy || !session}>
-                      {turn.retryMode === "same-request" ? "Retry this request" : turn.retryMode === "new-request" ? "Submit as a new request" : "Start a new chat"}
+                      {activeLabels.retry_answer}
                     </button>
                   )}
                   {turn.retryMode === "same-request" && (
@@ -350,7 +385,8 @@ export function GuestChat({
                       ? "Some details still need clarification." : turn.receipt.answer_status === "completed"
                         ? "The update was applied and the answer has now completed." : "The update was applied, but the answer did not finish."}</p>
                   <p>Recorded at trip details version {turn.receipt.brief_version_after}; current details may have changed since.</p>
-                  <GuestBriefRenderer brief={guestBrief ?? turn.briefSnapshot ?? {}} receipt={turn.receipt} delta={turn.appliedDelta} />
+                  <GuestBriefRenderer brief={guestBrief ?? turn.briefSnapshot ?? {}} receipt={turn.receipt}
+                    delta={turn.appliedDelta} labels={activeLabels} />
                 </details>
               </>}
               {turn.answer && <AnswerCard
@@ -360,6 +396,10 @@ export function GuestChat({
                 AnswerRenderer={AnswerRenderer}
                 stale={turn.stale ?? false}
                 freshnessError={turn.freshnessError}
+                historicalLanguageTag={turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en"}
+                currentPreferenceRevision={session?.language_preference?.revision ?? -1}
+                currentScopeSessionId={session?.session_id}
+                isCurrentTurn={turns.at(-1)?.id === turn.id && !busy}
                 onRecheck={() => void recheckAnswer(turn.id, turn.answer!)}
               />}
             </article>
@@ -384,6 +424,8 @@ export function GuestChat({
           <div className="composer-row">
             <textarea
               id="guest-question"
+              lang={session?.language_preference?.language_tag ?? "en"}
+              dir="auto"
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
               placeholder="Ask in any language…"
@@ -394,7 +436,7 @@ export function GuestChat({
               required
             />
             <button className="send-button" type="submit" disabled={!session || busy || unresolvedRequest || !question.trim()}>
-              Send
+              {activeLabels.send}
             </button>
           </div>
           {unresolvedRequest && <p className="composer-hint">Retry the pending request with the same ID, or start a new chat before asking another question.</p>}
@@ -412,6 +454,10 @@ function AnswerCard({
   AnswerRenderer,
   stale,
   freshnessError,
+  historicalLanguageTag,
+  currentPreferenceRevision,
+  currentScopeSessionId,
+  isCurrentTurn,
   onRecheck,
 }: {
   response: GuestMessageResponse;
@@ -420,14 +466,80 @@ function AnswerCard({
   AnswerRenderer: ComponentType<AnswerRendererProps>;
   stale: boolean;
   freshnessError?: string;
+  historicalLanguageTag: string;
+  currentPreferenceRevision: number;
+  currentScopeSessionId?: string;
+  isCurrentTurn: boolean;
   onRecheck: () => void;
 }) {
+  const [copyResult, setCopyResult] = useState<CopyResult | "">("");
+  const answerText = response.answer ?? "";
+  const answerNode = useRef<HTMLDivElement | null>(null);
+  const answerLanguage = response.presentation?.language_tag ?? historicalLanguageTag;
+  const answerDirection = response.presentation?.direction ?? directionForLanguageTag(answerLanguage);
+  const labels = labelsForLanguage(answerLanguage, response.presentation?.labels);
+  const showAnswerEnglishFallback = normalizeLanguageTag(answerLanguage)?.split("-")[0].toLowerCase() !== "en"
+    && (response.presentation?.labels_fallback === true || !hasCompleteLabelBundle(answerLanguage));
+  const answerStale = stale || response.answer_eligibility === "stale" || response.presentation?.freshness === "stale";
+  const preferenceIsCurrent = response.presentation?.preference_revision === currentPreferenceRevision;
+  const scopeIsCurrent = session?.session_id === currentScopeSessionId;
+  const eligible = response.status === "completed"
+    && response.answer_eligibility === "current"
+    && !!answerText
+    && !answerStale
+    && !freshnessError
+    && preferenceIsCurrent
+    && scopeIsCurrent
+    && isCurrentTurn;
+  const displayedEligibility = answerStale || !isCurrentTurn || !scopeIsCurrent || !preferenceIsCurrent
+    ? "stale" : eligible ? "current" : response.answer_eligibility ?? "pending";
+  const copyAnswer = async () => {
+    if (!eligible) return;
+    const selectAnswer = () => {
+      if (!eligibleRef.current) return false;
+      const node = answerNode.current;
+      if (!node || !window.getSelection) return false;
+      const selection = window.getSelection();
+      if (!selection) return false;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return true;
+    };
+    const textToCopy = answerNode.current?.textContent ?? answerText;
+    setCopyResult("");
+    const result = await copyPlainText(textToCopy, navigator.clipboard, selectAnswer);
+    if (eligibleRef.current) setCopyResult(result);
+  };
+  const eligibleRef = useRef(eligible);
+  useEffect(() => {
+    eligibleRef.current = eligible;
+  }, [eligible]);
+  const copyStatus = copyResult === "copied" ? labels.copied
+    : copyResult === "selection_fallback" ? "Answer selected. Use your browser’s copy command."
+      : copyResult === "unsupported" ? "Clipboard is unavailable. Select the answer and copy it manually."
+        : copyResult === "failed" ? labels.copy_failed : "";
   return (
-    <div className="message message-assistant">
-      {stale && <p className="status-note" role="status">This answer may no longer be current. Ask again for an updated answer.</p>}
+    <div className="message message-assistant" lang={answerLanguage} dir={answerDirection}
+      data-answer-eligibility={displayedEligibility} data-copy-eligible={String(eligible)}
+      data-receipt-id={response.presentation?.receipt_id ?? undefined}>
+      {showAnswerEnglishFallback && <p className="status-note" lang="en" dir="ltr" role="note">
+        Some interface labels are shown in English because translations are unavailable.
+      </p>}
+      {answerStale && <p className="status-note" role="status">{labels.stale_answer}</p>}
       {freshnessError && <p className="status-note" role="status">{freshnessError}</p>}
-      <button className="text-button" type="button" onClick={onRecheck}>Check whether this answer is current</button>
-      <AnswerRenderer answer={response.answer ?? ""} />
+      <div className="answer-actions">
+        <button className="text-button" type="button" onClick={onRecheck}>{labels.check_status}</button>
+        <button className="text-button" type="button" onClick={() => void copyAnswer()} disabled={!eligible}>
+          {labels.copy}
+        </button>
+      </div>
+      <span className="copy-status" data-copy-result={copyResult || undefined}
+        aria-live="polite" role={copyStatus ? "status" : undefined}>{copyStatus}</span>
+      <div ref={answerNode} className="answer-copy-source">
+        <AnswerRenderer answer={answerText} />
+      </div>
       {!stale && !freshnessError && !!response.media?.length && session && (
         <div className="answer-media" aria-label="Approved hotel media">
           {response.media.map((media) => (

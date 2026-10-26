@@ -213,7 +213,7 @@ def _selected_a(root: Path, manifest: dict) -> Path:
 def test_scoped_refresh_replay_revoke_expiry_and_cas(tmp_path: Path):
     engine = create_database_engine(os.environ["STAYLEAD_TEST_DATABASE_URL"])
     apply_migrations(engine)
-    assert schema_version(engine) == 5
+    assert schema_version(engine) == 6
     tag = uuid4().hex[:10].upper()
     root, manifest = _prepare(tmp_path / "original", tag)
     allowed = root.parent
