@@ -24,6 +24,12 @@ from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
     GroundedQAOrchestrator,
 )
+from staylead_platform.platform.conversation.responses.presentation_labels import (
+    ENGLISH_LABELS,
+    LABEL_KEYS,
+    missing_label_keys,
+    resolve_label_bundle,
+)
 from staylead_platform.platform.knowledge.retrieval.retriever import (
     KnowledgeRetriever,
     RetrievalResult,
@@ -283,6 +289,67 @@ def test_committed_language_is_authoritative_for_resumed_answer_not_historical_r
     assert "different explicit_language_tag" in request.instructions
     assert "unless this guest explicitly requests a different response language" not in request.instructions
     assert json.loads(request.input_text)["question"].startswith("Please answer in French")
+
+
+def _answer_with_label_bundle(label_bundle: object, language_tag: str):
+    fact_id = "F-HTL-CITY01-040"
+    provider = FakeProvider(answer={
+        "supported_claims": [{
+            "text": f"Breakfast starts at 06:30 [{fact_id}].",
+            "fact_ids": [fact_id],
+        }],
+        "unknowns": [], "conflicts": [], "label_bundle": label_bundle,
+    })
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="breakfast", history=[],
+        brief=GuestBriefSnapshot(brief_version=0, data={}),
+        preferred_language_tag=language_tag,
+        missing_label_keys=tuple(LABEL_KEYS), label_bundle_keys=LABEL_KEYS,
+    ))
+    return answer
+
+
+@pytest.mark.parametrize("invalid_bundle", [
+    7,
+    ["not", "an", "object"],
+    None,
+    {"unexpected": "label"},
+    {**{key: f"label-{key}" for key in LABEL_KEYS}, "copy": "<b>Copy</b>"},
+    {**{key: f"label-{key}" for key in LABEL_KEYS}, "unexpected": "extra"},
+    {**{key: f"label-{key}" for key in LABEL_KEYS}, "copy": "x" * 81},
+])
+def test_malformed_optional_label_bundle_falls_back_without_poisoning_cache(invalid_bundle) -> None:
+    language_tag = "zz-bad-labels"
+    answer = _answer_with_label_bundle(invalid_bundle, language_tag)
+
+    assert answer.answer.startswith("Breakfast starts at 06:30")
+    assert resolve_label_bundle(language_tag, answer.label_bundle) == ENGLISH_LABELS
+    assert missing_label_keys(language_tag) == list(LABEL_KEYS)
+
+
+def test_valid_label_bundle_survives_answer_schema_and_caches_atomically() -> None:
+    language_tag = "zz-good-labels"
+    translated = {key: f"日本語{key}" for key in LABEL_KEYS}
+    answer = _answer_with_label_bundle(translated, language_tag)
+
+    assert answer.label_bundle == translated
+    assert resolve_label_bundle(language_tag, answer.label_bundle) == translated
+    assert missing_label_keys(language_tag) == []
+
+
+def test_malformed_core_answer_remains_rejected_with_label_bundle_present() -> None:
+    provider = FakeProvider(answer={
+        "supported_claims": [{"text": "Breakfast starts at 06:30.", "fact_ids": []}],
+        "unknowns": [], "conflicts": [],
+        "label_bundle": {key: f"日本語{key}" for key in LABEL_KEYS},
+    })
+    with pytest.raises(ConversationFailure, match="invalid answer"):
+        asyncio.run(build(provider).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="breakfast", history=[],
+            brief=GuestBriefSnapshot(brief_version=0, data={}),
+            preferred_language_tag="ja",
+            missing_label_keys=tuple(LABEL_KEYS), label_bundle_keys=LABEL_KEYS,
+        ))
 
 
 def test_guest_question_number_cannot_authorize_unsupported_model_number() -> None:

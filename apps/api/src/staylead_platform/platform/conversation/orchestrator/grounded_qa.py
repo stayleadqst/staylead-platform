@@ -347,6 +347,8 @@ class GroundedQAOrchestrator:
             output_tokens=_complete_usage_sum(provider_results, "output_tokens"),
             total_tokens=_complete_usage_sum(provider_results, "total_tokens"),
         )
+        raw_label_bundle = getattr(payload, "label_bundle", None)
+        label_bundle = dict(raw_label_bundle) if isinstance(raw_label_bundle, dict) else {}
         return ConversationAnswer(
             answer=answer_text,
             citations=tuple(cited_facts),
@@ -366,7 +368,7 @@ class GroundedQAOrchestrator:
             guest_brief_refs=brief_refs,
             explicit_language_tag=_clean_language_tag(getattr(payload, "explicit_language_tag", None)),
             inferred_language_tag=_clean_language_tag(getattr(payload, "inferred_language_tag", None)),
-            label_bundle=dict(getattr(payload, "label_bundle", {}) or {}),
+            label_bundle=label_bundle,
         )
 
     async def prepare_turn(
