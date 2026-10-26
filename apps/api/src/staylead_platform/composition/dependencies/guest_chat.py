@@ -23,7 +23,10 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     GROUNDED_QA_INSTRUCTIONS,
 )
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
-from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
+from staylead_platform.domains.hospitality.schemas.grounded_answer import (
+    HospitalityGroundedAnswer,
+    committed_answer_output_schema,
+)
 from staylead_platform.domains.hospitality.schemas.guest_brief import validate_guest_brief_proposal
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
     validate_checkout_clarification,
@@ -152,6 +155,8 @@ def create_guest_chat_application(
             selection_schema=FactSelection,
             claim_formatter=format_grounded_claim,
             clarification_validator=validate_checkout_clarification,
+            committed_output_schema_factory=committed_answer_output_schema,
+            response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,
         )
     return GuestChatApplication(settings, database, orchestrator, media_repository)

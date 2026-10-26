@@ -22,31 +22,37 @@ SPEC.loader.exec_module(runtime)
 
 
 class RuntimeBoundsTests(unittest.TestCase):
-    def test_five_isolated_run_namespaces_are_available(self):
+    def test_six_isolated_run_namespaces_are_available(self):
         first = runtime._namespace_configuration("remediation-1")
         second = runtime._namespace_configuration("remediation-2")
         third = runtime._namespace_configuration("remediation-3")
         fourth = runtime._namespace_configuration("remediation-4")
         fifth = runtime._namespace_configuration("remediation-5")
+        sixth = runtime._namespace_configuration("remediation-6")
         self.assertEqual(first["run_id"], "s6-codex-20261026-remediation-1")
         self.assertEqual(second["run_id"], "s6-codex-20261026-remediation-2")
         self.assertEqual(third["run_id"], "s6-codex-20261026-remediation-3")
         self.assertEqual(fourth["run_id"], "s6-codex-20261026-remediation-4")
         self.assertEqual(fifth["run_id"], "s6-codex-20261026-remediation-5")
+        self.assertEqual(sixth["run_id"], "s6-codex-20261026-remediation-6")
         self.assertEqual(fifth["run_state"], Path("/private/tmp/staylead-sprint6-remediation-5-run-state.json"))
         self.assertEqual(fifth["events"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime-events.jsonl"))
         self.assertEqual(fifth["runtime"], Path("/private/tmp/staylead-sprint6-remediation-5-runtime.json"))
         self.assertEqual(fifth["capture_dir"], Path("/private/tmp/staylead-sprint6-remediation-5-synthetic-output"))
-        namespaces = (first, second, third, fourth, fifth)
+        self.assertEqual(sixth["run_state"], Path("/private/tmp/staylead-sprint6-remediation-6-run-state.json"))
+        self.assertEqual(sixth["events"], Path("/private/tmp/staylead-sprint6-remediation-6-runtime-events.jsonl"))
+        self.assertEqual(sixth["runtime"], Path("/private/tmp/staylead-sprint6-remediation-6-runtime.json"))
+        self.assertEqual(sixth["capture_dir"], Path("/private/tmp/staylead-sprint6-remediation-6-synthetic-output"))
+        namespaces = (first, second, third, fourth, fifth, sixth)
         for key in ("run_state", "events", "runtime", "capture_dir"):
             self.assertEqual(len({item[key] for item in namespaces}), len(namespaces), key)
         with self.assertRaises(ValueError):
             runtime._namespace_configuration("arbitrary-run")
 
-    def test_namespace_five_initialization_uses_frozen_caps_and_refuses_overwrite(self):
+    def test_namespace_six_initialization_uses_frozen_caps_and_refuses_overwrite(self):
         with tempfile.TemporaryDirectory() as directory:
             state_path = Path(directory) / "ns5-state.json"
-            namespace = runtime._namespace_configuration("remediation-5")
+            namespace = runtime._namespace_configuration("remediation-6")
             original_state, original_id = runtime.RUN_STATE, runtime.RUN_ID
             try:
                 runtime.RUN_STATE = state_path
@@ -185,13 +191,24 @@ class RuntimeBoundsTests(unittest.TestCase):
                 token = runtime.TURN.set(turn)
                 try:
                     with patch.object(runtime, "RUN_STATE", state_path), patch.object(runtime, "EVENTS", events_path), patch.dict(os.environ, {}, clear=True):
-                        request = SimpleNamespace(input_text="synthetic fixture", instructions="synthetic prompt", max_output_tokens=700)
+                        request = SimpleNamespace(
+                            input_text="synthetic fixture", instructions="synthetic prompt", max_output_tokens=700,
+                            response_schema={"type": "object", "properties": {"ok": {"type": "boolean"}}},
+                            response_envelope_key="response",
+                        )
                         await provider.generate(request)
-                        await provider.generate(request)
+                        await provider.generate(SimpleNamespace(
+                            input_text="legacy fixture", instructions="legacy prompt", max_output_tokens=700,
+                        ))
                         with self.assertRaisesRegex(RuntimeError, "two-Codex-requests-per-turn"):
                             await provider.generate(request)
                         self.assertEqual(provider.calls, 2)
                         self.assertEqual(json.loads(state_path.read_text())["codex_requests"], 2)
+                        events = [json.loads(line) for line in events_path.read_text().splitlines()]
+                        completed = [event for event in events if event["stage"] == "provider_call_completed"]
+                        self.assertTrue(completed[0]["response_envelope_unwrap_requested"])
+                        self.assertFalse(completed[1]["response_envelope_unwrap_requested"])
+                        self.assertEqual(completed[0]["request_shape"]["response_envelope_key"], "response")
                 finally:
                     runtime.TURN.reset(token)
 
@@ -222,6 +239,27 @@ class RuntimeBoundsTests(unittest.TestCase):
         ):
             with self.subTest(malformed=malformed):
                 self.assertIsNone(runtime._safe_validation_diagnostics(malformed))
+
+    def test_response_schema_metadata_hashes_canonical_schema_without_recording_schema(self):
+        first = {"type": "object", "properties": {"answer": {"type": "string"}}}
+        second = {"type": "object", "properties": {"answer": {"type": "string"}, "ok": {"type": "boolean"}}}
+        request = SimpleNamespace(response_schema=first, response_envelope_key="response")
+        metadata = runtime._response_schema_shape(request)
+        changed = runtime._response_schema_shape(SimpleNamespace(response_schema=second, response_envelope_key="response"))
+        legacy = runtime._response_schema_shape(SimpleNamespace())
+        self.assertTrue(metadata["response_schema_present"])
+        self.assertTrue(metadata["response_schema_canonicalized"])
+        self.assertGreater(metadata["response_schema_chars"], 0)
+        self.assertNotEqual(metadata["response_schema_sha256"], changed["response_schema_sha256"])
+        self.assertEqual(metadata["response_envelope_key"], "response")
+        self.assertFalse(legacy["response_schema_present"])
+        self.assertEqual(legacy["response_schema_chars"], 0)
+        self.assertIsNone(legacy["response_schema_sha256"])
+        self.assertNotIn("response_schema", metadata)
+        self.assertNotIn(json.dumps(first, sort_keys=True), json.dumps(metadata, sort_keys=True))
+        self.assertNotIn("private-key", json.dumps(runtime._response_schema_shape(
+            SimpleNamespace(response_schema=first, response_envelope_key="private-key")
+        )))
 
     def test_capture_requires_pinned_synthetic_opt_in_and_is_bounded(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -320,6 +358,7 @@ class RuntimeBoundsTests(unittest.TestCase):
         self.assertIn('`${RUN_NAMESPACE}-live-run`', source)
         self.assertIn('"remediation-3"', source)
         self.assertIn('"remediation-5"', source)
+        self.assertIn('"remediation-6"', source)
         self.assertIn('const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;', source)
         self.assertIn('const PRIVATE_PREFIX = RUN_NAMESPACE === "remediation-1" ? "staylead-sprint6-remediation" : `staylead-sprint6-${RUN_NAMESPACE}`;', source)
         self.assertIn("keepBrowserOpen = true", source)

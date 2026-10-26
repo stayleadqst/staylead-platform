@@ -63,8 +63,11 @@ def _namespace_configuration(namespace: str) -> dict[str, Any]:
     elif namespace == "remediation-5":
         prefix = "staylead-sprint6-remediation-5"
         run_id = "s6-codex-20261026-remediation-5"
+    elif namespace == "remediation-6":
+        prefix = "staylead-sprint6-remediation-6"
+        run_id = "s6-codex-20261026-remediation-6"
     else:
-        raise ValueError("Sprint 6 run namespace must be remediation-1, remediation-2, remediation-3, remediation-4, or remediation-5.")
+        raise ValueError("Sprint 6 run namespace must be remediation-1, remediation-2, remediation-3, remediation-4, remediation-5, or remediation-6.")
     private_root = Path("/private/tmp")
     return {
         "run_id": run_id,
@@ -197,6 +200,31 @@ def _identifier_hash(value: Any) -> str | None:
     if isinstance(value, str) and 1 <= len(value) <= 200:
         return hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
     return None
+
+
+def _response_schema_shape(request: Any) -> dict[str, Any]:
+    schema = getattr(request, "response_schema", None)
+    envelope_key = getattr(request, "response_envelope_key", None)
+    result: dict[str, Any] = {
+        "response_schema_present": schema is not None,
+        "response_schema_chars": 0,
+        "response_schema_sha256": None,
+        "response_envelope_key_present": envelope_key is not None,
+    }
+    if schema is not None:
+        try:
+            canonical = json.dumps(
+                schema, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+            )
+        except (TypeError, ValueError):
+            result["response_schema_canonicalized"] = False
+        else:
+            result["response_schema_canonicalized"] = True
+            result["response_schema_chars"] = len(canonical)
+            result["response_schema_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    if isinstance(envelope_key, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", envelope_key):
+        result["response_envelope_key"] = envelope_key
+    return result
 
 
 def _safe_validation_diagnostics(value: Any) -> dict[str, Any] | None:
@@ -352,6 +380,7 @@ def _observed_provider(provider: Any, cli_version: str) -> Any:
                 "input_chars": len(request.input_text),
                 "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
                 "max_output_tokens": request.max_output_tokens,
+                **_response_schema_shape(request),
             },
         }
         _event({"stage": "provider_call_started", **common})
@@ -383,6 +412,7 @@ def _observed_provider(provider: Any, cli_version: str) -> Any:
             "usage": asdict(result.usage),
             "output_chars": len(result.text),
             "output_sha256": hashlib.sha256(result.text.encode("utf-8")).hexdigest(),
+            "response_envelope_unwrap_requested": getattr(request, "response_envelope_key", None) is not None,
             **capture,
             "success": True,
         })

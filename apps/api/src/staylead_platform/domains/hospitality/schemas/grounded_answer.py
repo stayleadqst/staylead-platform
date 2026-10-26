@@ -59,3 +59,93 @@ class HospitalityGroundedAnswer(BaseModel):
         ):
             return {}
         return value
+
+
+def committed_answer_output_schema(label_keys: tuple[str, ...]) -> dict[str, object]:
+    """Build Codex's final-answer schema with at least one substantive channel."""
+    if (
+        len(set(label_keys)) != len(label_keys)
+        or any(not isinstance(key, str) or not key for key in label_keys)
+    ):
+        raise ValueError("Presentation label keys must be unique, non-empty strings.")
+
+    def text(*, max_length: int = 2000) -> dict[str, object]:
+        return {"type": "string", "minLength": 1, "maxLength": max_length, "pattern": r"\S"}
+
+    def string_array(*, maximum: int) -> dict[str, object]:
+        return {"type": "array", "items": text(max_length=2000), "minItems": 0, "maxItems": maximum}
+
+    properties: dict[str, object] = {
+        "supported_claims": {
+            "type": "array", "minItems": 0, "maxItems": 20,
+            "items": {
+                "type": "object", "properties": {
+                    "text": text(),
+                    "fact_ids": {"type": "array", "items": text(max_length=128), "minItems": 1, "maxItems": 10},
+                },
+                "required": ["text", "fact_ids"], "additionalProperties": False,
+            },
+        },
+        "unknowns": string_array(maximum=20),
+        "conflicts": string_array(maximum=10),
+        "guest_claims": {
+            "type": "array", "minItems": 0, "maxItems": 20,
+            "items": {
+                "type": "object", "properties": {
+                    "text": text(),
+                    "refs": {"type": "array", "items": text(max_length=128), "minItems": 1, "maxItems": 10},
+                },
+                "required": ["text", "refs"], "additionalProperties": False,
+            },
+        },
+        "guest_brief_refs": {"type": "array", "items": text(max_length=128), "minItems": 0, "maxItems": 20},
+        "guest_clarification": {
+            "anyOf": [
+                {"type": "object", "properties": {
+                    "field": {"type": "string", "enum": ["dates.check_out"]},
+                    "options": {"type": "array", "items": text(max_length=16), "minItems": 2, "maxItems": 2},
+                    "text": text(max_length=500),
+                }, "required": ["field", "options", "text"], "additionalProperties": False},
+                {"type": "null"},
+            ],
+        },
+        "conversational_acknowledgement": {
+            "anyOf": [
+                {"type": "object", "properties": {
+                    "intent": {"type": "string", "enum": ["thanks_acknowledged"]},
+                    "text": text(max_length=160),
+                }, "required": ["intent", "text"], "additionalProperties": False},
+                {"type": "null"},
+            ],
+        },
+        "label_bundle": {
+            "type": "object",
+            "properties": {key: text(max_length=80) for key in label_keys},
+            "required": list(label_keys),
+            "additionalProperties": False,
+        },
+    }
+    branches: list[dict[str, object]] = []
+    for channel in ("supported_claims", "guest_claims", "unknowns", "conflicts"):
+        branch_properties = {key: dict(value) for key, value in properties.items()}
+        branch_properties[channel] = dict(branch_properties[channel])
+        branch_properties[channel]["minItems"] = 1  # type: ignore[index]
+        branches.append({
+            "type": "object", "properties": branch_properties,
+            "required": list(properties), "additionalProperties": False,
+        })
+    for channel in ("guest_clarification", "conversational_acknowledgement"):
+        branch_properties = {key: dict(value) for key, value in properties.items()}
+        nullable = branch_properties[channel]
+        if isinstance(nullable, dict):
+            branch_properties[channel] = next(item for item in nullable["anyOf"] if item.get("type") == "object")
+        branches.append({
+            "type": "object", "properties": branch_properties,
+            "required": list(properties), "additionalProperties": False,
+        })
+    return {
+        "type": "object",
+        "properties": {"response": {"anyOf": branches}},
+        "required": ["response"],
+        "additionalProperties": False,
+    }

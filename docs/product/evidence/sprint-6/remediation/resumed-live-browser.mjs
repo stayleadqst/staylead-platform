@@ -26,7 +26,7 @@ const { chromium } = await import(pathToFileURL(
 const ROOT = process.cwd();
 const MATRIX_PATH = path.join(ROOT, "docs/product/evidence/sprint-6/live-cases.json");
 const RUN_NAMESPACE = process.env.STAYLEAD_S6_RUN_NAMESPACE ?? "remediation-1";
-requireCheck(["remediation-1", "remediation-2", "remediation-3", "remediation-4", "remediation-5"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1, remediation-2, remediation-3, remediation-4, or remediation-5");
+requireCheck(["remediation-1", "remediation-2", "remediation-3", "remediation-4", "remediation-5", "remediation-6"].includes(RUN_NAMESPACE), "STAYLEAD_S6_RUN_NAMESPACE must be remediation-1, remediation-2, remediation-3, remediation-4, remediation-5, or remediation-6");
 const RUN_ID = `s6-codex-20261026-${RUN_NAMESPACE}`;
 const OUTPUT_DIR = RUN_NAMESPACE === "remediation-1" ? "resumed-live-run" : `${RUN_NAMESPACE}-live-run`;
 const OUTPUT = path.join(ROOT, "docs/product/evidence/sprint-6/remediation", OUTPUT_DIR);

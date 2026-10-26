@@ -17,6 +17,7 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
+    committed_answer_output_schema,
 )
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
     validate_checkout_clarification,
@@ -105,6 +106,8 @@ def build(
     facts: MemoryFacts | None = None,
     retriever: KnowledgeRetriever | None = None,
     claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
+    committed_output_schema_factory: Callable[[tuple[str, ...]], dict[str, Any]] | None = None,
+    response_envelope_key: str | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
         provider=provider,
@@ -117,6 +120,8 @@ def build(
         selection_schema=FactSelection,
         claim_formatter=claim_formatter,
         clarification_validator=validate_checkout_clarification,
+        committed_output_schema_factory=committed_output_schema_factory,
+        response_envelope_key=response_envelope_key,
     )
 
 
@@ -907,8 +912,8 @@ def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_pa
     assert "The server attaches approved media" in instruction_text
     assert "Keep unknowns/conflicts concise" in instruction_text
     assert "Preserve cited fact number/date/time literals exactly." in instruction_text
-    assert "`supported_claims` is an array of up to 20 objects" in instruction_text
-    assert "`unknowns` has up to 20 strings; `conflicts` up to 10 strings" in instruction_text
+    assert "`supported_claims` (`text`, 1–10 `fact_ids`)" in instruction_text
+    assert "`guest_brief_refs` (up to 20)" in instruction_text
 
 
 def _checkout_pending_brief() -> GuestBriefSnapshot:
@@ -994,6 +999,62 @@ def test_typed_checkout_clarification_preserves_complete_ordered_numeric_literal
             hotel_id="HTL-CITY01", question="I mean 12/13 December for checkout.", history=[],
             brief=_checkout_pending_brief(), selected_fact_ids=(),
         ))
+
+
+def test_committed_output_schema_requires_substantive_response_and_exact_labels() -> None:
+    schema = committed_answer_output_schema(("send", "copy"))
+    assert schema["type"] == "object"
+    assert schema["required"] == ["response"]
+    assert schema["additionalProperties"] is False
+    response = schema["properties"]["response"]
+    branches = response["anyOf"]
+    assert len(branches) == 6
+    expected_properties = {
+        "supported_claims", "unknowns", "conflicts", "guest_claims", "guest_brief_refs",
+        "guest_clarification", "conversational_acknowledgement", "label_bundle",
+    }
+    for branch in branches:
+        properties = branch["properties"]
+        assert branch["additionalProperties"] is False
+        assert set(branch["required"]) == expected_properties
+        assert set(properties) == expected_properties
+        labels = properties["label_bundle"]
+        assert set(labels["properties"]) == {"send", "copy"}
+        assert labels["required"] == ["send", "copy"]
+        assert labels["additionalProperties"] is False
+    assert branches[0]["properties"]["supported_claims"]["minItems"] == 1
+    assert branches[1]["properties"]["guest_claims"]["minItems"] == 1
+    assert branches[2]["properties"]["unknowns"]["minItems"] == 1
+    assert branches[3]["properties"]["conflicts"]["minItems"] == 1
+    assert branches[4]["properties"]["guest_clarification"]["type"] == "object"
+    assert branches[5]["properties"]["conversational_acknowledgement"]["type"] == "object"
+    assert branches[2]["properties"]["unknowns"]["items"]["pattern"] == r"\S"
+
+
+def test_committed_output_schema_rejects_dynamic_label_keys() -> None:
+    schema = committed_answer_output_schema(("send",))
+    labels = schema["properties"]["response"]["anyOf"][0]["properties"]["label_bundle"]
+    assert labels["additionalProperties"] is False
+    assert set(labels["properties"]) == {"send"}
+
+
+def test_committed_output_schema_is_sent_only_for_final_answer_call() -> None:
+    provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    orchestrator = build(
+        provider,
+        committed_output_schema_factory=committed_answer_output_schema,
+        response_envelope_key="response",
+    )
+    answer = asyncio.run(orchestrator.answer_committed_turn(
+        hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[], brief=None,
+    ))
+
+    assert answer.calls == 2
+    assert provider.calls[0].response_schema is None
+    assert provider.calls[0].response_envelope_key is None
+    assert provider.calls[1].response_schema is not None
+    assert provider.calls[1].response_schema["required"] == ["response"]
+    assert provider.calls[1].response_envelope_key == "response"
 
 
 def test_typed_checkout_clarification_requires_pending_field_and_current_turn_source() -> None:

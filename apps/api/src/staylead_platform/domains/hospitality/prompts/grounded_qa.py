@@ -88,7 +88,10 @@ Use `conversational_acknowledgement` only as a short translation of intent `than
 
 The server attaches approved media after citation validation. Do not select media, invent URLs, infer visuals from captions, or put media requests in `unknowns`/`conflicts`. Keep unknowns/conflicts concise; put hotel conflicts in cited `supported_claims`.
 
-Return one JSON object only. `supported_claims` is an array of up to 20 objects with `text` and 1–10 string `fact_ids`; `unknowns` has up to 20 strings; `conflicts` up to 10 strings; `guest_claims` up to 20 `{text, refs}` objects; optional `guest_clarification` is `{field, options, text}`; optional `conversational_acknowledgement` is `{intent: "thanks_acknowledged", text}`; `guest_brief_refs` has up to 20 strings; language tags are ≤64 chars or null; optional `label_bundle` has up to 20 requested keys and values ≤80 chars. No other keys."""
+Return one flat JSON object with up to 20 `supported_claims` (`text`, 1–10 `fact_ids`), 20
+`unknowns`, 10 `conflicts`, 20 `guest_claims` (`text`, `refs`), `guest_brief_refs` (up to 20),
+optional typed `guest_clarification`, optional `conversational_acknowledgement`, and `label_bundle`
+with exactly requested keys. Do not add fields."""
 
 FACT_SELECTION_INSTRUCTIONS = """Select only fact IDs from the supplied hotel-scoped metadata index that
 could support the guest's question and recent references. Interpret the question semantically across

@@ -259,6 +259,8 @@ class GroundedQAOrchestrator:
             [Any, str, dict[str, Any] | None, tuple[str, ...]],
             tuple[str, tuple[str, ...]] | None,
         ] | None = None,
+        committed_output_schema_factory: Callable[[tuple[str, ...]], dict[str, Any]] | None = None,
+        response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
     ) -> None:
         self._provider = provider
@@ -271,6 +273,8 @@ class GroundedQAOrchestrator:
         self._selection_schema = selection_schema
         self._claim_formatter = claim_formatter
         self._clarification_validator = clarification_validator
+        self._committed_output_schema_factory = committed_output_schema_factory
+        self._response_envelope_key = response_envelope_key
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
 
     async def answer(
@@ -393,11 +397,18 @@ class GroundedQAOrchestrator:
                     "in the current or historical question/context, and do not return a different explicit_language_tag."
                 )
         try:
+            response_schema = (
+                self._committed_output_schema_factory(missing_label_keys)
+                if not extract_guest_patch and self._committed_output_schema_factory is not None
+                else None
+            )
             generated = await self._provider.generate(GenerationRequest(
                 instructions=(self._instructions if extract_guest_patch else self._committed_instructions)
                 + language_instruction,
                 input_text=evidence,
                 max_output_tokens=self._max_output_tokens,
+                response_schema=response_schema,
+                response_envelope_key=(self._response_envelope_key if response_schema is not None else None),
             ))
         except (ConversationFailure, ProviderError):
             raise
