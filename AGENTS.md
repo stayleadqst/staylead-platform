@@ -1,5 +1,9 @@
 # Staylead Platform — mandatory working context
 
+## Current instruction — 2026-10-26
+
+Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.
+
 Before planning, implementing, reviewing, or modifying AI behavior, read and apply:
 
 1. [Working rules](docs/WORKING_RULES.md).

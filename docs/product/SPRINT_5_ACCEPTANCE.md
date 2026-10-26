@@ -13,7 +13,7 @@ Delivery: existing [PR #89](https://github.com/stayleadqst/staylead-platform/pul
 | #86 mixed FAQ and web | B `/root/brief_consumer`, gpt-6-luna/high | Production consumer verified | Desktop/mobile/late response/freshness; actual Codex answers and canonical UI state | None; local AC/DoD review PASS |
 | #90 Sprint5 blocker remediation | B, gpt-6-luna/high; coordinator integration | Opt-in Codex adapter implemented and real sequence PASS | Default offline, production rejection, isolated tool-free subprocess, timeout/cancel cleanup, exact four-turn gate | Historical Grok cause remains unknown; no longer blocks revised slice |
 | Acceptance harness and PG observation | Reused helper `/root/acceptance_runtime`, gpt-6-luna/high | Separate persisted Codex accounting and read-only PG proof | Offline 8/4/2 limits, redaction and reload refusal; actual state proof | No further provider calls |
-| #87 coordination/integration | Coordinator `/root`, exact runtime model/effort unavailable | Evidence/report/backlog/publication | Candidate pin, expected/observed mapping, frozen historical attempts | Published; issue closure awaits separate authorization |
+| #87 coordination/integration | Coordinator `/root`, exact runtime model/effort unavailable | Evidence/report/backlog/publication | Candidate pin, expected/observed mapping, frozen historical attempts | Published; all scoped AC/DoD PASS |
 | Independent review | Fresh `/root/sprint5_codex_review`, gpt-6.1-sol/high | Code and actual local acceptance PASS | Independent adapter9tests, Ruff/compile, harness limits, exact192 hashes, real events/UI/PG | [Review](evidence/sprint-5/codex-review.md) |
 
 One active editor per file. Builders owned product code/tests; helper owned new harness/observation scripts; coordinator owned integration/runtime/evidence/docs/GitHub; fresh reviewer owned only its report. Prior independent source/receipt/recovery reviews remain valid for unchanged paths. No additional reporting-only agent.
@@ -67,7 +67,7 @@ Evidence: [observations/checks](evidence/sprint-5/codex-observations.json), [act
 | R2-AC2 | Small infrastructure-only Codex adapter, same M1–M6 and scope/CAS/receipt behavior,25sprovider/45sturn/max2calls, defaultoffline/productionreject; affected regressions PASS. |
 | R2-AC3 | Exact unchanged four-turn sequence on one fixed candidate through real production UI/API/PG/Codex, all expectations PASS. |
 | R2-AC4 | Unchanged partial/receipt/same-ID/resume guards retain valid independent evidence; new adapter timeout/cancel contracts PASS; no autonomous retry. |
-| R2-AC5 | Relevant checks, independent fixed-candidate review, truthful usage and branch publication/report; dependent stories have all amended AC/DoD verified; GitHub closure remains excluded by the standing R1 instruction. |
+| R2-AC5 | Relevant checks, independent fixed-candidate review, truthful usage and branch publication/report; dependent stories have all amended AC/DoD verified. Historical phase rules are revoked and impose no closure restriction. |
 
 ## Limits, usage and remaining scope
 
@@ -87,8 +87,10 @@ Pre-inference Codex configuration checks caught exec-only flag placement and res
 
 Fresh final review PASS: [codex-review.md](evidence/sprint-5/codex-review.md). Exact published/local commit and tree identities are recorded on #87/#90 and PR89 after verified publication; this avoids a self-referencing commit hash in this document. Runtime counters are retained at8/4/0. Dedicated acceptance API18085, production web13015 and PostgreSQL55455 were stopped after verification; data and sanitized evidence retained. No merge/deployment or parent/epic/milestone closure is part of delivery.
 
-## Verified publication and administrative blocker
+## Verified publication and current rule correction
 
 Published implementation/evidence commit `3a7b7974a9c2a2d4e21b5f31ab22b8ef42065647` and local `b2c517eb81c18ae237fe1ff58a4f1dacd9b2c5e7` have identical tree `c0d1322b5597f18b34e3e63b215ec0bb156169c2`. PR89 remains draft on the designated base. This report-only update does not change the accepted product fingerprint or evidence.
 
-#84–#87 and Sprint5 remediation #90 are **Verified: amended AC/DoD PASS; GitHub issues Open**. Automatic approval review rejected closing #84 because the standing R1 instruction forbids story closure. No issue was closed and no workaround was used. Only administrative closure is pending separate user authorization; no technical blocker remains for the Codex slice. #88 remains Open as historical Grok diagnosis, superseded for this acceptance gate. No new story was required beyond #90, which was executed in Sprint5. Parents/epics/milestone remain Open.
+On2026-10-26 Hieu explicitly revoked every historical R0/R1/R2 rule. The previous automatic-review rejection of closing#84 is retained only as history; it is not a current restriction or approval gate. Workspace and repository AGENTS.md record the revocation. Those old rules must never be used to block current work.
+
+#84–#87 and Sprint5 remediation #90 are **Done / GitHub Closed (completed) on2026-10-26**, with all amended AC/DoD PASS, independently reviewed and published. Closure follows the original Sprint5 execution instruction after Hieu explicitly revoked the historical phase rules; no further permission is required by those rules. No technical blocker remains for the Codex slice. #88 remains historical Grok diagnosis, superseded for this acceptance gate. No new story was required beyond #90, which was executed inSprint5. Current Sprint5-specific parent/epic/milestone and delivery boundaries are independent of the revoked rules.
