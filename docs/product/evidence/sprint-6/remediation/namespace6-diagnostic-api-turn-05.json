@@ -1,0 +1,71 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "run_namespace": "remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 5,
+  "request_id_sha256": "959f2d869c524250",
+  "question_sha256": "a6a06cb81bf29b723b3655217662a27d2fc5b0d2f5d27bd219aad80c1c2a9a10",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "客房区提供免费 Wi-Fi。网络名称和密码可在前台获取。 [F-HTL-CITY01-021]",
+    "answer_eligibility": "current",
+    "unknowns": [],
+    "evidence": [
+      {
+        "fact_id": "F-HTL-CITY01-021",
+        "hotel_id": "HTL-CITY01",
+        "source_id": "SRC-HTL-CITY01-AMENITY",
+        "source_version": "1.0",
+        "section": "Tiện ích"
+      }
+    ],
+    "language_preference": {
+      "language_tag": "zh",
+      "source": "explicit",
+      "revision": 5
+    },
+    "presentation": {
+      "language_tag": "zh",
+      "direction": "ltr",
+      "preference_revision": 5,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 3,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "c1b76c837825a446"
+          }
+        ]
+      },
+      "pending_fields": []
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-6",
+    "codex_requests": 10,
+    "guest_turns": 5,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "status": "completed"
+}

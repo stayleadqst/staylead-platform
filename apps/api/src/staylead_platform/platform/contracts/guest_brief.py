@@ -51,6 +51,8 @@ class GuestBriefContext:
     source_utterance_id: str
     source_utterance: str
     answer_only_receipt_id: str | None = None
+    turn_intents: tuple[str, ...] = ()
+    authorized_targets: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -90,6 +92,10 @@ class PreparedGuestTurn:
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
+    explicit_language_tag: str | None = None
+    inferred_language_tag: str | None = None
+    turn_intents: tuple[str, ...] = ()
+    patch_authorizations: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)

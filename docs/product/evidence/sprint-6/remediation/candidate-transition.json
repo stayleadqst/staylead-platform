@@ -1,0 +1,15 @@
+{
+  "at_utc": "2026-10-26T03:21:38.335973+00:00",
+  "before_candidate": "70b4641356d1ffb60673a3462c216713bdd709e8",
+  "after_candidate": "7ed3fc6",
+  "phase": "before explicit answer-only resume of T1",
+  "reason": "canonical ISO date literal guidance; guard unchanged",
+  "changed_product_file": "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+  "prompt_file_sha256": "9d40ab2cb9658a2547e86f466ab12e65ff90d5da1f167d050e6525896003acde",
+  "counters_not_reset": true,
+  "fixed_candidate_nine_turn_pass": false,
+  "execution_classification": "mixed-candidate diagnosis/recovery sequence; preserve failures; never claim fixed-candidate fullmatrixPASS",
+  "operator_command": "continue",
+  "global_max_provider_requests": 18,
+  "review": "fresh Q37affected tests PASS; no blocking finding"
+}

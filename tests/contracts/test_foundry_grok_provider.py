@@ -9,6 +9,9 @@ from typing import Any, ClassVar, Self
 import httpx
 import pytest
 from pydantic import SecretStr
+from staylead_platform.domains.hospitality.prompts.grounded_qa import (
+    COMMITTED_GROUNDED_QA_INSTRUCTIONS,
+)
 from staylead_platform.infrastructure.ai_provider import (
     FoundryGrokConfig,
     FoundryGrokProvider,
@@ -33,6 +36,9 @@ def run_offline_request(
     monkeypatch: pytest.MonkeyPatch,
     *,
     trace_callback: Callable[[str, dict[str, Any]], Awaitable[None]] | None = None,
+    response_schema: dict[str, Any] | None = None,
+    response_envelope_key: str | None = None,
+    instructions: str = "Return one JSON object.",
 ) -> tuple[dict[str, Any], Any]:
     captured: dict[str, Any] = {}
 
@@ -68,9 +74,11 @@ def run_offline_request(
         trace_callback=trace_callback,
     ))
     result = asyncio.run(provider.generate(GenerationRequest(
-        instructions="Return one JSON object.",
+        instructions=instructions,
         input_text='{"question":"What time is breakfast?"}',
         max_output_tokens=140,
+        response_schema=response_schema,
+        response_envelope_key=response_envelope_key,
     )))
     return captured, result
 
@@ -103,3 +111,22 @@ def test_foundry_grok_wires_optional_httpx_trace_callback(monkeypatch: pytest.Mo
     assert captured["payload"]["max_completion_tokens"] == 140
     assert result.text == '{"ok":true}'
     assert result.request_id == "offline-test-request"
+
+
+def test_foundry_ignores_optional_native_schema_hint_and_keeps_flat_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    schema = {
+        "type": "object", "properties": {"response": {"type": "object"}},
+        "required": ["response"], "additionalProperties": False,
+    }
+    captured, result = run_offline_request(
+        monkeypatch,
+        response_schema=schema,
+        response_envelope_key="response",
+        instructions=COMMITTED_GROUNDED_QA_INSTRUCTIONS,
+    )
+
+    assert captured["payload"]["messages"][0]["content"] == COMMITTED_GROUNDED_QA_INSTRUCTIONS
+    assert '"response"' not in COMMITTED_GROUNDED_QA_INSTRUCTIONS
+    assert result.text == '{"ok":true}'

@@ -1,0 +1,158 @@
+{
+  "classification": "independent semantic evidence review; synthetic software acceptance",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "candidate_commit": "fca86724c4446d82974d939fb17792dda2177a13",
+  "candidate_tree": "0dce4745f8db4e6b98c35eb5e20cae23c902bf9e",
+  "product_aggregate_sha256": "70498d890019fcf62ac6580e545b7c8e16360357500a725149c49a984997512a",
+  "product_unchanged_during_run": "coordinator verified fingerprint before fixes; review uses only this run evidence",
+  "verdict": "FAIL: T2 and T7 delivered no answer; T3-T9 lack browser/copy coverage",
+  "full_matrix_pass": false,
+  "browser_evidence_turns": [
+    1,
+    2
+  ],
+  "api_diagnostic_only_turns": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "semantic_pass_turns": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9
+  ],
+  "semantic_fail_turns": [
+    2,
+    7
+  ],
+  "all_nine_state_targets": "PASS against recorded API snapshots; child hash c1b76c837825a446 remains continuous after introduction",
+  "cases": [
+    {
+      "turn": 1,
+      "scope": "browser/API/copy evidence",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Vietnamese; canonical ISO dates, 3 nights and 2 adults; buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cited to 040. Current rendered answer and exact clipboard equality recorded."
+    },
+    {
+      "turn": 2,
+      "scope": "browser/API failure evidence; no delivered answer/copy",
+      "state": "PASS",
+      "answer_semantics": "FAIL",
+      "detail": "English revision 2 and brief 2 retain dates/adults and add one child with null age/pending. Nonempty schema-valid model output illegally cites the null child-age field in own refs and declared refs; runtime rejects it. The raw content also fails to ask the required child-age question."
+    },
+    {
+      "turn": 3,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "French; checkout 2026-12-14, 4 nights, same child now age 7; check-in/adults preserved, pending cleared, no unrelated unknowns."
+    },
+    {
+      "turn": 4,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040 and preserves brief 3."
+    },
+    {
+      "turn": 5,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Chinese free guest-area Wi-Fi and desk credentials answer cites 021; brief unchanged."
+    },
+    {
+      "turn": 6,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Arabic with RTL metadata; 40 reference covered spaces, 100000 VND per vehicle/night, no advance reservation; 046 citation. Additional one-vehicle policy matches 077. Exact requested synthetic URL has its own URL-001 citation; no internal URL or functional-availability claim. Brief unchanged."
+    },
+    {
+      "turn": 7,
+      "scope": "API diagnostic failure only",
+      "state": "PASS",
+      "answer_semantics": "FAIL",
+      "detail": "Hindi revision 7/brief 4 preserve checkout 2026-12-14, same child age 7, and pending checkout. Captured Hindi clarification asks 12 or 13 December but typed options add translated month text, violating exact-source options and causing rejection. Known 2026 context makes the no-year wording meaningful; no answer was delivered."
+    },
+    {
+      "turn": 8,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Korean revision 8/brief 5; checkout 2026-12-15, 5 nights, original check-in/adults/same child age 7; pending cleared. No unrelated prior-FAQ unknowns."
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Korean courtesy acknowledgment retains explicit Korean revision 8 and unchanged brief 5; no invented facts or unrelated unknowns."
+    }
+  ],
+  "guard_findings": [
+    {
+      "id": "T2_NULL_REF",
+      "runtime_result": "correct fail-closed rejection",
+      "location": "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py:_validated_brief_refs",
+      "evidence": "Captured output-04 replay rejects null child-age ref in claim refs and declared refs."
+    },
+    {
+      "id": "T7_TRANSLATED_OPTIONS",
+      "runtime_result": "correct exact-source clarification rejection",
+      "location": "apps/api/src/staylead_platform/domains/hospitality/validators/guest_clarification.py:validate_checkout_clarification",
+      "evidence": "Captured output-14 options are translated strings rather than exact source components 12 and 13. Correcting options alone validates its clarification text offline."
+    },
+    {
+      "id": "PENDING_NONNULL_REF_GAP",
+      "runtime_result": "separate provenance guard gap; not the observed T7 rejection cause",
+      "location": "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py:_validated_brief_refs",
+      "evidence": "Offline probe accepts dates.check_out when pending but non-null. Raw T7 includes that claim ref despite the prompt forbidding pending refs. Do not describe this as an existing second rejection path."
+    }
+  ],
+  "bounds": {
+    "guest_turns": 9,
+    "provider_requests": 18,
+    "provider_requests_per_turn": 2,
+    "answer_only_resumes": 0,
+    "automatic_retries": false,
+    "max_provider_latency_ms": 11938.7,
+    "max_http_latency_ms": 16729.7,
+    "max_reported_output_tokens_per_call": 421,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "allowance_closed": true
+  },
+  "native_schema_evidence": "Final calls record schema presence/hash and nonempty outputs; successful CLI adapter completion passed exact envelope unwrapping. Request-intent telemetry alone is not proof of constrained decoding or semantic validity. Native structure did not prevent invalid refs/options.",
+  "sources": [
+    "live-cases.json",
+    "remediation-6-live-run/observations.jsonl",
+    "namespace6-diagnostic-api-turn-03.json",
+    "namespace6-diagnostic-api-turn-04.json",
+    "namespace6-diagnostic-api-turn-05.json",
+    "namespace6-diagnostic-api-turn-06.json",
+    "namespace6-diagnostic-api-turn-07.json",
+    "namespace6-diagnostic-api-turn-08.json",
+    "namespace6-diagnostic-api-turn-09.json",
+    "namespace6-candidate-manifest.json",
+    "private namespace6 runtime events and synthetic output-04/output-14 (not copied into this report)"
+  ],
+  "limitations": [
+    "UI and clipboard evidence for turns 3-9 is absent.",
+    "Failed raw model content is not a delivered answer.",
+    "No additional provider calls, retries, or allowance are authorized by this review.",
+    "Screenshots remain local only."
+  ],
+  "reviewer_execution": "read-only source/evidence review and offline exact guard probes; no provider/model calls or app changes"
+}

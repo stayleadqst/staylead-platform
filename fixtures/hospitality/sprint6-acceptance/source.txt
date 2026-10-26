@@ -1,0 +1,6 @@
+S6 acceptance-only synthetic source for Harbor City Demo.
+
+The guest-visible link https://sprint6.example.invalid/HTL-CITY01/info is a
+nonfunctional sample used only to verify exact URL preservation in the
+multilingual acceptance flow. It is author-created for this test. It does not
+represent a real property, operator approval, or a working contact endpoint.

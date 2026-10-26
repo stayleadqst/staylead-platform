@@ -84,6 +84,10 @@ test("message client forwards bearer and preserves the API response shape", asyn
     config_version: "1",
     state_version: 1,
     source_generation: 1,
+    language_preference: { language_tag: "zh-Hant", source: "explicit", revision: 3 },
+    presentation: { language_tag: "zh-Hant", direction: "ltr", preference_revision: 3,
+      labels: { send: "发送", copy: "复制" }, freshness: "current", receipt_id: "receipt-3" },
+    answer_eligibility: "current",
   };
   globalThis.fetch = async (url, init) => {
     call = { url, init };

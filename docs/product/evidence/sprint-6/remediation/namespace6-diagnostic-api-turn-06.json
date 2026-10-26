@@ -1,0 +1,85 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "run_namespace": "remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 6,
+  "request_id_sha256": "6ff48cac23e5e18f",
+  "question_sha256": "4fef0046c32240dcdb2c71e85e7aaf3b12119b78626cc99c2a725439f170e77b",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "الموقف مغطّى، ويتسع لـ40 مركبة كعدد مرجعي. الرسوم 100000 VND لكل مركبة في الليلة، ولا يمكن حجز مكان مسبقًا. [F-HTL-CITY01-046]\nيسمح بمركبة واحدة مسجلة لكل حجز، ما لم يؤكد الموظفون خلاف ذلك. [F-HTL-CITY01-077]\nالرابط كما ورد: https://sprint6.example.invalid/HTL-CITY01/info [F-HTL-CITY01-S6-URL-001]",
+    "answer_eligibility": "current",
+    "unknowns": [],
+    "evidence": [
+      {
+        "fact_id": "F-HTL-CITY01-046",
+        "hotel_id": "HTL-CITY01",
+        "source_id": "SRC-HTL-CITY01-TRANSPORT",
+        "source_version": "1.0",
+        "section": "Đỗ xe và di chuyển"
+      },
+      {
+        "fact_id": "F-HTL-CITY01-077",
+        "hotel_id": "HTL-CITY01",
+        "source_id": "SRC-HTL-CITY01-TRANSPORT",
+        "source_version": "1.0",
+        "section": "Đỗ xe và di chuyển"
+      },
+      {
+        "fact_id": "F-HTL-CITY01-S6-URL-001",
+        "hotel_id": "HTL-CITY01",
+        "source_id": "SRC-HTL-CITY01-S6-URL",
+        "source_version": "1.0",
+        "section": "S6 acceptance-only sample link"
+      }
+    ],
+    "language_preference": {
+      "language_tag": "ar",
+      "source": "explicit",
+      "revision": 6
+    },
+    "presentation": {
+      "language_tag": "ar",
+      "direction": "rtl",
+      "preference_revision": 6,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 3,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "c1b76c837825a446"
+          }
+        ]
+      },
+      "pending_fields": []
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-6",
+    "codex_requests": 12,
+    "guest_turns": 6,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "status": "completed"
+}

@@ -1,0 +1,62 @@
+{
+  "state": "DELIVERED_SCOPED_SPRINT6_DONE",
+  "acceptance_published_head": "1333eb2c911f69d5dbc2cad1ba411a8629cb5ec8",
+  "acceptance_tree": "6b6cbe9cadabbdb31f589c5b5900909a30400c86",
+  "fetched_equal_tree_verified": true,
+  "local_clean_at_acceptance_publication": true,
+  "reviewed_source_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "published_source": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+  "final_product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "issues": [
+    {
+      "issue": 91,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/91",
+      "closed_at": "2026-10-26T07:42:45Z"
+    },
+    {
+      "issue": 92,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/92",
+      "closed_at": "2026-10-26T07:42:51Z"
+    },
+    {
+      "issue": 93,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/93",
+      "closed_at": "2026-10-26T07:42:55Z"
+    },
+    {
+      "issue": 74,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/74",
+      "closed_at": "2026-10-26T07:42:59Z"
+    },
+    {
+      "issue": 95,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/95",
+      "closed_at": "2026-10-26T07:43:03Z"
+    },
+    {
+      "issue": 94,
+      "state": "closed",
+      "state_reason": "completed",
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/94",
+      "closed_at": "2026-10-26T07:43:07Z"
+    }
+  ],
+  "no_scoped_blocked_story": true,
+  "new_duplicate_stories": 0,
+  "cumulative_actual_requests": 115,
+  "remaining_allowance": 0,
+  "screenshots_local_only": 43,
+  "PR96": "draft on sprint-5-canonical-brief; unmerged/not deployed",
+  "parents_epic_milestone": "left open; broader scope preserved",
+  "final_report_status_commit": "follows this verified acceptance head; final head equality is recorded in external receipt"
+}

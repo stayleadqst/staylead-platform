@@ -1,0 +1,26 @@
+{
+  "approved": true,
+  "conditions": {
+    "acceptance_only": true,
+    "functional": false
+  },
+  "fact_id": "F-HTL-CITY01-S6-URL-001",
+  "field": "acceptance_information_url",
+  "hotel_id": "HTL-CITY01",
+  "source_refs": [
+    {
+      "section": "S6 acceptance-only sample link",
+      "source_id": "SRC-HTL-CITY01-S6-URL",
+      "version": "1.0"
+    }
+  ],
+  "status": "confirmed",
+  "subject": "service",
+  "synthetic": true,
+  "topic": "contact",
+  "valid_from": "2026-10-01",
+  "valid_to": "2027-09-30",
+  "value": "https://sprint6.example.invalid/HTL-CITY01/info",
+  "version": "1.0",
+  "visibility": "guest"
+}

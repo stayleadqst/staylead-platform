@@ -1,0 +1,161 @@
+{
+  "classification": "independent semantic evidence review; synthetic software acceptance",
+  "run_id": "s6-codex-20261026-remediation-9",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "candidate_commit": "af4b42fb991b9425bcf320a85c604e33e9debbde",
+  "candidate_tree": "4d9ba6ba456305e0e3c4a15a8137cf107bb24e1e",
+  "product_aggregate_sha256": "eca37eaf3d3969049e89559a050099e795dc367559df6463b2ee3114b1b7ed75",
+  "verdict": "FAIL: T1 preparation payload is structurally invalid; stopped immediately; T2-T9 not executed",
+  "full_matrix_pass": false,
+  "executed_turns": [
+    1
+  ],
+  "not_executed_turns": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "cases": [
+    {
+      "turn": 1,
+      "verdict": "FAIL_PREPARATION_WIRE_SHAPE",
+      "state_target": "NOT_APPLIED",
+      "answer_semantics": "NO_DELIVERED_ANSWER",
+      "source_citation": "NO_DELIVERED_CITATION",
+      "current_copy": "NOT_AVAILABLE",
+      "detail": "HTTP 502 invalid_retrieval_selection after one preparation call. Proposed dates/adults, fact040, current quotes and intents are coherent, but both authorization op fields contain full operation objects instead of operation-name enum strings. Parsing rejects before application or final generation. Actual DB has no brief, preference or receipt."
+    },
+    {
+      "turn": 2,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 3,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 4,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 5,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 6,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 7,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 8,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    },
+    {
+      "turn": 9,
+      "verdict": "NOT_EXECUTED",
+      "detail": "Execution stopped at the first blocker; no acceptance evidence for this case in namespace9."
+    }
+  ],
+  "finding": {
+    "id": "T1_AUTHORIZATION_OP_SHAPE",
+    "severity": "P1",
+    "producer_failure": "guest_patch_authorizations[0].op and [1].op are objects rather than literal operation-name strings",
+    "exact_offline_parse_errors": [
+      {
+        "loc": [
+          "guest_patch_authorizations",
+          0,
+          "op"
+        ],
+        "type": "literal_error"
+      },
+      {
+        "loc": [
+          "guest_patch_authorizations",
+          1,
+          "op"
+        ],
+        "type": "literal_error"
+      }
+    ],
+    "offline_control": "Changing only each authorization op object to its operation-name string makes FactSelection parsing and current-question authorization validation pass. This is an offline diagnostic control, not a repaired or delivered live answer.",
+    "guard_result": "Correct fail-closed rejection before brief mutation, preference commit or committed-answer generation.",
+    "scope": "Producer wire shape; not a numeric/source/intent failure. Do not weaken authorization semantics to treat the captured raw output as accepted."
+  },
+  "final_database_observation": {
+    "observed_at_utc": "2026-10-26T06:59:08.461223+00:00",
+    "scope": "independent read-only local PostgreSQL SELECTs; exact namespace9 T1 request hash; synthetic hotel verified",
+    "request_id_sha256": "3324d7ae774001c7",
+    "session_id_sha256": "1ed5e653608a603e",
+    "request_status": "error",
+    "request_error_code": "invalid_retrieval_selection",
+    "scoped_request_count": 1,
+    "guest_brief_row_present": false,
+    "effective_brief_version": 0,
+    "brief_data": null,
+    "pending_fields": [],
+    "language_preference": null,
+    "receipt_count": 0,
+    "provider_calls": 0,
+    "mutations": 0
+  },
+  "visual_review": {
+    "files_checked": [
+      "remediation-9-live-run/turn-screenshots/turn-01.png"
+    ],
+    "result": "Vietnamese input and failure panel are readable without overlap/clipping. English interface fallback is explicitly disclosed. No answer, receipt or copy control was delivered.",
+    "screenshots_local_only": true
+  },
+  "bounds": {
+    "guest_turns": 1,
+    "provider_requests": 1,
+    "answer_only_resumes": 0,
+    "automatic_retries": false,
+    "provider_latency_ms": 5940.1,
+    "http_latency_ms": 6054.9,
+    "reported_output_tokens": 205,
+    "max_guest_turns": 9,
+    "max_provider_requests": 18,
+    "max_calls_per_turn": 2,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "execution_stopped_after_first_blocker": true,
+    "authorized_for_live_calls_at_review": true,
+    "unused_request_capacity": 17,
+    "future_calls_authorized_by_review": false
+  },
+  "reported_prior_request_count": 96,
+  "current_observed_requests": 1,
+  "cumulative_reported_plus_observed_requests": 97,
+  "sources": [
+    "live-cases.json",
+    "namespace9-candidate-manifest.json",
+    "remediation-9-live-run/observations.jsonl",
+    "remediation-9-live-run/run-result.json",
+    "private namespace9 captured preparation output-01 and run state (not copied here)",
+    "embedded independent exact-request PostgreSQL observation"
+  ],
+  "limitations": [
+    "Only T1 was executed; historical namespace results cannot establish remaining fixed-candidate cases.",
+    "Correct proposed business values are not applied state.",
+    "No final answer/native final-answer schema call occurred.",
+    "Private allowance was still marked authorized at review time; this review does not authorize continuation.",
+    "No model/provider calls, application HTTP calls, server starts or product edits were performed by reviewer."
+  ]
+}

@@ -9,6 +9,7 @@ import {
   hasUnresolvedRequest,
   isCurrentGeneration,
   releaseRequest,
+  resolveAnswerOnlyReceipt,
   retryModeForFailure,
 } from "../src/shared/chat/chat-state.ts";
 
@@ -70,6 +71,35 @@ test("an unresolved same-ID retry blocks the composer until resolved or a new ch
   const terminalTurn = { retryMode: classifyFailure({ code: "request_failed", outcome: "rejected" }).retryMode };
   assert.equal(hasUnresolvedRequest([terminalTurn]), false);
   assert.equal(canStartRequest(true, false, hasUnresolvedRequest([terminalTurn])), true);
+});
+
+test("successful answer-only continuation resolves every pending turn for its receipt only", () => {
+  const oldAnswer = { request_id: "historical-answer", answer: "keep unchanged", answer_eligibility: "current" };
+  const turns = [
+    { id: "original", answer: oldAnswer, resumeReceiptId: "receipt-1", partialSuccess: true,
+      receipt: { answer_status: "pending" } },
+    { id: "unknown-attempt", question: "Continue the answer", answerOnlyReceiptId: "receipt-1",
+      retryMode: "same-request", sameIdOnly: true, error: "Request may still be processing." },
+    { id: "unrelated", answerOnlyReceiptId: "receipt-2", retryMode: "same-request",
+      error: "Another receipt is unresolved." },
+    { id: "successful-attempt-new-request-id", answerOnlyReceiptId: "receipt-1", answer: { request_id: "resume-2", answer: "new answer" } },
+  ];
+
+  const resolved = resolveAnswerOnlyReceipt(turns, "receipt-1", "successful-attempt-new-request-id");
+  assert.equal(resolved[0].resumeReceiptId, undefined);
+  assert.equal(resolved[0].partialSuccess, false);
+  assert.equal(resolved[0].receipt.answer_status, "completed");
+  assert.equal(resolved[0].answer, oldAnswer, "historical answer must not be replaced or freshened");
+  assert.equal(resolved[1].retryMode, undefined, "unknown prior attempt must no longer hold the composer");
+  assert.equal(resolved[1].sameIdOnly, false);
+  assert.equal(resolved[1].error, undefined);
+  assert.equal(resolved[1].recovered, true);
+  assert.equal(resolved[2].retryMode, "same-request", "unrelated receipt remains unresolved");
+  assert.equal(resolved[3].answer.answer, "new answer");
+  assert.equal(resolved[3].recovered, undefined, "the successful current turn must not be mislabeled as a recovered sibling after its ID changes");
+  assert.equal(hasUnresolvedRequest(resolved), true, "unrelated pending receipt still blocks new semantic work");
+  const onlyResolved = resolved.filter((turn) => turn.id !== "unrelated");
+  assert.equal(hasUnresolvedRequest(onlyResolved), false, "matching receipt no longer blocks composer");
 });
 
 test("a contract mismatch has a clear deterministic error and no transient retry", () => {

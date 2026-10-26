@@ -1,0 +1,26 @@
+{
+  "schema_version": 6,
+  "import": {
+    "pack_id": "staylead-hospitality-knowledge-v1",
+    "reference_date": "2026-10-26",
+    "hotels": {
+      "HTL-CITY01": {
+        "slug": "harbor-city-demo",
+        "config_version": "1.0",
+        "guest_facts": 110
+      },
+      "HTL-BEACH02": {
+        "slug": "lagoon-family-demo",
+        "config_version": "1.0",
+        "guest_facts": 108
+      },
+      "HTL-RETREAT03": {
+        "slug": "pine-ridge-demo",
+        "config_version": "1.0",
+        "guest_facts": 110
+      }
+    }
+  },
+  "classification": "authored synthetic software acceptance",
+  "provider_calls": 0
+}

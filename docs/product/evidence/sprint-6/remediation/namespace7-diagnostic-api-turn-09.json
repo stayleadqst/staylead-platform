@@ -1,0 +1,71 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-7",
+  "run_namespace": "remediation-7",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 9,
+  "request_id_sha256": "eb750af014d593b6",
+  "question_sha256": "a7f983e32665b8ab175c8c1b358fad7b45ce95f551c3ff9ae90107bfac8de9c9",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "천만에요.",
+    "answer_eligibility": "current",
+    "unknowns": [],
+    "evidence": [],
+    "language_preference": {
+      "language_tag": "ko",
+      "source": "explicit",
+      "revision": 8
+    },
+    "presentation": {
+      "language_tag": "ko",
+      "direction": "ltr",
+      "preference_revision": 8,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 4,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "d1fb38f0c6baee2c"
+          }
+        ]
+      },
+      "pending_fields": [
+        "dates.check_out"
+      ]
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-7",
+    "codex_requests": 18,
+    "guest_turns": 9,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "database_preflight": {
+    "hotel_scope_verified": true,
+    "synthetic_hotel_verified": true,
+    "persisted_guest_request_count": 8,
+    "expected_prior_guest_turns": 8
+  },
+  "status": "completed"
+}

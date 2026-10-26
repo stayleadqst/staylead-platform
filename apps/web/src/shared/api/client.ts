@@ -7,6 +7,23 @@ export type GuestSession = Readonly<{
   expires_at: string;
   hotel: Record<string, unknown>;
   config_version: string;
+  language_preference?: GuestLanguagePreference;
+}>;
+
+export type GuestLanguagePreference = Readonly<{
+  language_tag: string;
+  source: "explicit" | "inferred" | "fallback";
+  revision: number;
+}>;
+
+export type GuestPresentation = Readonly<{
+  language_tag: string;
+  direction: "ltr" | "rtl";
+  preference_revision: number;
+  labels: Readonly<Record<string, string>>;
+  labels_fallback?: boolean;
+  freshness: "current" | "stale";
+  receipt_id: string | null;
 }>;
 
 export type GuestEvidence = Readonly<{
@@ -71,6 +88,9 @@ export type GuestMessageResponse = Readonly<{
   brief_narrative_stale?: boolean;
   replayed?: boolean;
   error?: Readonly<{ code: string; message: string }>;
+  language_preference?: GuestLanguagePreference;
+  presentation?: GuestPresentation;
+  answer_eligibility?: "current" | "pending" | "stale";
 }>;
 
 export type GuestBriefMember = Readonly<{ member_id: string; age: number | null }>;

@@ -1,0 +1,237 @@
+{
+  "classification": "independent focused implementation review; native preparation output remediation",
+  "created_at_utc": "2026-10-26T07:23:25.370788+00:00",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "role": "independent reviewer",
+    "live_provider_or_model_calls": 0
+  },
+  "verdict": "READY_TO_PIN_NO_REMAINING_SCOPED_FINDINGS",
+  "full_nine_case_live_acceptance": "UNPROVEN",
+  "live_execution_authorized_by_this_review": false,
+  "frozen_source_binding": {
+    "head_commit_at_artifact_creation": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+    "head_tree_at_artifact_creation": "77da592271da3e3cb01ab32bde72468a20b2b461",
+    "method": "SHA256 of exact reviewed file bytes; aggregate SHA256 of sorted path:sha256 newline records",
+    "changed_product_source": [
+      {
+        "path": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+        "sha256": "72c21e58dfb20cc3f3bf4d91fe2f5e388bfb3ba5990c6bcdaef47634c48acb1d"
+      },
+      {
+        "path": "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+        "sha256": "cb32bc7381d880aab3dc7a0ef276d00d2b976b5c4cdd9dce648b97370e2c71c1"
+      },
+      {
+        "path": "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py",
+        "sha256": "71f983bc9aa1a8a3cc103af02a8c040e1d42c444540935c235034e999f2657a3"
+      },
+      {
+        "path": "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py",
+        "sha256": "6d902bfa90a4cab6da24dfbf54d35ff2685e751d00eb85baed5900a9e9c53a76"
+      }
+    ],
+    "changed_product_source_aggregate_sha256": "a94b32b0ad9e61e9ffd1339810c608c061ebd644f32c830d17f181206991dd5a",
+    "changed_tests": [
+      {
+        "path": "tests/contracts/test_hospitality_preparation_output.py",
+        "sha256": "b2af1180019b507c5e9e49f7ac02288bda6e2d2fe05d10c4e6cd0ac38515a6e3"
+      },
+      {
+        "path": "tests/contracts/test_grounded_qa.py",
+        "sha256": "3a0effef5233dc521576fc5559cfddd003229c1b8326e3ec2d41809b3ccf2cc1"
+      }
+    ],
+    "changed_tests_aggregate_sha256": "feff2668985ca065b0dd1749212dbd2d79cd799e598df6c10af7237e010c8074",
+    "reused_transport_dependencies_and_tests": [
+      {
+        "path": "apps/api/src/staylead_platform/platform/contracts/ai_provider.py",
+        "sha256": "7ffc5ad5ae60d7e64107086549e0e43f05311d5a114ed68b9c3342b556c87091"
+      },
+      {
+        "path": "apps/api/src/staylead_platform/infrastructure/codex_provider.py",
+        "sha256": "b9ffe32275ba2fd7ce6a8d74d9fa6b93c9db370c559d6bbb1f8312bb033fdd1b"
+      },
+      {
+        "path": "apps/api/src/staylead_platform/infrastructure/ai_provider.py",
+        "sha256": "b35a4c1dcf24810df42fe6deab386e06a8283456b3bfec9db4f5ed49ec39e86a"
+      },
+      {
+        "path": "tests/contracts/test_codex_cli_provider.py",
+        "sha256": "c0a9698c1d264d0fa7e58d21704483bfaf70a13c42e129735c02975232b94890"
+      },
+      {
+        "path": "tests/contracts/test_foundry_grok_provider.py",
+        "sha256": "2e9115a17f18901028d6ffbe3e596cfdc4ad23736f8ccc944b1e760f5dd47461"
+      }
+    ],
+    "namespace10_helpers_and_tests": [
+      {
+        "path": "docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs",
+        "sha256": "6a499ec41c01d5a79a2e762b623851aafc12fcbfebed7e6b62312bd713e3fabf"
+      },
+      {
+        "path": "docs/product/evidence/sprint-6/remediation/resumed_acceptance_runtime.py",
+        "sha256": "29e23f6d64e1bc2babdee1f85b70e41c4291992431d4cfdc4180274f2c353ce0"
+      },
+      {
+        "path": "docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py",
+        "sha256": "3e87d57c36fdb981deb3dd9ac5b3ada4fd170192b979f28689c054f5e9f54ce0"
+      }
+    ]
+  },
+  "scope": "Hospitality-owned low/high preparation native schemas, existing neutral request/envelope ports, flat Foundry compatibility, unchanged semantic consumers and call limits, offline namespace10 preparation only",
+  "captured_ns9_failure": {
+    "private_local_artifact": "/private/tmp/staylead-sprint6-remediation-9-synthetic-output/output-01.json",
+    "artifact_sha256": "8080824aca05ed1dcfd1c2141aa206d287fc8089f52c4fa5f485e37bb6651629",
+    "captured_body_sha256": "5351ccb6d2590ca23150546ed5ae04e63ca727535159bac85f19e689519bcda9",
+    "body_not_copied": true,
+    "observed_failure": "Both guest_patch_authorizations op fields contain full operation objects instead of operation-name strings.",
+    "ajv_replay": "The captured flat body, placed under the required response envelope, is rejected by the actual low-preparation schema.",
+    "control": "Replacing only each authorization op object with its operation-name string makes the captured body pass Ajv and the existing current-turn authorization validator. The control was offline and was not applied or delivered."
+  },
+  "strict_schema_review": {
+    "result": "PASS",
+    "root": "Closed object; no root anyOf. Nested anyOf only.",
+    "object_policy": "Every object property is required and additionalProperties is false; nullable values express optional fields.",
+    "keywords_checked": [
+      "type",
+      "properties",
+      "required",
+      "additionalProperties",
+      "anyOf",
+      "items",
+      "minItems",
+      "maxItems",
+      "minLength",
+      "maxLength",
+      "pattern",
+      "minimum",
+      "maximum",
+      "enum"
+    ],
+    "unsupported_keywords_absent": [
+      "allOf",
+      "not",
+      "if",
+      "then",
+      "else",
+      "dependentRequired",
+      "dependentSchemas",
+      "const",
+      "default",
+      "discriminator"
+    ],
+    "bounds": "All item, length and numeric minimum/maximum pairs are consistent. Operation-name fields are string enums.",
+    "schema_metadata": {
+      "low_overlap_selection": {
+        "compact_utf8_bytes": 3215,
+        "canonical_sha256": "1d394f0a546f0999a1fa61599a7809888242e6d5629e0b632edabf6824d003f0",
+        "max_object_array_nesting": 5,
+        "property_slots": 28,
+        "property_and_enum_string_chars": 428
+      },
+      "high_overlap_preparation_answer": {
+        "compact_utf8_bytes": 31125,
+        "canonical_sha256": "08c39f26e97739c897a568a76f20783b97c0a6027ea673c798e2b0f78075b008",
+        "max_object_array_nesting": 5,
+        "property_slots": 291,
+        "property_and_enum_string_chars": 3603
+      }
+    },
+    "documented_limits_comparison": "Both schemas remain below 10 nesting levels, 5000 property slots, 120000 property/enum string characters and the adapter 256KiB schema-byte cap.",
+    "references": [
+      "https://developers.openai.com/api/docs/guides/structured-outputs",
+      "https://learn.chatgpt.com/docs/non-interactive-mode"
+    ]
+  },
+  "independent_reused_probe_results": [
+    {
+      "check": "Ajv actual NS9 object-valued authorization op",
+      "result": "REJECT_PASS"
+    },
+    {
+      "check": "Ajv captured string-op-only control",
+      "result": "ACCEPT_PASS"
+    },
+    {
+      "check": "Ajv low empty facts/no-op with required current intent",
+      "result": "ACCEPT_PASS"
+    },
+    {
+      "check": "Ajv invalid operation enum and empty target fields",
+      "result": "REJECT_PASS"
+    },
+    {
+      "check": "Ajv high mixed edit with nonempty authorized patch",
+      "result": "ACCEPT_PASS"
+    },
+    {
+      "check": "Ajv high no-evidence FAQ with meaningful unknown",
+      "result": "ACCEPT_PASS"
+    },
+    {
+      "check": "Ajv high empty/no-op without meaningful content",
+      "result": "REJECT_PASS"
+    },
+    {
+      "check": "Frozen af4 high-overlap blank consumption, patch absent and ops empty",
+      "result": "Typed invalid_model_output after one fake call; no consumable blank provisional answer. Consumer substantive guard remains unchanged by native-schema delta."
+    },
+    {
+      "check": "Mock Codex low/high preparation schema transport",
+      "result": "PASS: two explicit fake generate calls produce exactly two fake launches; --output-schema points to private0600 temporary files; response envelope unwraps exactly once; schema files are cleaned."
+    },
+    {
+      "check": "Mock Foundry low/high preparation compatibility",
+      "result": "PASS: optional hints do not change shared flat prompts or flat returned text; no global response-wrapper instruction introduced."
+    },
+    {
+      "check": "Final committed-only fields in high preparation",
+      "result": "PASS: guest_clarification and conversational_acknowledgement are required null in every branch; non-null values reject in Ajv; ordinary unknown remains accepted and blank content rejects."
+    },
+    {
+      "check": "Namespace10 changed mappings",
+      "result": "PASS: two focused mapping tests and JS syntax pass; all prior namespace paths remain isolated, caps/overwrite refusal unchanged; no private namespace10 files observed."
+    },
+    {
+      "check": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "closed_finding": {
+    "id": "HIGH_PREPARATION_COMMITTED_ONLY_CHANNELS",
+    "status": "CLOSED",
+    "initial_issue": "Native high-preparation schema offered clarification/acknowledgement branches that the preparation consumer always rejects.",
+    "final_resolution": "Both fields constrained to null in every high-preparation branch and the two substantive branches removed; five branches remain (four content channels plus nonempty patch).",
+    "final_high_schema_compact_bytes": 31125
+  },
+  "reported_builder_validation_not_reexecuted_as_a_broad_suite": {
+    "source": "backend/coordinator handoff",
+    "focused_contracts": 95,
+    "ruff": "reported PASS",
+    "compile": "reported PASS",
+    "note": "Reviewer reused these reported results and independently ran the targeted schema/transport/mapping probes above; no broad test rerun was performed for this artifact."
+  },
+  "architecture_and_bounds": {
+    "M1_M6": "Domain schemas stay in Hospitality; generic platform uses injected factories and existing provider-neutral schema/envelope request fields. Semantic authorization, source/numeric/URL/ref validators and receipt/resume behavior retain the prior af4 review.",
+    "extra_inference_calls_added": 0,
+    "max_calls_per_guest_turn": 2,
+    "max_requests_per_authorized_batch": 18,
+    "max_guest_turns_per_authorized_batch": 9,
+    "max_output_tokens": 700,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "automatic_retries": false,
+    "namespace10_initialized_by_review": false,
+    "namespace9_unused_requests": "17 remain reserved and paused; not transferred or consumed by reviewer"
+  },
+  "limitations": [
+    "JSON schema constrains structure; it does not prove the model correctly interprets intent, references, translated meaning or completeness.",
+    "Actual model/provider acceptance of the new native preparation schema and full fixed-candidate nine-case behavior remain unproven.",
+    "Historical NS9 T1 failure and unexecuted T2-T9 are not relabeled as passing.",
+    "Screenshots remain local; this artifact contains no images, raw guest quotes, credentials or private configuration.",
+    "Only this review JSON was written; no product edits, commits, provider calls, application HTTP calls or server starts were performed to create it."
+  ]
+}

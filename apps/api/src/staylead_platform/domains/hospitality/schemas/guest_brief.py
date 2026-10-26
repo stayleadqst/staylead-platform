@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -63,6 +63,135 @@ GuestBriefOperation = Annotated[
 class HospitalityGuestBriefPatch(BaseModel):
     model_config = ConfigDict(extra="forbid")
     ops: list[GuestBriefOperation] = Field(default_factory=list, max_length=12)
+
+
+class GuestPatchAuthorization(BaseModel):
+    """Same-turn provenance asserted for one proposed operation."""
+
+    model_config = ConfigDict(extra="forbid")
+    operation_index: int = Field(ge=0, le=11)
+    op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify"]
+    target_fields: list[str] = Field(min_length=1, max_length=2)
+    intent: Literal["explicit_request", "clarification"]
+    current_turn_quote: str = Field(min_length=1, max_length=500)
+
+
+GuestTurnIntent = Literal["hotel_information", "guest_state", "guest_edit", "courtesy"]
+
+
+def validate_guest_patch_authorization(
+    operations: tuple[dict[str, Any], ...], authorizations: Any, question: str,
+) -> None:
+    """Require one target-matched, current-utterance quote for every mutation."""
+    if not operations:
+        if authorizations:
+            raise ValueError("Patch authorizations require proposed operations.")
+        return
+    try:
+        records = [GuestPatchAuthorization.model_validate(item) for item in authorizations]
+    except (TypeError, ValidationError) as exc:
+        raise ValueError("Every guest edit requires valid current-turn authorization.") from exc
+    if len(records) != len(operations):
+        raise ValueError("Every guest edit requires exactly one current-turn authorization.")
+    for index, (operation, record) in enumerate(zip(operations, records, strict=True)):
+        op = operation.get("op")
+        expected_targets = _patch_target_fields(operation)
+        expected_intent = "clarification" if op == "clarify" else "explicit_request"
+        if (
+            record.operation_index != index or record.op != op
+            or record.target_fields != expected_targets or record.intent != expected_intent
+            or not record.current_turn_quote.strip()
+            or record.current_turn_quote not in question
+        ):
+            raise ValueError("Guest edit authorization does not match the current turn operation.")
+
+
+def validate_preparation_metadata(
+    payload: Any, patch: GuestBriefProposal | None, question: str,
+) -> tuple[tuple[str, ...], tuple[dict[str, Any], ...]]:
+    intents = tuple(dict.fromkeys(getattr(payload, "turn_intents", ())))
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy"}
+    if not intents or any(intent not in valid_intents for intent in intents):
+        raise ValueError("Preparation must classify at least one current-turn intent.")
+    authorizations = tuple(
+        item.model_dump(mode="json") for item in getattr(payload, "guest_patch_authorizations", ())
+    )
+    operations = patch.operations if patch is not None else ()
+    try:
+        validate_guest_patch_authorization(operations, authorizations, question)
+    except ValueError as exc:
+        raise ValueError("The proposed guest edit lacks current-turn authorization.") from exc
+    if operations and "guest_edit" not in intents:
+        raise ValueError("Guest edits require the current turn to be classified as an edit.")
+    return intents, authorizations
+
+
+def validate_committed_turn_channels(
+    payload: Any, intents: tuple[str, ...], pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
+) -> None:
+    """Enforce prepared turn scope even when a provider ignores native JSON schema hints."""
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy"}
+    if not intents or any(intent not in valid_intents for intent in intents):
+        raise ValueError("The committed answer has no persisted current-turn intent.")
+    acknowledgement = getattr(payload, "conversational_acknowledgement", None)
+    if acknowledgement is not None and "courtesy" not in intents:
+        raise ValueError("A courtesy acknowledgement is outside the prepared current-turn intent.")
+    required_clarifications = required_pending_clarification_fields(pending_fields, authorized_targets)
+    clarification = getattr(payload, "guest_clarification", None)
+    if required_clarifications and (
+        clarification is None or clarification.field not in required_clarifications
+    ):
+        raise ValueError("The committed answer omitted a required authorized pending-field question.")
+    if any(field.endswith(".age") for field in pending_fields) and not getattr(payload, "unknowns", ()):
+        raise ValueError("A pending child age requires a direct age question.")
+    if "hotel_information" in intents:
+        return
+    if getattr(payload, "supported_claims", ()) or getattr(payload, "conflicts", ()):
+        raise ValueError("Hotel information channels are outside the prepared current-turn scope.")
+    unknowns = getattr(payload, "unknowns", ())
+    pending_can_be_asked = any(
+        field == "dates.check_out" or field.endswith(".age") for field in pending_fields
+    )
+    missing_guest_state = (
+        "guest_state" in intents and not authorized_targets and not pending_fields
+    )
+    if unknowns and (
+        len(unknowns) != 1 or not pending_can_be_asked and not missing_guest_state
+        or any(not item.strip() for item in unknowns)
+    ):
+        raise ValueError("Only one pending guest detail may be clarified outside a hotel-information turn.")
+
+
+def required_pending_clarification_fields(
+    pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
+) -> tuple[str, ...]:
+    fields = [
+        field for field in pending_fields
+        if field in authorized_targets and not field.endswith(".age")
+    ]
+    if any(field in authorized_targets for field in ("dates.check_in", "dates.check_out")):
+        fields.extend(
+            field for field in ("dates.check_in", "dates.check_out")
+            if field in pending_fields and field not in fields
+        )
+    return tuple(dict.fromkeys(fields))
+
+
+def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
+    op = operation.get("op")
+    if op == "set_dates":
+        return [f"dates.{name}" for name in ("check_in", "check_out") if operation.get(name) is not None]
+    if op == "set_adults":
+        return ["party.adults"]
+    if op == "add_child":
+        return ["party.children"]
+    if op == "set_child_age":
+        return [f"party.children.{operation.get('member_id')}.age"]
+    if op == "remove_child":
+        return [f"party.children.{operation.get('member_id')}"]
+    if op == "clarify" and isinstance(operation.get("field"), str):
+        return [operation["field"]]
+    return []
 
 
 def _iso_date(value: str | None) -> date | None:

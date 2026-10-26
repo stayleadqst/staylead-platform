@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "message_calls": 4,
+  "composer_enabled_after_recovery": true,
+  "historical_answer_preserved": true,
+  "mocked_api_only": true
+}

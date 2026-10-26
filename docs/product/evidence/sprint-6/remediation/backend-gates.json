@@ -1,0 +1,42 @@
+{
+  "candidate": "7ed3fc6",
+  "at_utc": "2026-10-26T03:24:47.097244+00:00",
+  "checks": [
+    {
+      "command": [
+        "apps/api/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/contracts/test_grounded_qa.py",
+        "tests/contracts/test_sprint6_validation_diagnostics.py",
+        "tests/contracts/test_sprint6_language.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "backend-gate-1.log"
+    },
+    {
+      "command": [
+        "apps/api/.venv/bin/ruff",
+        "check",
+        "apps/api/src",
+        "tests/contracts/test_grounded_qa.py",
+        "tests/contracts/test_sprint6_validation_diagnostics.py"
+      ],
+      "exit_code": 0,
+      "log": "backend-gate-2.log"
+    },
+    {
+      "command": [
+        "apps/api/.venv/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "apps/api/src"
+      ],
+      "exit_code": 0,
+      "log": "backend-gate-3.log"
+    }
+  ],
+  "postgresql": "10 passed separately on isolated existing test DB; no schema/product change since then"
+}

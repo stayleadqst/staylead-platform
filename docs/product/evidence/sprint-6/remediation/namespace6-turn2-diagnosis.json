@@ -1,0 +1,14 @@
+{
+  "run_id": "s6-codex-20261026-remediation-6",
+  "candidate_commit": "fca86724c4446d82974d939fb17792dda2177a13",
+  "product_source": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
+  "native_schema_actual": "accepted for T1/T2; substantive output returned, no label-only output",
+  "turn1": "200 current VI, exactcopy, grounded breakfast/timezone and canonical stay details",
+  "turn2": "502invalid_model_output: both claimrefs/toprefs cite null pendingchildage; also no targetedagequestion. StateENrev2/brief2/childnullpending preserved. Correctguardrejection.",
+  "provider_requests_used": 4,
+  "authorized_remaining": 14,
+  "explicit_resumes": 0,
+  "automatic_retries": 0,
+  "decision": "No T2retry. Continue pinned cases3\u20139 on same product/session viaone-shot API diagnostics because paused browser driver cannot skip failure. These are NOT UI/copy proof. No product changes until casesfinish.",
+  "screenshots": "local only"
+}

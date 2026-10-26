@@ -15,6 +15,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from staylead_platform.composition.configuration.settings import Settings
+from staylead_platform.domains.hospitality.grounded_claim_format import format_grounded_claim
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     COMMITTED_FACT_SELECTION_INSTRUCTIONS,
     COMMITTED_GROUNDED_QA_INSTRUCTIONS,
@@ -22,8 +23,22 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     GROUNDED_QA_INSTRUCTIONS,
 )
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
-from staylead_platform.domains.hospitality.schemas.grounded_answer import HospitalityGroundedAnswer
-from staylead_platform.domains.hospitality.schemas.guest_brief import validate_guest_brief_proposal
+from staylead_platform.domains.hospitality.schemas.grounded_answer import (
+    HospitalityGroundedAnswer,
+    committed_answer_output_schema,
+)
+from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    validate_committed_turn_channels,
+    validate_guest_brief_proposal,
+    validate_preparation_metadata,
+)
+from staylead_platform.domains.hospitality.schemas.preparation_output import (
+    fact_selection_output_schema,
+    preparation_answer_output_schema,
+)
+from staylead_platform.domains.hospitality.validators.guest_clarification import (
+    validate_pending_guest_clarification,
+)
 from staylead_platform.infrastructure.ai_provider import FoundryGrokConfig, FoundryGrokProvider
 from staylead_platform.infrastructure.codex_provider import CodexCLIProvider
 from staylead_platform.infrastructure.database import create_database_engine
@@ -38,6 +53,7 @@ from staylead_platform.infrastructure.persistence.store import (
     StaleSource,
     VersionConflict,
     apply_guest_brief_patch,
+    commit_language_preference,
     complete_partial_request,
     complete_request,
     create_session,
@@ -48,6 +64,7 @@ from staylead_platform.infrastructure.persistence.store import (
     get_guest_brief_receipt,
     get_guest_brief_source_utterance,
     get_hotel_by_slug,
+    get_language_preference,
     get_session,
     recent_messages,
     reserve_request,
@@ -62,9 +79,17 @@ from staylead_platform.platform.contracts.knowledge import (
     MediaDescriptor,
     SourceVersionRef,
 )
+from staylead_platform.platform.contracts.language import language_direction, normalize_language_tag
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
     GroundedQAOrchestrator,
+)
+from staylead_platform.platform.conversation.responses.presentation_labels import (
+    LABEL_KEYS,
+    label_source_texts,
+    labels_fallback,
+    missing_label_keys,
+    resolve_label_bundle,
 )
 from staylead_platform.platform.guest_context.sessions.signing import (
     InvalidSessionToken,
@@ -77,14 +102,20 @@ SESSION_TTL = timedelta(hours=24)
 MEDIA_MAX_BYTES = {"image/png": 5 * 1024 * 1024, "video/mp4": 20 * 1024 * 1024, "text/vtt": 256 * 1024}
 
 
+def _validation_diagnostics_enabled(settings: Settings) -> bool:
+    return bool(settings.validation_diagnostics) and settings.environment.lower() in {"development", "test"}
+
+
 class GuestChatError(RuntimeError):
     def __init__(self, status: int, code: str, message: str, *, retryable: bool = False,
-                 partial_result: dict[str, Any] | None = None) -> None:
+                 partial_result: dict[str, Any] | None = None,
+                 validation_diagnostics: dict[str, Any] | None = None) -> None:
         super().__init__(message)
         self.status = status
         self.code = code
         self.retryable = retryable
         self.partial_result = partial_result
+        self.validation_diagnostics = validation_diagnostics
 
 
 def build_provider(settings: Settings) -> AIProvider | None:
@@ -131,6 +162,14 @@ def create_guest_chat_application(
             selection_instructions=FACT_SELECTION_INSTRUCTIONS,
             committed_selection_instructions=COMMITTED_FACT_SELECTION_INSTRUCTIONS,
             selection_schema=FactSelection,
+            claim_formatter=format_grounded_claim,
+            clarification_validator=validate_pending_guest_clarification,
+            committed_output_schema_factory=committed_answer_output_schema,
+            preparation_selection_schema_factory=fact_selection_output_schema,
+            preparation_answer_schema_factory=preparation_answer_output_schema,
+            preparation_metadata_validator=validate_preparation_metadata,
+            committed_answer_validator=validate_committed_turn_channels,
+            response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,
         )
     return GuestChatApplication(settings, database, orchestrator, media_repository)
@@ -248,6 +287,12 @@ def _receipt_payload(receipt: Any) -> dict[str, Any]:
     return value
 
 
+def _language_preference_payload(row: dict[str, Any] | None) -> dict[str, Any]:
+    if row is None:
+        return {"language_tag": "und", "source": "fallback", "revision": 0}
+    return {"language_tag": row["language_tag"], "source": row["source"], "revision": row["revision"]}
+
+
 def _resume_marker(receipt_id: str) -> str:
     return f"answer-only-resume:{receipt_id}"
 
@@ -348,11 +393,19 @@ class GuestChatApplication:
                     self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                 )
                 brief_stale = current_brief.brief_version != stored.get("brief_version_used")
+            current_language = get_language_preference(
+                self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+            )
+            preference_stale = (
+                (current_language or {}).get("revision", 0)
+                != (stored.get("presentation") or {}).get("preference_revision", 0)
+            )
         except GuestChatError:
             raise
         except Exception as exc:
             raise GuestChatError(503, "freshness_unavailable", "Answer freshness could not be checked.", retryable=True) from exc
-        return {"status": "current" if freshness.get("eligible") and not brief_stale else "stale"}
+        eligible = bool(freshness.get("eligible") and not brief_stale and not preference_stale)
+        return {"status": "current" if eligible else "stale", "answer_eligibility": "current" if eligible else "stale"}
 
     def open_session(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -377,6 +430,7 @@ class GuestChatApplication:
             "session_id": session_id, "access_token": token, "token_type": "Bearer",
             "expires_at": expires_at.isoformat(), "hotel": hotel["public_config"],
             "config_version": hotel["config_version"],
+            "language_preference": _language_preference_payload(None),
         }
 
     async def send_message(
@@ -416,6 +470,14 @@ class GuestChatApplication:
             raise GuestChatError(422, "invalid_message", "Provide either a question or an answer-only receipt reference.")
         if question is not None and not question.strip():
             raise GuestChatError(422, "invalid_question", "Question cannot be blank.")
+        try:
+            current_language_row = await asyncio.to_thread(
+                get_language_preference, self._engine, session_id=session_id,
+                hotel_id=claims.hotel_id, timeout_seconds=_remaining_seconds(deadline),
+            )
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Language preference storage is unavailable.", retryable=True) from exc
+        current_language = _language_preference_payload(current_language_row)
         reservation_question = question if question is not None else _resume_marker(answer_only_receipt_id or "")
         try:
             async with asyncio.timeout_at(deadline):
@@ -460,6 +522,10 @@ class GuestChatApplication:
                     timeout_seconds=_remaining_seconds(deadline),
                 )
                 cached["guest_brief"] = _brief_payload(current_brief)
+                brief_stale = bool(
+                    cached.get("brief_dependent")
+                    and cached.get("brief_version_used") != current_brief.brief_version
+                )
                 receipt_result = await asyncio.to_thread(
                     get_guest_brief_receipt, self._engine, session_id=session_id,
                     hotel_id=claims.hotel_id, receipt_id=request_id,
@@ -484,6 +550,24 @@ class GuestChatApplication:
                 raise GuestChatError(409, "stale_source", "The saved answer is no longer current. Ask again in a new turn.")
             cached.pop("evidence_bindings", None)
             cached.pop("freshness", None)
+            presentation = cached.get("presentation") or {
+                "language_tag": current_language["language_tag"],
+                "direction": language_direction(current_language["language_tag"]),
+                "preference_revision": current_language["revision"],
+                "labels": resolve_label_bundle(current_language["language_tag"], None),
+                "labels_fallback": labels_fallback(current_language["language_tag"]),
+                "freshness": "current", "receipt_id": cached.get("brief_receipt", {}).get("request_id"),
+            }
+            presentation_stale = presentation.get("preference_revision") != current_language["revision"]
+            presentation["freshness"] = "stale" if presentation_stale else "current"
+            cached["presentation"] = presentation
+            presentation.setdefault("labels_fallback", labels_fallback(presentation["language_tag"]))
+            cached["language_preference"] = current_language
+            cached["answer_eligibility"] = (
+                "pending" if cached.get("status") == "partial_success" or cached.get("answer_status") == "failed"
+                else "stale" if presentation_stale or not decision.eligible or brief_stale
+                else "current"
+            )
             return cached
         if self._orchestrator is None:
             await self._fail_request(session_id, request_id, "provider_unavailable")
@@ -497,6 +581,7 @@ class GuestChatApplication:
         committed_brief: GuestBriefSnapshot | None = None
         prepared = None
         resumed_receipt = None
+        language_race = False
         try:
             async with asyncio.timeout_at(deadline):
                 remaining = _remaining_seconds(deadline)
@@ -526,6 +611,25 @@ class GuestChatApplication:
                         raise GuestChatError(404, "brief_receipt_unavailable", "The saved trip update is not available for this chat.")
                     if saved_receipt["receipt"].answer_status != "failed":
                         raise GuestChatError(409, "brief_resume_unavailable", "This trip update does not need an answer resume.")
+                    saved_answer_payload = saved_receipt.get("answer_payload")
+                    saved_turn_intents = (
+                        saved_answer_payload.get("turn_intents")
+                        if isinstance(saved_answer_payload, dict) else None
+                    )
+                    saved_authorized_targets = (
+                        saved_answer_payload.get("authorized_targets")
+                        if isinstance(saved_answer_payload, dict) else None
+                    )
+                    if (
+                        not isinstance(saved_turn_intents, list) or not saved_turn_intents
+                        or any(not isinstance(item, str) for item in saved_turn_intents)
+                        or not isinstance(saved_authorized_targets, list)
+                        or any(not isinstance(item, str) for item in saved_authorized_targets)
+                    ):
+                        raise GuestChatError(
+                            409, "brief_resume_unavailable",
+                            "The saved answer is missing its current-turn scope and cannot be resumed safely.",
+                        )
                     resumed_receipt = saved_receipt["receipt"]
                     committed_brief = await asyncio.to_thread(
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
@@ -535,6 +639,12 @@ class GuestChatApplication:
                     answer = await self._orchestrator.answer_committed_turn(
                         hotel_id=claims.hotel_id, question=source_turn["content"], history=history,
                         brief=committed_brief, deadline=deadline,
+                        preferred_language_tag=(current_language_row or {}).get("language_tag"),
+                        missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                        label_bundle_keys=LABEL_KEYS,
+                        label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                        turn_intents=tuple(saved_turn_intents),
+                        authorized_targets=tuple(saved_authorized_targets),
                     )
                 else:
                     committed_brief = await asyncio.to_thread(
@@ -546,13 +656,43 @@ class GuestChatApplication:
                         hotel_id=claims.hotel_id, question=transcript_question, history=history,
                         brief=committed_brief, deadline=deadline,
                         source_utterance_id=source_utterance_id,
+                        preferred_language_tag=(current_language_row or {}).get("language_tag"),
+                        missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                        label_bundle_keys=LABEL_KEYS,
+                        label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
                     )
+                    requested_tag = normalize_language_tag(prepared.explicit_language_tag)
+                    inferred_tag = normalize_language_tag(prepared.inferred_language_tag)
+                    if requested_tag or (current_language_row is None and inferred_tag):
+                        expected_language_revision = current_language["revision"]
+                        requested_committed_tag = requested_tag or inferred_tag or "und"
+                        try:
+                            current_language_row = await asyncio.to_thread(
+                                commit_language_preference, self._engine,
+                                session_id=session_id, hotel_id=claims.hotel_id,
+                                language_tag=requested_tag or inferred_tag or "und",
+                                source="explicit" if requested_tag else "inferred",
+                                expected_revision=current_language["revision"],
+                                timeout_seconds=_remaining_seconds(deadline),
+                            )
+                        except Exception as exc:
+                            raise GuestChatError(503, "storage_unavailable", "Language preference could not be saved.", retryable=True) from exc
+                        current_language = _language_preference_payload(current_language_row)
+                        language_race = (
+                            current_language["revision"] == expected_language_revision
+                            and current_language["language_tag"] != requested_committed_tag
+                        ) or current_language["language_tag"] != requested_committed_tag
                     if prepared.guest_patch is not None:
                         source_utterance_id = prepared.source_utterance_id or source_utterance_id
                         brief_context = GuestBriefContext(
                             session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
                             expected_brief_version=committed_brief.brief_version,
                             source_utterance_id=source_utterance_id, source_utterance=transcript_question,
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=tuple(dict.fromkeys(
+                                target for authorization in prepared.patch_authorizations
+                                for target in authorization.get("target_fields", ())
+                            )),
                         )
                         validated = validate_guest_brief_proposal(committed_brief, prepared.guest_patch)
                         apply_attempted = True
@@ -594,14 +734,39 @@ class GuestChatApplication:
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
+                            preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
+                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                            label_bundle_keys=LABEL_KEYS,
+                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=brief_context.authorized_targets,
                         )
                     elif prepared.provisional_answer is not None:
-                        answer = prepared.provisional_answer
+                        if language_race:
+                            answer = await self._orchestrator.answer_committed_turn(
+                                hotel_id=claims.hotel_id, question=transcript_question, history=history,
+                                brief=committed_brief, deadline=deadline,
+                                selected_fact_ids=prepared.selected_fact_ids,
+                                preferred_language_tag=current_language["language_tag"],
+                                missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                                label_bundle_keys=LABEL_KEYS,
+                                label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                                turn_intents=prepared.turn_intents,
+                                authorized_targets=brief_context.authorized_targets if brief_context else (),
+                            )
+                        else:
+                            answer = prepared.provisional_answer
                     else:
                         answer = await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
+                            preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
+                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                            label_bundle_keys=LABEL_KEYS,
+                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            turn_intents=prepared.turn_intents,
+                            authorized_targets=brief_context.authorized_targets if brief_context else (),
                         )
                 # The orchestrator sets this only when its structured output cites
                 # validated canonical brief fields. A supplied brief alone does not
@@ -643,6 +808,8 @@ class GuestChatApplication:
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
                     "provider_request_ids": list(answer.provider_request_ids), "calls": answer.calls,
+                    "guest_claims_rejected": answer.rejected_guest_claims,
+                    "answer_validation": "safe_portion" if answer.rejected_guest_claims else "fully_validated",
                     "usage": {"input_tokens": answer.usage.input_tokens,
                               "output_tokens": answer.usage.output_tokens,
                               "total_tokens": answer.usage.total_tokens},
@@ -682,6 +849,30 @@ class GuestChatApplication:
                     brief_fields["answer_status"] = "completed"
                 if brief_version_used is not None:
                     answer = replace(answer, brief_version_used=brief_version_used)
+                answer_locale = (
+                    current_language["language_tag"] if current_language["source"] != "fallback"
+                    else normalize_language_tag(answer.inferred_language_tag) or "und"
+                )
+                answer_labels = resolve_label_bundle(answer_locale, answer.label_bundle)
+                answer_presentation = {
+                    "language_tag": answer_locale,
+                    "direction": language_direction(answer_locale),
+                    "preference_revision": current_language["revision"],
+                    "labels": answer_labels,
+                    "labels_fallback": labels_fallback(answer_locale),
+                    "freshness": "current",
+                    "receipt_id": receipt_id_for_answer,
+                }
+                try:
+                    latest_language_row = await asyncio.to_thread(
+                        get_language_preference, self._engine, session_id=session_id,
+                        hotel_id=claims.hotel_id, timeout_seconds=_remaining_seconds(deadline),
+                    )
+                except Exception as exc:
+                    raise GuestChatError(503, "storage_unavailable", "Language preference could not be checked.", retryable=True) from exc
+                latest_language = _language_preference_payload(latest_language_row)
+                language_stale = latest_language["revision"] != answer_presentation["preference_revision"]
+                answer_presentation["freshness"] = "stale" if language_stale else "current"
                 remaining = _remaining_seconds(deadline)
                 result = await asyncio.to_thread(
                     complete_request,
@@ -693,7 +884,10 @@ class GuestChatApplication:
                     response_fields={"unknowns": list(answer.unknowns),
                                      "guest_claims": list(answer.guest_claims),
                                      "trace": trace, "media": media,
-                                     "source_generation": snapshot.generation, **brief_fields},
+                                     "source_generation": snapshot.generation,
+                                     "language_preference": latest_language,
+                                     "presentation": answer_presentation,
+                                     "answer_eligibility": "stale" if language_stale else "current", **brief_fields},
                     brief_version_used=brief_version_used,
                     brief_dependent=brief_dependent,
                     brief_receipt_id=receipt_id_for_answer,
@@ -752,15 +946,20 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "storage_unavailable")
             raise GuestChatError(503, "storage_unavailable", "Request storage is unavailable.", retryable=True) from exc
         except ConversationFailure as exc:
+            diagnostics = exc.validation_diagnostics if _validation_diagnostics_enabled(self._settings) else None
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
                     receipt_id=request_id, brief_version_used=mutation.brief.brief_version,
                     code=exc.code, message=str(exc), deadline=deadline,
+                    validation_diagnostics=diagnostics,
                 ) from exc
             await self._fail_request(session_id, request_id, exc.code)
             status = 503 if exc.code == "provider_failure" else 502
-            raise GuestChatError(status, exc.code, str(exc), retryable=exc.retryable) from exc
+            raise GuestChatError(
+                status, exc.code, str(exc), retryable=exc.retryable,
+                validation_diagnostics=diagnostics,
+            ) from exc
         except ScopeError as exc:
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
@@ -812,6 +1011,7 @@ class GuestChatApplication:
     async def _partial_failure(
         self, *, session_id: str, hotel_id: str, request_id: str, receipt_id: str,
         brief_version_used: int, code: str, message: str, deadline: float, status: int = 502,
+        validation_diagnostics: dict[str, Any] | None = None,
     ) -> GuestChatError:
         brief = await asyncio.to_thread(
             get_guest_brief, self._engine, session_id=session_id, hotel_id=hotel_id,
@@ -824,6 +1024,11 @@ class GuestChatApplication:
         if saved is None:
             raise GuestChatError(503, "receipt_unavailable", "The trip update receipt could not be loaded.", retryable=True)
         receipt = saved["receipt"]
+        preference_row = await asyncio.to_thread(
+            get_language_preference, self._engine, session_id=session_id,
+            hotel_id=hotel_id, timeout_seconds=0.5,
+        )
+        preference = _language_preference_payload(preference_row)
         partial = {
             "request_id": request_id, "status": "partial_success",
             "error": {"code": code, "message": message},
@@ -831,13 +1036,28 @@ class GuestChatApplication:
             "brief_receipt": _receipt_payload(receipt),
             "applied_delta": receipt.applied_delta,
             "answer_status": "failed",
+            "language_preference": preference,
+            "presentation": {
+                "language_tag": preference["language_tag"],
+                "direction": language_direction(preference["language_tag"]),
+                "preference_revision": preference["revision"],
+                "labels": resolve_label_bundle(preference["language_tag"], None),
+                "labels_fallback": labels_fallback(preference["language_tag"]),
+                "freshness": "current", "receipt_id": receipt_id,
+            },
+            "answer_eligibility": "pending",
         }
+        if validation_diagnostics is not None:
+            partial["error"]["validation_diagnostics"] = validation_diagnostics
         partial = await asyncio.to_thread(
             complete_partial_request, self._engine, session_id=session_id, hotel_id=hotel_id,
             request_id=request_id, response=partial, brief_receipt_id=receipt_id,
             brief_version_used=brief_version_used, timeout_seconds=0.5,
         )
-        return GuestChatError(status, code, message, retryable=True, partial_result=partial)
+        return GuestChatError(
+            status, code, message, retryable=True, partial_result=partial,
+            validation_diagnostics=validation_diagnostics,
+        )
 
     async def _resolve_apply_outcome_unknown(
         self, *, session_id: str, hotel_id: str, request_id: str, deadline: float,

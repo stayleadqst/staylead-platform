@@ -1,0 +1,30 @@
+{
+  "candidate": "70b4641356d1ffb60673a3462c216713bdd709e8",
+  "turn": 1,
+  "http_status": 502,
+  "status": "partial_success",
+  "error_code": "unsupported_output",
+  "schema_validation": "passed; final returned JSON parsed",
+  "verified_failure_mechanism": "guest_claim date literals reformatted from canonical ISO to DD/MM/YYYY; exact ordered numeric guard rejected them",
+  "historic_run_cause": "still unknown; do not conflate with this captured failure",
+  "provider_requests": 2,
+  "persisted_brief": {
+    "version": 1,
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-13",
+    "nights": 3,
+    "adults": 2
+  },
+  "raw_output": "private synthetic capture only; not published",
+  "output_hashes": [
+    {
+      "attempt": 1,
+      "sha256": "0f0b08ad549eebbc72bb0bbb654a82c25ac39b4f54ad5207cc4ce008c984c174"
+    },
+    {
+      "attempt": 2,
+      "sha256": "fc384bc370510612b45f13261780b272b369d1502d8b0f1058bfc72474b4a98f"
+    }
+  ],
+  "coordinator_decision": "fix prompt to preserve canonical ISO and numeric literals; do not weaken guard; then explicit receipt recovery, preserve counters; mark sequence mixed-candidate"
+}

@@ -1,0 +1,14 @@
+{
+  "candidate": "a9338e044081b5f47ce70c3a3ba40d67212a44af",
+  "semantic_turns": 4,
+  "provider_requests": 8,
+  "automatic_retries": 0,
+  "operator_resumes": 0,
+  "T1": "correct VI state/hours/place/copy; expected source timezone omitted",
+  "T2": "PASS childunknownage EN/briefv2/copy",
+  "T3": "PASS core samechildage7 FR/checkout14/briefv3/copy",
+  "T4": "FAILdelivery: correct06:30～09:30に tokenizedas06:30 and09; Unicodeword suffixguardfalsepositive",
+  "T5_to_T9": "notexecuted",
+  "coordinator_decision": "stop;fix tokenizer adjacency and deterministic cited-source timezone formatter offline; preservefailures; do notclaimmatrixPASS",
+  "at_utc": "2026-10-26T04:01:16.702322+00:00"
+}

@@ -1,0 +1,31 @@
+$ node --test docs/product/evidence/sprint-6/remediation/test_operator_resume_routing.mjs
+TAP version 13
+# Subtest: generic HTTP 503 does not route to answer-only continuation
+ok 1 - generic HTTP 503 does not route to answer-only continuation
+  ---
+  duration_ms: 0.561209
+  ...
+# Subtest: HTTP 502 partial response with a raw in-memory receipt routes to explicit continuation
+ok 2 - HTTP 502 partial response with a raw in-memory receipt routes to explicit continuation
+  ---
+  duration_ms: 0.057916
+  ...
+# Subtest: partial status without a receipt or without an HTTP response is not resumable
+ok 3 - partial status without a receipt or without an HTTP response is not resumable
+  ---
+  duration_ms: 0.051042
+  ...
+# Subtest: completed responses and overlong receipt values are not routed
+ok 4 - completed responses and overlong receipt values are not routed
+  ---
+  duration_ms: 0.11175
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 70.058208
