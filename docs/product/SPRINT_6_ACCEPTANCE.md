@@ -83,3 +83,7 @@ Implementation và offline fixes đã commit trên `sprint-6-multilingual`; fina
 #95 giữ P0/E2/Draft, không gán milestone hoặc tự thực thi sprint sau. Next owner cần diagnostic capture/reproducer đủ xác định structural failure và một fresh acceptance allowance tường minh, rồi chạy/check toàn matrix trên fixed candidate. User stories #91/#92/#93/#74 và coordination#94 giữ Open/Blocked; chỉ Done khi đầy đủ scoped AC/DoD.
 
 C đã dừng riêng acceptance API18086 và web13016 sau snapshot; không dừng shared PostgreSQL server. Dữ liệu và counters giữ nguyên để điều tra. Secrets chỉ ở local private runtime config, không đưa lên repository/GitHub/evidence.
+
+## Verified publication
+
+[Draft PR #96](https://github.com/stayleadqst/staylead-platform/pull/96), base `sprint-5-canonical-brief`; không merge/deploy. CLI push không có noninteractive credential, nên publish qua connected GitHub Git-data API. [Local/published commit mapping](evidence/sprint-6/publication.json) ghi cả bảy candidate; mọi published tree khớp exact local tree. Initial published evidence head `dd958a4e34d7127e368e3a2fc113ea31070ac99f` khớp local `b3e77edd99ee212147edac7dff4ae2cccb735f42`, tree `06c2c34a1bf694c2c55e9f1b897859ae6ba0c345`. Failed live candidate e66647 tương đương published `ebb0ae942ca4bc658902c32be8f3806d1eb290ea`; final offline product5ac41 tương đương published `b7f488759428b7705095136a2341b82c6a0af5c4`. Publication-note-only commit không đổi product fingerprint; final published head ghi trên #94. CI có thể tự chạy sau publication/PR update; không kiểm hay nhận CI PASS.
