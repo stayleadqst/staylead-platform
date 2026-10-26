@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-26T04:52:37.675902+00:00",
+  "run_id": "s6-codex-20261026-remediation-5",
+  "candidate_commit": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
+  "reviewed_source_local": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
+  "provider_requests_used": 4,
+  "authorized_remaining": 14,
+  "semantic_turns": 2,
+  "automatic_retries": 0,
+  "explicit_resumes": 0,
+  "turn1": "UI/current/exactcopy passed",
+  "turn2": "HTTP502 invalid_model_output after commit; ENrev2/brief2/newchildnullage/pending preserved; all response content arrays empty, only valid labels",
+  "failure_class": "empty substantive output; not malformed labels or lost state",
+  "root_cause": "GenerationRequest/Codex adapter does not provide output schema; domain schema defaults allow label-only JSON structurally, meaningful consumer guard correctly rejects",
+  "decision": "Stop actual run, preserve failure/counters and14remaining; implement strict-compatible structured response schema through existing bounded call, no semantic guard weakening. No further request yet.",
+  "next_budget_decision": "After fixed code and review, prefer transfer14 plus explicit increment4 into one freshmax18 acceptance; increment not approved.",
+  "evidence": [
+    "remediation-5-live-run/observations.jsonl",
+    "namespace5-runtime-events.jsonl"
+  ],
+  "raw_synthetic_capture": "private only; no content published",
+  "screenshots": "local only"
+}

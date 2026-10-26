@@ -1,12 +1,12 @@
 {
-  "state": "reviewed_objects_prepared_ref_update_pending",
+  "state": "reviewed_source_objects_prepared_checkpoint",
   "repository": "stayleadqst/staylead-platform",
   "branch": "sprint-6-multilingual",
-  "remote_ref_expected": "f877fff0a23633e4940ac5b9266370fc8fc03c17",
-  "reviewed_product_local": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
+  "current_published_head": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
+  "reviewed_product_local": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
   "prepared_parent": {
-    "sha": "746fdcbc72cc01ec2aa9447545fa6dbc728b2115",
-    "tree": "90c69d158f37dec47b72a521706d11095c303715"
+    "sha": "f4d9407794e3c96f1ddebb2ca80095c3c05962ac",
+    "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca"
   },
   "mappings": [
     {
@@ -85,8 +85,26 @@
       "local_sha": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
       "remote_sha": "746fdcbc72cc01ec2aa9447545fa6dbc728b2115",
       "tree": "90c69d158f37dec47b72a521706d11095c303715"
+    },
+    {
+      "local_sha": "1bcb8a1",
+      "remote_sha": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
+      "tree": "314361400f72a3b6c876a71b3708650edfdd1b09"
+    },
+    {
+      "local_sha": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
+      "remote_sha": "f4d9407794e3c96f1ddebb2ca80095c3c05962ac",
+      "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca"
     }
   ],
-  "screenshots": "Local only by explicit Hieu instruction;15image bytes excluded. Local a6b7e08 containing images not included in remote parent chain.",
-  "final_ref_receipt": "Coordinator verifies remote ref and equal tree after metadata commit; final task response records publication outcome."
+  "screenshots": "all local only per user instruction; no image bytes added to publication chain",
+  "budget": {
+    "prior_namespaces_actual": 38,
+    "namespace5_used": 4,
+    "namespace5_remaining": 14,
+    "cumulative_actual": 42,
+    "namespace6_increment_requested": 4,
+    "namespace6_increment_approved": false
+  },
+  "note": "This is a publication checkpoint before moving branch ref; coordinator verifies final equal tree and records receipt outside Git."
 }

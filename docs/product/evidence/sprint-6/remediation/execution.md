@@ -4,17 +4,17 @@ Authority: Hieu requested continuing Sprint6 under `docs/execution/Sprint-Execut
 
 | Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
-| Language, grounding and answer contract | A `/root/backend` — gpt-6-luna/high | Candidate b9abb91 implemented, verified and reviewed | C82 contracts/architecture +4PG/API +Ruff/compile; Q77focused and probes PASS | Await actual-model confirmation of source-bound clarification, courtesy translation and relevance |
+| Language, grounding and answer contract | A `/root/backend` — gpt-6-luna/high | Candidate e9424bc implemented, verified and reviewed | C99 contracts/architecture +4PG/API +17runtime +Ruff/compile; Q84focused/Ajv schema/Foundry probes PASS | Await actual-model confirmation of source-bound clarification, courtesy translation and relevance |
 | Consumer and bounded harness | B `/root/frontend` — gpt-6-luna/high | Recovery fixed; NS5 mapping prepared, inactive | 36web/15state/build and browser recovery proof; runtime16 tests; helper14 + actual PG preflight | Reuse production web; no new calls or initialization without allowance |
-| Independent review | Q `/root/remediation_review` — gpt-6.1-sol/high | b9abb91 reviewed; no blocking code finding | Targeted boundary checks, actual evidence review | Both punctuation/freshness findings closed; actual matrix still required |
-| Integration, actual acceptance and delivery | C `/root` — runtime model/effort unavailable | NS4 closed at18requests/9semantic; report/backlog updated | UI T1–5/current/exactcopy; API7–9 diagnostics; read-only final DB snapshot | Source correction complete; explicit new max18-request allowance requested, pending |
+| Independent review | Q `/root/remediation_review` — gpt-6.1-sol/high | e9424bc reviewed; no concrete code finding | Targeted boundary checks, actual evidence review | Both punctuation/freshness findings closed; actual matrix still required |
+| Integration, actual acceptance and delivery | C `/root` — runtime model/effort unavailable | NS5 stopped4/18requests,2semantic; priorNS4closed18/18 | UI T1–5/current/exactcopy; API7–9 diagnostics; read-only final DB snapshot | Structured output correction complete; increment4+transfer14 requested, pending |
 
 One writer per file: A backend/tests, B web+harness, C reports/runtime/publication; Q read-only. Maximum four concurrent agents. No reporting-only agent. Reuse unchanged gates and fixtures. Root independently verifies affected consumer behavior before Done.
 
 ## Actual accounting
 
-- Original2, NS1four, NS2six, NS3eight, NS4eighteen = **38 provider requests**. NS1/2 had one explicit receipt resume each; zero automatic retries. Do not combine successful subsets from changing candidates into full-matrix PASS.
-- User explicitly granted NS2 max18, NS3 increment6+transfer12, NS4 increment8+transfer10. Old unused allowances closed when transferred; NS4 exhausted and live disabled. No NS5 allowance yet, no NS5 private files initialized.
+- Original2, NS1four, NS2six, NS3eight, NS4eighteen, NS5four = **42 provider requests**. NS1/2 had one explicit receipt resume each; zero automatic retries. Do not combine successful subsets from changing candidates into full-matrix PASS.
+- User explicitly granted NS2 max18, NS3 increment6+transfer12, NS4 increment8+transfer10. Old unused allowances closed when transferred; NS4 exhausted and live disabled. NS5 max18 explicitly approved and ran4;14remain untouched. NS6 mapping prepared only; increment4/transfer14 pending, no privateNS6files or calls.
 - Same model `gpt-6-luna/low`, CodexCLI0.153.4; max2calls/HTTP turn,25s/provider,45s/turn,700-token postcheck. Actual served model, total tokens/billing and agent token/cache metrics unavailable. Native pre-generation hard cap not verified.
 - NS4 UI1–6 used f52; API diagnostics7–9 used product559/helper0227. Original manifests and failures preserved. UI1–5 passed; T6 URL binding rejected correctly; T7 wrong numeric choices rejected; T8 state correct with irrelevant false unknowns; T9 empty output rejected. These are diagnostic results, not fixed-candidate acceptance.
 

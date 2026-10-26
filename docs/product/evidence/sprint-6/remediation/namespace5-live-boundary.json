@@ -1,0 +1,43 @@
+{
+  "at_utc": "2026-10-26T04:47:12.992823+00:00",
+  "authority": "Hieu explicit answer: Cho ph\u00e9p batch m\u1edbi t\u1ed1i \u0111a18 requests; call_f7f19c96771443139def9b2a7a88d540",
+  "candidate_commit": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
+  "tree": "314361400f72a3b6c876a71b3708650edfdd1b09",
+  "product_fingerprint": "0fe907c46071fa596a8df57f292ff33621ae6d79f31b93f602292153a9d24769",
+  "harness_sha256": {
+    "resumed_acceptance_runtime.py": "d36c1b9f0ec3434a09954b6a1d2d072f11533a10aa5fbbc6426de654f9cca0b7",
+    "resumed-live-browser.mjs": "58ce38b47cc793c2a0b5d8d09f8bc866f7df689b766c9c63441492098c248014",
+    "operator-resume-routing.mjs": "dde4f275842d3aaed7f85f351f2db980697afa0e57b063d9dd552acacc8dd6dc",
+    "safe-answer-trace.mjs": "6290d39a425c8e50947bf1e7ced0fa37bfe773f77d9fe2d050cb4a64c42551cc"
+  },
+  "matrix_sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07",
+  "requested_model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "actual_served_model": "unreported",
+  "max_guest_turns": 9,
+  "max_provider_requests": 18,
+  "max_calls_per_http_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_token_postcheck": 700,
+  "native_hard_output_token_cap_verified": false,
+  "automatic_retries": false,
+  "operator_answer_only_resume": "explicit C command only; same global18 cap; separate persistent receipt reservation",
+  "historic_run_counters": "immutable:1semantic turn,2provider requests; not reused/reset",
+  "synthetic_capture": "opt-in,64KiB limit,private0600; never published raw",
+  "prelive_review": "Q no blocking code findings b9abb91; C82contracts/architecture,4PGAPI,Ruff/compilePASS; Q77tests/probesPASS",
+  "configuration": "isolated local synthetic DB/newuniqueguest session; rebuilt productionweb; no deployment",
+  "run_id": "s6-codex-20261026-remediation-5",
+  "prior_actual_provider_requests": {
+    "original": 2,
+    "namespace1": 4,
+    "namespace2": 6,
+    "namespace3": 8,
+    "namespace4": 18
+  },
+  "fixed_candidate_sequence": true,
+  "transferred_existing_request_slots": 0,
+  "newly_approved_request_slots": 18,
+  "prior_cumulative_provider_requests": 38,
+  "screenshots": "local only; do not upload"
+}

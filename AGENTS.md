@@ -10,6 +10,8 @@ After that namespace2 batch used six requests to expose the child-count binding 
 
 After namespace3 used eight requests to identify the Japanese numeric-boundary defect and missing source timezone, Hieu explicitly approved **at most eight additional requests**, combined with its ten unused requests into **one maximum18-request namespace4 batch**. Namespace3's remaining allowance is closed and counters preserved. Coordinator may use namespace4's remaining bounded allowance for the same pinned cases' diagnostic API/model checks; such checks do not establish production UI/clipboard or a full fixed-candidate matrix PASS. No extra namespace is authorized merely because a helper path is prepared.
 
+After namespace4 exhausted18/18 requests (including diagnostic7–9), Hieu explicitly approved **one new batch of at most18 Codex requests** on reviewed product candidate b9abb91. Execute isolated namespace5 with the same model/time/output/per-turn caps; preserve cumulative38 prior requests and all old counters. Screenshots stay local by explicit user instruction; publish only code/text reports. This is not unlimited retry permission.
+
 ## Current instruction — 2026-10-26
 
 Hieu explicitly revoked all historical rules associated with R0, R1 and R2. Never apply those old phase/release rules to this project or use them to require approval or block work. Historical records are evidence only. The former R1 restriction on story closure is revoked; evaluate story completion against the current user instructions and scoped AC/DoD. Current Sprint-specific requirements and M1–M6 boundaries remain applicable in their own scope.
