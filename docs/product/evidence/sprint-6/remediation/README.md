@@ -22,6 +22,9 @@ the pinned matrix `staylead-s6-nine-turn-multilingual-20261026-v1`.
   and screenshot. The browser stays open for C's explicit recovery decision; the
   driver never submits another turn after a failure. The run remains bounded by
   the same persistent server counters during any operator-led recovery.
+- A `partial_success` response with an HTTP error status (including HTTP 502)
+  remains resumable when its raw receipt is present in memory. The receipt is
+  hashed in evidence; the raw value is never serialized.
 - A fresh browser profile creates a new unique guest session. Do not reuse the
   previous run's browser profile, database session, or state file.
 
@@ -95,6 +98,7 @@ or raw configuration are added to normal event logs.
 
 ```sh
 python3 docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py -v
+node --test docs/product/evidence/sprint-6/remediation/test_operator_resume_routing.mjs
 node --check docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs
 ```
 

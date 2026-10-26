@@ -31,6 +31,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import threading
 import time
@@ -222,9 +223,22 @@ def _capture_synthetic_json(text: str, common: dict[str, Any]) -> dict[str, Any]
         "body_json": parsed,
     }
     CAPTURE_DIR.mkdir(mode=0o700, parents=True, exist_ok=True)
-    with capture_file.open("x", encoding="utf-8") as stream:
-        stream.write(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
-    capture_file.chmod(0o600)
+    if CAPTURE_DIR.is_symlink() or not stat.S_ISDIR(CAPTURE_DIR.lstat().st_mode):
+        return {"capture_status": "refused_unsafe_capture_directory", "response_bytes": len(encoded)}
+    CAPTURE_DIR.chmod(0o700)
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        descriptor = os.open(capture_file, flags, 0o600)
+    except FileExistsError:
+        return {"capture_status": "refused_existing_capture", "response_bytes": len(encoded)}
+    os.fchmod(descriptor, 0o600)
+    stream = os.fdopen(descriptor, "w", encoding="utf-8")
+    try:
+        with stream:
+            stream.write(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
+    except Exception:
+        capture_file.unlink(missing_ok=True)
+        raise
     return {"capture_status": "captured_private", "capture_bytes": len(encoded), "capture_file": capture_file.name}
 
 

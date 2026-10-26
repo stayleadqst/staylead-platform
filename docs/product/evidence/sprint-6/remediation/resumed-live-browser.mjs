@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Fresh one-session driver for the resumed Sprint 6 nine-turn acceptance batch.
- * It never mocks the API, retries, resumes, reloads, or logs session tokens.
+ * It never mocks the API or automatically retries/resumes/reloads, and never
+ * logs session tokens. C may explicitly command one visible answer-only resume.
  * On failure, it saves evidence and holds the visible session for a C decision.
  *
  *   node docs/product/evidence/sprint-6/remediation/resumed-live-browser.mjs
@@ -15,6 +16,7 @@ import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
+import { shouldOfferOperatorResume } from "./operator-resume-routing.mjs";
 
 const { chromium } = await import(pathToFileURL(
   "/Users/ccvn/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs",
@@ -255,7 +257,7 @@ let keepBrowserOpen = false;
 const attemptedResumeReceipts = new Set();
 let resumeObservationIndex = 0;
 
-async function pauseForExplicitAnswerResume(turnCase, partialApi) {
+async function pauseForExplicitAnswerResume(turnCase, partialApi, rawReceiptId) {
   keepBrowserOpen = true;
   const terminal = createInterface({ input: stdin, output: stdout });
   try {
@@ -277,11 +279,11 @@ async function pauseForExplicitAnswerResume(turnCase, partialApi) {
         console.log("No command submitted. Only continue, snapshot, or close is accepted.");
         continue;
       }
-      if (partialApi.status !== "partial_success" || !partialApi.brief_receipt?.request_id) {
+      if (partialApi.status !== "partial_success" || typeof rawReceiptId !== "string" || !rawReceiptId) {
         console.log("This response has no resumable partial receipt; no request was sent.");
         continue;
       }
-      const receiptHash = hashIdentifier(partialApi.brief_receipt.request_id);
+      const receiptHash = hashIdentifier(rawReceiptId);
       if (attemptedResumeReceipts.has(receiptHash)) {
         console.log("This receipt was already explicitly continued once in this browser; no duplicate request was sent.");
         continue;
@@ -411,6 +413,8 @@ try {
     let rawResponse = null;
     try { rawResponse = response ? await response.json() : { request_error: requestIssue }; } catch { rawResponse = { parse_error: true }; }
     let api = safeApiResponse(rawResponse);
+    const operatorResumeReceiptId = typeof rawResponse?.brief_receipt?.request_id === "string"
+      ? rawResponse.brief_receipt.request_id : null;
     const httpStatus = response?.status() ?? 0;
 
     let rendered = null;
@@ -489,12 +493,11 @@ try {
       stopReason = `turn ${turnCase.turn} did not receive an API response`;
       break;
     }
-    if (httpStatus >= 400) {
-      stopReason = `turn ${turnCase.turn} returned HTTP ${httpStatus}`;
-      break;
-    }
-    if (outputIssue && api.status === "partial_success" && api.brief_receipt?.request_id) {
-      const resumed = await pauseForExplicitAnswerResume(turnCase, api);
+    const resumablePartial = shouldOfferOperatorResume({
+      responseReceived: Boolean(response), httpStatus, apiStatus: api.status, receiptId: operatorResumeReceiptId,
+    });
+    if (resumablePartial) {
+      const resumed = await pauseForExplicitAnswerResume(turnCase, api, operatorResumeReceiptId);
       if (!resumed.ok) {
         stopReason = resumed.reason;
         break;
@@ -503,6 +506,10 @@ try {
       rendered = resumed.rendered;
       clipboard = resumed.clipboard;
       outputIssue = null;
+    }
+    if (httpStatus >= 400 && !resumablePartial) {
+      stopReason = `turn ${turnCase.turn} returned HTTP ${httpStatus}`;
+      break;
     }
     if (outputIssue) {
       stopReason = outputIssue;

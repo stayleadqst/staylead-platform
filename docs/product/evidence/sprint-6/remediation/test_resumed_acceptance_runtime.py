@@ -198,12 +198,30 @@ class RuntimeBoundsTests(unittest.TestCase):
                 result = runtime._capture_synthetic_json('{"answer":"synthetic"}', common)
                 self.assertEqual(result["capture_status"], "captured_private")
                 capture_path = capture_dir / "output-01.json"
+                self.assertEqual(capture_dir.stat().st_mode & 0o777, 0o700)
                 self.assertEqual(capture_path.stat().st_mode & 0o777, 0o600)
                 saved = json.loads(capture_path.read_text(encoding="utf-8"))
                 self.assertEqual(saved["body_json"], {"answer": "synthetic"})
                 self.assertEqual(saved["body_text"], '{"answer":"synthetic"}')
                 self.assertNotIn("LEAK", capture_path.read_text(encoding="utf-8"))
                 self.assertEqual(runtime._capture_synthetic_json('{"answer":"again"}', common)["capture_status"], "refused_existing_capture")
+
+    def test_capture_refuses_symlink_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "target"
+            target.mkdir()
+            capture_dir = root / "capture"
+            capture_dir.symlink_to(target, target_is_directory=True)
+            env = {
+                "STAYLEAD_S6_CAPTURE_SYNTHETIC_JSON": "1",
+                "STAYLEAD_S6_SYNTHETIC_MATRIX_ID": runtime.MATRIX_ID,
+            }
+            common = {"guest_turn": 1, "attempt": 1, "synthetic_pinned": True, "request_shape": {}}
+            with patch.object(runtime, "CAPTURE_DIR", capture_dir), patch.dict(os.environ, env, clear=True):
+                result = runtime._capture_synthetic_json('{"answer":"synthetic"}', common)
+            self.assertEqual(result["capture_status"], "refused_unsafe_capture_directory")
+            self.assertEqual(list(target.iterdir()), [])
 
     def test_capture_refuses_non_pinned_turn_even_with_opt_in(self):
         with tempfile.TemporaryDirectory() as directory:
