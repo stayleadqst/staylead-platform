@@ -265,6 +265,26 @@ def test_lexical_supported_question_uses_one_call_and_never_crosses_hotel() -> N
     assert "F-HTL-BEACH02-040" not in answer.retrieval_fact_ids
 
 
+def test_committed_language_is_authoritative_for_resumed_answer_not_historical_request() -> None:
+    provider = FakeProvider()
+    orchestrator = build(provider)
+    asyncio.run(orchestrator.answer_committed_turn(
+        hotel_id="HTL-CITY01",
+        question="Please answer in French: when is breakfast?",
+        history=[{"role": "user", "content": "Please answer in French."}],
+        brief=GuestBriefSnapshot(brief_version=0, data={}),
+        preferred_language_tag="ja",
+    ))
+
+    request = provider.calls[-1]
+    assert "'ja'" in request.instructions
+    assert "is authoritative for this answer" in request.instructions
+    assert "Do not override it based on a language request" in request.instructions
+    assert "different explicit_language_tag" in request.instructions
+    assert "unless this guest explicitly requests a different response language" not in request.instructions
+    assert json.loads(request.input_text)["question"].startswith("Please answer in French")
+
+
 def test_guest_question_number_cannot_authorize_unsupported_model_number() -> None:
     provider = FakeProvider(answer={
         "supported_claims": [{
