@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -69,7 +70,7 @@ def test_saved_response_is_allowlisted_and_drops_credentials_and_unknown_fields(
             "brief_version": 5,
             "dates": {"check_in": "2026-12-10", "check_out": "2026-12-15"},
             "party": {"adults": 2, "children": [
-                {"age": 7, "member_id": "private-id", "member_id_sha256": "0123456789abcdef"},
+                {"age": 7, "member_id": "private-id"},
             ]},
             "pending_fields": [],
             "session_id": "private-session",
@@ -84,5 +85,5 @@ def test_saved_response_is_allowlisted_and_drops_credentials_and_unknown_fields(
     assert result["evidence"] == [{"fact_id": "F-1", "source_id": "S-1"}]
     assert result["trace"] == {"answer_validation": "fully_validated", "guest_claims_rejected": 0}
     assert result["guest_brief"]["party"]["children"] == [
-        {"age": 7, "member_id_sha256": "0123456789abcdef"}
+        {"age": 7, "member_id_sha256": hashlib.sha256(b"private-id").hexdigest()[:16]}
     ]

@@ -91,7 +91,7 @@ def _verify_prior_turn_count(actual: int, expected: int) -> None:
 def _resolve_session(database_url: str, request_hash: str, expected_guest_turns: int) -> tuple[str, str]:
     from sqlalchemy import select
     from staylead_platform.infrastructure.database import create_database_engine
-    from staylead_platform.infrastructure.persistence.store import guest_messages, hotels, requests, sessions
+    from staylead_platform.infrastructure.persistence.store import hotels, requests, sessions
 
     engine = create_database_engine(database_url)
     try:
@@ -111,16 +111,15 @@ def _resolve_session(database_url: str, request_hash: str, expected_guest_turns:
                 .join(hotels, hotels.c.hotel_id == sessions.c.hotel_id)
                 .where(sessions.c.session_id == session_id, sessions.c.hotel_id == "HTL-CITY01")
             ).mappings().one_or_none()
-            turns = connection.execute(
-                select(guest_messages.c.message_id).where(
-                    guest_messages.c.session_id == session_id,
-                    guest_messages.c.hotel_id == "HTL-CITY01",
-                    guest_messages.c.role == "user",
+            prior_requests = connection.execute(
+                select(requests.c.request_id).where(
+                    requests.c.session_id == session_id,
+                    requests.c.hotel_id == "HTL-CITY01",
                 )
             ).all()
             if scoped is None or scoped["synthetic"] is not True:
                 raise ValueError("Resolved DB session failed synthetic scope checks.")
-            _verify_prior_turn_count(len(turns), expected_guest_turns)
+            _verify_prior_turn_count(len(prior_requests), expected_guest_turns)
             return str(session_id), "HTL-CITY01"
     finally:
         engine.dispose()
@@ -194,8 +193,12 @@ def safe_response(payload: Any) -> dict[str, Any]:
                     ):
                         continue
                     safe_child = {"age": child["age"]}
+                    member_id = child.get("member_id")
+                    if isinstance(member_id, str) and member_id:
+                        safe_child["member_id_sha256"] = _hash(member_id)[:16]
                     member_hash = child.get("member_id_sha256")
-                    if isinstance(member_hash, str) and re.fullmatch(r"[a-f0-9]{16,64}", member_hash):
+                    if ("member_id_sha256" not in safe_child and isinstance(member_hash, str)
+                            and re.fullmatch(r"[a-f0-9]{16,64}", member_hash)):
                         safe_child["member_id_sha256"] = member_hash
                     safe_children.append(safe_child)
                 party_safe["children"] = safe_children
