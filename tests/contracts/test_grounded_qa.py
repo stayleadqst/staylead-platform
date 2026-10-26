@@ -717,3 +717,38 @@ def test_answer_brief_refs_are_validated_and_pure_faq_stays_independent() -> Non
         asyncio.run(build(invalid_provider).answer_committed_turn(
             hotel_id="HTL-CITY01", question="What did I tell you?", history=[], brief=brief,
         ))
+
+
+def test_committed_guest_claims_preserve_canonical_date_and_number_literals() -> None:
+    brief = GuestBriefSnapshot(1, {
+        "dates": {"check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3},
+        "party": {"adults": 2, "children": []},
+    })
+    refs = ["dates.check_in", "dates.check_out", "dates.nights", "party.adults"]
+    old_captured_shape = {
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{
+            "text": "Your stay is 10/12/2026 to 13/12/2026, 3 nights, for 2 adults.",
+            "refs": refs,
+        }],
+    }
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(FakeProvider(answer=old_captured_shape)).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="Confirm my stay details", history=[], brief=brief,
+            selected_fact_ids=(),
+        ))
+
+    canonical_shape = {
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_claims": [{
+            "text": "Your stay is 2026-12-10 to 2026-12-13, 3 nights, for 2 adults.",
+            "refs": refs,
+        }],
+    }
+    provider = FakeProvider(answer=canonical_shape)
+    answer = asyncio.run(build(provider).answer_committed_turn(
+        hotel_id="HTL-CITY01", question="Confirm my stay details", history=[], brief=brief,
+        selected_fact_ids=(),
+    ))
+    assert "2026-12-10 to 2026-12-13, 3 nights, for 2 adults" in answer.answer
+    assert "exact `YYYY-MM-DD`" in provider.calls[0].instructions
