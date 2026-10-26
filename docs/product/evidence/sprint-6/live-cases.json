@@ -132,7 +132,7 @@
     {
       "turn": 4,
       "input_language": "ja",
-      "utterance": "日本語で回答してください。朝食は何時からで、どこで提供されますか？",
+      "utterance": "日本語で回答してください。その朝食は何時からで、どこで提供されますか？",
       "explicit_preference": "ja",
       "expected_presentation": {"language_tag": "ja", "direction": "ltr", "preference_revision": 4},
       "expected_preference_state": {"language_tag": "ja", "source": "explicit", "revision": 4},
