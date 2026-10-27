@@ -158,3 +158,12 @@ class KnowledgeRetriever:
         # list_guest_facts is bounded by the repository limit; final prompt size is checked
         # by the orchestrator, so conflict versions are never silently truncated here.
         return tuple(_include_conflict_versions(all_facts, selected))
+
+    def list_current_facts(
+        self, hotel_id: str, *, limit: int = 400, timeout_seconds: float | None = None,
+    ) -> tuple[dict[str, Any], ...]:
+        """Return the bounded, repository-filtered current guest fact projection."""
+        facts = self._repository.list_guest_facts(
+            hotel_id, limit=min(max(limit, 1), 400), timeout_seconds=timeout_seconds,
+        )
+        return tuple(self._wire(fact) for fact in facts)

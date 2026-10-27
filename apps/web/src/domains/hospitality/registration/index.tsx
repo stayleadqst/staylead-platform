@@ -1,7 +1,32 @@
 import type { DomainRegistration, GuestBriefRendererProps } from "@/composition/domain_registry";
 import { HospitalityLanding } from "@/domains/hospitality/landing/HospitalityLanding";
 import { formatHospitalityBriefDelta } from "@/domains/hospitality/registration/brief-format";
+import { HospitalityTurnResultRenderer } from "@/domains/hospitality/registration/turn-result-renderer";
 import { ENGLISH_LABELS } from "@/shared/chat/presentation";
+import { selectGuestRoomAdviceOption } from "@/shared/api/client";
+
+type RoomAdviceIdentity = Readonly<{ result_id: string; result_version: number }>;
+function roomAdviceIdentity(value: unknown): RoomAdviceIdentity | null {
+  if (!value || typeof value !== "object") return null;
+  const result = value as Record<string, unknown>;
+  return typeof result.result_id === "string" && typeof result.result_version === "number"
+    ? { result_id: result.result_id, result_version: result.result_version }
+    : null;
+}
+
+function attachRoomSelection(response: unknown, result: unknown, selection: unknown): unknown {
+  if (!response || typeof response !== "object") return response;
+  const responseRecord = response as Record<string, unknown>;
+  const current = responseRecord.room_advice;
+  const resultIdentity = roomAdviceIdentity(result);
+  const selectionRecord = selection && typeof selection === "object" ? selection as Record<string, unknown> : null;
+  if (!current || typeof current !== "object" || !resultIdentity || !selectionRecord
+    || selectionRecord.result_id !== resultIdentity.result_id
+    || selectionRecord.result_version !== resultIdentity.result_version) return response;
+  const currentRecord = current as Record<string, unknown>;
+  if (currentRecord.result_id !== resultIdentity.result_id) return response;
+  return { ...responseRecord, room_advice: { ...currentRecord, selection: selectionRecord } };
+}
 
 function HospitalityAnswerRenderer({ answer }: { answer: string }) {
   return <p className="guest-answer-text">{answer}</p>;
@@ -66,6 +91,18 @@ export const hospitalityRegistration: DomainRegistration = {
   landing: HospitalityLanding,
   answerRenderer: HospitalityAnswerRenderer,
   guestBriefRenderer: HospitalityGuestBriefRenderer,
+  turnResultRenderer: HospitalityTurnResultRenderer,
+  turnResultActions: {
+    selectOption: async ({ sessionId, accessToken, result, optionId, target }) => {
+      const identity = roomAdviceIdentity(result);
+      if (!identity) throw new Error("The selected option is unavailable.");
+      return selectGuestRoomAdviceOption({
+        sessionId, accessToken, resultId: identity.result_id, resultVersion: identity.result_version,
+        optionId, target,
+      });
+    },
+    attachSelection: attachRoomSelection,
+  },
   themeClass: "theme-hospitality",
   content: {
     brand: "StayLead · Hospitality",

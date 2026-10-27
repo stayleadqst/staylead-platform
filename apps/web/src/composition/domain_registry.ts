@@ -13,6 +13,24 @@ export type GuestBriefRendererProps = Readonly<{
   delta?: unknown;
   labels?: Readonly<Record<string, string>>;
 }>;
+export type GuestTurnResultRendererProps = Readonly<{
+  response: unknown | null;
+  bookingChannel: unknown;
+  languageTag: string;
+  stale: boolean;
+  freshnessError: boolean;
+  selectionDisabled: boolean;
+  pendingOptionId: string | null;
+  selectionError: string;
+  onSelectOption: (turnId: string, result: unknown, optionId: string) => void;
+  turnId?: string;
+}>;
+export type TurnResultActions = Readonly<{
+  selectOption: (args: Readonly<{
+    sessionId: string; accessToken: string; result: unknown; optionId: string; target: DomainTarget;
+  }>) => Promise<unknown>;
+  attachSelection: (response: unknown, result: unknown, selection: unknown) => unknown;
+}>;
 
 export type DomainRegistration = Readonly<{
   domain: string;
@@ -21,6 +39,8 @@ export type DomainRegistration = Readonly<{
   landing: ComponentType;
   answerRenderer: ComponentType<AnswerRendererProps>;
   guestBriefRenderer: ComponentType<GuestBriefRendererProps>;
+  turnResultRenderer: ComponentType<GuestTurnResultRendererProps>;
+  turnResultActions?: TurnResultActions;
   themeClass: string;
   content: Readonly<{
     brand: string;

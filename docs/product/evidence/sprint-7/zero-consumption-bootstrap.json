@@ -1,0 +1,11 @@
+{
+  "bootstrap": "missing compatible headless browser binary; no guest/model attempt",
+  "failed_browser_report": "/private/tmp/staylead-s7-browser-s7-room-advice-20261026-batch1-bootstrap-missing-chromium/browser-report.json",
+  "guest_turns": 0,
+  "codex_requests": 0,
+  "state_reset": false,
+  "source_candidate_changed": false,
+  "candidate_sha256": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "recovery": "installed Playwright chromium-headless-shell v1234; samecandidate browser startup only",
+  "allowance_change": false
+}

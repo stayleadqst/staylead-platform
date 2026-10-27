@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import time
 import uuid
 from dataclasses import asdict, replace
 from datetime import UTC, datetime, timedelta
 from threading import Event
 from typing import Any
+from urllib.parse import urlsplit
 
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
@@ -22,6 +24,7 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     FACT_SELECTION_INSTRUCTIONS,
     GROUNDED_QA_INSTRUCTIONS,
 )
+from staylead_platform.domains.hospitality.recommendations.rooms import HospitalityRoomAdvice
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
@@ -63,14 +66,18 @@ from staylead_platform.infrastructure.persistence.store import (
     get_guest_brief,
     get_guest_brief_receipt,
     get_guest_brief_source_utterance,
+    get_hotel_by_id,
     get_hotel_by_slug,
     get_language_preference,
+    get_room_advice_result,
     get_session,
     recent_messages,
     reserve_request,
+    save_room_advice_result,
+    select_room_advice_option,
     validate_evidence_current,
 )
-from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError
+from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError, Usage
 from staylead_platform.platform.contracts.guest_brief import GuestBriefContext, GuestBriefSnapshot
 from staylead_platform.platform.contracts.knowledge import (
     ActiveKnowledgeSnapshot,
@@ -80,7 +87,9 @@ from staylead_platform.platform.contracts.knowledge import (
     SourceVersionRef,
 )
 from staylead_platform.platform.contracts.language import language_direction, normalize_language_tag
+from staylead_platform.platform.contracts.room_advice import RoomAdviceContext, RoomAdviceResult
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
+    ConversationAnswer,
     ConversationFailure,
     GroundedQAOrchestrator,
 )
@@ -104,6 +113,89 @@ MEDIA_MAX_BYTES = {"image/png": 5 * 1024 * 1024, "video/mp4": 20 * 1024 * 1024, 
 
 def _validation_diagnostics_enabled(settings: Settings) -> bool:
     return bool(settings.validation_diagnostics) and settings.environment.lower() in {"development", "test"}
+
+
+def _booking_channel(settings: Settings, hotel_slug: str) -> dict[str, Any]:
+    """Return only server-configured booking details; never derive a target from facts or chat."""
+    raw_url = settings.booking_destination_by_hotel.get(hotel_slug)
+    destination: str | None = None
+    if isinstance(raw_url, str) and len(raw_url) <= 2048:
+        try:
+            parsed = urlsplit(raw_url)
+            if (raw_url == raw_url.strip() and not any(char.isspace() or ord(char) < 32 for char in raw_url)
+                    and "\\" not in raw_url and parsed.scheme.lower() == "https"
+                    and parsed.hostname and parsed.username is None and parsed.password is None
+                    and not parsed.query and not parsed.fragment and parsed.port in (None, 443)):
+                destination = raw_url
+        except ValueError:
+            destination = None
+    contact = settings.booking_contact_by_hotel.get(hotel_slug)
+    safe_contact = contact.strip()[:240] if isinstance(contact, str) and contact.strip() else None
+    synthetic = bool(destination and urlsplit(destination).hostname and urlsplit(destination).hostname.endswith(".example"))
+    return {
+        "destination_url": destination,
+        "contact": safe_contact,
+        "destination_kind": "synthetic_demo" if synthetic else "configured",
+    }
+
+
+def _room_advice_json(result: RoomAdviceResult) -> dict[str, Any]:
+    value = asdict(result)
+    # Make the serialized representation JSON-native so PostgreSQL and replay use
+    # the exact same checked snapshot that the web client receives.
+    return json.loads(json.dumps(value, ensure_ascii=False, allow_nan=False))
+
+
+def _booking_channel_only_answer(turn_intents: tuple[str, ...], preparation: Any | None = None) -> ConversationAnswer:
+    """Create an empty safe turn answer after trusted booking intent classification."""
+    return ConversationAnswer(
+        answer="", citations=(), unknowns=(), provider=getattr(preparation, "provider", None) or "server",
+        deployment=getattr(preparation, "deployment", None) or "server-generated",
+        model=getattr(preparation, "model", None), provider_request_id=None, usage=Usage(), retrieval_fact_ids=(), calls=0,
+        provider_request_ids=(), turn_intents=turn_intents,
+    )
+
+
+def _room_advice_source_refs(result: RoomAdviceResult, snapshot: ActiveKnowledgeSnapshot,
+                            facts: tuple[dict[str, Any], ...]) -> list[dict[str, Any]]:
+    trusted_sources = {source.source_id: source for source in snapshot.sources}
+    trusted_facts = {fact.get("fact_id"): fact for fact in facts}
+    grouped: dict[str, set[str]] = {}
+    for raw in result.source_refs:
+        item = asdict(raw) if not isinstance(raw, dict) and hasattr(raw, "__dataclass_fields__") else dict(raw)
+        source = item.get("source") if isinstance(item.get("source"), dict) else item
+        source_id = source.get("source_id")
+        trusted = trusted_sources.get(source_id)
+        if trusted is None or trusted.hotel_id != snapshot.hotel_id:
+            raise StaleSource("room advice cited an unknown hotel source")
+        if (source.get("source_version", source.get("version")) != trusted.source_version
+                or source.get("source_hash", trusted.source_hash) != trusted.source_hash
+                or source.get("source_generation", source.get("hotel_generation", snapshot.generation)) != snapshot.generation):
+            raise StaleSource("room advice source reference does not match the active snapshot")
+        fact_ids = set(item.get("fact_ids", ()))
+        if item.get("fact_id"):
+            fact_ids.add(item["fact_id"])
+        if source.get("fact_id"):
+            fact_ids.add(source["fact_id"])
+        if not fact_ids:
+            raise StaleSource("room advice source reference is missing its supporting fact id")
+        if any(fact_id not in trusted_facts
+               or trusted_facts[fact_id].get("provenance", {}).get("source_id") != source_id
+               for fact_id in fact_ids):
+            raise StaleSource("room advice cited a fact outside the selected source-backed facts")
+        grouped.setdefault(source_id, set()).update(fact_ids)
+    refs: list[dict[str, Any]] = []
+    for source_id, fact_ids in sorted(grouped.items()):
+        source = trusted_sources[source_id]
+        refs.append({"source": {
+            "hotel_id": source.hotel_id, "source_id": source.source_id,
+            "hotel_generation": source.hotel_generation, "source_version": source.source_version,
+            "source_hash": source.source_hash, "status": source.status,
+            "guest_approved": source.guest_approved, "valid_from": source.valid_from,
+            "valid_to": source.valid_to, "last_failure": source.last_failure,
+            "last_success_at": source.last_success_at,
+        }, "fact_ids": sorted(fact_ids)})
+    return refs
 
 
 class GuestChatError(RuntimeError):
@@ -150,6 +242,7 @@ def create_guest_chat_application(
     selected_provider = provider if provider is not None else build_provider(settings)
     media_repository = PostgresMediaRepository(database)
     orchestrator = None
+    retriever = None
     if selected_provider:
         repository = PostgresKnowledgeFactRepository(database)
         retriever = KnowledgeRetriever(repository)
@@ -171,8 +264,9 @@ def create_guest_chat_application(
             committed_answer_validator=validate_committed_turn_channels,
             response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,
+            room_advice=HospitalityRoomAdvice(),
         )
-    return GuestChatApplication(settings, database, orchestrator, media_repository)
+    return GuestChatApplication(settings, database, orchestrator, media_repository, retriever)
 
 
 def _citation_reference(fact: dict[str, Any], source: SourceVersionRef) -> dict[str, Any]:
@@ -300,12 +394,13 @@ def _resume_marker(receipt_id: str) -> str:
 class GuestChatApplication:
     def __init__(
         self, settings: Settings, engine: Engine, orchestrator: GroundedQAOrchestrator | None,
-        media_repository: Any | None = None,
+        media_repository: Any | None = None, knowledge_retriever: KnowledgeRetriever | None = None,
     ) -> None:
         self._settings = settings
         self._engine = engine
         self._orchestrator = orchestrator
         self._media_repository = media_repository or PostgresMediaRepository(engine)
+        self._knowledge_retriever = knowledge_retriever
 
     def lookup_hotel(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -314,11 +409,75 @@ class GuestChatApplication:
             raise GuestChatError(503, "storage_unavailable", "Hotel lookup is unavailable.", retryable=True) from exc
         if not hotel:
             raise GuestChatError(404, "hotel_unavailable", "This hotel is not available.")
+        public_config = dict(hotel["public_config"])
+        public_config["booking_channel"] = _booking_channel(self._settings, hotel["slug"])
         return {
             "hotel_id": hotel["hotel_id"], "hotel_slug": hotel["slug"],
-            "public_config": hotel["public_config"], "config_version": hotel["config_version"],
+            "public_config": public_config, "config_version": hotel["config_version"],
             "guest_contract_version": "1",
         }
+
+    def _room_advice_scope(self, session_id: str, token: str) -> str:
+        if not self._settings.session_signing_secret:
+            raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
+        try:
+            claims = verify_token(token, secret=self._settings.session_signing_secret.get_secret_value())
+        except InvalidSessionToken as exc:
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
+        if claims.session_id != session_id:
+            raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
+        try:
+            session = get_session(self._engine, session_id)
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Session storage is unavailable.", retryable=True) from exc
+        if (not session or session["hotel_id"] != claims.hotel_id
+                or session["expires_at"] <= datetime.now(UTC)):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        return claims.hotel_id
+
+    def read_room_advice(self, *, session_id: str, token: str) -> dict[str, Any]:
+        hotel_id = self._room_advice_scope(session_id, token)
+        try:
+            result = get_room_advice_result(self._engine, session_id=session_id, hotel_id=hotel_id)
+        except Exception as exc:
+            raise GuestChatError(503, "room_advice_unavailable", "Room advice could not be loaded.", retryable=True) from exc
+        if result is None:
+            raise GuestChatError(404, "room_advice_unavailable", "No room advice is available yet.")
+        return self._room_advice_response(result)
+
+    def choose_room_advice_option(
+        self, *, session_id: str, token: str, result_id: str,
+        result_version: int, option_id: str,
+    ) -> dict[str, Any]:
+        hotel_id = self._room_advice_scope(session_id, token)
+        try:
+            selection = select_room_advice_option(
+                self._engine, session_id=session_id, hotel_id=hotel_id,
+                result_id=result_id, expected_result_version=result_version, option_id=option_id,
+            )
+        except VersionConflict as exc:
+            raise GuestChatError(409, "room_advice_version_conflict", "This room suggestion changed. Refresh before choosing.") from exc
+        except StaleSource as exc:
+            raise GuestChatError(409, "room_advice_stale", "This room suggestion is out of date. Ask for an updated suggestion.") from exc
+        except ScopeError as exc:
+            raise GuestChatError(404, "room_advice_unavailable", "This room option is not available in this chat.") from exc
+        except Exception as exc:
+            raise GuestChatError(503, "room_advice_unavailable", "The room option could not be saved.", retryable=True) from exc
+        return selection
+
+    @staticmethod
+    def _room_advice_response(record: dict[str, Any]) -> dict[str, Any]:
+        payload = dict(record["payload"])
+        payload.update({
+            "result_id": record["result_id"], "session_id": record["session_id"],
+            "hotel_id": record["hotel_id"], "result_version": record["result_version"],
+            "brief_version": record["brief_version"], "source_generation": record["source_generation"],
+            "config_version": record["config_version"], "policy_version": record.get("policy_version"),
+            "price_version": record.get("price_version"),
+            "dependency_fingerprint": record["dependency_fingerprint"],
+            "currentness": record["currentness"], "selection": record.get("selection"),
+        })
+        return payload
 
     def read_media(
         self, *, session_id: str, token: str, media_id: str, generation: int,
@@ -400,12 +559,28 @@ class GuestChatApplication:
                 (current_language or {}).get("revision", 0)
                 != (stored.get("presentation") or {}).get("preference_revision", 0)
             )
+            room_advice_currentness = None
+            saved_room_advice = stored.get("room_advice")
+            if isinstance(saved_room_advice, dict) and isinstance(saved_room_advice.get("result_id"), str):
+                exact_room_result = get_room_advice_result(
+                    self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+                    result_id=saved_room_advice["result_id"],
+                )
+                room_advice_currentness = (
+                    exact_room_result.get("currentness") if exact_room_result is not None else "stale"
+                )
         except GuestChatError:
             raise
         except Exception as exc:
             raise GuestChatError(503, "freshness_unavailable", "Answer freshness could not be checked.", retryable=True) from exc
-        eligible = bool(freshness.get("eligible") and not brief_stale and not preference_stale)
-        return {"status": "current" if eligible else "stale", "answer_eligibility": "current" if eligible else "stale"}
+        room_stale = room_advice_currentness == "stale"
+        eligible = bool(freshness.get("eligible") and not brief_stale and not preference_stale and not room_stale)
+        return {
+            "status": "current" if eligible else "stale",
+            "answer_eligibility": "current" if eligible else "stale",
+            **({"room_advice_currentness": room_advice_currentness}
+               if room_advice_currentness is not None else {}),
+        }
 
     def open_session(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -426,9 +601,11 @@ class GuestChatApplication:
             secret=self._settings.session_signing_secret.get_secret_value(),
             session_id=session_id, hotel_id=hotel["hotel_id"], expires_at=int(expires_at.timestamp()),
         )
+        public_config = dict(hotel["public_config"])
+        public_config["booking_channel"] = _booking_channel(self._settings, hotel["slug"])
         return {
             "session_id": session_id, "access_token": token, "token_type": "Bearer",
-            "expires_at": expires_at.isoformat(), "hotel": hotel["public_config"],
+            "expires_at": expires_at.isoformat(), "hotel": public_config,
             "config_version": hotel["config_version"],
             "language_preference": _language_preference_payload(None),
         }
@@ -540,6 +717,36 @@ class GuestChatApplication:
             bindings = cached.get("evidence_bindings") or _evidence_bindings(
                 cached.get("evidence", []), cached.get("media", []),
             )
+            room_advice_stale = False
+            cached_advice = cached.get("room_advice")
+            if isinstance(cached_advice, dict) and isinstance(cached_advice.get("result_id"), str):
+                try:
+                    exact_room_result = await asyncio.to_thread(
+                        get_room_advice_result, self._engine,
+                        session_id=session_id, hotel_id=claims.hotel_id,
+                        result_id=cached_advice["result_id"], timeout_seconds=_remaining_seconds(deadline),
+                    )
+                except Exception as exc:
+                    raise GuestChatError(503, "freshness_unavailable", "Room advice freshness could not be checked.", retryable=True) from exc
+                if exact_room_result is None:
+                    room_advice_stale = True
+                    cached_advice = {**cached_advice, "currentness": "stale", "selection": None}
+                else:
+                    cached_advice = self._room_advice_response(exact_room_result)
+                    room_advice_stale = exact_room_result.get("currentness") != "current"
+                cached["room_advice"] = cached_advice
+                room_fact_ids = {
+                    fact_id for ref in (exact_room_result or {}).get("source_refs", [])
+                    for fact_id in (ref.get("fact_ids", []) if isinstance(ref, dict) else [])
+                }
+                if room_fact_ids:
+                    filtered_bindings = []
+                    for binding in bindings:
+                        raw = asdict(binding) if isinstance(binding, EvidenceBinding) else dict(binding)
+                        remaining_facts = set(raw.get("fact_ids", ())) - room_fact_ids
+                        if remaining_facts or raw.get("media_ids"):
+                            filtered_bindings.append({**raw, "fact_ids": sorted(remaining_facts)})
+                    bindings = filtered_bindings
             try:
                 decision = await asyncio.to_thread(
                     validate_evidence_current, self._engine, claims.hotel_id, bindings, datetime.now(UTC),
@@ -565,7 +772,7 @@ class GuestChatApplication:
             cached["language_preference"] = current_language
             cached["answer_eligibility"] = (
                 "pending" if cached.get("status") == "partial_success" or cached.get("answer_status") == "failed"
-                else "stale" if presentation_stale or not decision.eligible or brief_stale
+                else "stale" if presentation_stale or not decision.eligible or brief_stale or room_advice_stale
                 else "current"
             )
             return cached
@@ -582,6 +789,12 @@ class GuestChatApplication:
         prepared = None
         resumed_receipt = None
         language_race = False
+        room_advice_requested = False
+        booking_requested = False
+        pure_booking_request = False
+        language_only_room_advice = False
+        room_advice_response: dict[str, Any] | None = None
+        room_advice_bindings: list[EvidenceBinding] = []
         try:
             async with asyncio.timeout_at(deadline):
                 remaining = _remaining_seconds(deadline)
@@ -630,28 +843,37 @@ class GuestChatApplication:
                             409, "brief_resume_unavailable",
                             "The saved answer is missing its current-turn scope and cannot be resumed safely.",
                         )
+                    room_advice_requested = "room_advice" in saved_turn_intents
+                    booking_requested = "booking_request" in saved_turn_intents
+                    pure_booking_request = tuple(saved_turn_intents) == ("booking_request",)
                     resumed_receipt = saved_receipt["receipt"]
                     committed_brief = await asyncio.to_thread(
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                         timeout_seconds=_remaining_seconds(deadline),
                     )
                     receipt_id_for_answer = answer_only_receipt_id
-                    answer = await self._orchestrator.answer_committed_turn(
-                        hotel_id=claims.hotel_id, question=source_turn["content"], history=history,
-                        brief=committed_brief, deadline=deadline,
-                        preferred_language_tag=(current_language_row or {}).get("language_tag"),
-                        missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
-                        label_bundle_keys=LABEL_KEYS,
-                        label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
-                        turn_intents=tuple(saved_turn_intents),
-                        authorized_targets=tuple(saved_authorized_targets),
-                    )
+                    if pure_booking_request:
+                        answer = _booking_channel_only_answer(tuple(saved_turn_intents))
+                    elif not room_advice_requested:
+                        answer = await self._orchestrator.answer_committed_turn(
+                            hotel_id=claims.hotel_id, question=source_turn["content"], history=history,
+                            brief=committed_brief, deadline=deadline,
+                            preferred_language_tag=(current_language_row or {}).get("language_tag"),
+                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
+                            label_bundle_keys=LABEL_KEYS,
+                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            turn_intents=tuple(saved_turn_intents),
+                            authorized_targets=tuple(saved_authorized_targets),
+                        )
+                    else:
+                        answer = None
                 else:
                     committed_brief = await asyncio.to_thread(
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                         timeout_seconds=_remaining_seconds(deadline),
                     )
                     source_utterance_id = str(uuid.uuid4())
+                    language_before_turn = current_language["language_tag"]
                     prepared = await self._orchestrator.prepare_turn(
                         hotel_id=claims.hotel_id, question=transcript_question, history=history,
                         brief=committed_brief, deadline=deadline,
@@ -661,6 +883,9 @@ class GuestChatApplication:
                         label_bundle_keys=LABEL_KEYS,
                         label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
                     )
+                    room_advice_requested = "room_advice" in prepared.turn_intents
+                    booking_requested = "booking_request" in prepared.turn_intents
+                    pure_booking_request = tuple(prepared.turn_intents) == ("booking_request",)
                     requested_tag = normalize_language_tag(prepared.explicit_language_tag)
                     inferred_tag = normalize_language_tag(prepared.inferred_language_tag)
                     if requested_tag or (current_language_row is None and inferred_tag):
@@ -678,6 +903,12 @@ class GuestChatApplication:
                         except Exception as exc:
                             raise GuestChatError(503, "storage_unavailable", "Language preference could not be saved.", retryable=True) from exc
                         current_language = _language_preference_payload(current_language_row)
+                        language_only_room_advice = (
+                            room_advice_requested
+                            and prepared.guest_patch is None
+                            and set(prepared.turn_intents) == {"room_advice"}
+                            and current_language["language_tag"] != language_before_turn
+                        )
                         language_race = (
                             current_language["revision"] == expected_language_revision
                             and current_language["language_tag"] != requested_committed_tag
@@ -730,7 +961,7 @@ class GuestChatApplication:
                         apply_attempted = False
                         committed_brief = mutation.brief
                         receipt_id_for_answer = request_id
-                        answer = await self._orchestrator.answer_committed_turn(
+                        answer = None if room_advice_requested else _booking_channel_only_answer(prepared.turn_intents, prepared) if pure_booking_request else await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
@@ -742,7 +973,11 @@ class GuestChatApplication:
                             authorized_targets=brief_context.authorized_targets,
                         )
                     elif prepared.provisional_answer is not None:
-                        if language_race:
+                        if room_advice_requested:
+                            answer = None
+                        elif pure_booking_request:
+                            answer = _booking_channel_only_answer(prepared.turn_intents, prepared)
+                        elif language_race:
                             answer = await self._orchestrator.answer_committed_turn(
                                 hotel_id=claims.hotel_id, question=transcript_question, history=history,
                                 brief=committed_brief, deadline=deadline,
@@ -757,7 +992,7 @@ class GuestChatApplication:
                         else:
                             answer = prepared.provisional_answer
                     else:
-                        answer = await self._orchestrator.answer_committed_turn(
+                        answer = None if room_advice_requested else _booking_channel_only_answer(prepared.turn_intents, prepared) if pure_booking_request else await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
@@ -768,6 +1003,133 @@ class GuestChatApplication:
                             turn_intents=prepared.turn_intents,
                             authorized_targets=brief_context.authorized_targets if brief_context else (),
                         )
+                if room_advice_requested:
+                    if committed_brief is None or self._knowledge_retriever is None:
+                        raise GuestChatError(503, "room_advice_unavailable", "Room advice context is unavailable.", retryable=True)
+                    # Pin the hotel configuration alongside the committed brief before
+                    # invoking the provider. A config read after generation would
+                    # incorrectly bind an answer to settings it never saw.
+                    pinned_hotel = await asyncio.to_thread(get_hotel_by_id, self._engine, claims.hotel_id)
+                    if pinned_hotel is None:
+                        raise StaleSource("hotel configuration disappeared before room advice generation")
+                    pinned_config_version = pinned_hotel["config_version"]
+                    if prepared is not None:
+                        room_question = transcript_question
+                        intent_tags = prepared.turn_intents
+                    else:
+                        room_question = source_turn["content"]
+                        intent_tags = tuple(saved_turn_intents)
+                    reusable = None
+                    if language_only_room_advice:
+                        reusable = await asyncio.to_thread(
+                            get_room_advice_result, self._engine, session_id=session_id,
+                            hotel_id=claims.hotel_id, timeout_seconds=_remaining_seconds(deadline),
+                        )
+                    if (reusable is not None and reusable.get("currentness") == "current"
+                            and reusable.get("brief_version") == committed_brief.brief_version
+                            and reusable.get("config_version") == pinned_config_version):
+                        stored_payload = reusable.get("payload") or {}
+                        persisted_advice = RoomAdviceResult(
+                            status=stored_payload["status"],
+                            brief_version=stored_payload["brief_version"],
+                            source_generation=stored_payload["source_generation"],
+                            source_refs=tuple(stored_payload.get("source_refs", ())),
+                            options=tuple(stored_payload.get("options", ())),
+                            questions=tuple(stored_payload.get("questions", ())),
+                            explanation_inputs=stored_payload.get("explanation_inputs", {}),
+                            availability=stored_payload.get("availability", "unknown"),
+                        )
+                        localized_advice = self._orchestrator.relocalize_room_advice(
+                            persisted_advice,
+                            current_language["language_tag"] if current_language["source"] != "fallback" else None,
+                        )
+                        reusable = {**reusable, "payload": _room_advice_json(localized_advice)}
+                        sources_by_id = {source.source_id: source for source in snapshot.sources}
+                        room_advice_bindings = [EvidenceBinding(
+                            source=sources_by_id[ref["source"]["source_id"]],
+                            fact_ids=tuple(ref.get("fact_ids", ())),
+                        ) for ref in reusable.get("source_refs", [])
+                          if isinstance(ref, dict) and isinstance(ref.get("source"), dict)
+                          and ref["source"].get("source_id") in sources_by_id]
+                        room_advice_response = self._room_advice_response(reusable)
+                        answer = _booking_channel_only_answer(tuple(intent_tags), prepared)
+                    else:
+                        current_facts = await asyncio.to_thread(
+                            self._knowledge_retriever.list_current_facts,
+                            claims.hotel_id, timeout_seconds=_remaining_seconds(deadline),
+                        )
+                        room_context = RoomAdviceContext(
+                            hotel_id=claims.hotel_id, brief_version=committed_brief.brief_version,
+                            brief_data=committed_brief.data, pending_fields=committed_brief.pending_fields,
+                            source_generation=snapshot.generation, facts=tuple(current_facts),
+                            question=room_question,
+                            locale=current_language["language_tag"] if current_language["source"] != "fallback" else None,
+                            turn_intents=tuple(intent_tags),
+                            hotel_information_fact_ids=(
+                                tuple(prepared.selected_fact_ids)
+                                if prepared is not None and "hotel_information" in intent_tags else ()
+                            ),
+                        )
+                        room_result, room_generation = await self._orchestrator.recommend_committed_room_advice(
+                            context=room_context, deadline=deadline,
+                        )
+                        safe_source_refs = _room_advice_source_refs(room_result, snapshot, tuple(current_facts))
+                        sources_by_id = {source.source_id: source for source in snapshot.sources}
+                        room_advice_bindings = [EvidenceBinding(
+                            source=sources_by_id[ref["source"]["source_id"]],
+                            fact_ids=tuple(ref["fact_ids"]),
+                        ) for ref in safe_source_refs]
+                        try:
+                            saved_room_result = await asyncio.to_thread(
+                                save_room_advice_result, self._engine,
+                                session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
+                                payload=_room_advice_json(room_result),
+                                brief_version=room_result.brief_version,
+                                source_generation=room_result.source_generation,
+                                config_version=pinned_config_version,
+                                source_refs=safe_source_refs,
+                                policy_version=(room_result.explanation_inputs.get("policy_version")
+                                                if isinstance(room_result.explanation_inputs.get("policy_version"), str) else None),
+                                price_version=(room_result.explanation_inputs.get("price_version")
+                                               if isinstance(room_result.explanation_inputs.get("price_version"), str) else None),
+                                expected_state_version=int(session["state_version"]),
+                                timeout_seconds=_remaining_seconds(deadline),
+                            )
+                        except Exception as exc:
+                            if isinstance(exc, (StaleSource, VersionConflict, IdempotencyConflict, ScopeError)):
+                                raise
+                            raise GuestChatError(503, "room_advice_storage_unavailable", "Room advice could not be saved.", retryable=True) from exc
+                        room_advice_response = self._room_advice_response(saved_room_result)
+                        answer = ConversationAnswer(
+                            answer="", citations=(), unknowns=(), provider=room_generation.provider,
+                            deployment=room_generation.deployment, model=room_generation.model,
+                            provider_request_id=room_generation.request_id, usage=room_generation.usage,
+                            retrieval_fact_ids=(), calls=1,
+                            provider_request_ids=(room_generation.request_id,) if room_generation.request_id else (),
+                            brief_version_used=committed_brief.brief_version, brief_dependent=True,
+                            turn_intents=tuple(intent_tags),
+                        )
+                        if "hotel_information" in intent_tags and room_result.hotel_answer is not None:
+                            raw_hotel_answer = asdict(room_result.hotel_answer)
+                            selected_ids = set(prepared.selected_fact_ids if prepared is not None else ())
+                            facts_by_id = {str(fact.get("fact_id")): fact for fact in current_facts}
+                            hotel_claims = raw_hotel_answer.get("supported_claims", [])
+                            if any(not set(claim.get("fact_ids", ())) <= selected_ids
+                                   or any(fact_id not in facts_by_id for fact_id in claim.get("fact_ids", ()))
+                                   for claim in hotel_claims):
+                                raise GuestChatError(503, "room_advice_unavailable", "The hotel answer could not be tied to the selected records.", retryable=True)
+                            citations = tuple(facts_by_id[fact_id] for claim in hotel_claims for fact_id in claim.get("fact_ids", ()))
+                            unique_citations = tuple({fact["fact_id"]: fact for fact in citations}.values())
+                            answer_text = "\n".join(format_grounded_claim(
+                                claim["text"], [facts_by_id[fact_id] for fact_id in claim.get("fact_ids", ())],
+                            ) for claim in hotel_claims)
+                            answer = replace(
+                                answer, answer=answer_text, citations=unique_citations,
+                                # This response contract has one uncertainty channel;
+                                # preserve checked conflicts there rather than dropping them.
+                                unknowns=tuple(raw_hotel_answer.get("unknowns", ()))
+                                + tuple(raw_hotel_answer.get("conflicts", ())),
+                            )
                 # The orchestrator sets this only when its structured output cites
                 # validated canonical brief fields. A supplied brief alone does not
                 # make an ordinary grounded FAQ stale on a later trip edit.
@@ -803,7 +1165,7 @@ class GuestChatApplication:
                     if source is None or fact.get("provenance", {}).get("source_version") != source.source_version:
                         raise StaleSource("retrieved evidence no longer matches active source state")
                     evidence.append(_citation_reference(fact, source))
-                bindings = _evidence_bindings(evidence, media, snapshot)
+                bindings = [*_evidence_bindings(evidence, media, snapshot), *room_advice_bindings]
                 trace = {
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
@@ -874,6 +1236,8 @@ class GuestChatApplication:
                 language_stale = latest_language["revision"] != answer_presentation["preference_revision"]
                 answer_presentation["freshness"] = "stale" if language_stale else "current"
                 remaining = _remaining_seconds(deadline)
+                room_advice_fields = {"room_advice": room_advice_response} if room_advice_response is not None else {}
+                booking_fields = {"booking_request": {"requested": True}} if booking_requested else {}
                 result = await asyncio.to_thread(
                     complete_request,
                     self._engine, session_id=session_id, hotel_id=claims.hotel_id,
@@ -887,7 +1251,8 @@ class GuestChatApplication:
                                      "source_generation": snapshot.generation,
                                      "language_preference": latest_language,
                                      "presentation": answer_presentation,
-                                     "answer_eligibility": "stale" if language_stale else "current", **brief_fields},
+                                     "answer_eligibility": "stale" if language_stale else "current",
+                                     **brief_fields, **room_advice_fields, **booking_fields},
                     brief_version_used=brief_version_used,
                     brief_dependent=brief_dependent,
                     brief_receipt_id=receipt_id_for_answer,

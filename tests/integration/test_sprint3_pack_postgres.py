@@ -8,6 +8,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy import delete, func, insert, select
 from sqlalchemy.exc import IntegrityError
+
 from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.store import (
     apply_migrations,
@@ -35,7 +36,7 @@ def test_complete_pack_publication_replay_immutability_and_scoped_media_reads(tm
     )
 
     engine = create_database_engine(os.environ["STAYLEAD_TEST_DATABASE_URL"])
-    if schema_version(engine) != 6:
+    if schema_version(engine) != 7:
         apply_migrations(engine)
     root = tmp_path / "allowed" / "pack"
     root.parent.mkdir()

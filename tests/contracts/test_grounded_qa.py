@@ -5,6 +5,7 @@ from dataclasses import asdict, replace
 from typing import Any
 
 import pytest
+
 from staylead_platform.domains.hospitality.grounded_claim_format import (
     format_grounded_claim,
 )
@@ -125,6 +126,7 @@ def build(
     committed_answer_validator: Callable[..., None] | None = None,
     preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
     preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
+    preparation_metadata_validator: Callable[..., Any] | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
         provider=provider,
@@ -142,6 +144,7 @@ def build(
         committed_answer_validator=committed_answer_validator,
         preparation_selection_schema_factory=preparation_selection_schema_factory,
         preparation_answer_schema_factory=preparation_answer_schema_factory,
+        preparation_metadata_validator=preparation_metadata_validator,
     )
 
 
@@ -874,7 +877,11 @@ def test_low_overlap_preparation_combines_patch_selection_and_committed_answer_i
     assert prepared.provider_request_ids == ("prepare-1",)
     assert prepared.total_tokens == 38
     assert prepared.guest_patch is not None
-    assert prepared.guest_patch.operations == ({"op": "add_child", "age": None},)
+    assert prepared.guest_patch.operations == ({
+        "op": "add_child", "age": None,
+        "guardian_adult_index": None, "share_bed_with_guardian": None,
+    },)
+    assert not prepared.patch_authorizations
     assert provider.calls[0].instructions == FACT_SELECTION_INSTRUCTIONS
     committed = GuestBriefSnapshot(1, {
         **brief.data,
@@ -892,6 +899,121 @@ def test_low_overlap_preparation_combines_patch_selection_and_committed_answer_i
     assert "guest_patch" not in provider.calls[-1].instructions
     assert "set_dates" not in provider.calls[-1].instructions
     assert final.brief_version_used is None
+
+
+def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_any_commit() -> None:
+    question = (
+        "Tôi đi công tác một mình, ở từ 2026-11-10 đến 2026-11-13. "
+        "Ngân sách tối đa 6000000 VND cho toàn bộ tiền phòng. "
+        "Hãy tư vấn phòng phù hợp và chi phí tham khảo."
+    )
+    selected_ids = [
+        "F-HTL-CITY01-ROOM_TYPE-CITY-STD", "F-HTL-CITY01-ROOM_TYPE-CITY-TWN",
+        "F-HTL-CITY01-REFERENCE_RATE-RATE-CITY-STD-REF",
+        "F-HTL-CITY01-REFERENCE_RATE-RATE-CITY-TWN-REF",
+    ]
+    captured = {
+        "fact_ids": selected_ids,
+        "guest_patch": {"ops": [
+            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-13"},
+            {"op": "set_adults", "count": 1},
+            {"op": "set_room_requirements", "budget_amount": 6_000_000,
+             "budget_currency": "VND", "budget_basis": "stay_total", "budget_strength": "hard",
+             "sharing": None, "hard_accessibility_needs": None,
+             "preferred_accessibility_needs": None, "hard_bed_types": None,
+             "preferred_bed_types": None, "avoided_bed_types": None, "max_rooms": 1,
+             "clear_fields": []},
+        ]},
+        "guest_patch_authorizations": [
+            {"operation_index": 0, "op": "set_dates",
+             "target_fields": ["dates.check_in", "dates.check_out"],
+             "intent": "explicit_request", "current_turn_quote": "ở từ 2026-11-10 đến 2026-11-13"},
+            {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
+             "intent": "explicit_request", "current_turn_quote": "một mình"},
+            {"operation_index": 2, "op": "set_room_requirements",
+             "target_fields": [
+                 "room_requirements.budget_amount", "room_requirements.budget_currency",
+                 "room_requirements.budget_basis,room_requirements.budget_strength,room_requirements.max_rooms",
+             ], "intent": "explicit_request",
+             "current_turn_quote": "Ngân sách tối đa 6000000 VND cho toàn bộ tiền phòng"},
+        ],
+        "turn_intents": ["room_advice"],
+        "explicit_language_tag": None, "inferred_language_tag": "vi",
+    }
+    with pytest.raises(ValueError):
+        validate_guest_patch_authorization(
+            tuple(captured["guest_patch"]["ops"]),
+            tuple(captured["guest_patch_authorizations"]),
+            question,
+        )
+
+    def run(payload: dict[str, Any]) -> tuple[GroundedQAOrchestrator, FakeProvider, GuestBriefSnapshot]:
+        provider = FakeProvider()
+
+        async def respond(request: GenerationRequest) -> GenerationResult:
+            provider.calls.append(request)
+            return GenerationResult(
+                text=json.dumps(payload, ensure_ascii=False), provider="fake", deployment="test",
+                model="recorded-capture", request_id="capture-1",
+                usage=Usage(input_tokens=10979, output_tokens=1407, total_tokens=12386),
+            )
+
+        provider.generate = respond  # type: ignore[method-assign]
+        retriever = KnowledgeRetriever(MemoryFacts())
+        retriever.retrieve = lambda hotel_id, question, context, timeout_seconds=None: RetrievalResult(
+            hotel_id=hotel_id, facts=(), conflicts=(), query_terms=40, term_coverage=0.1,
+            candidate_index=tuple({
+                "fact_id": fact_id, "subject": "rooms", "topic": "room_catalog", "field": "room_type",
+            } for fact_id in selected_ids),
+        )  # type: ignore[method-assign]
+        before = GuestBriefSnapshot(0, {
+            "dates": {"check_in": None, "check_out": None, "nights": None},
+            "party": {"adults": None, "children": []},
+        })
+        return build(
+            provider, retriever=retriever,
+            preparation_metadata_validator=validate_preparation_metadata,
+        ), provider, before
+
+    orchestrator, provider, brief = run(captured)
+    with pytest.raises(ConversationFailure) as rejected:
+        asyncio.run(orchestrator.prepare_turn(
+            hotel_id="HTL-CITY01", question=question, history=[], brief=brief,
+        ))
+    assert rejected.value.code == "invalid_retrieval_selection"
+    assert len(provider.calls) == 1
+    assert brief.brief_version == 0
+    assert brief.data["party"]["adults"] is None
+
+    corrected = json.loads(json.dumps(captured))
+    corrected["guest_patch"]["ops"][2]["max_rooms"] = None
+    corrected["guest_patch_authorizations"][2]["target_fields"] = [
+        "room_requirements.budget_amount", "room_requirements.budget_currency",
+        "room_requirements.budget_basis", "room_requirements.budget_strength",
+    ]
+    corrected["turn_intents"] = ["guest_edit", "room_advice"]
+    orchestrator, provider, brief = run(corrected)
+    prepared = asyncio.run(orchestrator.prepare_turn(
+        hotel_id="HTL-CITY01", question=question, history=[], brief=brief,
+    ))
+    assert prepared.guest_patch is not None
+    assert prepared.preparation_calls == 1
+    assert len(provider.calls) == 1
+    assert prepared.turn_intents == ("guest_edit", "room_advice")
+    assert prepared.patch_authorizations[2]["target_fields"] == corrected["guest_patch_authorizations"][2]["target_fields"]
+    assert brief.brief_version == 0
+    assert brief.data["party"]["adults"] is None
+
+    missing_edit_intent = json.loads(json.dumps(corrected))
+    missing_edit_intent["turn_intents"] = ["room_advice"]
+    orchestrator, provider, brief = run(missing_edit_intent)
+    with pytest.raises(ConversationFailure) as missing_intent:
+        asyncio.run(orchestrator.prepare_turn(
+            hotel_id="HTL-CITY01", question=question, history=[], brief=brief,
+        ))
+    assert missing_intent.value.code == "invalid_model_output"
+    assert len(provider.calls) == 1
+    assert brief.brief_version == 0
 
 
 def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_patch_grammar() -> None:

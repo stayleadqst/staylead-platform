@@ -46,7 +46,7 @@ class HospitalityGroundedAnswer(BaseModel):
     conflicts: list[str] = Field(default_factory=list, max_length=10)
     guest_patch: HospitalityGuestBriefPatch | None = None
     guest_patch_authorizations: list[GuestPatchAuthorization] = Field(default_factory=list, max_length=12)
-    turn_intents: list[GuestTurnIntent] = Field(default_factory=list, max_length=4)
+    turn_intents: list[GuestTurnIntent] = Field(default_factory=list, max_length=6)
     guest_claims: list[GuestBriefClaim] = Field(default_factory=list, max_length=20)
     guest_clarification: GuestClarification | None = None
     conversational_acknowledgement: ConversationalAcknowledgement | None = None

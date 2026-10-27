@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 from pydantic import ValidationError
+
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     GUEST_BRIEF_PATCH_RULES,
 )
@@ -67,7 +68,8 @@ def test_low_and_high_overlap_schemas_are_closed_and_use_string_operation_names(
     auth_op = low_schema["properties"]["guest_patch_authorizations"]["items"]["properties"]["op"]
     assert auth_op == {
         "type": "string",
-        "enum": ["set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify"],
+        "enum": ["set_dates", "set_adults", "add_child", "set_child_age", "remove_child",
+                 "set_room_requirements", "set_child_guardian", "set_bed_sharing", "clarify"],
     }
     patch = low_schema["properties"]["guest_patch"]["anyOf"][0]
     op_schemas = patch["properties"]["ops"]["items"]["anyOf"]

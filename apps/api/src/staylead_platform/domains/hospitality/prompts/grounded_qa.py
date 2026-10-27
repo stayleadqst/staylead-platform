@@ -20,12 +20,30 @@ member ID present in the supplied brief; never invent a member ID. Never infer a
 edits from hotel evidence. If the guest negates an edit, do not emit that operation. Omit the patch for
 a pure FAQ or when no edit was requested. The patch is a proposal, never applied state.
 For this current question, classify one or more `turn_intents`: `hotel_information`, `guest_state`,
-`guest_edit`, `courtesy`. History may resolve references but cannot authorize a new edit or request intent.
+`guest_edit`, `courtesy`, `room_advice`, `booking_request`. `room_advice` means the guest wants
+room-type/party-fit advice; `booking_request` means they want the configured official booking channel.
+History may resolve references but cannot authorize a new edit or request intent.
+Whenever `guest_patch.ops` contains an edit, include `guest_edit` as well as any other current-turn intent
+such as `room_advice`; never omit it for initial trip details.
 For each patch op, return exactly one `guest_patch_authorizations` item with its zero-based operation_index,
 the operation-name string only in `op` (for example `set_dates`, never the operation object), exact
 canonical target_fields, intent `explicit_request` (or `clarification` for clarify), and an exact nonempty
-`current_turn_quote` copied from this question. Return [] when there are no ops. Never quote history as
-authorization."""
+`current_turn_quote` copied from this question. Put one exact target path in each array item; never join,
+comma-pack, or invent target paths. For `set_room_requirements`, targets are exactly
+`room_requirements.<field>` for each non-null field explicitly set and each field named by `clear_fields`;
+omit null placeholders and list targets in the suffix order below. The valid suffixes are `budget_amount`, `budget_currency`, `budget_basis`,
+`budget_strength`, `sharing`, `hard_accessibility_needs`, `preferred_accessibility_needs`,
+`hard_bed_types`, `preferred_bed_types`, `avoided_bed_types`, and `max_rooms`. Do not infer a room
+count from traveling alone or from party size; set `max_rooms` only when the guest explicitly states a
+maximum number of rooms. Return [] when there are no ops. Never quote history as authorization. A new
+child can include `guardian_adult_index` only when the guest explicitly identifies
+that adult as guardian in this turn; include `share_bed_with_guardian: true` only when the guest
+explicitly authorizes that child to share with that guardian. Use `set_child_guardian` for an existing child. Use
+`set_bed_sharing` with exact current party member IDs and `allow_share` true or false only for an
+explicit pair/group consent or refusal; never infer consent from family/adult relationships. Use
+`set_room_requirements` to preserve exact hard constraints and preferences in their separate fields;
+the `sharing` field means bed-sharing preference only, not room allocation or permission to share;
+unknown details belong in a clarification, not invented enum mappings."""
 
 GROUNDED_QA_INSTRUCTIONS = """You are the guest information assistant for the one named property in the evidence.
 Answer the guest's question directly in the language they used. The evidence may use another language.

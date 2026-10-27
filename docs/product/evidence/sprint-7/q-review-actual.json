@@ -1,0 +1,80 @@
+{
+  "candidate_sha256": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "preserved_source_snapshot": "/private/tmp/staylead-s7-live-candidate-9a4833b8",
+  "snapshot235hashes_verified": true,
+  "actual_verdict": "FAIL firstguestturn; HTTP502 invalid_model_output;1guestturn1Codexrequest;no calltwo; no roomadvice/selection produced. Batchhalted, no further modelcalls authorized for this review.",
+  "diagnosis": {
+    "primary": "Preparation protocol/prompt under-specification: native target_fields accepts arbitrarystrings,max3, while9aserver expects exactaggregate[room_requirements]; model emitted granularpaths and packedcomma-separatedpaths that fail exactauthorizationmatching",
+    "secondary": "Modelturn_intents omittedguest_edit despite proposedtrip-detailpatchops; aftertargetonlyrepair validator independentlyrejects missingintent",
+    "semantic_deviation": "Modelset max_rooms1 without an explicitroomcountconstraint. Guestsolo does not authorize that hard constraint. No such patchwascommitted.",
+    "not_the_cause": "max3 alone didnot makebudgetunserializable in9a: aggregateauthorizationusesoneitem; correctcounterfactual validates underoriginalcandidate",
+    "original_protocol_rejection": "Failclosedmetadataauthorizationguard worked; no guardbypass required"
+  },
+  "offline_reproducer": "q-review-actual-protocol-probe.py/results.json (imports preserved9asource,notmutatingAcurrentcode)",
+  "read_only_database": {
+    "transaction_read_only": "on",
+    "guest_sessions_count": 1,
+    "guest_requests_count": 1,
+    "guest_messages_count": 0,
+    "guest_briefs_count": 0,
+    "guest_brief_source_utterances_count": 0,
+    "guest_brief_receipts_count": 0,
+    "guest_room_advice_results_count": 0,
+    "guest_room_advice_selections_count": 0,
+    "guest_language_preferences_count": 0,
+    "sessions": [
+      {
+        "session_id_sha256": "97ec6194e7c4d76462c738dbb14693bfb2dd5fe51f76cf1dfeae3f7217d2f4fd",
+        "hotel_id": "HTL-CITY01",
+        "state_version": 0
+      }
+    ],
+    "requests": [
+      {
+        "request_id_sha256": "19167842fbee4f48726e4637685922af6a5e3a0c76bfa54fe9658b8db6a2e25c",
+        "hotel_id": "HTL-CITY01",
+        "expected_version": 0,
+        "status": "error",
+        "error_code": "invalid_model_output",
+        "has_response": false
+      }
+    ],
+    "trace_audit_tables": []
+  },
+  "counters_and_usage": {
+    "run_state": {
+      "run_id": "s7-room-advice-20261026-batch1",
+      "status": "halted",
+      "guest_turns": 1,
+      "codex_requests": 1,
+      "max_guest_turns": 9,
+      "max_codex_requests": 18
+    },
+    "state_mode": "0o600",
+    "provider_reservations": 1,
+    "provider_completions": 1,
+    "input_tokens": 10979,
+    "output_tokens": 396,
+    "reported_total_tokens": null,
+    "latency_ms": 7420.9,
+    "prior_bootstrap": "Runtimeapproval/bootstrap/browsermissingdependency failures occurredat0/0; they are not modelattempts. Actualreservationstartedlater; no namespace reset observed."
+  },
+  "request_provenance": "PGrequestSHA19167842fbee4f48726e4637685922af6a5e3a0c76bfa54fe9658b8db6a2e25c matchesprovider/httptelemetry; DBrequesterrorinvalid_model_output,sessionstate0. RawresponsecaptureSHA4699f4855a41b04fa90a4e733703e9c8bce0b7c24abd163900e176cc4093f211 matchesproviderevent.",
+  "story28_independent_assessment": {
+    "verdict": "FullDone not supported by currentevidence; accept completed technicalboundary portions separately",
+    "B07_AC1": "TrustedpropertyHTTPSconfig/URLimmutability/unsaferejection implementedandtested, but actual AIunderstandingofbookingintentinguestlanguage NOTobserved. Actualbatchstoppedbeforeturn9; BookingIntentProvider presetsintent offline.",
+    "B07_AC2": "Staticapprovedanchor/noquery/PII/referrercontrols supported by reviewedcode+actualproductionbrowser with fakeprovider. No realworkinghotelbookingendpointclaimed; destinationclearlysyntheticnonfunctional.",
+    "B07_AC3": "Externalprice/availability/terms and noreservation/payment disclosures plusmissinglinkconfiguredcontact supported bycode/contracts/UIevidence.",
+    "why_no_closure": "ExactAC1requiresAIunderstanding; fakeintentclassificationandtrustedlinkboundary are not evidence of that actualbehavior. No authorizationto waiveAC or makeanotherlivecall implied.",
+    "scope": "This is not a new requirement for full9turnsequence specifically for28; a suitablyauthorizedindependentactualbookingsemanticcase could satisfy missing part. Such case hasnotrun."
+  },
+  "delivery_status": "39/97notDone; boundedblockerdeferral mayretainBlocked afterofflinefix because actualacceptanceisstillnotverified.28also lacksfullAC1evidence. Rootownsbacklogstate andengineeringfix.",
+  "restrictions_respected": [
+    "NoQmodel/providerrequests",
+    "NoDBmutations;connectiondefault_transaction_read_only=on and SHOWconfirmedon",
+    "No namespace/counter/state reset",
+    "No source/test/harnessmodification",
+    "NoCI/deploy/booking/navigation/externalmessages"
+  ],
+  "next_step": "Aofflineprotocolfix alreadyassigned byroot; review fixed frozenbytes and exactcounterfactual afterfreeze. Do not rerunactualbatch without applicable authorization."
+}

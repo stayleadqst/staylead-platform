@@ -106,6 +106,18 @@ async function forward(request: NextRequest, context: RouteContext) {
     backendPath = `/v1/guest/sessions/${path[1]}/messages`;
     requiresJsonBody = true;
   } else if (
+    method === "GET" && path.length === 3 && path[0] === "sessions"
+    && SESSION_ID_PATTERN.test(path[1]) && path[2] === "room-advice"
+  ) {
+    backendPath = `/v1/guest/sessions/${path[1]}/room-advice`;
+  } else if (
+    method === "POST" && path.length === 5 && path[0] === "sessions"
+    && SESSION_ID_PATTERN.test(path[1]) && path[2] === "room-advice"
+    && SAFE_ID_PATTERN.test(path[3]) && path[4] === "selection"
+  ) {
+    backendPath = `/v1/guest/sessions/${path[1]}/room-advice/${encodeURIComponent(path[3])}/selection`;
+    requiresJsonBody = true;
+  } else if (
     method === "POST" && path.length === 3 && path[0] === "sessions"
     && SESSION_ID_PATTERN.test(path[1]) && path[2] === "freshness"
   ) {
@@ -154,6 +166,8 @@ async function forward(request: NextRequest, context: RouteContext) {
   if (requiresJsonBody) headers.set("content-type", "application/json");
   const authorization = request.headers.get("authorization");
   const scopedGuestRequest = (method === "POST" && path.length === 3 && path[2] === "messages")
+    || (method === "GET" && path.length === 3 && path[2] === "room-advice")
+    || (method === "POST" && path.length === 5 && path[2] === "room-advice" && path[4] === "selection")
     || (method === "POST" && path.length === 3 && path[2] === "freshness")
     || (method === "GET" && path.length === 4 && path[2] === "media");
   if (scopedGuestRequest && authorization?.startsWith("Bearer ")) {

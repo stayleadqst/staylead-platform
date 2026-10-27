@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.entrypoints.app import create_app
 from staylead_platform.infrastructure.database import create_database_engine

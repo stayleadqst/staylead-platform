@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies.guest_chat import build_provider
 from staylead_platform.infrastructure.codex_provider import CodexCLIProvider

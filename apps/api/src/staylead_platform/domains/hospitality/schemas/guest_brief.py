@@ -32,6 +32,8 @@ class AddChild(BaseModel):
     model_config = ConfigDict(extra="forbid")
     op: Literal["add_child"]
     age: int | None = Field(default=None, ge=0, le=17)
+    guardian_adult_index: int | None = Field(default=None, ge=1, le=30)
+    share_bed_with_guardian: bool | None = None
 
 
 class SetChildAge(BaseModel):
@@ -47,6 +49,43 @@ class RemoveChild(BaseModel):
     member_id: str
 
 
+class SetRoomRequirements(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    op: Literal["set_room_requirements"]
+    budget_amount: int | None = Field(default=None, ge=0, le=10_000_000_000)
+    budget_currency: str | None = Field(default=None, min_length=3, max_length=3)
+    budget_basis: Literal["stay_total", "per_night"] | None = None
+    budget_strength: Literal["hard", "target"] | None = None
+    sharing: Literal["allow", "prefer", "avoid"] | None = Field(
+        default=None, description="Bed sharing preference; this does not authorize sharing without party.bed_sharing consent.",
+    )
+    hard_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
+    preferred_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
+    hard_bed_types: list[str] | None = Field(default=None, max_length=8)
+    preferred_bed_types: list[str] | None = Field(default=None, max_length=8)
+    avoided_bed_types: list[str] | None = Field(default=None, max_length=8)
+    max_rooms: int | None = Field(default=None, ge=1, le=10)
+    clear_fields: list[Literal[
+        "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+        "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
+        "preferred_bed_types", "avoided_bed_types", "max_rooms",
+    ]] = Field(default_factory=list, max_length=11)
+
+
+class SetChildGuardian(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    op: Literal["set_child_guardian"]
+    child_id: str = Field(min_length=1, max_length=64)
+    guardian_id: str = Field(min_length=1, max_length=64)
+
+
+class SetBedSharing(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    op: Literal["set_bed_sharing"]
+    member_ids: list[str] = Field(min_length=2, max_length=10)
+    allow_share: bool
+
+
 class ClarifyField(BaseModel):
     model_config = ConfigDict(extra="forbid")
     op: Literal["clarify"]
@@ -55,7 +94,8 @@ class ClarifyField(BaseModel):
 
 
 GuestBriefOperation = Annotated[
-    SetDates | SetAdults | AddChild | SetChildAge | RemoveChild | ClarifyField,
+    SetDates | SetAdults | AddChild | SetChildAge | RemoveChild | SetRoomRequirements
+    | SetChildGuardian | SetBedSharing | ClarifyField,
     Field(discriminator="op"),
 ]
 
@@ -70,13 +110,20 @@ class GuestPatchAuthorization(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     operation_index: int = Field(ge=0, le=11)
-    op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify"]
-    target_fields: list[str] = Field(min_length=1, max_length=2)
+    op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "remove_child",
+                "set_room_requirements", "set_child_guardian", "set_bed_sharing", "clarify"]
+    target_fields: list[Annotated[str, Field(max_length=128, pattern=(
+        r"^(?:dates\.(?:check_in|check_out)|party\.(?:adults|children|guardians|bed_sharing)|room_requirements|"
+        r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.age)?|room_requirements\."
+        r"(?:budget_amount|budget_currency|budget_basis|budget_strength|sharing|"
+        r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
+        r"preferred_bed_types|avoided_bed_types|max_rooms))$"
+    ))]] = Field(min_length=1, max_length=11)
     intent: Literal["explicit_request", "clarification"]
     current_turn_quote: str = Field(min_length=1, max_length=500)
 
 
-GuestTurnIntent = Literal["hotel_information", "guest_state", "guest_edit", "courtesy"]
+GuestTurnIntent = Literal["hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"]
 
 
 def validate_guest_patch_authorization(
@@ -110,7 +157,7 @@ def validate_preparation_metadata(
     payload: Any, patch: GuestBriefProposal | None, question: str,
 ) -> tuple[tuple[str, ...], tuple[dict[str, Any], ...]]:
     intents = tuple(dict.fromkeys(getattr(payload, "turn_intents", ())))
-    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy"}
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("Preparation must classify at least one current-turn intent.")
     authorizations = tuple(
@@ -130,7 +177,7 @@ def validate_committed_turn_channels(
     payload: Any, intents: tuple[str, ...], pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
 ) -> None:
     """Enforce prepared turn scope even when a provider ignores native JSON schema hints."""
-    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy"}
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("The committed answer has no persisted current-turn intent.")
     acknowledgement = getattr(payload, "conversational_acknowledgement", None)
@@ -184,11 +231,31 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
     if op == "set_adults":
         return ["party.adults"]
     if op == "add_child":
-        return ["party.children"]
+        targets = ["party.children"]
+        if operation.get("guardian_adult_index") is not None:
+            targets.append("party.guardians")
+        if operation.get("share_bed_with_guardian") is True:
+            targets.append("party.bed_sharing")
+        return targets
     if op == "set_child_age":
         return [f"party.children.{operation.get('member_id')}.age"]
     if op == "remove_child":
         return [f"party.children.{operation.get('member_id')}"]
+    if op == "set_child_guardian":
+        return [f"party.guardians.{operation.get('child_id')}"]
+    if op == "set_bed_sharing":
+        return ["party.bed_sharing"]
+    if op == "set_room_requirements":
+        requirement_fields = (
+            "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+            "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
+            "preferred_bed_types", "avoided_bed_types", "max_rooms",
+        )
+        cleared = set(operation.get("clear_fields") or ())
+        return [
+            f"room_requirements.{field}" for field in requirement_fields
+            if field in cleared or operation.get(field) is not None
+        ]
     if op == "clarify" and isinstance(operation.get("field"), str):
         return [operation["field"]]
     return []
@@ -218,14 +285,18 @@ def validate_guest_brief_proposal(
         "dates": dict(current.data.get("dates") or {}),
         "party": dict(current.data.get("party") or {}),
     }
+    if "room_requirements" in current.data:
+        data["room_requirements"] = dict(current.data.get("room_requirements") or {})
     data["dates"].setdefault("check_in", None)
     data["dates"].setdefault("check_out", None)
     data["dates"].setdefault("nights", None)
     data["party"].setdefault("adults", None)
     data["party"]["children"] = [dict(child) for child in data["party"].get("children", [])]
+    if "guardians" in data["party"]:
+        data["party"]["guardians"] = dict(data["party"].get("guardians") or {})
     pending = set(current.pending_fields)
     fields: set[str] = set()
-    delta: dict[str, object] = {"dates": {}, "party": {}}
+    delta: dict[str, object] = {"dates": {}, "party": {}, "room_requirements": {}}
     clarification = False
     changed = False
     for operation in patch.ops:
@@ -307,6 +378,21 @@ def validate_guest_brief_proposal(
             data["party"]["children"].append(child)
             fields.add(f"party.children.{member_id}")
             delta["party"].setdefault("children_added", []).append(child)
+            if operation.guardian_adult_index is not None:
+                adults = data["party"].get("adults") or 0
+                if operation.guardian_adult_index > adults:
+                    raise ValueError("The authorized guardian adult does not exist in the current brief.")
+                guardian_id = f"adult-{operation.guardian_adult_index}"
+                data["party"].setdefault("guardians", {})[member_id] = guardian_id
+                delta["party"].setdefault("guardians", {})[member_id] = guardian_id
+                fields.add(f"party.guardians.{member_id}")
+                if operation.share_bed_with_guardian is True:
+                    group = {"member_ids": sorted((member_id, guardian_id)), "allow_share": True}
+                    data["party"].setdefault("bed_sharing", []).append(group)
+                    delta["party"].setdefault("bed_sharing", []).append(group)
+                    fields.add("party.bed_sharing")
+            elif operation.share_bed_with_guardian is not None:
+                raise ValueError("Explicit child bed sharing requires an identified guardian adult.")
             if operation.age is None:
                 pending.add(f"party.children.{member_id}.age")
                 clarification = True
@@ -344,6 +430,49 @@ def validate_guest_brief_proposal(
             pending.discard(f"party.children.{operation.member_id}.age")
             pending.discard("party.children.member")
             changed = True
+        elif isinstance(operation, SetChildGuardian):
+            fields.add(f"party.guardians.{operation.child_id}")
+            if not any(item.get("member_id") == operation.child_id for item in data["party"]["children"]):
+                raise ValueError("The referenced child is not in the current brief.")
+            adults = data["party"].get("adults") or 0
+            if operation.guardian_id not in {f"adult-{index}" for index in range(1, adults + 1)}:
+                raise ValueError("A guardian must be an identified adult in the current brief.")
+            if data["party"].get("guardians", {}).get(operation.child_id) != operation.guardian_id:
+                data["party"].setdefault("guardians", {})[operation.child_id] = operation.guardian_id
+                delta["party"].setdefault("guardians", {})[operation.child_id] = operation.guardian_id
+                changed = True
+        elif isinstance(operation, SetRoomRequirements):
+            fields.add("room_requirements")
+            if set(operation.clear_fields) & {
+                key for key in operation.model_fields_set - {"op", "clear_fields"}
+                if getattr(operation, key) is not None
+            }:
+                raise ValueError("A room requirement cannot be set and cleared in one operation.")
+            requirements = data.setdefault("room_requirements", {})
+            for key in operation.clear_fields:
+                if key in requirements:
+                    requirements.pop(key)
+                    delta["room_requirements"][key] = None
+                    changed = True
+            for key in operation.model_fields_set - {"op", "clear_fields"}:
+                value = getattr(operation, key)
+                if value is not None and requirements.get(key) != value:
+                    requirements[key] = value
+                    delta["room_requirements"][key] = value
+                    changed = True
+        elif isinstance(operation, SetBedSharing):
+            fields.add("party.bed_sharing")
+            all_members = {f"adult-{index}" for index in range(1, (data["party"].get("adults") or 0) + 1)}
+            all_members.update(child["member_id"] for child in data["party"]["children"])
+            if len(set(operation.member_ids)) != len(operation.member_ids) or not set(operation.member_ids) <= all_members:
+                raise ValueError("Bed-sharing preference must name distinct current party members.")
+            groups = [dict(group) for group in data["party"].get("bed_sharing", [])
+                      if set(group.get("member_ids", ())) != set(operation.member_ids)]
+            groups.append({"member_ids": sorted(operation.member_ids), "allow_share": operation.allow_share})
+            if groups != data["party"].get("bed_sharing", []):
+                data["party"]["bed_sharing"] = groups
+                delta["party"]["bed_sharing"] = groups
+                changed = True
         elif isinstance(operation, ClarifyField):
             child_age_field = operation.field.startswith("party.children.") and operation.field.endswith(".age")
             if child_age_field:
@@ -351,7 +480,7 @@ def validate_guest_brief_proposal(
                     UUID(operation.field.split(".")[2])
                 except ValueError as exc:
                     raise ValueError("Child clarification must use a stable member ID.") from exc
-            if operation.field not in {"dates.check_in", "dates.check_out", "party.adults", "party.children.member"} and not child_age_field:
+            if operation.field not in {"dates.check_in", "dates.check_out", "party.adults", "party.children.member", "room_requirements"} and not child_age_field:
                 raise ValueError("The clarification field is outside the guest brief.")
             fields.add(operation.field)
             pending.add(operation.field)
@@ -360,6 +489,12 @@ def validate_guest_brief_proposal(
         delta.pop("dates")
     if not delta["party"]:
         delta.pop("party")
+    if not delta["room_requirements"]:
+        delta.pop("room_requirements")
+    if data.get("room_requirements") == {}:
+        data.pop("room_requirements")
+    if data["party"].get("guardians") == {}:
+        data["party"].pop("guardians")
     data_changed = data != current.data
     pending_changed = tuple(sorted(pending)) != current.pending_fields
     changed = changed or data_changed or pending_changed

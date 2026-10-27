@@ -11,6 +11,7 @@ from threading import Barrier, Event
 import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+
 from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.store import (
     IdempotencyConflict,
@@ -348,8 +349,8 @@ def test_schema_four_upgrade_preserves_existing_session_and_source(engine) -> No
         connection.exec_driver_sql("DROP TABLE guest_briefs")
         connection.exec_driver_sql("DELETE FROM schema_versions WHERE version > 4")
     assert schema_version(engine) == 4
-    assert apply_migrations(engine) == 6
-    assert schema_version(engine) == 6
+    assert apply_migrations(engine) == 7
+    assert schema_version(engine) == 7
     assert get_guest_brief(engine, session_id=session_id, hotel_id=hotel_id).brief_version == 0
     assert get_session(engine, session_id)["hotel_id"] == hotel_id
     with engine.connect() as connection:

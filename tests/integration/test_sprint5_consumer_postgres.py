@@ -11,10 +11,11 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-import staylead_platform.composition.dependencies.guest_chat as guest_chat_composition
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy.exc import OperationalError
+
+import staylead_platform.composition.dependencies.guest_chat as guest_chat_composition
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.entrypoints.app import create_app
 from staylead_platform.infrastructure.database import create_database_engine
@@ -247,7 +248,7 @@ def test_preparation_rejects_unscoped_patch_before_m2_or_brief_mutation(engine) 
     response = _post(client, session, {"request_id": request_id, "question": question})
 
     assert response.status_code == 502, (response.text, provider.inputs)
-    assert response.json()["error"]["code"] == "invalid_retrieval_selection"
+    assert response.json()["error"]["code"] == "invalid_model_output"
     assert provider.calls == 1, "invalid preparation metadata must be rejected before committed-answer M2"
     after = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01")
     assert after == before
@@ -258,7 +259,7 @@ def test_preparation_rejects_unscoped_patch_before_m2_or_brief_mutation(engine) 
     ) is None
 
 
-def test_high_overlap_preparation_rejects_unscoped_patch_as_invalid_model_output(engine) -> None:
+def test_breakfast_preparation_rejects_unscoped_patch_as_invalid_model_output(engine) -> None:
     provider = UnscopedPreparationPatchProvider()
     client, session = _client(engine, provider)
     request_id = str(uuid.uuid4())
@@ -269,8 +270,7 @@ def test_high_overlap_preparation_rejects_unscoped_patch_as_invalid_model_output
 
     assert response.status_code == 502, (response.text, provider.inputs)
     assert response.json()["error"]["code"] == "invalid_model_output", provider.inputs
-    assert "candidate_index" not in provider.inputs[0], "the regression must exercise direct high-overlap preparation"
-    assert provider.calls == 1, "invalid high-overlap preparation must fail before a second model call"
+    assert provider.calls == 1, "invalid preparation metadata must fail before a second model call"
     assert get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01") == before
     assert get_guest_brief_receipt(
         engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,

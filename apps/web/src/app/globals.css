@@ -32,6 +32,18 @@ body {
 }
 .chat-header h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(32px, 6vw, 46px); letter-spacing: -.03em; }
 .chat-intro { max-width: 620px; margin: 10px 0 0; color: #5a625d; font-size: 16px; line-height: 1.55; }
+.booking-channel { max-width: 620px; margin-top: 16px; padding: 14px 16px; border: 1px solid #dce6dd; border-radius: 12px; background: #fbfcfa; }
+.booking-channel h2 { margin: 0 0 8px; font-size: 16px; }
+.booking-channel p { margin: 8px 0 0; }
+.booking-channel a { color: #176247; font-weight: 700; text-underline-offset: 3px; }
+.room-advice { max-width: min(100%, 680px); margin: 12px 0; padding: 16px; border: 1px solid #dce6dd; border-radius: 14px; background: #fbfcfa; color: #26372d; }
+.room-advice h2 { margin: 0 0 8px; font-size: 19px; }
+.room-option { margin-top: 14px; padding: 14px; border: 1px solid #e0e8e1; border-radius: 12px; background: #fff; }
+.room-option h3 { margin: 0 0 10px; font-size: 16px; }
+.room-layout, .room-rationale, .room-cost ul, .room-questions ul { margin: 8px 0; padding-inline-start: 22px; }
+.room-layout li { margin: 6px 0; }
+.room-layout small { display: block; color: #68746c; }
+.room-cost { margin-top: 10px; font-size: 14px; }
 .brief-summary { margin-top: 16px; border: 1px solid #dce6dd; border-radius: 12px; padding: 12px 14px; background: #f8faf7; color: #34473b; }
 .brief-summary h2 { margin: 0 0 6px; font-size: 14px; }
 .brief-summary p { margin: 4px 0; font-size: 13px; }
