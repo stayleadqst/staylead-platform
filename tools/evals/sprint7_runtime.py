@@ -13,9 +13,9 @@ Expected private files (mode 0600, both under /private/tmp):
           oracle_sha256
 state:  run_id, authority, candidate_sha256, matrix_sha256,
           authorized_for_live_calls=true, status='authorized',
-  max_guest_turns=7, max_codex_requests=14, max_calls_per_turn=2,
-          reserved_guest_turn_budget=7, reserved_request_budget=14,
-  guest_turns=2, codex_requests=4 (exact sealed continuation seed; only approved turns 3–7)
+  max_guest_turns=4, max_codex_requests=8, max_calls_per_turn=2,
+  reserved_guest_turn_budget=4, reserved_request_budget=8,
+  guest_turns=0, codex_requests=0 (fresh namespace; cases 1–4 only)
 
 The authorization record and pinned candidate manifest are supplied by the
 coordinator after approval. This runtime intentionally has no init/reset CLI.
@@ -37,19 +37,16 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261027-reacceptance2-cont1"
-CASE_RUN_ID = "s7-room-advice-20261027-reacceptance2"
-PRIOR_RUN_ID = "s7-room-advice-20261026-reacceptance1-cont2"
-PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance1-cont2-state.json")
-PRIOR_STATE_SHA256 = "3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843"
-PARENT_RUN_ID = "s7-room-advice-20261027-reacceptance2"
-PARENT_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance2-state.json")
-PARENT_STATE_SHA256 = "4f18e653499684919c083856474068bb3d2a1b6bedb5c3b6d2ab6204dd8c9feb"
-MAX_GUEST_TURNS = 7
-MAX_REQUESTS = 14
-START_GUEST_TURNS = 2
-START_REQUESTS = 4
-APPROVED_CASE_TURNS = (3, 4, 5, 6, 7)
+RUN_ID = "s7-room-advice-20261027-reacceptance3"
+CASE_RUN_ID = "s7-room-advice-20261027-reacceptance3"
+PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance2-cont1"
+PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance2-cont1-state.json")
+PRIOR_STATE_SHA256 = "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5"
+MAX_GUEST_TURNS = 4
+MAX_REQUESTS = 8
+START_GUEST_TURNS = 0
+START_REQUESTS = 0
+APPROVED_CASE_TURNS = (1, 2, 3, 4)
 MAX_CALLS_PER_TURN = 2
 MAX_OUTPUT_TOKENS = 700
 PROVIDER_TIMEOUT_SECONDS = 25.0
@@ -154,15 +151,14 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
         and state.get("reserved_request_budget") == MAX_REQUESTS
         and _counter(state.get("guest_turns"), MAX_GUEST_TURNS)
         and _counter(state.get("codex_requests"), MAX_REQUESTS)
-        and state.get("guest_turns") >= START_GUEST_TURNS
-        and state.get("codex_requests") >= START_REQUESTS
+        and state.get("guest_turns") == state.get("approved_case_turn")
         and state.get("approved_case_turn") == state.get("guest_turns")
-        and (not fresh or (state.get("guest_turns") == START_GUEST_TURNS
-                           and state.get("codex_requests") == START_REQUESTS
-                           and state.get("approved_case_turn") == START_GUEST_TURNS))
-        and isinstance(config.get("prior_allocation"), dict)
-        and config.get("continuation") == _continuation_record()
-        and state.get("continuation_parent_state_sha256") == PARENT_STATE_SHA256
+        and (not fresh or (state.get("guest_turns") == 0
+                           and state.get("codex_requests") == 0
+                           and state.get("approved_case_turn") == 0))
+        and config.get("prior_allocation") == _prior_allocation_record()
+        and config.get("continuation") is None
+        and state.get("prior_allocation_state_sha256") == PRIOR_STATE_SHA256
         and isinstance(state.get("authority"), str)
         and bool(state["authority"].strip())
         and config.get("provider") == "codex_cli"
@@ -181,35 +177,16 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
 
 def _prior_allocation_record() -> dict[str, Any]:
     return {
-        "run_id": PRIOR_RUN_ID, "guest_turns": 5, "codex_requests": 8,
-        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 25,
-        "unused_guest_slots": 2, "unused_request_slots": 6,
-        "unused_slots": "closed; no transfer/reset/reuse",
+        "run_id": PRIOR_RUN_ID, "status": "halted", "guest_turns": 6, "codex_requests": 11,
+        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 36,
+        "unused_guest_slots": 1, "unused_request_slots": 3,
+        "unused_slots": "closed; no replay/reset/reallocation",
+        "actual_outcome": {
+            "city1": "PASS", "city2": "FAIL invented hard twin", "family3_5": "PASS",
+            "pine6": "FAIL invented child-1; HTTP500", "pine7": "Blocked dependency; not attempted",
+        },
+        "no_further_calls": True,
     }
-
-
-def _continuation_record() -> dict[str, Any]:
-    return {
-        "parent_run_id": PARENT_RUN_ID, "parent_state_path": str(PARENT_STATE_PATH),
-        "parent_state_sha256": PARENT_STATE_SHA256,
-        "parent_guest_turns": START_GUEST_TURNS, "parent_codex_requests": START_REQUESTS,
-        "approved_case_turns": list(APPROVED_CASE_TURNS), "budget_turns": list(APPROVED_CASE_TURNS),
-        "max_new_guest_turns": len(APPROVED_CASE_TURNS),
-        "max_new_requests": len(APPROVED_CASE_TURNS) * MAX_CALLS_PER_TURN,
-    }
-
-
-def _verify_parent_continuation(value: Any) -> dict[str, Any]:
-    if value != _continuation_record():
-        raise RuntimeError("Continuation is not the exact approved immutable parent receipt.")
-    parent = _private_file(PARENT_STATE_PATH)
-    if (_file_sha256(PARENT_STATE_PATH) != PARENT_STATE_SHA256
-            or parent.get("run_id") != PARENT_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != START_GUEST_TURNS
-            or parent.get("codex_requests") != START_REQUESTS
-            or parent.get("approved_case_turn") != START_GUEST_TURNS):
-        raise RuntimeError("Parent Sprint 7 state changed or is not the sealed 2/4 allocation.")
-    return parent
 
 
 def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
@@ -218,9 +195,9 @@ def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
     parent = _private_file(PRIOR_STATE_PATH)
     if (_file_sha256(PRIOR_STATE_PATH) != PRIOR_STATE_SHA256
             or parent.get("run_id") != PRIOR_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != 5 or parent.get("codex_requests") != 8
+            or parent.get("guest_turns") != 6 or parent.get("codex_requests") != 11
             or parent.get("max_guest_turns") != 7 or parent.get("max_codex_requests") != 14):
-        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 5/8 allocation.")
+        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 6/11 allocation.")
     return parent
 
 
@@ -253,8 +230,8 @@ def prepare_private_run(
 ) -> None:
     """Create a fresh private namespace from approval and a pinned candidate.
 
-    The prior allocation remains closed. This bounded continuation verifies its
-    exact parent receipt and seeds only the sealed 2/4 counters for approved turns 3–7.
+    The prior allocation remains closed. This fresh namespace starts at 0/0 and
+    verifies the exact prior receipt; no counters transfer from earlier attempts.
     No secrets are read from the environment or printed.
     """
     approval = json.loads(approval_file.read_text(encoding="utf-8"))
@@ -276,7 +253,8 @@ def prepare_private_run(
         or not isinstance(approval.get("authority"), str)
         or not approval["authority"].strip()
         or approval.get("case_matrix_sha256") != manifest.get("matrix_sha256")
-        or approval.get("continuation") != manifest.get("continuation")
+        or approval.get("continuation") is not None
+        or manifest.get("continuation") is not None
     ):
         raise RuntimeError("Approval does not authorize this exact Sprint 7 run and cap set.")
     candidate_sha = manifest.get("candidate_sha256")
@@ -290,11 +268,9 @@ def prepare_private_run(
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]
             or not manifest.get("live_cases_path") or not manifest.get("oracle_path")
             or manifest.get("prior_allocation") != _prior_allocation_record()
-            or manifest.get("continuation") != _continuation_record()
             or approval.get("prior_allocation") != manifest.get("prior_allocation")):
         raise RuntimeError("Candidate manifest does not pin source, case and oracle bytes.")
     _verify_closed_prior_allocation(manifest["prior_allocation"])
-    _verify_parent_continuation(manifest["continuation"])
     if not database_url or not session_signing_secret:
         raise RuntimeError("Private development database and signing secret are required.")
     for destination in (config_path, state_path):
@@ -312,7 +288,7 @@ def prepare_private_run(
         "oracle_path": str(manifest.get("oracle_path", "")),
         "oracle_sha256": manifest.get("oracle_sha256"),
         "prior_allocation": manifest["prior_allocation"],
-        "continuation": manifest["continuation"],
+        "continuation": None,
     }
     _verify_candidate_inputs(config)
     state = {
@@ -323,9 +299,9 @@ def prepare_private_run(
         "max_calls_per_turn": MAX_CALLS_PER_TURN,
         "reserved_guest_turn_budget": MAX_GUEST_TURNS,
         "reserved_request_budget": MAX_REQUESTS,
-        "guest_turns": START_GUEST_TURNS, "codex_requests": START_REQUESTS,
+        "guest_turns": 0, "codex_requests": 0,
         "approved_case_turn": START_GUEST_TURNS,
-        "continuation_parent_state_sha256": PARENT_STATE_SHA256,
+        "prior_allocation_state_sha256": PRIOR_STATE_SHA256,
     }
     for destination, value in ((config_path, config), (state_path, state)):
         destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -464,11 +440,10 @@ def _verify_candidate_inputs(config: dict[str, Any]) -> None:
             or manifest.get("matrix_sha256") != config.get("matrix_sha256")
             or manifest.get("oracle_sha256") != config.get("oracle_sha256")
             or manifest.get("prior_allocation") != config.get("prior_allocation")
-            or manifest.get("continuation") != config.get("continuation")
+            or manifest.get("continuation") is not None or config.get("continuation") is not None
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]):
         raise RuntimeError("Pinned Sprint 7 candidate manifest changed or lacks source file pins.")
     _verify_closed_prior_allocation(config["prior_allocation"])
-    _verify_parent_continuation(config["continuation"])
     repo_root = Path(__file__).resolve().parents[2]
     for relative, expected in manifest["source_files"].items():
         if (not isinstance(relative, str) or not isinstance(expected, str)

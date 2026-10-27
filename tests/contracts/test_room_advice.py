@@ -284,6 +284,23 @@ def test_adversarial_free_text_is_rejected_and_localized_rationale_uses_checked_
     assert rationale["locale_fallback"] is True
 
 
+def test_room_advice_question_fields_are_canonical_and_reject_presentation_aliases() -> None:
+    schema = room_advice_output_schema()
+    field_schema = schema["properties"]["response"]["properties"]["questions"]["items"]["properties"]["field"]
+    allowed = field_schema["anyOf"][0]["enum"]
+    assert "room_requirements.hard_accessibility_needs" in allowed
+    assert "room_requirements.budget_strength" in allowed
+    assert "accessibility_confirmation" not in allowed
+    assert RoomAdviceQuestion(field="room_requirements.hard_accessibility_needs")
+    assert RoomAdviceQuestion(field="party.children.6adf87cf-4a99-4437-b293-d1e417e31c81.age")
+    with pytest.raises(ValidationError):
+        RoomAdviceQuestion(field="accessibility_confirmation")
+    with pytest.raises(ValidationError):
+        RoomAdviceQuestion(field="room_requirements.not_a_requirement")
+    with pytest.raises(ValidationError):
+        RoomAdviceQuestion(field="party.children.not-a-uuid.age")
+
+
 def test_native_room_advice_schema_parses_localized_mixed_room_candidates() -> None:
     schema = room_advice_output_schema()
     assert schema["additionalProperties"] is False

@@ -225,6 +225,81 @@ def test_sharing_schema_uses_only_canonical_adults_and_current_saved_child_ids()
     }]
 
 
+def test_room_requirement_clear_schema_is_limited_to_present_non_null_values() -> None:
+    brief = GuestBriefSnapshot(4, {
+        "room_requirements": {
+            "budget_amount": 0,
+            "hard_accessibility_needs": ["step-free access", "wheelchair bathroom"],
+            "budget_strength": None,
+            "sharing": "allow",
+        },
+    })
+
+    def room_requirement_variants(schema: dict[str, Any]) -> list[dict[str, Any]]:
+        body = schema["properties"]["response"]
+        branch = next(item for item in body.get("anyOf", (body,))
+                      if "guest_patch" in item.get("properties", {}))
+        patch = branch["properties"]["guest_patch"]["anyOf"][0]
+        items = patch["properties"]["ops"]["items"]["anyOf"]
+        return [variant for item in items for variant in item.get("anyOf", (item,))
+                if variant.get("properties", {}).get("op", {}).get("enum") == ["set_room_requirements"]]
+
+    schemas = (
+        fact_selection_output_schema(brief),
+        preparation_answer_output_schema(("send",), ("send",), brief),
+    )
+    for schema in schemas:
+        variants = room_requirement_variants(schema)
+        assert len(variants) == 2
+        set_variant, clear_variant = variants
+        assert set_variant["properties"]["clear_fields"]["maxItems"] == 0
+        assert clear_variant["properties"]["clear_fields"]["items"]["enum"] == [
+            "budget_amount", "sharing", "hard_accessibility_needs",
+        ]
+        assert clear_variant["properties"]["clear_fields"]["minItems"] == 1
+        assert all(clear_variant["properties"][field] == {"type": "null"} for field in (
+            "budget_amount", "sharing", "hard_accessibility_needs", "budget_strength",
+        ))
+
+    empty = GuestBriefSnapshot(1, {"room_requirements": {"sharing": None}})
+    for schema in (
+        fact_selection_output_schema(empty),
+        preparation_answer_output_schema(("send",), ("send",), empty),
+    ):
+        variants = room_requirement_variants(schema)
+        assert len(variants) == 1
+        assert "enum" not in variants[0]["properties"]["clear_fields"]["items"]
+        assert variants[0]["properties"]["clear_fields"]["maxItems"] == 0
+
+
+def test_room_requirement_clear_and_set_operations_preserve_zero_and_partial_lists() -> None:
+    brief = GuestBriefSnapshot(2, {
+        "room_requirements": {
+            "budget_amount": 0,
+            "budget_currency": "VND",
+            "hard_accessibility_needs": ["step-free entry", "wheelchair bathroom"],
+        },
+    })
+    mixed = GuestBriefProposal((
+        {"op": "set_room_requirements", "clear_fields": ["hard_accessibility_needs"],
+         "current_turn_quote": "Remove step-free entry"},
+        {"op": "set_room_requirements", "budget_amount": 0, "budget_strength": "hard",
+         "current_turn_quote": "make zero VND a hard limit"},
+    ))
+    changed = validate_guest_brief_proposal(brief, mixed)
+    assert changed.data["room_requirements"] == {
+        "budget_amount": 0, "budget_currency": "VND", "budget_strength": "hard",
+    }
+
+    partial = GuestBriefProposal(({
+        "op": "set_room_requirements", "hard_accessibility_needs": ["wheelchair bathroom"],
+        "current_turn_quote": "keep a wheelchair bathroom",
+    },))
+    changed_partial = validate_guest_brief_proposal(brief, partial)
+    assert changed_partial.data["room_requirements"]["hard_accessibility_needs"] == [
+        "wheelchair bathroom",
+    ]
+
 def test_new_child_sharing_is_valid_only_through_inline_add_child_consent() -> None:
     brief = GuestBriefSnapshot(0, {"party": {"adults": 1, "children": []}})
     question = "We are one adult and our seven-year-old may share my bed; I am the guardian."

@@ -12,6 +12,11 @@ from staylead_platform.domains.hospitality.schemas.guest_brief import (
 from staylead_platform.platform.contracts.guest_brief import GuestBriefSnapshot
 
 TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request")
+ROOM_REQUIREMENT_FIELDS = (
+    "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+    "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
+    "preferred_bed_types", "avoided_bed_types", "max_rooms",
+)
 
 
 def _string(*, maximum: int = 2000, minimum: int = 1) -> dict[str, Any]:
@@ -82,6 +87,41 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
             }),
         ],
     }
+    room_requirement_values = {
+        "budget_amount": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 10000000000}, {"type": "null"}]},
+        "budget_currency": _nullable_string(maximum=3),
+        "budget_basis": {"anyOf": [{"type": "string", "enum": ["stay_total", "per_night"]}, {"type": "null"}]},
+        "budget_strength": {"anyOf": [{"type": "string", "enum": ["hard", "target"]}, {"type": "null"}]},
+        "sharing": {"description": "Bed-sharing preference only; does not authorize sharing.",
+                    "anyOf": [{"type": "string", "enum": ["allow", "prefer", "avoid"]}, {"type": "null"}]},
+        "hard_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
+        "preferred_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
+        "hard_bed_types": {"description": HARD_BED_TYPES_DESCRIPTION,
+                           "anyOf": [_array({"type": "string", "enum": list(CANONICAL_BED_TYPES)}, maximum=8), {"type": "null"}]},
+        "preferred_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
+        "avoided_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
+        "max_rooms": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": 10}, {"type": "null"}]},
+    }
+    current_requirements = (brief.data.get("room_requirements") or {}) if brief is not None else {}
+    clearable_fields = [
+        field for field in ROOM_REQUIREMENT_FIELDS
+        if field in current_requirements and current_requirements[field] is not None
+    ]
+    set_room_requirements = _operation_schema("set_room_requirements", {
+        **room_requirement_values,
+        # Clearing uses a separate variant so the model cannot fill unchanged
+        # values and clear unrelated requirements in the same operation.
+        "clear_fields": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
+    })
+    room_requirement_variants = [set_room_requirements]
+    if clearable_fields:
+        room_requirement_variants.append(_operation_schema("set_room_requirements", {
+            **{field: {"type": "null"} for field in ROOM_REQUIREMENT_FIELDS},
+            "clear_fields": {
+                "type": "array", "items": {"type": "string", "enum": clearable_fields},
+                "minItems": 1, "maxItems": len(clearable_fields),
+            },
+        }))
     ops = [
         _operation_schema("set_dates", {
             "check_in": _nullable_string(maximum=10), "check_out": _nullable_string(maximum=10),
@@ -95,26 +135,7 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
             "child_id": _string(maximum=64), "requires_separate_bed": {"type": "boolean"},
         }),
         _operation_schema("remove_child", {"member_id": _string(maximum=64)}),
-        _operation_schema("set_room_requirements", {
-            "budget_amount": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 10000000000}, {"type": "null"}]},
-            "budget_currency": _nullable_string(maximum=3),
-            "budget_basis": {"anyOf": [{"type": "string", "enum": ["stay_total", "per_night"]}, {"type": "null"}]},
-            "budget_strength": {"anyOf": [{"type": "string", "enum": ["hard", "target"]}, {"type": "null"}]},
-            "sharing": {"description": "Bed-sharing preference only; does not authorize sharing.",
-                        "anyOf": [{"type": "string", "enum": ["allow", "prefer", "avoid"]}, {"type": "null"}]},
-            "hard_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
-            "preferred_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
-            "hard_bed_types": {"description": HARD_BED_TYPES_DESCRIPTION,
-                               "anyOf": [_array({"type": "string", "enum": list(CANONICAL_BED_TYPES)}, maximum=8), {"type": "null"}]},
-            "preferred_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
-            "avoided_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
-            "max_rooms": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": 10}, {"type": "null"}]},
-            "clear_fields": _array({"type": "string", "enum": [
-                "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
-                "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
-                "preferred_bed_types", "avoided_bed_types", "max_rooms",
-            ]}, maximum=11),
-        }),
+        {"anyOf": room_requirement_variants},
         _operation_schema("set_child_guardian", {
             "child_id": _string(maximum=64), "guardian_id": _string(maximum=64),
         }),

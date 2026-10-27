@@ -366,6 +366,112 @@ class MixedHotelAnswerRoomAdviceProvider(HappyPathRoomAdviceProvider):
         )
 
 
+class PineAgeAndAccessibilityProvider(RoomAdviceProvider):
+    """Exercise contextual clear-fields, M4, French labels, and persisted result in one API path."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.child_id: str | None = None
+        self.schemas: list[dict[str, object] | None] = []
+
+    def _patch(self, question: str) -> dict[str, object]:
+        if "seven-year-old" not in question:
+            assert self.child_id is not None
+            return {"ops": [
+                {"op": "set_child_age", "member_id": self.child_id, "age": 8,
+                 "current_turn_quote": "change my saved child's age to 8"},
+                {"op": "set_room_requirements", "clear_fields": [
+                    "hard_accessibility_needs",
+                ], "current_turn_quote": "remove the step-free entry and wheelchair bathroom requirements"},
+            ]}
+        return {"ops": [
+            {"op": "set_adults", "count": 1, "current_turn_quote": "one adult"},
+            {"op": "add_child", "age": 7, "guardian_adult_index": 1,
+             "share_bed_with_guardian": True, "requires_separate_bed": None,
+             "current_turn_quote": "I am one adult with my seven-year-old; I am the guardian and we may share a bed"},
+            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-12",
+             "current_turn_quote": "Check in 2026-11-10, check out 2026-11-12"},
+            {"op": "set_room_requirements", "hard_accessibility_needs": [
+                "step-free entry", "wheelchair-accessible bathroom",
+            ], "current_turn_quote": "We require step-free entry and wheelchair-accessible bathroom"},
+        ]}
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        payload = json.loads(request.input_text)
+        self.calls.append(payload)
+        self.schemas.append(request.response_schema)
+        question = str(payload.get("question", payload.get("current_question", "")))
+        if "current_question" in payload:
+            facts = payload["guest_facts"]
+            brief = payload["committed_guest_brief"]
+            if (brief.get("room_requirements") or {}).get("hard_accessibility_needs"):
+                value = {"options": [], "questions": [{
+                    "field": "room_requirements.hard_accessibility_needs",
+                }]}
+                return GenerationResult(
+                    text=json.dumps(value), provider="offline-fake", deployment="s7-test",
+                    model="mock-pine-clear-and-french", request_id=f"s7-pine-clear-{len(self.calls)}",
+                    usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+                )
+            room = next(fact for fact in facts if fact.get("field") == "room_type"
+                        and fact.get("value", {}).get("room_type_id") == "PINE-LOFT")
+            rate = next(fact for fact in facts if fact.get("field") == "reference_rate"
+                        and fact.get("value", {}).get("room_type_id") == "PINE-LOFT")
+            child_id = brief["party"]["children"][0]["member_id"]
+            templates = payload.get("presentation_templates", {})
+            french = {
+                "claim.party_fit": "Cette configuration convient au groupe confirmé et respecte les règles vérifiées.",
+                "claim.reference_price": "Estimation indicative du tarif pour le séjour : {amount} {currency}.",
+                "claim.charges_confirmation": "Certains frais d'enfant ou de couchage supplémentaire ne sont pas inclus.",
+            }
+            value = {
+                "options": [{
+                    "option_id": "pine-loft-age-eight",
+                    "rooms": [{"room_index": 0, "room_type_id": "PINE-LOFT"}],
+                    "assignments": [
+                        {"member_id": "adult-1", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+                        {"member_id": child_id, "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+                    ],
+                    "rationale": [
+                        {"claim_code": "party_fit", "fact_ids": [room["fact_id"]]},
+                        {"claim_code": "reference_price", "fact_ids": [rate["fact_id"]]},
+                        {"claim_code": "charges_confirmation", "fact_ids": [rate["fact_id"]]},
+                    ],
+                }],
+                "questions": [],
+                "presentation_labels": [
+                    {"key": key, "text": french[key]}
+                    for key in french if key in templates
+                ],
+            }
+        else:
+            patch = self._patch(question)
+            intents = ["guest_edit"]
+            locale = None
+            if "recommend a room" in question.lower():
+                intents.append("room_advice")
+                if "in French" in question:
+                    locale = "fr"
+            value = {
+                "fact_ids": [], "guest_patch": patch,
+                "turn_intents": intents, "explicit_language_tag": locale,
+                "inferred_language_tag": None,
+            }
+            if "candidate_index" not in payload:
+                value = {
+                    "supported_claims": [], "unknowns": ["I can check the room fit next."], "conflicts": [],
+                    "guest_patch": patch, "turn_intents": intents, "guest_claims": [],
+                    "guest_clarification": None, "conversational_acknowledgement": None,
+                    "guest_brief_refs": [], "explicit_language_tag": locale,
+                    "inferred_language_tag": None, "label_bundle": {},
+                }
+        return GenerationResult(
+            text=json.dumps(value, ensure_ascii=False), provider="offline-fake", deployment="s7-test",
+            model="mock-pine-clear-and-french", request_id=f"s7-pine-clear-{len(self.calls)}",
+            usage=Usage(input_tokens=3, output_tokens=4, total_tokens=7),
+        )
+
+
 @pytest.fixture(scope="module")
 def engine():
     if not TEST_DSN:
@@ -918,6 +1024,87 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     )
     assert old_result["currentness"] == "stale"
     assert old_result["selection"] is None
+
+
+def test_pine_accessibility_clear_age_update_reaches_french_persisted_advice(engine) -> None:
+    provider = PineAgeAndAccessibilityProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-seven-pine-clear-test-signing-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "pine-ridge-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    endpoint = f"/v1/guest/sessions/{session['session_id']}/messages"
+
+    first_question = (
+        "I am one adult with my seven-year-old; I am the guardian and we may share a bed. "
+        "Check in 2026-11-10, check out 2026-11-12. "
+        "We require step-free entry and wheelchair-accessible bathroom. Please recommend a room."
+    )
+    first = client.post(endpoint, headers=headers, json={
+        "request_id": str(uuid.uuid4()), "question": first_question,
+    })
+    assert first.status_code == 200, first.text
+    assert first.json()["room_advice"]["status"] == "needs_clarification"
+    saved = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-RETREAT03")
+    child_id = saved.data["party"]["children"][0]["member_id"]
+    provider.child_id = child_id
+    assert saved.data["party"]["children"][0]["age"] == 7
+    assert saved.data["room_requirements"]["hard_accessibility_needs"] == [
+        "step-free entry", "wheelchair-accessible bathroom",
+    ]
+
+    second_question = (
+        "Please change my saved child's age to 8 and remove the step-free entry and wheelchair "
+        "bathroom requirements. Keep the same guardian and dates. Recommend a room in French."
+    )
+    second = client.post(endpoint, headers=headers, json={
+        "request_id": str(uuid.uuid4()), "question": second_question,
+    })
+    assert second.status_code == 200, second.text
+    response = second.json()
+    advice = response["room_advice"]
+    assert advice["status"] in {"ready", "partial"}, advice.get("explanation_inputs")
+    assert advice["options"][0]["rooms"][0]["room_type_id"] == "PINE-LOFT"
+    assert advice["options"][0]["cost"]["nightly_subtotal"] == 2_200_000
+    assert any(item["amount"] == 4_400_000 and item["status"] == "known"
+               for item in advice["options"][0]["cost"]["breakdown"])
+    assert advice["options"][0]["cost"]["total"] is None
+    assert advice["options"][0]["cost"]["status"] == "incomplete"
+    assert advice["options"][0]["rationale"][0]["locale"] == "fr", response.get("language_preference")
+    assert advice["options"][0]["rationale"][0]["locale_fallback"] is False
+    assert "Cette configuration" in advice["options"][0]["rationale"][0]["text"]
+
+    def enum_values(node):
+        if isinstance(node, dict):
+            if "enum" in node:
+                yield node["enum"]
+            for child in node.values():
+                yield from enum_values(child)
+        elif isinstance(node, list):
+            for child in node:
+                yield from enum_values(child)
+
+    context_clear_enums = [values for values in enum_values(provider.schemas[2] or {})
+                           if "hard_accessibility_needs" in values]
+    assert context_clear_enums == [["hard_accessibility_needs"]]
+    current = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-RETREAT03")
+    assert current.data["party"]["children"][0]["member_id"] == child_id
+    assert current.data["party"]["children"][0]["age"] == 8
+    assert current.data["party"]["guardians"][child_id] == "adult-1"
+    assert (current.data.get("room_requirements") or {}).get("hard_accessibility_needs") is None
+
+    persisted = get_room_advice_result(
+        engine, session_id=session["session_id"], hotel_id="HTL-RETREAT03",
+        result_id=advice["result_id"],
+    )
+    assert persisted["currentness"] == "current"
+    assert persisted["payload"]["options"][0]["cost"] == advice["options"][0]["cost"]
+    assert persisted["payload"]["options"][0]["rationale"][0]["locale"] == "fr"
+    assert len(provider.calls) == 4
 
 
 def test_unknown_new_child_sharing_id_fails_as_model_output_without_brief_mutation(engine) -> None:

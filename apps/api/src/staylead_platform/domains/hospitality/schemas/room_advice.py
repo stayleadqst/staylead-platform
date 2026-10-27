@@ -3,10 +3,21 @@
 from __future__ import annotations
 
 from typing import Any, Literal
+from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from staylead_platform.domains.hospitality.schemas.grounded_answer import GroundedClaim
+
+ROOM_ADVICE_QUESTION_FIELDS = (
+    "dates.check_in", "dates.check_out", "party.adults", "party.children.age",
+    "room_requirements.budget_amount", "room_requirements.budget_currency",
+    "room_requirements.budget_basis", "room_requirements.budget_strength",
+    "room_requirements.sharing", "room_requirements.hard_accessibility_needs",
+    "room_requirements.preferred_accessibility_needs", "room_requirements.hard_bed_types",
+    "room_requirements.preferred_bed_types", "room_requirements.avoided_bed_types",
+    "room_requirements.max_rooms", "room_advice",
+)
 
 PRESENTATION_LABEL_KEYS = (
     "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
@@ -53,6 +64,20 @@ class RoomAdviceOption(BaseModel):
 class RoomAdviceQuestion(BaseModel):
     model_config = ConfigDict(extra="forbid")
     field: str = Field(min_length=1, max_length=64)
+
+    @field_validator("field")
+    @classmethod
+    def canonical_field_or_stable_child_age(cls, value: str) -> str:
+        if value in ROOM_ADVICE_QUESTION_FIELDS:
+            return value
+        parts = value.split(".")
+        if len(parts) == 4 and parts[0:2] == ["party", "children"] and parts[3] == "age":
+            try:
+                if str(UUID(parts[2])) == parts[2]:
+                    return value
+            except ValueError:
+                pass
+        raise ValueError("Room-advice questions must use a canonical field key.")
 
 
 class RoomAdvicePresentationLabel(BaseModel):
@@ -119,7 +144,12 @@ def room_advice_output_schema(
         "assignments": {"type": "array", "items": assignment, "minItems": 1, "maxItems": 40},
         "rationale": {"type": "array", "items": rationale, "maxItems": 8},
     })
-    question = _object({"field": id_text})
+    question = _object({
+        "field": {"anyOf": [
+            {"type": "string", "enum": list(ROOM_ADVICE_QUESTION_FIELDS)},
+            {"type": "string", "pattern": r"^party\.children\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.age$"},
+        ]},
+    })
     body_properties = {
         "options": {"type": "array", "items": option, "maxItems": 4},
         "questions": {"type": "array", "items": question, "maxItems": 6},

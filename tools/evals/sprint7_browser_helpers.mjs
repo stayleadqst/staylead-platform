@@ -1,8 +1,25 @@
 /** Small pure helpers shared with offline tests for bounded browser branches. */
 export function selectionOptionForAcceptanceTurn(turnNumber, roomAdvice) {
-  if (turnNumber !== 7) return null;
+  if (![1, 2, 4].includes(turnNumber)) return null;
   const options = Array.isArray(roomAdvice?.options) ? roomAdvice.options : [];
   return options.find((option) => typeof option?.option_id === "string" && option.option_id.length > 0) ?? null;
+}
+
+/** A useful option has a checked room choice and complete guest assignments. */
+export function hasUsefulRoomOptions(roomAdvice) {
+  return Array.isArray(roomAdvice?.options) && roomAdvice.options.some((option) =>
+    Array.isArray(option?.rooms) && option.rooms.length > 0
+      && Array.isArray(option?.assignments) && option.assignments.length > 0);
+}
+
+/** Validate the approved Pine party without adding an unrequested child bed constraint. */
+export function checkPinePartyBrief(brief, expectedAge) {
+  const child = brief?.party?.children?.[0];
+  return brief?.party?.adults === 1 && brief.party.children?.length === 1
+    && child?.age === expectedAge && typeof child.member_id === "string"
+    && brief.party.guardians?.[child.member_id] === "adult-1"
+    && hasExactBedSharingConsent(brief, ["adult-1", child.member_id], true)
+    ? child.member_id : null;
 }
 
 /** A case advances only after its private coordinator semantic receipt is exact and passing. */
@@ -34,11 +51,24 @@ export function hasExplicitSeparateBedResolution(brief) {
     || hasCanonicalSeparateBedConstraint(brief);
 }
 
-/** The City2 browser branch accepts either explicit no-sharing or a canonical separate-bed type. */
+/** This approved City2 case denies sharing without naming a physical bed type. */
 export function checkCity2Brief(brief) {
   return brief?.room_requirements?.budget_amount === 6_500_000
     && brief.room_requirements?.budget_strength === "hard"
-    && hasExplicitSeparateBedResolution(brief);
+    && hasExactBedSharingConsent(brief, ["adult-1", "adult-2"], false)
+    && !(brief.room_requirements?.hard_bed_types ?? []).length;
+}
+
+/** Two adults have separate checked surfaces when they occupy distinct beds or rooms. */
+export function hasDistinctAssignedBeds(option, memberIds) {
+  const assignments = (option?.assignments ?? []).filter((item) => memberIds.includes(item.member_id));
+  if (assignments.length !== memberIds.length) return false;
+  const roomIndexes = assignments.map((item) => item.room_index);
+  if (!roomIndexes.every(Number.isInteger)) return false;
+  const surfaces = assignments.map((item) => Number.isInteger(item.bed_index)
+    ? `${item.room_index}:${item.bed_index}` : null);
+  if (surfaces.every((surface) => surface !== null)) return new Set(surfaces).size === surfaces.length;
+  return new Set(roomIndexes).size === roomIndexes.length;
 }
 
 /** Adult consent must name exactly the two adults and allow sharing. */

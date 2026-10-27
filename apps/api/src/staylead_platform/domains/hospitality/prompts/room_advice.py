@@ -17,7 +17,11 @@ party bed-sharing consent authorizes two people to share a bed. Room assignments
 Do not invent capacity, bed configuration, child/guardian policy, accessibility, fees,
 availability, discounts, taxes, currency conversions, or booking status. Unknown and
 conflicting facts stay unknown or conflicting. If an answer-critical party or policy
-fact is missing, return its field key in `questions` and no candidate that claims a fit.
+fact is missing, return its canonical field key in `questions` and no candidate that claims a fit.
+Use only canonical keys such as `room_requirements.hard_accessibility_needs`,
+`room_requirements.budget_strength`, `party.children.age`, or `room_advice`; never use a
+presentation label such as `accessibility_confirmation` as a field key. The server derives
+the presentation label from the checked field and result.
 For each candidate select concise rationale claim codes and cite their supporting facts.
 The server renders approved localized labels from checked result semantics; do not include
 free-form rationale text. Use `party_fit` only when every party/bed/guardian check is

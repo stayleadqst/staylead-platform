@@ -1,0 +1,70 @@
+{
+  "scope": "NEW manual reacceptance3; prior36requests excluded",
+  "guest_turns": 4,
+  "reserved_requests": 8,
+  "completed_responses_with_usage": 8,
+  "observed_input_tokens": 98877,
+  "observed_output_tokens": 3178,
+  "lifetime_requests": 44,
+  "requests": [
+    {
+      "turn": 1,
+      "call": 1,
+      "input_tokens": 12725,
+      "output_tokens": 503,
+      "latency_ms": 13992.7
+    },
+    {
+      "turn": 1,
+      "call": 2,
+      "input_tokens": 11614,
+      "output_tokens": 439,
+      "latency_ms": 6706.8
+    },
+    {
+      "turn": 2,
+      "call": 1,
+      "input_tokens": 12844,
+      "output_tokens": 580,
+      "latency_ms": 13493.4
+    },
+    {
+      "turn": 2,
+      "call": 2,
+      "input_tokens": 11586,
+      "output_tokens": 216,
+      "latency_ms": 6053.3
+    },
+    {
+      "turn": 3,
+      "call": 1,
+      "input_tokens": 12897,
+      "output_tokens": 679,
+      "latency_ms": 12067.6
+    },
+    {
+      "turn": 3,
+      "call": 2,
+      "input_tokens": 11758,
+      "output_tokens": 33,
+      "latency_ms": 3882.9
+    },
+    {
+      "turn": 4,
+      "call": 1,
+      "input_tokens": 13138,
+      "output_tokens": 653,
+      "latency_ms": 11506.4
+    },
+    {
+      "turn": 4,
+      "call": 2,
+      "input_tokens": 12315,
+      "output_tokens": 75,
+      "latency_ms": 4329.7
+    }
+  ],
+  "agent_tokens": "unavailable",
+  "billing_amount": "unavailable",
+  "actual_outcome": "City1+2/Pine3PASS; Pine4FAIL; all failures count; no more approved calls"
+}

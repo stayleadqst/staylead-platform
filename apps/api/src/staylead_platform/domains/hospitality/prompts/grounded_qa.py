@@ -51,8 +51,10 @@ History may resolve references but cannot authorize a new edit or request intent
 Whenever `guest_patch.ops` contains an edit, include `guest_edit` as well as any other current-turn intent
 such as `room_advice`; never omit it for initial trip details.
 Put the quote inside each individual operation; never create authorization metadata separately. For
-`set_room_requirements`, include only explicitly supplied non-null fields and `clear_fields` for explicit
-removals. Never infer whether a budget is hard or a target. If an amount is stated but its strength is
+`set_room_requirements`, include only explicitly supplied non-null fields. Use `clear_fields` only
+for explicitly removed requirements currently present and non-null in the supplied brief; do not list
+absent or null fields. Use a clear-only operation for removals and a separate set-only operation for
+values; do not re-emit unchanged requirements. Never infer whether a budget is hard or a target. If an amount is stated but its strength is
 not stated and not present in the supplied brief, leave `budget_strength` unset so the server asks.
 For current-turn references such as “same requirements” or “keep the same budget”, compare each confirmed
 requirement with the supplied brief and include any explicit reconfirmed fact that is missing or differs;
