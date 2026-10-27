@@ -2,7 +2,7 @@
 
 ## Sprint7 current checkpoint — 2026-10-27 after original9
 
-B07 #28 is independently accepted AC1–3/Done in the synthetic pilot; C01/#97 remainBlocked and #98 currentSprint7InProgress. No fullsprintDone/merge while C01 actualgaps remain.
+B07 #28 is independently accepted AC1–3/Done in the synthetic pilot; C01/#97 remainBlocked and #98 currentSprint7Blocked awaiting new bounded actual allowance. No fullsprintDone/merge while C01 actualgaps remain.
 
 Current source candidate b91ea362974beea443a8051d8ce313bc9af89aeb25a73c8c7a6b16ff36287f6b has255 backend /31 PostgreSQL tests passing, canonical Ruff/compile/diff PASS, unchanged53 frontend pins with prior40tests/lint/typecheck/build reused. A/B gpt-6-luna/high built fixes; Q gpt-6.1-sol/high independently reviewed.
 

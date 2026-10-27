@@ -2,7 +2,7 @@
 
 2026-10-27 (Asia/Ho_Chi_Minh). **In progress: full AC/DoD has not been achieved.**
 
-Hieu requested continued investigation, implementation and verification to remove all blockers and complete Sprint7. [S7-F1 #98](https://github.com/stayleadqst/staylead-platform/issues/98) is in **Sprint7 / P0 / In Progress**; its historical future-sprint deferral is superseded. [C01 #39](https://github.com/stayleadqst/staylead-platform/issues/39), [coordination #97](https://github.com/stayleadqst/staylead-platform/issues/97) remain **Blocked** pending acceptance. **B07 #28 has passed all AC1–3 and is Done independently** within the approved synthetic pilot; code/evidence are included in this publication. C01 and the sprint are not Done.
+Hieu requested continued investigation, implementation and verification to remove all blockers and complete Sprint7. [S7-F1 #98](https://github.com/stayleadqst/staylead-platform/issues/98) is in **Sprint7 / P0 / Blocked**; its historical future-sprint deferral is superseded. [C01 #39](https://github.com/stayleadqst/staylead-platform/issues/39), [coordination #97](https://github.com/stayleadqst/staylead-platform/issues/97) remain **Blocked** pending acceptance. **B07 #28 has passed all AC1–3 and is Done independently** within the approved synthetic pilot; code/evidence are included in this publication. C01 and the sprint are not Done.
 
 ## Work, ownership and verification
 
@@ -12,7 +12,7 @@ Hieu requested continued investigation, implementation and verification to remov
 | Persistence and registered consumer | B / gpt-6-luna / high | Implemented; budget question CAS and localization repaired | FastAPI/PostgreSQL currentness, selection, replay, language and stale-result coverage | 31 PostgreSQL tests PASS; B07 AC1–3 accepted; actual C01 sequences still missing |
 | Bounded runtime/browser driver | B / gpt-6-luna / high | Cont6 original9 completed; actual API/browser stopped | Exact parent counters/source/oracle pins; no absent-option selection; truthful nightly-vs-total math; pure booking response handled | Original9 browser PASS; no advice selection/French claim |
 | Independent review | Q / gpt-6.1-sol / high | Atomic protocol, consumer and localization repairs independently reviewed | Both native output paths fail closed; repeated derivation does not mutate payload; quotes excluded from canonical M2 | Case8 French FAIL preserved; case9 independently accepted, B07 AC1–3 PASS |
-| Integration, gates, backlog and delivery | Coordinator / current session; exact model/effort metadata unavailable | [Draft PR99](https://github.com/stayleadqst/staylead-platform/pull/99), unmerged | Local gates, source-bound evidence and preserved failures/counters | Publish reviewed candidate/evidence; full AC required before Done/merge |
+| Integration, gates, backlog and delivery | Coordinator / current session; exact model/effort metadata unavailable | [Draft PR99](https://github.com/stayleadqst/staylead-platform/pull/99), unmerged | Local gates, source-bound evidence and preserved failures/counters | Published reviewed code/evidence; await new bounded actual allowance; full AC required before sprint Done/merge |
 
 One mutable-file owner at a time. M1–M6 boundaries remain mandatory. Hospitality derives authorization metadata behind the existing neutral platform port; platform does not import domain code. No language parser, fabricated M2 history or extra narrative call was added.
 
@@ -60,7 +60,9 @@ Earlier source-bound review reports are in [evidence/sprint-7](evidence/sprint-7
 | #39 C01 | Domain data/checks/math, persisted result/selection/edit/replay, registered UI; City1 actual; offline remediations | Actual repaired City2/3, family4/5/6 and original Pine7→8 including French and current selection; fullAC1–8 | **Blocked** |
 | #28 B07 | Actual9 intent/language/injection/trusted boundary PASS; offline safe/missing/contact fallbacks reused; independentAC1–3 PASS | None within approved synthetic pilot; no real booking endpoint/functionality claim | **Done** |
 | #97 coordination | Team/contracts/oracle, local gates, independent review, preserved attempts and active remediation | Full goal/AC/DoD and verified delivery | **Blocked** |
-| #98 S7-F1 | Existing follow-up pulled into current sprint; protocol and evidenced defects repaired | Fixed-candidate actual semantic acceptance and independent verdict | **In Progress / Sprint7** |
+| #98 S7-F1 | Existing follow-up pulled into current sprint; protocol and evidenced defects repaired | Fixed-candidate actual semantic acceptance and independent verdict | **Blocked / Sprint7** |
+
+B07 #28 is closed as completed after code/evidence publication and independent acceptance. C01/#97/#98 remain Blocked pending the bounded reacceptance allowance.
 
 No new follow-up story was added during resumed execution: #98 already covers these related protocol/acceptance blockers with problem, impact, attempts, evidence, AC, epic/priority and affected-story links. No broader parent/epic/milestone is closed.
 
@@ -74,7 +76,7 @@ Q's [minimal reacceptance plan](evidence/sprint-7/q-minimal-reacceptance-plan.js
 
 ## Delivery state
 
-Own branch `sprint-7-room-advisory`; accepted baseline `a46a63eb4b589b8518f9477ebd66e81d89a0f054`; draft PR99 targets designated `sprint-5-canonical-brief`. Previous published HEAD was `e84a7030d8b2a50b920591461cc984748060caf3`; this update contains resumed fixes, reviewed candidate `b91ea362` and sanitized evidence for publication. Final branch commit receipt is recorded in the PR/backlog delivery update. No fullDone, merge, deployment or real booking claim. Three synthetic hotels/nine room types establish neither real hotel approval nor live availability. Demonstration destinations are nonfunctional examples.
+Own branch `sprint-7-room-advisory`; accepted baseline `a46a63eb4b589b8518f9477ebd66e81d89a0f054`; draft PR99 targets designated `sprint-5-canonical-brief`. Reviewed implementation/evidence published as commit `48460e39cd56112c7bd3095f7b1b1d94f8996ae4`, local/remote tree `1ed2ab6af7f6be368c0e0f28c6dd9d2d6e615b30` matched exactly. Product candidate `b91ea362` remains unchanged; this follow-up records final story statuses. B07 #28 is closed completed; #39/#97/#98 remain open Blocked. Final branch receipt is in the PR/backlog delivery update. No fullDone, merge, deployment or real booking claim. Three synthetic hotels/nine room types establish neither real hotel approval nor live availability. Demonstration destinations are nonfunctional examples.
 
 [Independent B07 actual verdict](evidence/sprint-7/q-review-cont6-actual.json) verifies native booking_request+hotel_information/en, exact approved URL, English disclosures and source bindings. Read-only DB confirms no M2/result/selection mutation. No external destination click or real-site functionality is claimed.
 
