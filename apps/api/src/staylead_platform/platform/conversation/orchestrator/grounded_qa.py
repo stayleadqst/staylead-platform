@@ -781,6 +781,7 @@ class GroundedQAOrchestrator:
         if self._room_advice is None:
             raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
         mixed_hotel_request = {"hotel_information", "room_advice"} <= set(context.turn_intents)
+        include_presentation_labels = self._room_advice.needs_presentation_labels(context.locale)
         requested_hotel_fact_ids = set(context.hotel_information_fact_ids) if mixed_hotel_request else set()
         eligible_facts = self._room_advice.eligible_facts(context)
         eligible_by_id = {fact.get("fact_id"): fact for fact in eligible_facts}
@@ -821,14 +822,18 @@ class GroundedQAOrchestrator:
         if mixed_hotel_request:
             preparation_input["turn_intents"] = list(context.turn_intents)
             preparation_input["hotel_information_facts"] = list(hotel_information_facts)
+        if include_presentation_labels:
+            preparation_input["presentation_templates"] = self._room_advice.presentation_templates()
         generated = await self._provider.generate(GenerationRequest(
             instructions=self._room_advice.preparation_instructions(
                 context.locale, include_hotel_answer=mixed_hotel_request,
+                include_presentation_labels=include_presentation_labels,
             ),
             input_text=json.dumps(preparation_input, ensure_ascii=False, separators=(",", ":")),
             max_output_tokens=self._max_output_tokens,
             response_schema=self._room_advice.preparation_output_schema(
                 include_hotel_answer=mixed_hotel_request,
+                include_presentation_labels=include_presentation_labels,
             ),
             response_envelope_key="response",
         ))
@@ -957,11 +962,45 @@ class GroundedQAOrchestrator:
 
     def relocalize_room_advice(
         self, result: RoomAdviceResult, locale: str | None,
+        presentation_labels: dict[str, str] | None = None,
     ) -> RoomAdviceResult:
         """Forward presentation-only localization to the registered domain port."""
         if self._room_advice is None:
             raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
-        return self._room_advice.relocalize(result, locale)
+        return self._room_advice.relocalize(result, locale, presentation_labels)
+
+    async def translate_room_advice(
+        self, result: RoomAdviceResult, locale: str | None, *, deadline: float | None = None,
+    ) -> tuple[RoomAdviceResult, GenerationResult | None]:
+        """Use the existing second slot for presentation-only localization of checked advice."""
+        if self._room_advice is None:
+            raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
+        request = self._room_advice.localization_request(result, locale)
+        if request is None:
+            return self._room_advice.relocalize(result, locale), None
+        try:
+            generated = await self._provider.generate(GenerationRequest(
+                instructions=request["instructions"],
+                input_text=json.dumps(request["input"], ensure_ascii=False, separators=(",", ":")),
+                max_output_tokens=self._max_output_tokens,
+                response_schema=request["response_schema"],
+                response_envelope_key="response",
+            ))
+            labels = self._room_advice.parse_localization(
+                generated.text, expected_keys=tuple(request["keys"]), locale=locale,
+            )
+        except (ProviderError, TimeoutError):
+            raise
+        except (ValidationError, ValueError) as exc:
+            diagnostics = _validation_diagnostics(exc) if isinstance(exc, ValidationError) else None
+            raise ConversationFailure(
+                "invalid_room_advice_localization", "The model returned invalid room-advice labels.",
+                validation_diagnostics=diagnostics,
+            ) from exc
+        remaining = self._remaining(deadline)
+        if remaining is not None and remaining <= 0:
+            raise TimeoutError("The request deadline expired during room-advice localization.")
+        return self._room_advice.relocalize(result, locale, labels), generated
 
     def _validated_preparation_metadata(
         self, payload: Any, patch: GuestBriefProposal | None, question: str,

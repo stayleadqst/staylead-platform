@@ -1338,6 +1338,123 @@ def get_room_advice_result(
         return result
 
 
+def update_room_advice_presentation(
+    engine: Engine, *, session_id: str, hotel_id: str, result_id: str,
+    expected_result_version: int, expected_payload: dict[str, Any],
+    payload: dict[str, Any], expected_language_revision: int,
+    timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Persist localized display text without changing the checked advice decision.
+
+    The stored result version and dependency fingerprint remain stable. The caller
+    supplies the payload it read; this compare-and-set accepts only changes to
+    presentation labels and rendered rationale/question text and metadata.
+    """
+    def decision_content(value: dict[str, Any]) -> dict[str, Any]:
+        content = json.loads(json.dumps(value, ensure_ascii=False))
+        content.pop("presentation_labels", None)
+        content.pop("presentation_locale", None)
+        claim_codes = {
+            "party_fit", "bed_setup", "reference_price", "policy_confirmation",
+            "accessibility_confirmation", "preference_tradeoff", "charges_confirmation",
+        }
+        def checked_key(actual: Any, expected: str) -> str:
+            if actual is not None and actual != expected:
+                raise ValueError("localized room advice contains an invalid presentation key")
+            return expected
+
+        def question_key(field: Any) -> str:
+            if field == "room_requirements.budget_strength":
+                return "question.budget_strength"
+            unknowns = set(content.get("explanation_inputs", {}).get("unknowns", ()))
+            conflicts = set(content.get("explanation_inputs", {}).get("conflicts", ()))
+            if "rate_basis" in unknowns:
+                return "question.rate_basis"
+            if "rate_validity_window" in unknowns:
+                return "question.rate_validity_window"
+            if field == "room_advice" and conflicts:
+                conflict = min(conflicts)
+                return {
+                    "hard_budget_exceeded": "question.hard_budget_exceeded",
+                    "source_fact_conflict": "question.source_fact_conflict",
+                }.get(conflict, "question.room_rule_conflict")
+            if field in {"dates.check_in", "dates.check_out"}:
+                return "question.dates"
+            if field == "party.adults":
+                return "question.party"
+            if field == "party.children.age" or (
+                isinstance(field, str) and field.startswith("party.children.") and field.endswith(".age")
+            ):
+                return "question.age"
+            if field == "room_advice" or isinstance(field, str) and field.startswith("room_requirements."):
+                return "question.room"
+            return "question.generic"
+
+        for option in content.get("options", ()):
+            if not isinstance(option, dict):
+                continue
+            for item in option.get("rationale", ()):
+                if isinstance(item, dict):
+                    claim_code = item.get("claim_code")
+                    if claim_code not in claim_codes:
+                        raise ValueError("localized room advice contains an invalid rationale code")
+                    item["presentation_key"] = checked_key(
+                        item.get("presentation_key"), f"claim.{claim_code}",
+                    )
+                    for key in ("text", "locale", "locale_fallback"):
+                        item.pop(key, None)
+        for question in content.get("questions", ()):
+            if isinstance(question, dict):
+                question["presentation_key"] = checked_key(
+                    question.get("presentation_key"), question_key(question.get("field")),
+                )
+                for key in ("reason", "locale", "locale_fallback"):
+                    question.pop(key, None)
+        return content
+
+    if decision_content(expected_payload) != decision_content(payload):
+        raise ValueError("localized room advice changed checked decision content")
+    now = utcnow()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions.c.session_id).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > now,
+        )).with_for_update()).first()
+        if session is None:
+            raise ScopeError("room advice presentation session is no longer current")
+        row = connection.execute(select(room_advice_results).where(and_(
+            room_advice_results.c.result_id == result_id,
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.hotel_id == hotel_id,
+        )).with_for_update()).mappings().first()
+        if (row is None or row["result_version"] != expected_result_version
+                or decision_content(row["payload"]) != decision_content(expected_payload)):
+            raise VersionConflict("room advice changed before its presentation was updated")
+        if _room_advice_currentness(connection, row, now) != "current":
+            raise StaleSource("room advice dependencies changed before presentation update")
+        preference = connection.execute(select(guest_language_preferences.c.revision).where(and_(
+            guest_language_preferences.c.session_id == session_id,
+            guest_language_preferences.c.hotel_id == hotel_id,
+        )).with_for_update()).scalar_one_or_none()
+        if int(preference or 0) != expected_language_revision:
+            raise VersionConflict("guest language preference changed before presentation update")
+        connection.execute(update(room_advice_results).where(
+            room_advice_results.c.result_id == result_id,
+        ).values(payload=payload))
+        updated = connection.execute(select(room_advice_results).where(
+            room_advice_results.c.result_id == result_id,
+        )).mappings().one()
+        result = dict(updated)
+        result["currentness"] = "current"
+        selection = connection.execute(select(room_advice_selections).where(and_(
+            room_advice_selections.c.session_id == session_id,
+            room_advice_selections.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        result["selection"] = _selection_payload(selection, updated)
+        return result
+
+
 def select_room_advice_option(
     engine: Engine, *, session_id: str, hotel_id: str, result_id: str,
     expected_result_version: int, option_id: str, timeout_seconds: float | None = None,

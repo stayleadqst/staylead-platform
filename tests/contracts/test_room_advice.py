@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from copy import deepcopy
 from dataclasses import asdict, replace
 from typing import get_args
@@ -17,10 +16,12 @@ from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
 )
 from staylead_platform.domains.hospitality.schemas.guest_brief import (
-    GuestPatchAuthorization,
+    CANONICAL_BED_TYPES,
     GuestTurnIntent,
+    SetRoomRequirements,
     validate_guest_brief_proposal,
     validate_guest_patch_authorization,
+    validate_preparation_metadata,
 )
 from staylead_platform.domains.hospitality.schemas.preparation_output import (
     TURN_INTENTS,
@@ -41,6 +42,7 @@ from staylead_platform.platform.contracts.room_advice import (
     RoomAdviceCandidate,
     RoomAdviceContext,
     RoomAdviceDraft,
+    RoomAdviceResult,
 )
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     GroundedQAOrchestrator,
@@ -116,6 +118,11 @@ def _context(brief: dict, facts: tuple[dict, ...]) -> RoomAdviceContext:
     )
 
 
+def _without_inline_quotes(operations: tuple[dict, ...]) -> tuple[dict, ...]:
+    return tuple({key: value for key, value in operation.items() if key != "current_turn_quote"}
+                 for operation in operations)
+
+
 def test_couple_sharing_is_checked_and_reference_total_is_independently_calculated() -> None:
     room, rate = _catalog(), _rate()
     brief = {
@@ -143,6 +150,55 @@ def test_couple_sharing_is_checked_and_reference_total_is_independently_calculat
     assert option["rationale"][1]["text"] == "本次入住的参考房费估算：200 VND。"
     assert result.availability == "unknown"
     assert all(ref["source_generation"] == 7 for ref in result.source_refs)
+
+
+def test_rejected_over_budget_alternative_does_not_poison_valid_option() -> None:
+    standard_room = _catalog(room_id="CITY-STD", max_occupancy=2)
+    standard_room["fact_id"] = "F-STD"
+    standard_room["value"]["beds"] = [{"type": "queen", "count": 1, "occupant_capacity": 2}]
+    family_room = deepcopy(standard_room)
+    family_room["fact_id"] = "F-FAMILY"
+    family_room["value"]["room_type_id"] = "CITY-FAM"
+
+    standard_rate = _rate(amount=1_800_000)
+    standard_rate["fact_id"] = "F-RATE-STD"
+    standard_rate["value"].update(room_type_id="CITY-STD", rate_id="RATE-STD")
+    family_rate = deepcopy(standard_rate)
+    family_rate["fact_id"] = "F-RATE-FAMILY"
+    family_rate["value"].update(room_type_id="CITY-FAM", rate_id="RATE-FAMILY", amount=2_900_000)
+
+    brief = {
+        "dates": {"check_in": "2026-11-01", "check_out": "2026-11-04"},
+        "party": {"adults": 2, "children": [], "bed_sharing": [
+            {"member_ids": ["adult-1", "adult-2"], "allow_share": True}],
+        },
+        "room_requirements": {
+            "budget_amount": 6_000_000, "budget_currency": "VND",
+            "budget_basis": "stay_total", "budget_strength": "hard",
+        },
+    }
+    def candidate(option_id: str, room_id: str) -> RoomAdviceCandidate:
+        return RoomAdviceCandidate(
+            option_id=option_id, rooms=({"room_index": 0, "room_type_id": room_id},),
+            assignments=tuple({"member_id": f"adult-{number}", "room_index": 0,
+                               "bed_index": 0, "bed_type": "queen"} for number in (1, 2)),
+        )
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(brief, (standard_room, standard_rate, family_room, family_rate)),
+        draft=RoomAdviceDraft("ready", (
+            candidate("standard-queen", "CITY-STD"), candidate("family-queen", "CITY-FAM"),
+        )),
+    ))
+    assert result.status == "ready"
+    assert [option["option_id"] for option in result.options] == ["standard-queen"]
+    assert result.options[0]["cost"]["total"] == 5_400_000
+    assert result.questions == ()
+    assert result.explanation_inputs["conflicts"] == []
+    rejected = result.explanation_inputs["rejected_alternatives"]
+    assert rejected[0]["option_id"] == "family-queen"
+    assert rejected[0]["reason"] == "hard_budget_exceeded"
+    assert set(rejected[0]["fact_ids"]) == {"F-FAMILY", "F-RATE-FAMILY"}
 
 
 def test_child_guardian_age_and_unknown_child_fee_prevent_complete_budget_claim() -> None:
@@ -281,54 +337,409 @@ def test_missing_dates_preserve_nightly_reference_estimate_and_mark_total_partia
     assert result.status == "partial"
 
 
+def test_budget_amount_without_strength_remains_pending_and_requires_explicit_classification() -> None:
+    question = "Set a 6000000 VND budget for the whole stay."
+    operation = {
+        "op": "set_room_requirements", "budget_amount": 6_000_000,
+        "budget_currency": "VND", "budget_basis": "stay_total",
+        "current_turn_quote": question,
+    }
+    payload = {"turn_intents": ["guest_edit", "room_advice"], "guest_patch": {"ops": [operation]}}
+    parsed = FactSelection.model_validate(payload)
+    _, authorizations = validate_preparation_metadata(
+        parsed, GuestBriefProposal((_without_inline_quotes((operation,))[0],)), question,
+    )
+    assert authorizations[0]["target_fields"] == [
+        "room_requirements.budget_amount", "room_requirements.budget_currency",
+        "room_requirements.budget_basis",
+    ]
+    current = GuestBriefSnapshot(0, {"dates": {}, "party": {"adults": 2, "children": []}})
+    updated = validate_guest_brief_proposal(
+        current, GuestBriefProposal((_without_inline_quotes((operation,))[0],)),
+    )
+    assert updated.data["room_requirements"]["budget_amount"] == 6_000_000
+    assert "budget_strength" not in updated.data["room_requirements"]
+    assert "room_requirements.budget_strength" in updated.pending_fields
+    assert updated.status == "partial_success"
+
+
+def test_budget_without_strength_keeps_known_cost_and_cannot_claim_fit_to_budget() -> None:
+    brief = {
+        "dates": {"check_in": "2026-11-01", "check_out": "2026-11-03"},
+        "party": {"adults": 2, "children": []},
+        "room_requirements": {"budget_amount": 1_000, "budget_currency": "VND",
+                              "budget_basis": "stay_total"},
+    }
+    candidate = RoomAdviceCandidate(
+        option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=({"member_id": "adult-1", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+                     {"member_id": "adult-2", "room_index": 0, "bed_index": 0, "bed_type": "queen"}),
+        rationale=(RoomRationale(claim_code="party_fit", fact_ids=["F-ROOM"]),),
+    )
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(brief, (_catalog(), _rate(amount=100))),
+        draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    assert result.status == "partial"
+    assert result.questions[0]["field"] == "room_requirements.budget_strength"
+    option = result.options[0]
+    assert option["cost"]["total"] == 200
+    checks = {check["code"]: check["status"] for check in option["checks"]}
+    assert checks["budget_strength"] == "unknown"
+    assert not any("budget" in item["text"].casefold() or "stated requirements" in item["text"].casefold()
+                   for item in option["rationale"])
+
+
+def test_budget_strength_question_keeps_priority_when_rate_basis_is_also_unknown() -> None:
+    result = RoomAdviceResult(
+        status="partial", brief_version=4, source_generation=7,
+        questions=({"field": "room_requirements.budget_strength"}, {"field": "room_advice"}),
+        explanation_inputs={"unknowns": ["rate_basis", "rate_validity_window"]},
+    )
+    labels = {
+        "question.budget_strength": "Ce budget est-il une limite absolue ou un objectif ?",
+        "question.rate_basis": "Confirmez le tarif par chambre et par nuit.",
+    }
+    localized = HospitalityRoomAdvice.relocalize(result, "fr-FR", labels)
+    assert [item["presentation_key"] for item in localized.questions] == [
+        "question.budget_strength", "question.rate_basis",
+    ]
+    assert localized.questions[0]["reason"] == labels["question.budget_strength"]
+    assert localized.questions[1]["reason"] == labels["question.rate_basis"]
+
+
 def test_preparation_native_and_pydantic_intents_are_in_parity_and_support_booking() -> None:
     assert set(get_args(GuestTurnIntent)) == set(TURN_INTENTS)
     assert FactSelection.model_validate({"turn_intents": ["booking_request"]}).turn_intents == ["booking_request"]
     assert HospitalityGroundedAnswer.model_validate({"turn_intents": ["booking_request"]}).turn_intents == ["booking_request"]
     add_child = {"op": "add_child", "age": 5, "guardian_adult_index": 1,
-                 "share_bed_with_guardian": True}
-    authorization = {"operation_index": 0, "op": "add_child",
-                     "target_fields": ["party.children", "party.guardians", "party.bed_sharing"],
-                     "intent": "explicit_request", "current_turn_quote": "My child will share with me."}
+                 "share_bed_with_guardian": True,
+                 "current_turn_quote": "My child will share with me."}
     payload = {"turn_intents": ["guest_edit", "booking_request"],
-               "guest_patch": {"ops": [add_child]}, "guest_patch_authorizations": [authorization]}
-    assert len(FactSelection.model_validate(payload).guest_patch_authorizations[0].target_fields) == 3
-    assert len(HospitalityGroundedAnswer.model_validate(payload).guest_patch_authorizations[0].target_fields) == 3
+               "guest_patch": {"ops": [add_child]}}
+    fact_selection = FactSelection.model_validate(payload)
+    answer = HospitalityGroundedAnswer.model_validate(payload)
+    for parsed in (fact_selection, answer):
+        _, authorizations = validate_preparation_metadata(
+            parsed, GuestBriefProposal((add_child,)), "My child will share with me."
+        )
+        assert len(authorizations[0]["target_fields"]) == 3
     fact_response = fact_selection_output_schema()["properties"]["response"]["properties"]
     answer_response = preparation_answer_output_schema((), ())["properties"]["response"]["anyOf"][0]["properties"]
     answer_schema = answer_response["turn_intents"]
     assert fact_response["turn_intents"]["items"]["enum"] == list(TURN_INTENTS)
     assert answer_schema["items"]["enum"] == list(TURN_INTENTS)
-    pydantic_target_schema = GuestPatchAuthorization.model_json_schema()["properties"]["target_fields"]
     for response in (fact_response, answer_response):
-        authorization = response["guest_patch_authorizations"]["items"]
-        assert authorization["properties"]["target_fields"]["maxItems"] == 11
-        target_item = authorization["properties"]["target_fields"]["items"]
-        target_enum = target_item["anyOf"][0]["enum"]
-        assert "room_requirements" in target_enum
-        assert "room_requirements.budget_amount" in target_enum
-        assert "room_requirements.max_rooms" in target_enum
-        assert pydantic_target_schema["maxItems"] == 11
-        assert target_item["anyOf"][0]["maxLength"] == pydantic_target_schema["items"]["maxLength"] == 128
-        assert target_item["anyOf"][1]["maxLength"] == pydantic_target_schema["items"]["maxLength"]
-        pydantic_pattern = re.compile(pydantic_target_schema["items"]["pattern"])
-        dynamic_pattern = re.compile(target_item["anyOf"][1]["pattern"])
-        assert all(pydantic_pattern.fullmatch(field) for field in target_enum)
-        assert dynamic_pattern.fullmatch("party.children.123e4567.age")
-        assert pydantic_pattern.fullmatch("party.children.123e4567.age")
-        assert not dynamic_pattern.fullmatch("room_requirements.budget_basis,room_requirements.max_rooms")
-        assert not pydantic_pattern.fullmatch("room_requirements.budget_basis,room_requirements.max_rooms")
-        add_child = response["guest_patch"]["anyOf"][0]["properties"]["ops"]["items"]["anyOf"][2]
-        assert {"guardian_adult_index", "share_bed_with_guardian"} <= set(add_child["properties"])
+        assert "guest_patch_authorizations" not in response
+        op_schemas = response["guest_patch"]["anyOf"][0]["properties"]["ops"]["items"]["anyOf"]
+        flattened = [variant for item in op_schemas for variant in item.get("anyOf", (item,))]
+        assert all("current_turn_quote" in item["required"] for item in flattened)
+        add_child_variants = response["guest_patch"]["anyOf"][0]["properties"]["ops"]["items"]["anyOf"][2]["anyOf"]
+        assert len(add_child_variants) == 2
+        assert all({"guardian_adult_index", "share_bed_with_guardian", "requires_separate_bed"}
+                   <= set(add_child["properties"]) for add_child in add_child_variants)
     assert "Whenever `guest_patch.ops` contains an edit, include `guest_edit`" in GUEST_BRIEF_PATCH_RULES
     assert "Do not infer a room" in GUEST_BRIEF_PATCH_RULES
     assert "set `max_rooms` only when the guest explicitly states a" in GUEST_BRIEF_PATCH_RULES
     assert "maximum number of rooms" in GUEST_BRIEF_PATCH_RULES
+    assert "`adult-1` through `adult-N` may be used by a later sharing operation" in GUEST_BRIEF_PATCH_RULES
+    assert "targets are exactly" not in GUEST_BRIEF_PATCH_RULES
+
+
+def test_new_child_keeps_guardian_separation_and_adult_sharing_as_separate_facts() -> None:
+    question = (
+        "Stay 2026-11-10 to 2026-11-12. We are two adults and one child. "
+        "I am the child’s parent and guardian; the adults may share a queen bed, "
+        "and the child needs a separate sleeping place."
+    )
+    operations = (
+        {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-12",
+         "current_turn_quote": "Stay 2026-11-10 to 2026-11-12."},
+        {"op": "set_adults", "count": 2, "current_turn_quote": "We are two adults and one child."},
+        {"op": "add_child", "age": None, "guardian_adult_index": 1,
+         "requires_separate_bed": True,
+         "current_turn_quote": "I am the child’s parent and guardian; the adults may share a queen bed, and the child needs a separate sleeping place."},
+        {"op": "set_bed_sharing", "member_ids": ["adult-1", "adult-2"], "allow_share": True,
+         "current_turn_quote": "the adults may share a queen bed"},
+    )
+    assert operations.index(next(op for op in operations if op["op"] == "set_adults")) < operations.index(
+        next(op for op in operations if op["op"] == "set_bed_sharing")
+    )
+    payload = {"turn_intents": ["guest_edit", "room_advice"],
+               "guest_patch": {"ops": list(operations)}}
+    fact_selection = FactSelection.model_validate(payload)
+    answer = HospitalityGroundedAnswer.model_validate(payload)
+    canonical_operations = _without_inline_quotes(operations)
+    _, authorizations = validate_preparation_metadata(
+        fact_selection, GuestBriefProposal(canonical_operations), question
+    )
+    validate_preparation_metadata(answer, GuestBriefProposal(canonical_operations), question)
+    target_fields = {
+        "party.children", "party.guardians",
+    }
+    assert set(authorizations[2]["target_fields"]) == target_fields
+
+    native_patch_ops = fact_selection_output_schema()["properties"]["response"]["properties"][
+        "guest_patch"
+    ]["anyOf"][0]["properties"]["ops"]["items"]["anyOf"]
+    native_operations = [variant for item in native_patch_ops for variant in item.get("anyOf", (item,))]
+    native_add_child_variants = [
+        item for item in native_operations
+        if item.get("properties", {}).get("op", {}).get("enum") == ["add_child"]
+    ]
+    assert len(native_add_child_variants) == 2
+    separations = [
+        (set(item["properties"]["requires_separate_bed"]["enum"]),
+         set(item["properties"]["share_bed_with_guardian"]["enum"]))
+        for item in native_add_child_variants
+    ]
+    assert not any(True in separate and True in share for separate, share in separations)
+    assert any(True in separate and False in share for separate, share in separations)
+    assert any(None in separate and True in share for separate, share in separations)
+    assert "requires_separate_bed: true" in GUEST_BRIEF_PATCH_RULES
+    assert "all current party members" in GUEST_BRIEF_PATCH_RULES
+    assert "speaking guest is `adult-1`" in GUEST_BRIEF_PATCH_RULES
+    with pytest.raises(ValidationError):
+        FactSelection.model_validate({
+            **payload,
+            "guest_patch": {"ops": [{**operations[2], "share_bed_with_guardian": True}]},
+        })
+
+    current = GuestBriefSnapshot(0, {"dates": {}, "party": {"adults": None, "children": []}})
+    updated = validate_guest_brief_proposal(current, GuestBriefProposal(operations))
+    child = updated.data["party"]["children"][0]
+    child_id = child["member_id"]
+    assert child["age"] is None
+    assert child["requires_separate_bed"] is True
+    assert updated.data["party"]["guardians"][child_id] == "adult-1"
+    rules = {frozenset(rule["member_ids"]): rule["allow_share"]
+             for rule in updated.data["party"]["bed_sharing"]}
+    assert rules[frozenset(("adult-1", "adult-2"))] is True
+    assert len(rules) == 1  # The hard separation rule is stored on the child, not duplicated as pair rules.
+    assert f"party.children.{child_id}.age" in updated.pending_fields
+
+    relax = {"op": "set_child_separate_bed", "child_id": child_id, "requires_separate_bed": False}
+    relax_auth = {"operation_index": 0, "op": "set_child_separate_bed",
+                  "target_fields": [f"party.children.{child_id}.requires_separate_bed"],
+                  "intent": "explicit_request", "current_turn_quote": "The child may share a sleeping surface now."}
+    validate_guest_patch_authorization((relax,), (relax_auth,), question + " The child may share a sleeping surface now.")
+    relaxed = validate_guest_brief_proposal(
+        GuestBriefSnapshot(1, updated.data, updated.pending_fields), GuestBriefProposal((relax,)),
+    )
+    assert "requires_separate_bed" not in relaxed.data["party"]["children"][0]
+    assert relaxed.data["party"]["bed_sharing"] == updated.data["party"]["bed_sharing"]
+    reaffirmed = validate_guest_brief_proposal(
+        GuestBriefSnapshot(2, updated.data, updated.pending_fields),
+        GuestBriefProposal(({"op": "set_child_separate_bed", "child_id": child_id,
+                            "requires_separate_bed": True},)),
+    )
+    still_relaxed = validate_guest_brief_proposal(
+        GuestBriefSnapshot(2, relaxed.data, relaxed.pending_fields),
+        GuestBriefProposal(({"op": "set_child_separate_bed", "child_id": child_id,
+                            "requires_separate_bed": False},)),
+    )
+    assert reaffirmed.status == still_relaxed.status == "no_change"
+    assert reaffirmed.applied_delta == still_relaxed.applied_delta == {}
+
+    refusal = {"op": "add_child", "age": None, "guardian_adult_index": 1,
+               "share_bed_with_guardian": False}
+    refusal_authorization = {"operation_index": 0, "op": "add_child",
+                             "target_fields": ["party.children", "party.guardians", "party.bed_sharing"],
+                             "intent": "explicit_request", "current_turn_quote": question}
+    validate_guest_patch_authorization((refusal,), (refusal_authorization,), question)
+    refusal_brief = validate_guest_brief_proposal(
+        GuestBriefSnapshot(0, {"dates": {}, "party": {"adults": 2, "children": []}}),
+        GuestBriefProposal((refusal,)),
+    )
+    refusal_child = refusal_brief.data["party"]["children"][0]
+    assert refusal_brief.data["party"]["bed_sharing"] == [{
+        "member_ids": sorted((refusal_child["member_id"], "adult-1")), "allow_share": False,
+    }]
+
+    room, rate = _catalog(), _rate()
+    candidate = RoomAdviceCandidate(
+        option_id="separate-child-bed", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=(
+            {"member_id": "adult-1", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+            {"member_id": "adult-2", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+            {"member_id": child_id, "room_index": 0, "bed_index": 1, "bed_type": "twin"},
+        ),
+    )
+    ready_brief = deepcopy(updated.data)
+    ready_brief["party"]["children"][0]["age"] = 7
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(ready_brief, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    assert result.options
+    checks = {check["code"]: check["status"] for check in result.options[0]["checks"]}
+    assert checks["separate_bed_requirement"] == "pass"
+
+    violating = replace(candidate, option_id="child-shares", assignments=(
+        {"member_id": "adult-1", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+        {"member_id": child_id, "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+        {"member_id": "adult-2", "room_index": 0, "bed_index": 1, "bed_type": "twin"},
+    ))
+    rejected = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(ready_brief, (room, rate)), draft=RoomAdviceDraft("ready", (violating,)),
+    ))
+    assert rejected.options == ()
+    assert rejected.status == "conflict"
+
+    ambiguous = replace(candidate, option_id="unidentified-other-surface", assignments=(
+        {"member_id": "adult-1", "room_index": 0, "bed_index": 0, "bed_type": "queen"},
+        {"member_id": "adult-2", "room_index": 0, "bed_index": None, "bed_type": "queen"},
+        {"member_id": child_id, "room_index": 0, "bed_index": 1, "bed_type": "twin"},
+    ))
+    uncertain = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(ready_brief, (room, rate)), draft=RoomAdviceDraft("ready", (ambiguous,)),
+    ))
+    assert uncertain.options
+    ambiguous_checks = {check["code"]: check["status"] for check in uncertain.options[0]["checks"]}
+    assert ambiguous_checks["separate_bed_requirement"] == "unknown"
+
+
+def test_separate_beds_are_a_sharing_constraint_not_an_invented_bed_type() -> None:
+    quote = "We now require two separate beds; increase the total room budget to 6500000 VND."
+    captured_patch = {
+        "ops": [{
+            "op": "set_room_requirements", "budget_amount": 6_500_000, "budget_currency": "VND",
+            "budget_basis": "stay_total", "budget_strength": "hard", "sharing": None,
+            "hard_accessibility_needs": None, "preferred_accessibility_needs": None,
+            "hard_bed_types": ["separate beds"], "preferred_bed_types": None,
+            "avoided_bed_types": None, "max_rooms": None, "clear_fields": ["preferred_bed_types"],
+        }],
+    }
+    malformed = {"guest_patch": captured_patch, "turn_intents": ["guest_edit", "room_advice"]}
+    with pytest.raises(ValidationError):
+        FactSelection.model_validate(malformed)
+    with pytest.raises(ValidationError):
+        HospitalityGroundedAnswer.model_validate(malformed)
+    unsupported = deepcopy(malformed)
+    unsupported["guest_patch"]["ops"][0]["hard_bed_types"] = ["waterbed"]
+    with pytest.raises(ValidationError):
+        FactSelection.model_validate(unsupported)
+
+    native_response = fact_selection_output_schema()["properties"]["response"]["properties"]
+    native_patch = native_response["guest_patch"]["anyOf"][0]["properties"]["ops"]["items"]["anyOf"]
+    native_operations = [variant for item in native_patch for variant in item.get("anyOf", (item,))]
+    native_room_requirements = next(
+        schema for schema in native_operations
+        if schema["properties"]["op"]["enum"] == ["set_room_requirements"]
+    )
+    native_hard_bed_types = native_room_requirements["properties"]["hard_bed_types"]["anyOf"][0]["items"]["enum"]
+    pydantic_hard_bed_types = SetRoomRequirements.model_json_schema()["properties"]["hard_bed_types"]
+    assert native_hard_bed_types == list(CANONICAL_BED_TYPES)
+    assert pydantic_hard_bed_types["anyOf"][0]["items"]["enum"] == native_hard_bed_types
+    assert "separate beds" not in native_hard_bed_types
+    assert "A request for separate sleeping surfaces is not a" in GUEST_BRIEF_PATCH_RULES
+    assert "`set_bed_sharing`" in GUEST_BRIEF_PATCH_RULES
+
+    valid_ops = (
+        {**captured_patch["ops"][0], "hard_bed_types": None, "current_turn_quote": quote},
+        {"op": "set_bed_sharing", "member_ids": ["adult-1", "adult-2"], "allow_share": False,
+         "current_turn_quote": quote},
+    )
+    payload = {"turn_intents": ["guest_edit", "room_advice"], "guest_patch": {"ops": list(valid_ops)}}
+    parsed = FactSelection.model_validate(payload)
+    canonical_ops = _without_inline_quotes(valid_ops)
+    validate_preparation_metadata(parsed, GuestBriefProposal(canonical_ops), quote)
+    with pytest.raises(ValueError, match="require the current turn"):
+        validate_preparation_metadata(
+            FactSelection.model_validate({**payload, "turn_intents": ["room_advice"]}),
+            GuestBriefProposal(canonical_ops), quote,
+        )
+
+    room, rate = _catalog(
+        room_id="CITY-TWN", beds=[{"type": "single", "count": 2, "occupant_capacity": 1}],
+        max_occupancy=2,
+    ), _rate(amount=1_800_000)
+    rate["value"]["room_type_id"] = "CITY-TWN"
+    brief = {
+        "dates": {"check_in": "2026-11-10", "check_out": "2026-11-13"},
+        "party": {"adults": 2, "children": [], "bed_sharing": [
+            {"member_ids": ["adult-1", "adult-2"], "allow_share": False}]},
+        "room_requirements": {"budget_amount": 6_500_000, "budget_currency": "VND",
+                              "budget_basis": "stay_total", "budget_strength": "hard"},
+    }
+    candidate = RoomAdviceCandidate(
+        option_id="two-single-beds", rooms=({"room_index": 0, "room_type_id": "CITY-TWN"},),
+        assignments=tuple({"member_id": f"adult-{number}", "room_index": 0,
+                           "bed_index": number - 1, "bed_type": "single"} for number in (1, 2)),
+    )
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(brief, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    assert result.status == "ready"
+    checks = {check["code"]: check["status"] for check in result.options[0]["checks"]}
+    assert checks["bed_configuration"] == "pass"
+    assert len({assignment["bed_index"] for assignment in result.options[0]["assignments"]}) == 2
+    assert checks.get("bed_sharing_consent") != "conflict"
+
+
+def test_unsupported_explicit_bed_type_becomes_pending_and_cannot_be_certified() -> None:
+    quote = "I require a waterbed."
+    operation = {"op": "clarify", "field": "room_requirements.hard_bed_types",
+                 "reason": "Please clarify the required bed type.", "current_turn_quote": quote}
+    payload = {"turn_intents": ["guest_edit"], "guest_patch": {"ops": [operation]}}
+    parsed = FactSelection.model_validate(payload)
+    patch = GuestBriefProposal((operation,))
+    validate_preparation_metadata(parsed, patch, quote)
+    current = GuestBriefSnapshot(3, {
+        "dates": {"check_in": "2026-11-01", "check_out": "2026-11-02", "nights": 1},
+        "party": {"adults": 1, "children": []},
+    })
+    updated = validate_guest_brief_proposal(current, patch)
+    assert "room_requirements.hard_bed_types" in updated.pending_fields
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=replace(_context(updated.data, (_catalog(), _rate())), pending_fields=updated.pending_fields),
+        draft=RoomAdviceDraft("ready", (RoomAdviceCandidate(
+            option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+            assignments=({"member_id": "adult-1", "room_index": 0,
+                          "bed_index": 0, "bed_type": "queen"},),
+        ),)),
+    ))
+    assert result.status == "needs_clarification"
+    assert result.options == ()
+    resolved = validate_guest_brief_proposal(updated, GuestBriefProposal(({
+        "op": "set_room_requirements", "hard_bed_types": ["queen"],
+    },)))
+    assert "room_requirements.hard_bed_types" not in resolved.pending_fields
+    assert resolved.data["room_requirements"]["hard_bed_types"] == ["queen"]
+
+
+def test_unsupported_soft_bed_preference_remains_a_tradeoff_not_a_hard_clarification() -> None:
+    quote = "I would prefer a waterbed, but it is not essential."
+    operation = {"op": "set_room_requirements", "preferred_bed_types": ["waterbed"],
+                 "current_turn_quote": quote}
+    parsed = FactSelection.model_validate({
+        "turn_intents": ["guest_edit"], "guest_patch": {"ops": [operation]},
+    })
+    validate_preparation_metadata(parsed, GuestBriefProposal((operation,)), quote)
+
+    room, rate = _catalog(), _rate()
+    brief = {"dates": {"check_in": "2026-11-01", "check_out": "2026-11-02"},
+             "party": {"adults": 1, "children": []},
+             "room_requirements": {"preferred_bed_types": ["waterbed"]}}
+    candidate = RoomAdviceCandidate(
+        option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=({"member_id": "adult-1", "room_index": 0,
+                      "bed_index": 0, "bed_type": "queen"},),
+    )
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(brief, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    assert len(result.options) == 1
+    assert result.status == "partial"
+    assert {check["code"]: check["status"] for check in result.options[0]["checks"]}[
+        "preferred_bed_type"
+    ] == "not_met"
+    assert "Preserve unsupported soft preferred or avoided bed-type wording" in GUEST_BRIEF_PATCH_RULES
 
 
 def test_room_requirement_clarification_uses_aggregate_target_but_edits_stay_granular() -> None:
     question = "Please clarify my room requirements."
-    operation = {"op": "clarify", "field": "room_requirements", "reason": "Confirm the constraints."}
+    operation = {"op": "clarify", "field": "room_requirements", "reason": "Confirm the constraints.",
+                 "current_turn_quote": "room requirements"}
     authorization = {
         "operation_index": 0,
         "op": "clarify",
@@ -341,11 +752,13 @@ def test_room_requirement_clarification_uses_aggregate_target_but_edits_stay_gra
     payload = {
         "turn_intents": ["guest_edit"],
         "guest_patch": {"ops": [operation]},
-        "guest_patch_authorizations": [authorization],
     }
     for model in (FactSelection, HospitalityGroundedAnswer):
         parsed = model.model_validate(payload)
-        assert parsed.guest_patch_authorizations[0].target_fields == ["room_requirements"]
+        _, authorizations = validate_preparation_metadata(
+            parsed, GuestBriefProposal((_without_inline_quotes((operation,))[0],)), question
+        )
+        assert authorizations[0]["target_fields"] == ["room_requirements"]
 
     set_operation = {"op": "set_room_requirements", "budget_amount": 6_000_000}
     with pytest.raises(ValueError):
@@ -367,7 +780,7 @@ def test_room_requirement_authorization_covers_four_budget_fields_and_up_to_elev
         "sharing": "avoid", "hard_accessibility_needs": ["step-free"],
         "preferred_accessibility_needs": ["near lift"], "hard_bed_types": ["queen"],
         "preferred_bed_types": ["twin"], "avoided_bed_types": ["bunk"], "max_rooms": 2,
-        "clear_fields": [],
+        "clear_fields": [], "current_turn_quote": question,
     }
     target_fields = [
         "room_requirements.budget_amount", "room_requirements.budget_currency",
@@ -382,13 +795,13 @@ def test_room_requirement_authorization_covers_four_budget_fields_and_up_to_elev
         "intent": "explicit_request", "current_turn_quote": question,
     }
     validate_guest_patch_authorization((operation,), (authorization,), question)
-    payload = {
-        "turn_intents": ["guest_edit", "room_advice"],
-        "guest_patch": {"ops": [operation]}, "guest_patch_authorizations": [authorization],
-    }
+    payload = {"turn_intents": ["guest_edit", "room_advice"], "guest_patch": {"ops": [operation]}}
     for model in (FactSelection, HospitalityGroundedAnswer):
         parsed = model.model_validate(payload)
-        assert len(parsed.guest_patch_authorizations[0].target_fields) == 11
+        _, authorizations = validate_preparation_metadata(
+            parsed, GuestBriefProposal((_without_inline_quotes((operation,))[0],)), question
+        )
+        assert len(authorizations[0]["target_fields"]) == 11
     with pytest.raises(ValueError):
         validate_guest_patch_authorization(
             (operation,), ({**authorization, "target_fields": ["room_requirements.budget_amount,"]},), question,
@@ -403,7 +816,7 @@ def test_four_budget_targets_validate_with_null_native_placeholders_and_max_room
         "sharing": None, "hard_accessibility_needs": None,
         "preferred_accessibility_needs": None, "hard_bed_types": None,
         "preferred_bed_types": None, "avoided_bed_types": None, "max_rooms": None,
-        "clear_fields": [],
+        "clear_fields": [], "current_turn_quote": question,
     }
     targets = [
         "room_requirements.budget_amount", "room_requirements.budget_currency",
@@ -415,12 +828,10 @@ def test_four_budget_targets_validate_with_null_native_placeholders_and_max_room
     }
     validate_guest_patch_authorization((operation,), (authorization,), question)
     assert "room_requirements.max_rooms" not in targets
-    payload = {
-        "turn_intents": ["guest_edit", "room_advice"],
-        "guest_patch": {"ops": [operation]}, "guest_patch_authorizations": [authorization],
-    }
-    FactSelection.model_validate(payload)
-    HospitalityGroundedAnswer.model_validate(payload)
+    payload = {"turn_intents": ["guest_edit", "room_advice"], "guest_patch": {"ops": [operation]}}
+    for model in (FactSelection, HospitalityGroundedAnswer):
+        parsed = model.model_validate(payload)
+        validate_preparation_metadata(parsed, GuestBriefProposal((_without_inline_quotes((operation,))[0],)), question)
     with pytest.raises(ValidationError):
         FactSelection.model_validate({
             **payload,
@@ -871,6 +1282,215 @@ def test_relocalization_changes_only_presentation_and_never_calls_provider() -> 
     fallback.options[0]["checks"][0]["status"] = "mutated-copy"
     assert original.options[0]["checks"][0]["status"] == "pass"
     assert provider.calls == 0
+
+
+def test_open_language_bundle_is_bounded_checked_and_preserves_advice() -> None:
+    room, rate = _catalog(), _rate()
+    rate["value"]["price_basis"]["unit"] = "person_night"
+    brief = {"dates": {"check_in": "2026-11-01", "check_out": "2026-11-03"},
+             "party": {"adults": 2, "children": [], "bed_sharing": [
+                 {"member_ids": ["adult-1", "adult-2"], "allow_share": True}]}}
+    candidate = RoomAdviceCandidate(
+        option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=tuple({"member_id": f"adult-{index}", "room_index": 0,
+                           "bed_index": 0, "bed_type": "queen"} for index in (1, 2)),
+        rationale=({"claim_code": "party_fit", "fact_ids": ["F-ROOM"]},),
+    )
+    advice = HospitalityRoomAdvice()
+    checked = __import__("asyncio").run(advice.recommend(
+        context=replace(_context(brief, (room, rate)), locale="fr-FR"),
+        draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    request = advice.localization_request(checked, "fr-FR")
+    assert request is not None
+    assert "question.rate_basis" in request["keys"]
+    labels = {}
+    for key in request["keys"]:
+        if key == "claim.party_fit":
+            labels[key] = "Cette configuration convient au groupe confirmé et respecte les règles vérifiées."
+        elif key == "question.rate_basis":
+            labels[key] = "Pouvez-vous confirmer si ce tarif est calculé par chambre et par nuit ?"
+        elif key == "claim.reference_price":
+            labels[key] = "Estimation indicative du tarif des chambres pour le séjour : {amount} {currency}."
+        else:
+            labels[key] = "Veuillez confirmer ce détail concernant la chambre."
+    payload = {"presentation_labels": [{"key": key, "text": value} for key, value in labels.items()]}
+    from staylead_platform.domains.hospitality.schemas.room_advice import (
+        RoomAdviceLocalizationPreparation,
+    )
+
+    parsed = RoomAdviceLocalizationPreparation.model_validate(payload)
+    checked_labels = advice.parse_localization(
+        parsed.model_dump_json(), expected_keys=tuple(request["keys"]), locale="fr-FR",
+    )
+    french = advice.relocalize(checked, "fr-FR", checked_labels)
+    assert french.options[0]["rationale"][0]["text"] == labels["claim.party_fit"]
+    assert french.options[0]["rationale"][0]["locale"] == "fr"
+    assert french.questions[0]["reason"] == labels["question.rate_basis"]
+    assert french.questions[0]["locale_fallback"] is False
+    assert french.options[0]["cost"] == checked.options[0]["cost"]
+    assert french.options[0]["assignments"] == checked.options[0]["assignments"]
+    assert french.source_refs == checked.source_refs
+
+    rejected = {}
+    for unsafe in (
+        "Confirmez le tarif sur https://example.invalid ?",
+        "Confirmez le tarif sur ftp://example.invalid ?",
+        "Confirmez le tarif par mailto:guest@example.invalid ?",
+    ):
+        malicious = dict(labels)
+        malicious["question.rate_basis"] = unsafe
+        malicious_payload = {"presentation_labels": [
+            {"key": key, "text": value} for key, value in malicious.items()
+        ]}
+        rejected = advice.parse_localization(
+            RoomAdviceLocalizationPreparation.model_validate(malicious_payload).model_dump_json(),
+            expected_keys=tuple(request["keys"]), locale="fr-FR",
+        )
+        assert rejected == {}
+    safe_fallback = advice.relocalize(checked, "fr-FR", rejected)
+    assert safe_fallback.options[0]["rationale"][0]["locale"] == "en"
+    assert safe_fallback.options[0]["rationale"][0]["locale_fallback"] is True
+
+
+def test_candidate_translation_labels_project_only_after_checked_rationale_filtering() -> None:
+    room, rate = _catalog(), _rate()
+    brief = {"dates": {"check_in": "2026-11-01", "check_out": "2026-11-03"},
+             "party": {"adults": 2, "children": [], "bed_sharing": [
+                 {"member_ids": ["adult-1", "adult-2"], "allow_share": True}]}}
+    candidate = RoomAdviceCandidate(
+        option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=tuple({"member_id": f"adult-{index}", "room_index": 0,
+                           "bed_index": 0, "bed_type": "queen"} for index in (1, 2)),
+        rationale=(
+            {"claim_code": "party_fit", "fact_ids": ["F-UNSUPPORTED-PARTY-FACT"]},
+            {"claim_code": "bed_setup", "fact_ids": ["F-ROOM"]},
+            {"claim_code": "reference_price", "fact_ids": ["F-RATE"]},
+            {"claim_code": "charges_confirmation", "fact_ids": ["F-UNSUPPORTED-CHARGE-FACT"]},
+        ),
+    )
+    labels = {
+        "claim.party_fit": "Cette configuration convient au groupe confirmé et aux règles vérifiées.",
+        "claim.bed_setup": "La configuration des lits correspond à la chambre vérifiée.",
+        "claim.reference_price": "Tarif indicatif des chambres pour le séjour : {amount} {currency}.",
+        "claim.charges_confirmation": "Certains frais d’enfant ou de literie ne sont pas inclus.",
+    }
+
+    def run(label_map: dict[str, str]) -> RoomAdviceResult:
+        draft = RoomAdviceDraft(
+            "ready", (candidate,), presentation_labels=tuple(
+                {"key": key, "text": text} for key, text in label_map.items()
+            ),
+        )
+        return __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+            context=replace(_context(brief, (room, rate)), locale="fr-FR"), draft=draft,
+        ))
+
+    french = run(labels)
+    assert [item["claim_code"] for item in french.options[0]["rationale"]] == [
+        "bed_setup", "reference_price",
+    ]
+    assert [item["locale"] for item in french.options[0]["rationale"]] == ["fr", "fr"]
+    assert [item["text"] for item in french.options[0]["rationale"]] == [
+        labels["claim.bed_setup"],
+        labels["claim.reference_price"].format(amount="200", currency="VND"),
+    ]
+    assert all(item["locale_fallback"] is False for item in french.options[0]["rationale"])
+
+    missing_required = {key: value for key, value in labels.items() if key != "claim.reference_price"}
+    forged_superset = {**labels, "question.generic": "Veuillez confirmer cette préférence de chambre."}
+    price_mutation = {**labels, "claim.reference_price": "Tarif indicatif : 200 {currency}."}
+    for invalid in (missing_required, forged_superset, price_mutation):
+        fallback = run(invalid)
+        assert all(item["locale"] == "en" and item["locale_fallback"] is True
+                   for item in fallback.options[0]["rationale"])
+
+
+def test_candidate_translation_may_cover_only_m4_derived_checked_questions() -> None:
+    room, rate = _catalog(), _rate()
+    rate["value"]["price_basis"]["unit"] = "person_night"
+    brief = {"dates": {"check_in": "2026-11-01", "check_out": "2026-11-03"},
+             "party": {"adults": 2, "children": [], "bed_sharing": [
+                 {"member_ids": ["adult-1", "adult-2"], "allow_share": True}]}}
+    candidate = RoomAdviceCandidate(
+        option_id="A", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=tuple({"member_id": f"adult-{index}", "room_index": 0,
+                           "bed_index": 0, "bed_type": "queen"} for index in (1, 2)),
+        rationale=({"claim_code": "party_fit", "fact_ids": ["F-ROOM"]},),
+    )
+    labels = {
+        "claim.party_fit": "Cette configuration convient au groupe confirmé et aux règles vérifiées.",
+        "question.rate_basis": "Pouvez-vous confirmer si ce tarif est calculé par chambre et par nuit ?",
+    }
+
+    def run(label_map: dict[str, str]) -> RoomAdviceResult:
+        draft = RoomAdviceDraft(
+            "ready", (candidate,), presentation_labels=tuple(
+                {"key": key, "text": text} for key, text in label_map.items()
+            ),
+        )
+        return __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+            context=replace(_context(brief, (room, rate)), locale="fr-FR"), draft=draft,
+        ))
+
+    checked_question = run(labels)
+    assert checked_question.questions[0]["presentation_key"] == "question.rate_basis"
+    assert checked_question.questions[0]["reason"] == labels["question.rate_basis"]
+    assert checked_question.questions[0]["locale_fallback"] is False
+    assert checked_question.options[0]["rationale"][0]["text"] == labels["claim.party_fit"]
+
+    unrelated_superset = run({**labels, "question.dates": "Quelles sont vos dates d'arrivée et de départ ?"})
+    assert unrelated_superset.questions[0]["locale"] == "en"
+    assert unrelated_superset.questions[0]["locale_fallback"] is True
+
+
+@pytest.mark.parametrize(("field", "explanation", "expected_key"), [
+    ("dates.check_in", {}, "question.dates"),
+    ("party.adults", {}, "question.party"),
+    ("party.children.age", {}, "question.age"),
+    ("room_requirements.max_rooms", {}, "question.room"),
+    ("room_advice", {"unknowns": ["rate_basis"]}, "question.rate_basis"),
+    ("room_advice", {"unknowns": ["rate_validity_window"]}, "question.rate_validity_window"),
+    ("room_advice", {"conflicts": ["hard_budget_exceeded"]}, "question.hard_budget_exceeded"),
+    ("room_advice", {"conflicts": ["source_fact_conflict"]}, "question.source_fact_conflict"),
+    ("room_advice", {"conflicts": ["other_known_rule"]}, "question.room_rule_conflict"),
+    ("unrecognized_field", {}, "question.generic"),
+])
+def test_open_language_questions_cover_each_checked_reason_branch(field, explanation, expected_key) -> None:
+    result = RoomAdviceResult(
+        status="conflict", brief_version=1, source_generation=1,
+        questions=({"field": field},), explanation_inputs=explanation,
+    )
+    label = "Texte français de confirmation pour la demande concernée."
+    localized = HospitalityRoomAdvice.relocalize(result, "fr", {expected_key: label})
+    assert localized.questions[0]["reason"] == label
+    assert localized.questions[0]["presentation_key"] == expected_key
+    assert localized.questions[0]["locale"] == "fr"
+    assert localized.questions[0]["locale_fallback"] is False
+
+
+@pytest.mark.parametrize(("field", "explanation", "expected_key"), [
+    ("dates.check_in", {}, "question.dates"),
+    ("party.adults", {}, "question.party"),
+    ("party.children.age", {}, "question.age"),
+    ("room_requirements.max_rooms", {}, "question.room"),
+    ("room_advice", {"unknowns": ["rate_basis"]}, "question.rate_basis"),
+    ("room_advice", {"unknowns": ["rate_validity_window"]}, "question.rate_validity_window"),
+    ("room_advice", {"conflicts": ["hard_budget_exceeded"]}, "question.hard_budget_exceeded"),
+    ("room_advice", {"conflicts": ["source_fact_conflict"]}, "question.source_fact_conflict"),
+    ("room_advice", {"conflicts": ["other_known_rule"]}, "question.room_rule_conflict"),
+    ("unrecognized_field", {}, "question.generic"),
+])
+def test_japanese_questions_cover_each_checked_reason_branch(field, explanation, expected_key) -> None:
+    result = RoomAdviceResult(
+        status="conflict", brief_version=1, source_generation=1,
+        questions=({"field": field},), explanation_inputs=explanation,
+    )
+    localized = HospitalityRoomAdvice.relocalize(result, "ja-JP")
+    assert localized.questions[0]["presentation_key"] == expected_key
+    assert localized.questions[0]["locale"] == "ja"
+    assert localized.questions[0]["locale_fallback"] is False
+    assert any("\u3040" <= char <= "\u30ff" for char in localized.questions[0]["reason"])
 
 
 def test_conflicting_room_catalogue_source_has_conflict_status_and_both_refs() -> None:

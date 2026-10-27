@@ -73,7 +73,6 @@ class FakeProvider:
             eligible = [item["fact_id"] for item in index]
             result = {
                 "fact_ids": eligible[:4], "turn_intents": ["hotel_information"],
-                "guest_patch_authorizations": [],
             }
         else:
             facts = json.loads(request.input_text)["facts"]
@@ -86,7 +85,6 @@ class FakeProvider:
             else:
                 result = {"supported_claims": [], "unknowns": ["This detail is not in the available records."], "conflicts": []}
             result["turn_intents"] = ["hotel_information"]
-            result["guest_patch_authorizations"] = []
         return GenerationResult(
             text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
             request_id=f"fake-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),
@@ -270,8 +268,7 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                 result = {
                     "fact_ids": [candidate_index[0]["fact_id"]],
                     "turn_intents": ["hotel_information"],
-                    "guest_patch_authorizations": [],
-                }
+                    }
             else:
                 facts = json.loads(request.input_text)["facts"]
                 fact_id = facts[0]["fact_id"]
@@ -280,7 +277,6 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                     "unknowns": [], "conflicts": [],
                 }
             result["turn_intents"] = ["hotel_information"]
-            result["guest_patch_authorizations"] = []
             return GenerationResult(
                 text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
                 request_id=f"gated-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),

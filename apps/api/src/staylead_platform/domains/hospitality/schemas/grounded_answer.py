@@ -1,15 +1,16 @@
 """Structured answer wire schema registered by Hospitality composition."""
 
 import re
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from staylead_platform.domains.hospitality.schemas.guest_brief import (
     GuestPatchAuthorization,
     GuestTurnIntent,
     HospitalityGuestBriefPatch,
     required_pending_clarification_fields,
+    validate_inline_patch_quotes,
 )
 
 
@@ -41,6 +42,7 @@ class ConversationalAcknowledgement(BaseModel):
 
 
 class HospitalityGroundedAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     supported_claims: list[GroundedClaim] = Field(default_factory=list, max_length=20)
     unknowns: list[str] = Field(default_factory=list, max_length=20)
     conflicts: list[str] = Field(default_factory=list, max_length=10)
@@ -54,6 +56,11 @@ class HospitalityGroundedAnswer(BaseModel):
     explicit_language_tag: str | None = Field(default=None, max_length=64)
     inferred_language_tag: str | None = Field(default=None, max_length=64)
     label_bundle: dict[str, str] = Field(default_factory=dict, max_length=20)
+
+    @model_validator(mode="after")
+    def _patch_quotes_are_inline(self) -> Self:
+        validate_inline_patch_quotes(self.guest_patch)
+        return self
 
     @field_validator("label_bundle", mode="before")
     @classmethod

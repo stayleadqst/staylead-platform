@@ -1,0 +1,66 @@
+{
+  "verdict": "FAIL actual case8 French checked rationale; case9 unattempted; B07 actual acceptance pending",
+  "candidate": "93b38c3012e267fe1e415fe101c811932e62abac2eb0d4704fbc28fd5b44ffdc",
+  "actual_counts": {
+    "seed": [
+      7,
+      12
+    ],
+    "sealed": [
+      8,
+      14
+    ],
+    "new_turns": 1,
+    "new_provider_calls": 2,
+    "state_sha256": "9066ab842f0905d6f3bce771816a275be779c1595a1ba60c1c23dee8e96d59a6"
+  },
+  "finding": {
+    "id": "Q-C7",
+    "severity": "P1",
+    "file": "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+    "line": 438,
+    "cause": "M4 prunes candidate rationale claims, then exact label-key equality rejects the validated superset; all surviving French labels discarded.",
+    "model_candidate_codes": [
+      "party_fit",
+      "bed_setup",
+      "charges_confirmation",
+      "policy_confirmation"
+    ],
+    "checked_codes": [
+      "bed_setup",
+      "policy_confirmation"
+    ],
+    "valid_label_keys": [
+      "claim.party_fit",
+      "claim.bed_setup",
+      "claim.policy_confirmation",
+      "claim.charges_confirmation"
+    ],
+    "needed_keys": [
+      "claim.bed_setup",
+      "claim.policy_confirmation"
+    ],
+    "original_bundle_repro": "both surviving rationale fall back English",
+    "projected_bundle_counterfactual": "both surviving rationale French without fallback",
+    "smallest_fix": "Project validated candidate labels to surviving checked keys, require coverage, preserve raw key/text/placeholder/URI/price guards."
+  },
+  "verified_actual": {
+    "brief": "adult1 + stablechild8 + explicitguardianadult1 + explicitsharetrue + dates2026-11-10..12 + explicitmaxrooms1",
+    "assignments": "two distinctmembers once each in one queen bed, checks pass",
+    "source_refs": "pinned source refs valid",
+    "cost": "2.2mVND/night x2=4.4m known base; mandatorychildchargeunknown; incomplete/nulltotal; availabilityunknown",
+    "persistence": "readonly=on; state1,brief1,1completedrequest/receipt/sourceutterance/result,2messages,0selections; q-review-cont5-actual-db-readonly.json"
+  },
+  "booking9_independent_feasibility": "Coordinator reports original session token was not saved before browser context closed. Use fresh Pine session and unchanged original9 pure booking only; session creation 0-provider. B07 AC1-3 do not require selectedadvice. No auth reconstruction, exact8 replay, M2 repair, advice selection or French retry needed. Do not claim selection preservation or C01 journey from fresh9.",
+  "B07_AC1_3": "Not actual Done yet: original9 unattempted. A fresh9 booking-only browser/model check may complete remaining actual booking-intent/URL-injection/trustedchannel/safe-navigation/no-falsebooking evidence; offline missingconfig/contact/unsafeURL/noPII proofs reusable. It cannot establish C01 selection or French.",
+  "minimal_C01_reacceptance_plan_not_authorization": {
+    "turns": 7,
+    "coupled_sequences": [
+      "City2 fresh full context, Chinese comparison/budget survivor wording then City3 bed/no-sharing edit; latestoldcardstale/selection",
+      "Beach4 exact missingage + explicitguardian + separatechildbed/adultsharing, then5 age7 stablechild, then6 age12/budget preservingguardian/separatebed; independentbase5.2m/unknowncharges/hard-vs-target",
+      "Pine7 fullcontext hardaccessunknown then original8 explicitrelaxation/age8 samechild, French checkedrationale; selection/latestcurrent"
+    ],
+    "reuse": "City1 solo/math evidence and offline complete matrix. Failed French amended8 cannot be counted as French success; originalPine8 can cover French after fix. No allowance requested or assumed."
+  },
+  "effects": "No provider calls or actual DB writes by Q; enforced readonly DB transaction rolled back."
+}

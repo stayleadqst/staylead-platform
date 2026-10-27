@@ -60,6 +60,7 @@ class RoomAdviceDraft:
     options: tuple[RoomAdviceCandidate, ...] = ()
     questions: tuple[dict[str, str], ...] = ()
     hotel_answer: RoomAdviceHotelAnswer | None = None
+    presentation_labels: tuple[dict[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,8 @@ class RoomAdviceResult:
     explanation_inputs: dict[str, Any] = field(default_factory=dict)
     availability: Literal["unknown"] = "unknown"
     hotel_answer: RoomAdviceHotelAnswer | None = None
+    presentation_labels: dict[str, str] = field(default_factory=dict)
+    presentation_locale: str | None = None
 
 
 class RoomAdviceUseCase(Protocol):
@@ -82,9 +85,17 @@ class RoomAdviceUseCase(Protocol):
 
     def preparation_instructions(
         self, locale: str | None, *, include_hotel_answer: bool = False,
+        include_presentation_labels: bool = False,
     ) -> str: ...
 
-    def preparation_output_schema(self, *, include_hotel_answer: bool = False) -> dict[str, Any]: ...
+    def preparation_output_schema(
+        self, *, include_hotel_answer: bool = False,
+        include_presentation_labels: bool = False,
+    ) -> dict[str, Any]: ...
+
+    def needs_presentation_labels(self, locale: str | None) -> bool: ...
+
+    def presentation_templates(self) -> dict[str, str]: ...
 
     def parse_draft(self, text: str) -> RoomAdviceDraft: ...
 
@@ -100,4 +111,13 @@ class RoomAdviceUseCase(Protocol):
 
     def relocalize(
         self, result: RoomAdviceResult, locale: str | None,
+        presentation_labels: dict[str, str] | None = None,
     ) -> RoomAdviceResult: ...
+
+    def localization_request(
+        self, result: RoomAdviceResult, locale: str | None,
+    ) -> dict[str, Any] | None: ...
+
+    def parse_localization(
+        self, text: str, *, expected_keys: tuple[str, ...], locale: str | None,
+    ) -> dict[str, str]: ...

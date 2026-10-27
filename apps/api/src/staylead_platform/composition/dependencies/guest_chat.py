@@ -75,6 +75,7 @@ from staylead_platform.infrastructure.persistence.store import (
     reserve_request,
     save_room_advice_result,
     select_room_advice_option,
+    update_room_advice_presentation,
     validate_evidence_current,
 )
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError, Usage
@@ -1038,12 +1039,36 @@ class GuestChatApplication:
                             questions=tuple(stored_payload.get("questions", ())),
                             explanation_inputs=stored_payload.get("explanation_inputs", {}),
                             availability=stored_payload.get("availability", "unknown"),
+                            presentation_labels=stored_payload.get("presentation_labels", {}),
+                            presentation_locale=stored_payload.get("presentation_locale"),
                         )
-                        localized_advice = self._orchestrator.relocalize_room_advice(
+                        localized_advice, localization_generation = await self._orchestrator.translate_room_advice(
                             persisted_advice,
                             current_language["language_tag"] if current_language["source"] != "fallback" else None,
+                            deadline=deadline,
                         )
-                        reusable = {**reusable, "payload": _room_advice_json(localized_advice)}
+                        localized_payload = _room_advice_json(localized_advice)
+                        try:
+                            reusable = await asyncio.to_thread(
+                                update_room_advice_presentation, self._engine,
+                                session_id=session_id, hotel_id=claims.hotel_id,
+                                result_id=reusable["result_id"],
+                                expected_result_version=reusable["result_version"],
+                                expected_payload=stored_payload,
+                                payload=localized_payload,
+                                expected_language_revision=current_language["revision"],
+                                timeout_seconds=_remaining_seconds(deadline),
+                            )
+                        except VersionConflict:
+                            # A concurrent language choice or newer result wins. Re-read
+                            # that current record instead of overwriting its presentation.
+                            reusable = await asyncio.to_thread(
+                                get_room_advice_result, self._engine,
+                                session_id=session_id, hotel_id=claims.hotel_id,
+                                timeout_seconds=_remaining_seconds(deadline),
+                            )
+                            if reusable is None:
+                                raise StaleSource("room advice disappeared during localization")
                         sources_by_id = {source.source_id: source for source in snapshot.sources}
                         room_advice_bindings = [EvidenceBinding(
                             source=sources_by_id[ref["source"]["source_id"]],
@@ -1053,6 +1078,16 @@ class GuestChatApplication:
                           and ref["source"].get("source_id") in sources_by_id]
                         room_advice_response = self._room_advice_response(reusable)
                         answer = _booking_channel_only_answer(tuple(intent_tags), prepared)
+                        if localization_generation is not None:
+                            answer = replace(
+                                answer, provider=localization_generation.provider,
+                                deployment=localization_generation.deployment,
+                                model=localization_generation.model,
+                                provider_request_id=localization_generation.request_id,
+                                usage=localization_generation.usage, calls=1,
+                                provider_request_ids=(localization_generation.request_id,)
+                                if localization_generation.request_id else (),
+                            )
                     else:
                         current_facts = await asyncio.to_thread(
                             self._knowledge_retriever.list_current_facts,

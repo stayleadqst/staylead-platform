@@ -5,8 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-PATCH_OPERATIONS = ("set_dates", "set_adults", "add_child", "set_child_age", "remove_child",
-                    "set_room_requirements", "set_child_guardian", "set_bed_sharing", "clarify")
+from staylead_platform.domains.hospitality.schemas.guest_brief import CANONICAL_BED_TYPES
+
 TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request")
 
 
@@ -32,7 +32,11 @@ def _closed_object(properties: dict[str, Any]) -> dict[str, Any]:
 def _operation_schema(
     op: str, properties: dict[str, Any], *, required: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
-    operation_properties = {"op": {"type": "string", "enum": [op]}, **properties}
+    operation_properties = {
+        "op": {"type": "string", "enum": [op]},
+        **properties,
+        "current_turn_quote": _string(maximum=500),
+    }
     return {
         "type": "object", "properties": operation_properties,
         "required": list(required or operation_properties), "additionalProperties": False,
@@ -41,18 +45,37 @@ def _operation_schema(
 
 def _patch_schema() -> dict[str, Any]:
     integer = {"type": "integer"}
+    add_child_properties = {
+        "age": {"anyOf": [{**integer, "minimum": 0, "maximum": 17}, {"type": "null"}]},
+        "guardian_adult_index": {"anyOf": [{**integer, "minimum": 1, "maximum": 30}, {"type": "null"}]},
+    }
+    # Structured Outputs supports anyOf but not `not`; these strict object variants
+    # keep child separation and guardian sharing mutually consistent.
+    add_child = {
+        "anyOf": [
+            _operation_schema("add_child", {
+                **add_child_properties,
+                "share_bed_with_guardian": {"type": ["boolean", "null"], "enum": [False, None]},
+                "requires_separate_bed": {"type": ["boolean", "null"], "enum": [True, None]},
+            }),
+            _operation_schema("add_child", {
+                **add_child_properties,
+                "share_bed_with_guardian": {"type": ["boolean", "null"], "enum": [True, False, None]},
+                "requires_separate_bed": {"type": "null", "enum": [None]},
+            }),
+        ],
+    }
     ops = [
         _operation_schema("set_dates", {
             "check_in": _nullable_string(maximum=10), "check_out": _nullable_string(maximum=10),
         }),
         _operation_schema("set_adults", {"count": {**integer, "minimum": 1, "maximum": 30}}),
-        _operation_schema("add_child", {
-            "age": {"anyOf": [{**integer, "minimum": 0, "maximum": 17}, {"type": "null"}]},
-            "guardian_adult_index": {"anyOf": [{**integer, "minimum": 1, "maximum": 30}, {"type": "null"}]},
-            "share_bed_with_guardian": {"anyOf": [{"type": "boolean"}, {"type": "null"}]},
-        }),
+        add_child,
         _operation_schema("set_child_age", {
             "member_id": _string(maximum=64), "age": {**integer, "minimum": 0, "maximum": 17},
+        }),
+        _operation_schema("set_child_separate_bed", {
+            "child_id": _string(maximum=64), "requires_separate_bed": {"type": "boolean"},
         }),
         _operation_schema("remove_child", {"member_id": _string(maximum=64)}),
         _operation_schema("set_room_requirements", {
@@ -64,7 +87,7 @@ def _patch_schema() -> dict[str, Any]:
                         "anyOf": [{"type": "string", "enum": ["allow", "prefer", "avoid"]}, {"type": "null"}]},
             "hard_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
             "preferred_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
-            "hard_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
+            "hard_bed_types": {"anyOf": [_array({"type": "string", "enum": list(CANONICAL_BED_TYPES)}, maximum=8), {"type": "null"}]},
             "preferred_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
             "avoided_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
             "max_rooms": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": 10}, {"type": "null"}]},
@@ -91,40 +114,9 @@ def _patch_schema() -> dict[str, Any]:
     ]}
 
 
-def _authorization_schema() -> dict[str, Any]:
-    fixed_targets = [
-        "dates.check_in", "dates.check_out", "party.adults", "party.children",
-        "party.guardians", "party.bed_sharing", "room_requirements",
-        *(
-            f"room_requirements.{field}" for field in (
-                "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
-                "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
-                "preferred_bed_types", "avoided_bed_types", "max_rooms",
-            )
-        ),
-    ]
-    target_item = {"anyOf": [
-        {"type": "string", "enum": fixed_targets, "minLength": 1, "maxLength": 128},
-        {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128,
-            "pattern": r"^party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.age)?$",
-        },
-    ]}
-    return _closed_object({
-        "operation_index": {"type": "integer", "minimum": 0, "maximum": 11},
-        "op": {"type": "string", "enum": list(PATCH_OPERATIONS)},
-        "target_fields": _array(target_item, maximum=11, minimum=1),
-        "intent": {"type": "string", "enum": ["explicit_request", "clarification"]},
-        "current_turn_quote": _string(maximum=500),
-    })
-
-
 def _common_preparation_properties() -> dict[str, Any]:
     return {
         "guest_patch": _patch_schema(),
-        "guest_patch_authorizations": _array(_authorization_schema(), maximum=12),
         "turn_intents": _array(
             {"type": "string", "enum": list(TURN_INTENTS)}, maximum=6, minimum=1,
         ),

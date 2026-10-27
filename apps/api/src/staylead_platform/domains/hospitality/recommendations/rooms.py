@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from copy import deepcopy
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from typing import Any
 
 from pydantic import ValidationError
 
 from staylead_platform.domains.hospitality.schemas.room_advice import (
+    RoomAdviceLocalizationPreparation,
     RoomAdviceOption,
     RoomAdvicePreparation,
+    room_advice_localization_output_schema,
 )
 from staylead_platform.platform.contracts.room_advice import (
     RoomAdviceCandidate,
@@ -22,6 +26,136 @@ from staylead_platform.platform.contracts.room_advice import (
     RoomAdviceHotelClaim,
     RoomAdviceResult,
 )
+
+_CLAIM_TEMPLATES = {
+    "claim.party_fit": "This arrangement fits the confirmed party and verified room rules.",
+    "claim.bed_setup": "The listed bed setup matches the verified bed configuration.",
+    "claim.reference_price": "Reference room-rate estimate for the stay: {amount} {currency}.",
+    "claim.policy_confirmation": "Some room details still need confirmation.",
+    "claim.accessibility_confirmation": "Accessibility fit is not confirmed for this room.",
+    "claim.preference_tradeoff": "This option does not meet a bed-sharing or bed-type preference.",
+    "claim.charges_confirmation": "Some child or extra bedding charges are not included in this estimate.",
+}
+_QUESTION_TEMPLATES = {
+    "question.dates": "What are your check-in and check-out dates?",
+    "question.party": "How many adults will stay?",
+    "question.age": "How old is each child?",
+    "question.room": "Which room requirement should I use?",
+    "question.budget_strength": "Is this budget a hard limit or a target?",
+    "question.rate_basis": "Could you confirm whether this rate is per room per night?",
+    "question.rate_validity_window": "These stay dates fall outside the source rate period. Could you confirm current pricing?",
+    "question.hard_budget_exceeded": "This arrangement exceeds the confirmed budget. Would you like to adjust the budget or try another arrangement?",
+    "question.source_fact_conflict": "The room source records conflict. Could I look for another room arrangement?",
+    "question.room_rule_conflict": "This arrangement conflicts with a confirmed room rule. Would you like me to try another arrangement?",
+    "question.generic": "Could you confirm this room detail?",
+}
+_PRESENTATION_TEMPLATES = {**_CLAIM_TEMPLATES, **_QUESTION_TEMPLATES}
+_CLAIM_KEYS = {code: f"claim.{code}" for code in (
+    "party_fit", "bed_setup", "reference_price", "policy_confirmation",
+    "accessibility_confirmation", "preference_tradeoff", "charges_confirmation",
+)}
+_QUESTION_FIELD_KEYS = {
+    "dates.check_in": "question.dates", "dates.check_out": "question.dates",
+    "party.adults": "question.party", "party.children.age": "question.age",
+    "room_requirements.budget_strength": "question.budget_strength",
+    "room_advice": "question.room",
+}
+_OPEN_LOCALE_BUILTINS = {"en", "vi", "zh", "ja"}
+_URL_OR_MARKUP = re.compile(r"(?:[a-z][a-z0-9+.-]{1,15}://|mailto:|www\.)|[<>]", re.IGNORECASE)
+_PLACEHOLDER = re.compile(r"\{([a-z_]+)\}")
+
+
+def _language(locale: str | None) -> str:
+    return (locale or "en").split("-")[0].lower()
+
+
+def _open_locale(locale: str | None) -> bool:
+    return _language(locale) not in _OPEN_LOCALE_BUILTINS
+
+
+def _valid_presentation_labels(raw: object) -> dict[str, str]:
+    if not isinstance(raw, (list, tuple)):
+        return {}
+    labels: dict[str, str] = {}
+    for item in raw:
+        if not isinstance(item, dict):
+            return {}
+        key, text = item.get("key"), item.get("text")
+        if key not in _PRESENTATION_TEMPLATES or key in labels or not isinstance(text, str):
+            return {}
+        template = _PRESENTATION_TEMPLATES[key]
+        expected = set(_PLACEHOLDER.findall(template))
+        found = _PLACEHOLDER.findall(text)
+        if set(found) != expected or len(found) != len(expected):
+            return {}
+        without_placeholders = _PLACEHOLDER.sub("", text)
+        if (not text.strip() or len(text) > 160 or _URL_OR_MARKUP.search(without_placeholders)
+                or any(char in without_placeholders for char in "{}")
+                or any(char.isdecimal() for char in without_placeholders)
+                or any(unicodedata.category(char).startswith("C") for char in text)):
+            return {}
+        labels[key] = text.strip()
+    return labels
+
+
+def _result_question_key(result: RoomAdviceResult, field: object) -> str:
+    if field == "room_requirements.budget_strength":
+        return "question.budget_strength"
+    unknowns = set(result.explanation_inputs.get("unknowns", ()))
+    conflicts = set(result.explanation_inputs.get("conflicts", ()))
+    if "rate_basis" in unknowns:
+        return "question.rate_basis"
+    if "rate_validity_window" in unknowns:
+        return "question.rate_validity_window"
+    if field == "room_advice" and conflicts:
+        conflict = next(iter(sorted(conflicts)))
+        return {
+            "hard_budget_exceeded": "question.hard_budget_exceeded",
+            "source_fact_conflict": "question.source_fact_conflict",
+        }.get(conflict, "question.room_rule_conflict")
+    if isinstance(field, str):
+        if field in _QUESTION_FIELD_KEYS:
+            return _QUESTION_FIELD_KEYS[field]
+        if field.startswith("party.children.") and field.endswith(".age"):
+            return "question.age"
+        if field.startswith("room_requirements."):
+            return "question.room"
+    return "question.generic"
+
+
+def _needed_presentation_keys(result: RoomAdviceResult) -> tuple[str, ...]:
+    keys = {
+        _CLAIM_KEYS[rationale["claim_code"]]
+        for option in result.options for rationale in option.get("rationale", ())
+        if rationale.get("claim_code") in _CLAIM_KEYS
+    }
+    keys.update(_result_question_key(result, question.get("field")) for question in result.questions)
+    return tuple(sorted(keys))
+
+
+def _draft_rationale_presentation_keys(draft: RoomAdviceDraft) -> set[str]:
+    """Rationale label keys explicitly attached to model candidates before M4 filtering."""
+    keys = {
+        _CLAIM_KEYS[claim_code]
+        for option in draft.options for rationale in option.rationale
+        if (claim_code := (rationale.get("claim_code") if isinstance(rationale, dict)
+                           else getattr(rationale, "claim_code", None))) in _CLAIM_KEYS
+    }
+    return keys
+
+
+def _project_checked_presentation_labels(
+    result: RoomAdviceResult, draft: RoomAdviceDraft, candidate_labels: dict[str, str],
+) -> dict[str, str]:
+    """Bind labels to candidate claims or checked questions, then project all required keys."""
+    needed = set(_needed_presentation_keys(result))
+    allowed = _draft_rationale_presentation_keys(draft) | {
+        key for key in needed if key.startswith("question.")
+    }
+    if not set(candidate_labels) <= allowed:
+        return {}
+    projected = {key: text for key, text in candidate_labels.items() if key in needed}
+    return projected if set(projected) == needed else {}
 
 
 def _source(fact: dict[str, Any], generation: int) -> dict[str, Any] | None:
@@ -101,9 +235,9 @@ def _active_facts(context: RoomAdviceContext) -> tuple[dict[str, Any], ...]:
 
 def _localized_rationale(
     claim_code: str, locale: str | None, *, subtotal: int | None,
-    currency: str | None,
+    currency: str | None, presentation_labels: dict[str, str] | None = None,
 ) -> tuple[str, str, bool]:
-    language = (locale or "en").split("-")[0].lower()
+    language = _language(locale)
     labels = {
         "en": {
             "party_fit": "This arrangement fits the confirmed party and verified room rules.",
@@ -142,11 +276,17 @@ def _localized_rationale(
             "charges_confirmation": "この見積もりには一部の子ども料金や追加ベッド料金が含まれていません。",
         },
     }
+    if language not in labels and presentation_labels:
+        template = presentation_labels.get(_CLAIM_KEYS[claim_code])
+        if template:
+            return template.format(amount=subtotal, currency=currency), language, False
     labels_for_language = labels.get(language, labels["en"])
     return labels_for_language[claim_code], language if language in labels else "en", language not in labels
 
 
-def _localized_question(field: object, locale: str | None) -> tuple[str | None, str, bool]:
+def _localized_question(
+    field: object, locale: str | None, presentation_labels: dict[str, str] | None = None,
+) -> tuple[str | None, str, bool]:
     if not isinstance(field, str):
         return None, "en", True
     if field in {"dates.check_in", "dates.check_out"}:
@@ -155,45 +295,68 @@ def _localized_question(field: object, locale: str | None) -> tuple[str | None, 
         key = "party"
     elif field == "party.children.age" or field.startswith("party.children.") and field.endswith(".age"):
         key = "age"
+    elif field == "room_requirements.budget_strength":
+        key = "budget_strength"
     elif field == "room_advice" or field.startswith("room_requirements."):
         key = "room"
     else:
         return None, "en", True
-    language = (locale or "en").split("-")[0].lower()
+    language = _language(locale)
     questions = {
         "en": {"dates": "What are your check-in and check-out dates?",
                "party": "How many adults will stay?", "age": "How old is each child?",
-               "room": "Which room requirement should I use?"},
+               "room": "Which room requirement should I use?",
+               "budget_strength": "Is this budget a hard limit or a target?"},
         "vi": {"dates": "Bạn nhận phòng và trả phòng vào ngày nào?",
                "party": "Có bao nhiêu người lớn sẽ lưu trú?", "age": "Mỗi trẻ bao nhiêu tuổi?",
-               "room": "Tôi nên áp dụng yêu cầu phòng nào?"},
+               "room": "Tôi nên áp dụng yêu cầu phòng nào?",
+               "budget_strength": "Ngân sách này là giới hạn bắt buộc hay mức mục tiêu?"},
         "zh": {"dates": "您的入住和退房日期是什么时候？",
                "party": "将有几位成人入住？", "age": "每位儿童分别几岁？",
-               "room": "您希望我采用哪项房间要求？"},
+               "room": "您希望我采用哪项房间要求？",
+               "budget_strength": "这项预算是硬性上限还是目标金额？"},
+        "ja": {"dates": "チェックイン日とチェックアウト日を教えてください。",
+               "party": "宿泊する大人は何人ですか？", "age": "お子様はそれぞれ何歳ですか？",
+               "room": "どの客室条件を適用しますか？",
+               "budget_strength": "この予算は上限ですか、それとも目標額ですか？"},
     }
+    label_key = _QUESTION_FIELD_KEYS.get(field)
+    if label_key is None:
+        label_key = f"question.{key}"
+    if language not in questions and presentation_labels and label_key in presentation_labels:
+        return presentation_labels[label_key], language, False
     return (questions.get(language, questions["en"])[key],
             language if language in questions else "en", language not in questions)
 
 
 def _localized_result_question(
     result: RoomAdviceResult, field: object, locale: str | None,
+    presentation_labels: dict[str, str] | None = None,
 ) -> tuple[str, str, bool]:
-    language = (locale or "en").split("-")[0].lower()
+    language = _language(locale)
     unknowns = set(result.explanation_inputs.get("unknowns", ()))
     conflicts = set(result.explanation_inputs.get("conflicts", ()))
+    if field == "room_requirements.budget_strength":
+        return _localized_question(field, locale, presentation_labels)
     if "rate_basis" in unknowns:
         labels = {
             "en": "Could you confirm whether this rate is per room per night?",
             "vi": "Bạn xác nhận mức giá này tính theo phòng mỗi đêm được không?",
             "zh": "请确认此价格是否按每间客房每晚计算。",
+            "ja": "この料金が1室1泊あたりかどうか確認していただけますか？",
         }
+        if language not in labels and presentation_labels and "question.rate_basis" in presentation_labels:
+            return presentation_labels["question.rate_basis"], language, False
         return labels.get(language, labels["en"]), language if language in labels else "en", language not in labels
     if "rate_validity_window" in unknowns:
         labels = {
             "en": "These stay dates fall outside the source rate period. Could you confirm current pricing?",
             "vi": "Ngày lưu trú nằm ngoài thời hạn của giá nguồn. Bạn có thể xác nhận giá hiện tại không?",
             "zh": "入住日期超出来源价格的有效期。请确认当前价格。",
+            "ja": "宿泊日が料金情報の有効期間外です。現在の料金をご確認いただけますか？",
         }
+        if language not in labels and presentation_labels and "question.rate_validity_window" in presentation_labels:
+            return presentation_labels["question.rate_validity_window"], language, False
         return labels.get(language, labels["en"]), language if language in labels else "en", language not in labels
     if field == "room_advice" and conflicts:
         labels_by_conflict = {
@@ -201,23 +364,36 @@ def _localized_result_question(
                 "en": "This arrangement exceeds the confirmed budget. Would you like to adjust the budget or try another arrangement?",
                 "vi": "Phương án này vượt ngân sách đã xác nhận. Bạn muốn điều chỉnh ngân sách hay thử cách sắp xếp khác?",
                 "zh": "此方案超出已确认的预算。您希望调整预算还是尝试其他安排？",
+                "ja": "この案は確認済みの予算を超えています。予算を調整するか、別の案を試しますか？",
             },
             "source_fact_conflict": {
                 "en": "The room source records conflict. Could I look for another room arrangement?",
                 "vi": "Các nguồn thông tin về phòng đang mâu thuẫn. Tôi có thể tìm cách sắp xếp phòng khác không?",
                 "zh": "房间来源信息存在冲突。我可以为您查找其他房间安排吗？",
+                "ja": "客室の情報源に食い違いがあります。別の客室構成を探しましょうか？",
             },
         }
         conflict = next(iter(sorted(conflicts)))
+        conflict_key = {
+            "hard_budget_exceeded": "question.hard_budget_exceeded",
+            "source_fact_conflict": "question.source_fact_conflict",
+        }.get(conflict, "question.room_rule_conflict")
+        if language not in labels_by_conflict.get(conflict, {}) and presentation_labels and conflict_key in presentation_labels:
+            return presentation_labels[conflict_key], language, False
         labels = labels_by_conflict.get(conflict, {
             "en": "This arrangement conflicts with a confirmed room rule. Would you like me to try another arrangement?",
             "vi": "Phương án này mâu thuẫn với quy tắc phòng đã xác nhận. Bạn muốn tôi thử cách sắp xếp khác không?",
             "zh": "此安排与已确认的房间规则冲突。您希望我尝试其他安排吗？",
+            "ja": "この案は確認済みの客室ルールと矛盾しています。別の配置を試しますか？",
         })
         return labels.get(language, labels["en"]), language if language in labels else "en", language not in labels
-    text, question_locale, fallback = _localized_question(field, locale)
+    text, question_locale, fallback = _localized_question(field, locale, presentation_labels)
     if text is None:
-        return _localized_question("room_advice", locale)
+        if language == "ja":
+            return "客室について確認させてください。", "ja", False
+        if _open_locale(locale) and presentation_labels and "question.generic" in presentation_labels:
+            return presentation_labels["question.generic"], _language(locale), False
+        return _localized_question("room_advice", locale, presentation_labels)
     return text, question_locale, fallback
 
 
@@ -232,6 +408,7 @@ class HospitalityRoomAdvice:
     @staticmethod
     def preparation_instructions(
         locale: str | None, *, include_hotel_answer: bool = False,
+        include_presentation_labels: bool = False,
     ) -> str:
         from staylead_platform.domains.hospitality.prompts.room_advice import (
             ROOM_ADVICE_INSTRUCTIONS,
@@ -246,36 +423,113 @@ include room recommendation rationale here; that belongs in candidate rationale 
 When there is no supported answer, return a concise `unknowns` entry. The server validates
 this answer against the selected facts before release."""
         suffix = f"\n{mixed_faq}" if include_hotel_answer else ""
-        return f"{ROOM_ADVICE_INSTRUCTIONS}{suffix}\nRespond in {language}."
+        labels = ""
+        if include_presentation_labels:
+            labels = """
+For open-language presentation, return `presentation_labels` as a list of `{key,text}`. Translate
+only the supplied `presentation_templates` whose keys you actually use in returned `rationale`
+or `questions`. Do not add explanations. Use only bounded keys in the schema. The
+`claim.reference_price` template must contain exactly `{amount}` and `{currency}`; all other
+templates have no placeholders. Leave numbers, URLs, factual claims, and extra keys out. The
+server validates phrases and inserts checked amount/currency values itself.
+"""
+        return f"{ROOM_ADVICE_INSTRUCTIONS}{suffix}{labels}\nRespond in {language}."
 
     @staticmethod
-    def preparation_output_schema(*, include_hotel_answer: bool = False) -> dict[str, Any]:
+    def preparation_output_schema(
+        *, include_hotel_answer: bool = False, include_presentation_labels: bool = False,
+    ) -> dict[str, Any]:
         from staylead_platform.domains.hospitality.schemas.room_advice import (
             room_advice_output_schema,
         )
 
-        return room_advice_output_schema(include_hotel_answer=include_hotel_answer)
+        return room_advice_output_schema(
+            include_hotel_answer=include_hotel_answer,
+            include_presentation_labels=include_presentation_labels,
+        )
 
     @staticmethod
-    def relocalize(result: RoomAdviceResult, locale: str | None) -> RoomAdviceResult:
+    def relocalize(
+        result: RoomAdviceResult, locale: str | None,
+        presentation_labels: dict[str, str] | None = None,
+    ) -> RoomAdviceResult:
         """Re-render trusted presentation text without changing a checked decision."""
         localized = deepcopy(result)
+        labels = presentation_labels
+        if labels is None and result.presentation_locale == locale:
+            labels = result.presentation_labels
+        labels = labels or {}
+        needed = _needed_presentation_keys(result)
+        if set(labels) != set(needed):
+            labels = {}
         for option in localized.options:
             cost = option.get("cost") or {}
             for rationale in option.get("rationale") or []:
                 text, rationale_locale, fallback = _localized_rationale(
                     rationale["claim_code"], locale,
                     subtotal=cost.get("total"), currency=cost.get("currency"),
+                    presentation_labels=labels,
                 )
                 rationale.update({"text": text, "locale": rationale_locale,
-                                  "locale_fallback": fallback})
+                                  "locale_fallback": fallback,
+                                  "presentation_key": _CLAIM_KEYS[rationale["claim_code"]]})
         for question in localized.questions:
+            presentation_key = _result_question_key(localized, question.get("field"))
             text, question_locale, fallback = _localized_result_question(
-                localized, question.get("field"), locale,
+                localized, question.get("field"), locale, labels,
             )
             question.update({"reason": text, "locale": question_locale,
-                             "locale_fallback": fallback})
-        return localized
+                             "locale_fallback": fallback,
+                             "presentation_key": presentation_key})
+        return replace(
+            localized, presentation_labels=dict(labels),
+            presentation_locale=locale if labels else None,
+        )
+
+    @staticmethod
+    def needs_presentation_labels(locale: str | None) -> bool:
+        return _open_locale(locale)
+
+    @staticmethod
+    def presentation_templates() -> dict[str, str]:
+        return dict(_PRESENTATION_TEMPLATES)
+
+    @staticmethod
+    def localization_request(
+        result: RoomAdviceResult, locale: str | None,
+    ) -> dict[str, Any] | None:
+        if not _open_locale(locale):
+            return None
+        keys = _needed_presentation_keys(result)
+        if not keys:
+            return None
+        return {
+            "keys": keys,
+            "instructions": (
+                f"Translate only the supplied approved room-advice phrase templates into {locale}. "
+                "Return each requested key exactly once and no extra text. Preserve exact placeholders. "
+                "Do not add facts, numbers, URLs, or markup."
+            ),
+            "input": {"locale": locale, "presentation_templates": {key: _PRESENTATION_TEMPLATES[key] for key in keys}},
+            "response_schema": room_advice_localization_output_schema(keys),
+        }
+
+    @staticmethod
+    def parse_localization(
+        text: str, *, expected_keys: tuple[str, ...], locale: str | None,
+    ) -> dict[str, str]:
+        if not _open_locale(locale):
+            return {}
+        try:
+            parsed = RoomAdviceLocalizationPreparation.model_validate_json(text)
+        except ValidationError:
+            return {}
+        labels = _valid_presentation_labels([
+            item.model_dump(mode="json") for item in parsed.presentation_labels
+        ])
+        if set(labels) != set(expected_keys):
+            return {}
+        return labels
 
     @staticmethod
     def parse_draft(text: str) -> RoomAdviceDraft:
@@ -296,6 +550,7 @@ this answer against the selected facts before release."""
                 unknowns=tuple(parsed.hotel_answer.unknowns),
                 conflicts=tuple(parsed.hotel_answer.conflicts),
             ) if parsed.hotel_answer is not None else None),
+            presentation_labels=tuple(item.model_dump(mode="json") for item in parsed.presentation_labels),
         )
 
     @staticmethod
@@ -318,6 +573,12 @@ this answer against the selected facts before release."""
     ) -> RoomAdviceResult:
         del deadline  # Bounds are owned by the caller/provider; this operation is deterministic.
         active = _active_facts(context)
+        presentation_labels = _valid_presentation_labels(draft.presentation_labels)
+
+        def relocalize_checked(result: RoomAdviceResult) -> RoomAdviceResult:
+            labels = _project_checked_presentation_labels(result, draft, presentation_labels)
+            return self.relocalize(result, context.locale, labels)
+
         source_facts = {fact["fact_id"]: fact for fact in active}
         room_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for fact in active:
@@ -347,44 +608,66 @@ this answer against the selected facts before release."""
         questions = []
         for item in draft.questions:
             field = item.get("field")
-            question, question_locale, question_fallback = _localized_question(field, context.locale)
-            if question:
-                questions.append({"field": field, "reason": question, "locale": question_locale,
-                                  "locale_fallback": question_fallback})
+            if isinstance(field, str):
+                questions.append({"field": field})
         if adults is None or not members:
-            question, question_locale, question_fallback = _localized_question("party.adults", context.locale)
-            questions.append({"field": "party.adults", "reason": question, "locale": question_locale,
-                              "locale_fallback": question_fallback})
-            return RoomAdviceResult(
+            questions.append({"field": "party.adults"})
+            result = RoomAdviceResult(
                 status="needs_clarification", brief_version=context.brief_version,
                 source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
                 questions=tuple(questions), explanation_inputs={"unknowns": ["party size"]},
                 hotel_answer=draft.hotel_answer,
             )
+            return relocalize_checked(result)
         if len(members) > 40:
-            return RoomAdviceResult(
+            result = RoomAdviceResult(
                 status="processing_limit", brief_version=context.brief_version,
                 source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
                 questions=tuple(questions), explanation_inputs={"unknowns": ["party exceeds checked assignment limit"]},
                 hotel_answer=draft.hotel_answer,
             )
+            return relocalize_checked(result)
         if any(field == "party.children.member" or field.startswith("party.children.") for field in pending):
-            question, question_locale, question_fallback = _localized_question("party.children.age", context.locale)
-            questions.append({"field": "party.children.age", "reason": question, "locale": question_locale,
-                              "locale_fallback": question_fallback})
+            questions.append({"field": "party.children.age"})
+        requirements = context.brief_data.get("room_requirements") or {}
+        budget_strength_unknown = (
+            requirements.get("budget_amount") is not None
+            and requirements.get("budget_strength") not in {"hard", "target"}
+        )
+        if budget_strength_unknown:
+            pending.add("room_requirements.budget_strength")
+        if "room_requirements.budget_strength" in pending:
+            questions.append({"field": "room_requirements.budget_strength"})
+        other_pending_room_requirements = (
+            pending - {"room_requirements.budget_strength"}
+            if budget_strength_unknown else pending
+        )
+        if "room_requirements" in other_pending_room_requirements or any(
+            field.startswith("room_requirements.") for field in other_pending_room_requirements
+        ):
+            questions.append({"field": "room_advice"})
+            result = RoomAdviceResult(
+                status="needs_clarification", brief_version=context.brief_version,
+                source_generation=context.source_generation,
+                source_refs=tuple(_source(f, context.source_generation) for f in active),
+                questions=tuple(questions),
+                explanation_inputs={"unknowns": ["room requirements"]},
+                hotel_answer=draft.hotel_answer,
+            )
+            return relocalize_checked(result)
         if draft.status != "ready" or not draft.options:
-            return RoomAdviceResult(
+            result = RoomAdviceResult(
                 status=(draft.status if draft.status != "ready" else "needs_clarification"),
                 brief_version=context.brief_version, source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
                 questions=tuple(questions), explanation_inputs={"unknowns": ["no checked room candidate"]},
                 hotel_answer=draft.hotel_answer,
             )
+            return relocalize_checked(result)
 
         options: list[dict[str, Any]] = []
-        incomplete_cost = False
         seen_option_ids: set[str] = set()
         all_claim_ids: set[str] = set()
         if draft.hotel_answer is not None:
@@ -392,6 +675,7 @@ this answer against the selected facts before release."""
                 fact_id for claim in draft.hotel_answer.supported_claims for fact_id in claim.fact_ids
             )
         invalid_reasons: list[str] = []
+        rejected_alternatives: list[dict[str, Any]] = []
         for raw in draft.options:
             try:
                 candidate = RoomAdviceOption.model_validate({
@@ -465,12 +749,13 @@ this answer against the selected facts before release."""
                 hard_beds = requirements.get("hard_bed_types") or []
                 special_needs = {"cot": any(any(token in value.casefold() for token in ("cot", "crib", "nôi"))
                                                for value in hard_beds if isinstance(value, str)),
-                                 "extra_bed": any("extra bed" in value.casefold() or "giường phụ" in value.casefold()
+                                 "extra_bed": any(value.casefold() == "extra_bed" or "extra bed" in value.casefold() or "giường phụ" in value.casefold()
                                                   for value in hard_beds if isinstance(value, str))}
                 ordinary_hard_beds = [value for value in hard_beds
-                                      if isinstance(value, str) and not any(
-                                          token in value.casefold() for token in ("cot", "crib", "nôi", "extra bed", "giường phụ")
-                                      )]
+                                      if isinstance(value, str) and value.casefold() != "extra_bed"
+                                      and not any(token in value.casefold() for token in (
+                                          "cot", "crib", "nôi", "extra bed", "giường phụ",
+                                      ))]
                 if ordinary_hard_beds and not selected_bed_types <= set(ordinary_hard_beds):
                     feasible = False
                     checks.append({"code": "hard_bed_type", "status": "conflict", "fact_ids": [room_fact["fact_id"]]})
@@ -546,6 +831,36 @@ this answer against the selected facts before release."""
                     checks.append({"code": "bed_configuration", "status": "pass", "fact_ids": [room_fact["fact_id"]]})
                     if sharing_preference == "prefer":
                         checks.append({"code": "bed_sharing_preference", "status": "not_met", "fact_ids": [room_fact["fact_id"]]})
+                separate_bed_members = {
+                    child.get("member_id") for child in (context.brief_data.get("party") or {}).get("children", [])
+                    if child.get("requires_separate_bed") is True
+                }
+                separate_assignments = [item for item in guests if item["member_id"] in separate_bed_members]
+                if separate_assignments:
+                    def sleeping_surface(item: dict[str, Any]) -> tuple[int, str | None] | None:
+                        index = item.get("bed_index")
+                        if not isinstance(index, int):
+                            return None
+                        if item.get("bed_type") == "bunk":
+                            position = item.get("bed_position")
+                            return (index, position) if position in {"upper", "lower"} else None
+                        return index, None
+
+                    surface_counts = Counter(
+                        surface for item in guests if (surface := sleeping_surface(item)) is not None
+                    )
+                    required_surfaces = [sleeping_surface(item) for item in separate_assignments]
+                    if (any(surface is None for surface in required_surfaces)
+                            or any(sleeping_surface(item) is None for item in guests)):
+                        checks.append({"code": "separate_bed_requirement", "status": "unknown",
+                                       "fact_ids": [room_fact["fact_id"]]})
+                    elif any(surface_counts[surface] > 1 for surface in required_surfaces):
+                        feasible = False
+                        checks.append({"code": "separate_bed_requirement", "status": "conflict",
+                                       "fact_ids": [room_fact["fact_id"]]})
+                    else:
+                        checks.append({"code": "separate_bed_requirement", "status": "pass",
+                                       "fact_ids": [room_fact["fact_id"]]})
                 bunk_positions = Counter(
                     (item.get("bed_index"), item.get("bed_position"))
                     for item in guests if item.get("bed_type") == "bunk"
@@ -753,8 +1068,10 @@ this answer against the selected facts before release."""
             if unpriced_bedding:
                 complete = False
             if not complete:
-                incomplete_cost = True
                 checks.append({"code": "cost_completeness", "status": "unknown",
+                               "fact_ids": [rate["fact_id"] for rate in rates_by_room.values() if rate]})
+            if budget_strength_unknown:
+                checks.append({"code": "budget_strength", "status": "unknown",
                                "fact_ids": [rate["fact_id"] for rate in rates_by_room.values() if rate]})
             if rate_basis_unknown:
                 checks.append({"code": "rate_basis", "status": "unknown",
@@ -793,6 +1110,12 @@ this answer against the selected facts before release."""
                 basis_value = known_lower_bound if comparable else None
                 if basis_value is not None and basis_value > requirements["budget_amount"]:
                     invalid_reasons.append("hard_budget_exceeded")
+                    rejected_alternatives.append({"option_id": candidate.option_id,
+                                                  "reason": "hard_budget_exceeded",
+                                                  "fact_ids": sorted({
+                                                      *(room_records[index]["fact_id"] for index in room_indices),
+                                                      *(rate["fact_id"] for rate in rates_by_room.values() if rate),
+                                                  })})
                     continue
                 if basis_value is None or complete_basis_value is None:
                     checks.append({"code": "budget", "status": "unknown", "fact_ids": [rate["fact_id"] for rate in rates_by_room.values() if rate]})
@@ -807,6 +1130,7 @@ this answer against the selected facts before release."""
             fit_codes = {
                 "occupancy", "bed_configuration", "guardian_relationship", "child_age_policy",
                 "bunk_position_policy", "bunk_position_capacity", "bed_sharing_consent",
+                "separate_bed_requirement",
                 "cot_policy", "extra_bed_policy", "accessibility",
             }
             fit_verified = all(
@@ -855,6 +1179,7 @@ this answer against the selected facts before release."""
                 text, rationale_locale, locale_fallback = _localized_rationale(
                     claim.claim_code, context.locale, subtotal=subtotal,
                     currency=next(iter(currencies)) if len(currencies) == 1 else None,
+                    presentation_labels=presentation_labels,
                 )
                 safe_rationale.append({"claim_code": claim.claim_code, "text": text,
                                        "locale": rationale_locale,
@@ -877,7 +1202,8 @@ this answer against the selected facts before release."""
         tradeoffs = sorted({check["code"] for option in options for check in option["checks"]
                             if check["status"] == "not_met"})
         if options:
-            status = "partial" if unknown_checks or incomplete_cost or invalid_reasons or tradeoffs else "ready"
+            accepted_incomplete_cost = any(option["cost"]["status"] != "complete" for option in options)
+            status = "partial" if unknown_checks or accepted_incomplete_cost or tradeoffs else "ready"
         elif invalid_reasons:
             status = "conflict" if any(reason in {
                 "candidate_fails_hard_room_check", "hard_budget_exceeded", "hard_room_count_exceeded",
@@ -885,12 +1211,12 @@ this answer against the selected facts before release."""
             } for reason in invalid_reasons) else "unsupported"
         else:
             status = "needs_clarification"
-        if invalid_reasons:
+        if invalid_reasons and not options:
             questions.extend({"field": "room_advice", "reason": reason.replace("_", " ")}
                              for reason in dict.fromkeys(invalid_reasons))
         source_refs = tuple(_source(source_facts[fact_id], context.source_generation)
                             for fact_id in sorted(all_claim_ids) if fact_id in source_facts)
-        return RoomAdviceResult(
+        result = RoomAdviceResult(
             status=status, brief_version=context.brief_version,
             source_generation=context.source_generation, source_refs=source_refs,
             options=tuple(options), questions=tuple(questions),
@@ -898,13 +1224,15 @@ this answer against the selected facts before release."""
                 "supported_fact_ids": sorted(all_claim_ids),
                 "unknowns": sorted({check["code"] for option in options for check in option["checks"]
                                      if check["status"] == "unknown"}),
-                "conflicts": sorted(set(invalid_reasons)),
+                "conflicts": sorted(set(invalid_reasons)) if not options else [],
+                "rejected_alternatives": rejected_alternatives,
                 "tradeoffs": tradeoffs,
                 "availability": "unknown",
                 "rationale_locale": context.locale or "en",
             },
             hotel_answer=draft.hotel_answer,
         )
+        return relocalize_checked(result)
 
 
 __all__ = ["HospitalityRoomAdvice"]

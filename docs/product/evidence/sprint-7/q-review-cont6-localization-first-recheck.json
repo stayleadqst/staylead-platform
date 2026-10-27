@@ -1,0 +1,11 @@
+{
+  "actual_capture_four_to_two": "PASS raw model draft parses, 4validatedcandidatekeys allowed; projects2checkedkeys; French nofallback",
+  "decision_immutable": "cost/assignments/source_refs identical",
+  "negatives": "missingneeded/numeric/URI/placeholder remain rejected",
+  "known_remaining_finding": "q-review-cont6-question-projection-regression.json pending repair",
+  "hashes": {
+    "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py": "d67067fe3fb536c8c431da37776266e8fc4058fc8a9238cde0954f346c9cfec4",
+    "tests/contracts/test_room_advice.py": "789b63630f2ff20ce2eadcd18015220ad5887ee3bc2f01793f38c27e7b0c7599"
+  },
+  "effects": "offline only; historical actual8 unchangedFAIL"
+}

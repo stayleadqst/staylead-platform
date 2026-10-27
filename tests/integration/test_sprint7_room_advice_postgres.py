@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import uuid
+from dataclasses import asdict
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from pydantic import SecretStr
 from sqlalchemy import select, update
 
 from staylead_platform.composition.configuration.settings import Settings
+from staylead_platform.domains.hospitality.recommendations.rooms import HospitalityRoomAdvice
 from staylead_platform.entrypoints.app import create_app
 from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.store import (
@@ -32,6 +34,7 @@ from staylead_platform.infrastructure.persistence.store import (
     save_room_advice_result,
     select_room_advice_option,
     sessions,
+    update_room_advice_presentation,
 )
 from staylead_platform.infrastructure.source_connectors.knowledge_v1 import (
     import_fixture_pack,
@@ -41,6 +44,7 @@ from staylead_platform.platform.contracts.ai_provider import (
     GenerationResult,
     Usage,
 )
+from staylead_platform.platform.contracts.room_advice import RoomAdviceResult
 
 FIXTURE_ROOT = Path(__file__).resolve().parents[2] / "fixtures" / "hospitality" / "knowledge-v1"
 TEST_DSN = os.environ.get("STAYLEAD_TEST_DATABASE_URL")
@@ -61,14 +65,14 @@ class RoomAdviceProvider:
             }]}
         elif "candidate_index" in payload:
             value = {
-                "fact_ids": [], "guest_patch": None, "guest_patch_authorizations": [],
+                "fact_ids": [], "guest_patch": None,
                 "turn_intents": ["room_advice"], "explicit_language_tag": None,
                 "inferred_language_tag": None,
             }
         else:
             value = {
                 "supported_claims": [], "unknowns": ["I will check the room fit."], "conflicts": [],
-                "guest_patch": None, "guest_patch_authorizations": [], "turn_intents": ["room_advice"],
+                "guest_patch": None, "turn_intents": ["room_advice"],
                 "guest_claims": [], "guest_clarification": None,
                 "conversational_acknowledgement": None, "guest_brief_refs": [],
                 "explicit_language_tag": None, "inferred_language_tag": None,
@@ -82,26 +86,19 @@ class RoomAdviceProvider:
 
 
 class HappyPathRoomAdviceProvider(RoomAdviceProvider):
-    def _patch(self, question: str) -> tuple[dict[str, object], list[dict[str, object]]]:
+    def _patch(self, question: str) -> dict[str, object]:
         if "one more night" in question.lower():
-            ops = [{"op": "set_dates", "check_in": None, "check_out": "2026-11-05"}]
-            auth = [{"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_out"],
-                     "intent": "explicit_request", "current_turn_quote": "checkout is 2026-11-05"}]
+            ops = [{"op": "set_dates", "check_in": None, "check_out": "2026-11-05",
+                    "current_turn_quote": "checkout is 2026-11-05"}]
         else:
             ops = [
-                {"op": "set_dates", "check_in": "2026-11-01", "check_out": "2026-11-04"},
-                {"op": "set_adults", "count": 2},
-                {"op": "set_bed_sharing", "member_ids": ["adult-1", "adult-2"], "allow_share": True},
+                {"op": "set_dates", "check_in": "2026-11-01", "check_out": "2026-11-04",
+                 "current_turn_quote": "check in 2026-11-01 and check out 2026-11-04"},
+                {"op": "set_adults", "count": 2, "current_turn_quote": "Two adults"},
+                {"op": "set_bed_sharing", "member_ids": ["adult-1", "adult-2"], "allow_share": True,
+                 "current_turn_quote": "we can share a queen bed"},
             ]
-            auth = [
-                {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
-                 "intent": "explicit_request", "current_turn_quote": "check in 2026-11-01 and check out 2026-11-04"},
-                {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
-                 "intent": "explicit_request", "current_turn_quote": "Two adults"},
-                {"operation_index": 2, "op": "set_bed_sharing", "target_fields": ["party.bed_sharing"],
-                 "intent": "explicit_request", "current_turn_quote": "we can share a queen bed"},
-            ]
-        return {"ops": ops}, auth
+        return {"ops": ops}
 
     async def generate(self, request: GenerationRequest) -> GenerationResult:
         payload = json.loads(request.input_text)
@@ -131,16 +128,16 @@ class HappyPathRoomAdviceProvider(RoomAdviceProvider):
             }
             value: dict[str, object] = {"options": [candidate], "questions": []}
         elif "candidate_index" in payload:
-            patch, authorizations = self._patch(question)
-            value = {"fact_ids": [], "guest_patch": patch, "guest_patch_authorizations": authorizations,
+            patch = self._patch(question)
+            value = {"fact_ids": [], "guest_patch": patch,
                      "turn_intents": ["guest_edit", "room_advice"], "explicit_language_tag": None,
                      "inferred_language_tag": None}
         else:
-            patch, authorizations = self._patch(question)
+            patch = self._patch(question)
             keys = payload.get("missing_label_keys", [])
             value = {
                 "supported_claims": [], "unknowns": ["I will check the room fit."], "conflicts": [],
-                "guest_patch": patch, "guest_patch_authorizations": authorizations,
+                "guest_patch": patch,
                 "turn_intents": ["guest_edit", "room_advice"], "guest_claims": [],
                 "guest_clarification": None, "conversational_acknowledgement": None,
                 "guest_brief_refs": [], "explicit_language_tag": None, "inferred_language_tag": None,
@@ -164,14 +161,14 @@ class BookingIntentProvider(RoomAdviceProvider):
         intents = ["booking_request", "hotel_information"] if self.mixed else ["booking_request"]
         if "candidate_index" in payload:
             value = {
-                "fact_ids": [], "guest_patch": None, "guest_patch_authorizations": [],
+                "fact_ids": [], "guest_patch": None,
                 "turn_intents": intents, "explicit_language_tag": None,
                 "inferred_language_tag": None,
             }
         else:
             value = {
                 "supported_claims": [], "unknowns": ["I could not confirm booking details from hotel records."] if self.mixed else [], "conflicts": [],
-                "guest_patch": None, "guest_patch_authorizations": [], "turn_intents": intents,
+                "guest_patch": None, "turn_intents": intents,
                 "guest_claims": [], "guest_clarification": None,
                 "conversational_acknowledgement": None, "guest_brief_refs": [],
                 "explicit_language_tag": None, "inferred_language_tag": None,
@@ -188,11 +185,41 @@ class LanguageOnlyRoomAdviceProvider(HappyPathRoomAdviceProvider):
     async def generate(self, request: GenerationRequest) -> GenerationResult:
         payload = json.loads(request.input_text)
         question = str(payload.get("question", payload.get("current_question", "")))
-        if "vietnamese" in question.lower() and "candidate_index" in payload:
+        if "locale" in payload and "presentation_templates" in payload:
+            self.calls.append(payload)
+            translations = {
+                "claim.party_fit": "Cette configuration convient au groupe confirmé et respecte les règles vérifiées.",
+                "claim.bed_setup": "La configuration des lits indiquée correspond aux lits vérifiés.",
+                "claim.reference_price": "Estimation indicative du tarif pour le séjour : {amount} {currency}.",
+                "claim.policy_confirmation": "Certains détails de la chambre restent à confirmer.",
+                "claim.accessibility_confirmation": "L'accessibilité de cette chambre n'est pas confirmée.",
+                "claim.preference_tradeoff": "Cette option ne répond pas à une préférence de partage ou de type de lit.",
+                "claim.charges_confirmation": "Certains frais d'enfant ou de couchage supplémentaire ne sont pas inclus.",
+                "question.dates": "Quelles sont vos dates d'arrivée et de départ ?",
+                "question.party": "Combien d'adultes séjourneront ?",
+                "question.age": "Quel âge a chaque enfant ?",
+                "question.room": "Quelle exigence de chambre dois-je retenir ?",
+                "question.rate_basis": "Pouvez-vous confirmer si ce tarif est calculé par chambre et par nuit ?",
+                "question.rate_validity_window": "Ces dates dépassent la période du tarif source. Pouvez-vous confirmer le tarif actuel ?",
+                "question.hard_budget_exceeded": "Cette option dépasse le budget confirmé. Souhaitez-vous modifier le budget ou essayer une autre option ?",
+                "question.source_fact_conflict": "Les informations sources sur la chambre sont contradictoires. Puis-je chercher une autre option ?",
+                "question.room_rule_conflict": "Cette option contredit une règle confirmée. Souhaitez-vous essayer une autre disposition ?",
+                "question.generic": "Pouvez-vous confirmer ce détail concernant la chambre ?",
+            }
+            value = {"presentation_labels": [
+                {"key": key, "text": translations[key]}
+                for key in payload["presentation_templates"]
+            ]}
+            return GenerationResult(
+                text=json.dumps(value, ensure_ascii=False), provider="offline-fake", deployment="s7-test",
+                model="mock-french-localization", request_id=f"s7-french-{len(self.calls)}",
+                usage=Usage(input_tokens=2, output_tokens=4, total_tokens=6),
+            )
+        if "french" in question.lower() and "candidate_index" in payload:
             self.calls.append(payload)
             value = {
-                "fact_ids": [], "guest_patch": None, "guest_patch_authorizations": [],
-                "turn_intents": ["room_advice"], "explicit_language_tag": "vi",
+                "fact_ids": [], "guest_patch": None,
+                "turn_intents": ["room_advice"], "explicit_language_tag": "fr",
                 "inferred_language_tag": None,
             }
             return GenerationResult(
@@ -200,7 +227,7 @@ class LanguageOnlyRoomAdviceProvider(HappyPathRoomAdviceProvider):
                 model="mock-language-only", request_id=f"s7-language-{len(self.calls)}",
                 usage=Usage(input_tokens=2, output_tokens=2, total_tokens=4),
             )
-        if "vietnamese" in question.lower() and "current_question" in payload:
+        if "french" in question.lower() and "current_question" in payload:
             self.calls.append(payload)
             alternate = {
                 "option_id": "must-not-replace-existing-option",
@@ -213,7 +240,52 @@ class LanguageOnlyRoomAdviceProvider(HappyPathRoomAdviceProvider):
                 provider="offline-fake", deployment="s7-test", model="must-not-run",
                 request_id=f"s7-must-not-run-{len(self.calls)}", usage=Usage(),
             )
-        return await super().generate(request)
+        generated = await super().generate(request)
+        if "presentation_templates" in payload and "current_question" in payload:
+            value = json.loads(generated.text)
+            value["presentation_labels"] = [{
+                "key": "claim.reference_price",
+                "text": "Estimation indicative du tarif pour le séjour : {amount} {currency}.",
+            }]
+            return GenerationResult(
+                text=json.dumps(value, ensure_ascii=False), provider=generated.provider,
+                deployment=generated.deployment, model=generated.model,
+                request_id=generated.request_id, usage=generated.usage,
+            )
+        return generated
+
+
+class AdviceThenBookingProvider(LanguageOnlyRoomAdviceProvider):
+    def __init__(self) -> None:
+        super().__init__()
+        self.booking_mode = False
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        payload = json.loads(request.input_text)
+        question = str(payload.get("question", payload.get("current_question", "")))
+        if not self.booking_mode or "How do I book a room?" not in question:
+            return await super().generate(request)
+        self.calls.append(payload)
+        if "candidate_index" in payload:
+            value = {
+                "fact_ids": [], "guest_patch": None,
+                "turn_intents": ["booking_request"], "explicit_language_tag": None,
+                "inferred_language_tag": None,
+            }
+        else:
+            value = {
+                "supported_claims": [], "unknowns": [], "conflicts": [],
+                "guest_patch": None, "turn_intents": ["booking_request"],
+                "guest_claims": [], "guest_clarification": None,
+                "conversational_acknowledgement": None, "guest_brief_refs": [],
+                "explicit_language_tag": None, "inferred_language_tag": None,
+                "label_bundle": {},
+            }
+        return GenerationResult(
+            text=json.dumps(value), provider="offline-fake", deployment="s7-test",
+            model="mock-booking-after-room-advice", request_id=f"s7-after-booking-{len(self.calls)}",
+            usage=Usage(input_tokens=2, output_tokens=2, total_tokens=4),
+        )
 
 
 class MixedHotelAnswerRoomAdviceProvider(HappyPathRoomAdviceProvider):
@@ -225,10 +297,9 @@ class MixedHotelAnswerRoomAdviceProvider(HappyPathRoomAdviceProvider):
                 item["fact_id"] for item in payload["candidate_index"]
                 if item.get("fact_id") == "F-HTL-CITY01-001"
             )
-            patch, authorizations = self._patch(str(payload.get("question", "")))
+            patch = self._patch(str(payload.get("question", "")))
             value = {
                 "fact_ids": [selected_name], "guest_patch": patch,
-                "guest_patch_authorizations": authorizations,
                 "turn_intents": ["hotel_information", "guest_edit", "room_advice"],
                 "explicit_language_tag": None, "inferred_language_tag": None,
             }
@@ -405,6 +476,71 @@ def test_result_snapshot_is_idempotent_persisted_and_selection_is_versioned(engi
         )) == payload
 
 
+def test_open_locale_presentation_persists_without_changing_checked_result(engine) -> None:
+    session_id, snapshot, hotel, source_refs = _scope(engine)
+    legacy_advice = RoomAdviceResult(
+        status="ready", brief_version=0, source_generation=snapshot.generation,
+        source_refs=tuple(source_refs), options=({
+            "option_id": "option-a", "assignments": [{"member_id": "adult-1", "room_index": 0}],
+            "checks": [{"code": "party_fit", "status": "pass"}],
+            "cost": {"total": 1000000, "currency": "VND"},
+            "rooms": [{"room_index": 0, "room_type_id": "CITY-STD"}],
+            "rationale": [{"claim_code": "party_fit", "fact_ids": [source_refs[0]["fact_ids"][0]],
+                           "text": "This arrangement fits.", "locale": "en", "locale_fallback": False}],
+        },), questions=({
+            "field": "room_requirements.budget_strength", "reason": "Is this budget a hard limit or a target?",
+            "locale": "en", "locale_fallback": False,
+        },), explanation_inputs={"unknowns": ["rate_basis"]},
+    )
+    payload = asdict(legacy_advice)
+    payload.pop("presentation_locale")
+    payload.pop("presentation_labels")
+    saved = save_room_advice_result(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", request_id=f"s7-{uuid.uuid4()}",
+        payload=payload, brief_version=0, source_generation=snapshot.generation,
+        config_version=hotel["config_version"], source_refs=source_refs, expected_state_version=0,
+    )
+    preference = commit_language_preference(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", language_tag="fr",
+        source="explicit", expected_revision=0,
+    )
+    localized = asdict(HospitalityRoomAdvice.relocalize(
+        legacy_advice, "fr", {
+            "claim.party_fit": "Cette configuration convient au groupe confirmé.",
+            "question.budget_strength": "Ce budget est-il une limite stricte ou un objectif ?",
+        },
+    ))
+    updated = update_room_advice_presentation(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", result_id=saved["result_id"],
+        expected_result_version=saved["result_version"], expected_payload=payload,
+        payload=localized, expected_language_revision=preference["revision"],
+    )
+    persisted = get_room_advice_result(engine, session_id=session_id, hotel_id="HTL-CITY01")
+    localized_json = json.loads(json.dumps(localized))
+    assert persisted["payload"] == localized_json
+    assert persisted["result_version"] == saved["result_version"]
+    assert persisted["dependency_fingerprint"] == saved["dependency_fingerprint"]
+    assert updated["result_id"] == saved["result_id"]
+    assert persisted["payload"]["questions"][0]["presentation_key"] == "question.budget_strength"
+    assert persisted["payload"]["questions"][0]["reason"] == "Ce budget est-il une limite stricte ou un objectif ?"
+
+    selected = select_room_advice_option(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", result_id=saved["result_id"],
+        expected_result_version=saved["result_version"], option_id="option-a",
+    )
+    assert selected["option_id"] == "option-a"
+    assert get_room_advice_result(engine, session_id=session_id, hotel_id="HTL-CITY01")["payload"] == localized_json
+
+    forged = json.loads(json.dumps(localized))
+    forged["options"][0]["cost"]["total"] += 1
+    with pytest.raises(ValueError, match="checked decision content"):
+        update_room_advice_presentation(
+            engine, session_id=session_id, hotel_id="HTL-CITY01", result_id=saved["result_id"],
+            expected_result_version=saved["result_version"], expected_payload=localized,
+            payload=forged, expected_language_revision=preference["revision"],
+        )
+
+
 def test_config_change_after_generation_pin_rejects_commit(engine) -> None:
     session_id, snapshot, hotel, source_refs = _scope(engine)
     pinned_config_version = hotel["config_version"]
@@ -482,6 +618,56 @@ def test_messages_routes_booking_request_to_trusted_channel(engine, mixed: bool,
     assert body["trace"]["calls"] == len(provider.calls)
 
 
+def test_pure_booking_response_omission_preserves_selected_current_advice(engine) -> None:
+    provider = AdviceThenBookingProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-seven-booking-preserves-advice-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "harbor-city-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    headers = {"Authorization": f"Bearer {session['access_token']}"}
+    endpoint = f"/v1/guest/sessions/{session['session_id']}"
+    advised = client.post(f"{endpoint}/messages", headers=headers, json={
+        "request_id": str(uuid.uuid4()),
+        "question": "Two adults, we can share a queen bed, check in 2026-11-01 and check out 2026-11-04. Recommend a room.",
+    })
+    assert advised.status_code == 200, advised.text
+    advice = advised.json()["room_advice"]
+    assert advice["currentness"] == "current" and advice["options"]
+    selected = client.post(
+        f"{endpoint}/room-advice/{advice['result_id']}/selection", headers=headers,
+        json={"result_version": advice["result_version"], "option_id": advice["options"][0]["option_id"]},
+    )
+    assert selected.status_code == 200, selected.text
+    selected_option_id = selected.json()["option_id"]
+    before = client.get(f"{endpoint}/room-advice", headers=headers)
+    assert before.status_code == 200, before.text
+    assert before.json()["currentness"] == "current"
+    before_result_id = before.json()["result_id"]
+    before_version = before.json()["result_version"]
+    assert before.json()["selection"]["option_id"] == selected_option_id
+
+    provider.booking_mode = True
+    call_count_before_booking = len(provider.calls)
+    booking = client.post(f"{endpoint}/messages", headers=headers, json={
+        "request_id": str(uuid.uuid4()), "question": "How do I book a room?",
+    })
+    assert booking.status_code == 200, booking.text
+    body = booking.json()
+    assert body["booking_request"] == {"requested": True}
+    assert "room_advice" not in body
+    assert body["trace"]["calls"] == 1
+    assert len(provider.calls) == call_count_before_booking + 1
+    after = client.get(f"{endpoint}/room-advice", headers=headers)
+    assert after.status_code == 200, after.text
+    assert after.json()["currentness"] == "current"
+    assert (after.json()["result_id"], after.json()["result_version"]) == (before_result_id, before_version)
+    assert after.json()["selection"]["option_id"] == selected_option_id
+
+
 def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine) -> None:
     provider = LanguageOnlyRoomAdviceProvider()
     settings = Settings(
@@ -555,11 +741,11 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
 
     language_only = client.post(endpoint, headers=headers, json={
         "request_id": str(uuid.uuid4()),
-        "question": "Please show the same room suggestion in Vietnamese.",
+        "question": "Please show the same room suggestion in French.",
     })
     assert language_only.status_code == 200, language_only.text
     relocalized = language_only.json()["room_advice"]
-    assert len(provider.calls) == 3, provider.calls
+    assert len(provider.calls) == 4, provider.calls
     assert relocalized["result_id"] == result_id
     assert relocalized["result_version"] == advice["result_version"]
     assert relocalized["options"][0]["rooms"] == advice["options"][0]["rooms"]
@@ -568,15 +754,26 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     assert relocalized["options"][0]["cost"] == advice["options"][0]["cost"]
     assert relocalized["options"][0]["rationale"][0]["fact_ids"] == advice["options"][0]["rationale"][0]["fact_ids"]
     assert relocalized["selection"]["option_id"] == option_id
-    assert relocalized["options"][0]["rationale"][0]["locale"] == "vi"
+    assert relocalized["options"][0]["rationale"][0]["locale"] == "fr"
     assert language_only.json()["trace"]["calls"] == len(provider.calls) - 2
+
+    latest_read = client.get(
+        f"/v1/guest/sessions/{session['session_id']}/room-advice", headers=headers,
+    )
+    assert latest_read.status_code == 200, latest_read.text
+    assert latest_read.json()["options"][0]["rationale"][0]["text"] == (
+        "Estimation indicative du tarif pour le séjour : 5400000 VND."
+    )
+    assert latest_read.json()["result_version"] == advice["result_version"]
+    assert latest_read.json()["options"][0]["cost"] == advice["options"][0]["cost"]
 
     replay = client.post(endpoint, headers=headers, json={
         "request_id": first_request_id, "question": first_question,
     })
     assert replay.status_code == 200, replay.text
     assert replay.json()["room_advice"]["result_id"] == result_id
-    assert len(provider.calls) == 3
+    assert replay.json()["room_advice"]["options"][0]["rationale"][0]["locale"] == "fr"
+    assert len(provider.calls) == 4
 
     source_ref = advice["source_refs"][0]
     source_id = source_ref.get("source_id") or source_ref["source"]["source_id"]
@@ -599,7 +796,7 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
         assert source_freshness.status_code == 200, source_freshness.text
         assert source_freshness.json()["room_advice_currentness"] == "stale"
         assert source_freshness.json()["status"] == "stale"
-        assert len(provider.calls) == 3
+        assert len(provider.calls) == 4
     finally:
         with engine.begin() as connection:
             connection.execute(update(knowledge_sources).where(
@@ -613,7 +810,7 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     })
     assert second.status_code == 200, second.text
     updated_advice = second.json()["room_advice"]
-    assert len(provider.calls) == 5
+    assert len(provider.calls) == 6
     assert updated_advice["brief_version"] == advice["brief_version"] + 1
     assert updated_advice["options"][0]["cost"]["total"] == 7_200_000
     assert updated_advice["currentness"] == "current"

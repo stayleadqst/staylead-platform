@@ -8,6 +8,14 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from staylead_platform.domains.hospitality.schemas.grounded_answer import GroundedClaim
 
+PRESENTATION_LABEL_KEYS = (
+    "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
+    "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
+    "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+    "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
+    "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
+)
+
 
 class RoomAssignment(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -46,6 +54,18 @@ class RoomAdviceQuestion(BaseModel):
     field: str = Field(min_length=1, max_length=64)
 
 
+class RoomAdvicePresentationLabel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    key: Literal[
+        "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
+        "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
+        "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+        "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
+        "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
+    ]
+    text: str = Field(min_length=1, max_length=160)
+
+
 class RoomAdviceHotelAnswer(BaseModel):
     model_config = ConfigDict(extra="forbid")
     supported_claims: list[GroundedClaim] = Field(default_factory=list, max_length=4)
@@ -58,6 +78,12 @@ class RoomAdvicePreparation(BaseModel):
     options: list[RoomAdviceOption] = Field(default_factory=list, max_length=4)
     questions: list[RoomAdviceQuestion] = Field(default_factory=list, max_length=6)
     hotel_answer: RoomAdviceHotelAnswer | None = None
+    presentation_labels: list[RoomAdvicePresentationLabel] = Field(default_factory=list, max_length=17)
+
+
+class RoomAdviceLocalizationPreparation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    presentation_labels: list[RoomAdvicePresentationLabel] = Field(min_length=1, max_length=17)
 
 
 def _object(properties: dict[str, Any], required: list[str] | None = None) -> dict[str, Any]:
@@ -66,7 +92,9 @@ def _object(properties: dict[str, Any], required: list[str] | None = None) -> di
             "additionalProperties": False}
 
 
-def room_advice_output_schema(*, include_hotel_answer: bool = False) -> dict[str, Any]:
+def room_advice_output_schema(
+    *, include_hotel_answer: bool = False, include_presentation_labels: bool = False,
+) -> dict[str, Any]:
     id_text = {"type": "string", "minLength": 1, "maxLength": 64, "pattern": r"\S"}
     assignment = _object({
         "member_id": id_text, "room_index": {"type": "integer", "minimum": 0, "maximum": 9},
@@ -108,5 +136,26 @@ def room_advice_output_schema(*, include_hotel_answer: bool = False) -> dict[str
                 {"type": "null"},
             ],
         }
+    if include_presentation_labels:
+        body_properties["presentation_labels"] = {
+            "type": "array", "items": _object({
+                "key": {"type": "string", "enum": list(PRESENTATION_LABEL_KEYS)},
+                "text": {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"\S"},
+            }), "maxItems": len(PRESENTATION_LABEL_KEYS),
+        }
     body = _object(body_properties)
     return _object({"response": body})
+
+
+def room_advice_localization_output_schema(keys: tuple[str, ...]) -> dict[str, Any]:
+    if not keys or len(set(keys)) != len(keys) or any(key not in PRESENTATION_LABEL_KEYS for key in keys):
+        raise ValueError("Room-advice localization requires unique supported keys.")
+    return _object({"response": _object({
+        "presentation_labels": {
+            "type": "array", "minItems": len(keys), "maxItems": len(keys),
+            "items": _object({
+                "key": {"type": "string", "enum": list(keys)},
+                "text": {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"\S"},
+            }),
+        },
+    })})

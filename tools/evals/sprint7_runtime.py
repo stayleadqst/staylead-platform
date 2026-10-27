@@ -11,11 +11,11 @@ Expected private files (mode 0600, both under /private/tmp):
           session_signing_secret, provider='codex_cli', model='gpt-6-luna',
           effort='low', candidate_manifest_path, live_cases_path, oracle_path,
           oracle_sha256
-  state:  run_id, authority, candidate_sha256, matrix_sha256,
+state:  run_id, authority, candidate_sha256, matrix_sha256,
           authorized_for_live_calls=true, status='authorized',
           max_guest_turns=9, max_codex_requests=18, max_calls_per_turn=2,
           reserved_guest_turn_budget=9, reserved_request_budget=18,
-          guest_turns=0, codex_requests=0
+  guest_turns=8, codex_requests=14 (sealed parent counters; only original case 9 remains)
 
 The authorization record and pinned candidate manifest are supplied by the
 coordinator after approval. This runtime intentionally has no init/reset CLI.
@@ -37,7 +37,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261026-batch1"
+RUN_ID = "s7-room-advice-20261026-batch2-cont6"
+PARENT_RUN_ID = "s7-room-advice-20261026-batch2-cont5"
+CASE_RUN_ID = "s7-room-advice-20261026-batch2"
+PARENT_GUEST_TURNS = 8
+PARENT_REQUESTS = 14
 MAX_GUEST_TURNS = 9
 MAX_REQUESTS = 18
 MAX_CALLS_PER_TURN = 2
@@ -114,7 +118,7 @@ def _paths() -> tuple[Path, Path, Path]:
         raise RuntimeError(f"Set {CONFIG_ENV} and {STATE_ENV} to approved private files.")
     config = Path(config_value)
     state = Path(state_value)
-    events = Path(os.environ.get(EVENTS_ENV, "/private/tmp/staylead-s7-room-advice-runtime-events.jsonl"))
+    events = Path(os.environ.get(EVENTS_ENV, f"/private/tmp/staylead-s7-{RUN_ID}-runtime-events.jsonl"))
     if not config or not state:
         raise RuntimeError(f"Set {CONFIG_ENV} and {STATE_ENV} to approved private files.")
     for item in (config, state, events):
@@ -140,6 +144,8 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
         and state.get("reserved_request_budget") == MAX_REQUESTS
         and _counter(state.get("guest_turns"), MAX_GUEST_TURNS)
         and _counter(state.get("codex_requests"), MAX_REQUESTS)
+        and state.get("guest_turns", -1) >= PARENT_GUEST_TURNS
+        and state.get("codex_requests", -1) >= PARENT_REQUESTS
         and isinstance(state.get("authority"), str)
         and bool(state["authority"].strip())
         and config.get("provider") == "codex_cli"
@@ -152,7 +158,39 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
         and isinstance(config.get("live_cases_path"), str)
         and isinstance(config.get("oracle_path"), str)
         and isinstance(config.get("oracle_sha256"), str)
+        and _valid_continuation(config.get("continuation"))
+        and state.get("continuation_parent_state_sha256") == config["continuation"]["parent_state_sha256"]
     )
+
+
+def _valid_continuation(value: Any) -> bool:
+    if not isinstance(value, dict):
+        return False
+    return (
+        value.get("parent_run_id") == PARENT_RUN_ID
+        and value.get("parent_guest_turns") == PARENT_GUEST_TURNS
+        and value.get("parent_codex_requests") == PARENT_REQUESTS
+        and isinstance(value.get("parent_state_path"), str)
+        and value["parent_state_path"].startswith("/private/tmp/")
+        and re.fullmatch(r"[a-f0-9]{64}", str(value.get("parent_state_sha256", ""))) is not None
+    )
+
+
+def _verify_parent_state(continuation: dict[str, Any]) -> dict[str, Any]:
+    if not _valid_continuation(continuation):
+        raise RuntimeError("Sprint 7 continuation authorization is malformed.")
+    parent_path = Path(continuation["parent_state_path"])
+    if _file_sha256(parent_path) != continuation["parent_state_sha256"]:
+        raise RuntimeError("Sprint 7 continuation parent state changed.")
+    parent = _private_file(parent_path)
+    if (parent.get("run_id") != PARENT_RUN_ID or parent.get("status") != "halted"
+            or parent.get("guest_turns") != PARENT_GUEST_TURNS
+            or parent.get("codex_requests") != PARENT_REQUESTS
+            or parent.get("max_guest_turns") != MAX_GUEST_TURNS
+            or parent.get("max_codex_requests") != MAX_REQUESTS
+            or parent.get("max_calls_per_turn") != MAX_CALLS_PER_TURN):
+        raise RuntimeError("Sprint 7 continuation parent is not the exact sealed 8/14 state.")
+    return parent
 
 
 def _counter(value: Any, limit: int) -> bool:
@@ -182,12 +220,12 @@ def prepare_private_run(
     *, approval_file: Path, candidate_manifest: Path, config_path: Path, state_path: Path,
     database_url: str, session_signing_secret: str,
 ) -> None:
-    """Create a fresh private allowance only from explicit approval + pinned candidate.
+    """Create a private continuation only from explicit approval + pinned candidate.
 
-    This function is intentionally never called by the runtime or tests. The
-    coordinator may call it only after receiving execution authorization. It
-    fails closed if either destination exists, so it cannot reset or transfer
-    counters. No secrets are read from the environment or printed.
+    The coordinator calls this only after approving the exact parent state and
+    remaining case. It seeds the new namespace at the sealed 8/14 counters;
+    it cannot reset or transfer counters, and never overwrites control files.
+    No secrets are read from the environment or printed.
     """
     approval = json.loads(approval_file.read_text(encoding="utf-8"))
     manifest = json.loads(candidate_manifest.read_text(encoding="utf-8"))
@@ -218,8 +256,11 @@ def prepare_private_run(
     if (_candidate_manifest_digest(manifest) != candidate_sha
             or not isinstance(manifest.get("oracle_sha256"), str)
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]
-            or not manifest.get("live_cases_path") or not manifest.get("oracle_path")):
+            or not manifest.get("live_cases_path") or not manifest.get("oracle_path")
+            or not _valid_continuation(manifest.get("continuation"))
+            or approval.get("continuation") != manifest.get("continuation")):
         raise RuntimeError("Candidate manifest does not pin source, case and oracle bytes.")
+    _verify_parent_state(manifest["continuation"])
     if not database_url or not session_signing_secret:
         raise RuntimeError("Private development database and signing secret are required.")
     for destination in (config_path, state_path):
@@ -236,6 +277,7 @@ def prepare_private_run(
         "live_cases_path": str(manifest.get("live_cases_path", "")),
         "oracle_path": str(manifest.get("oracle_path", "")),
         "oracle_sha256": manifest.get("oracle_sha256"),
+        "continuation": manifest["continuation"],
     }
     _verify_candidate_inputs(config)
     state = {
@@ -246,7 +288,8 @@ def prepare_private_run(
         "max_calls_per_turn": MAX_CALLS_PER_TURN,
         "reserved_guest_turn_budget": MAX_GUEST_TURNS,
         "reserved_request_budget": MAX_REQUESTS,
-        "guest_turns": 0, "codex_requests": 0,
+        "guest_turns": PARENT_GUEST_TURNS, "codex_requests": PARENT_REQUESTS,
+        "continuation_parent_state_sha256": manifest["continuation"]["parent_state_sha256"],
     }
     for destination, value in ((config_path, config), (state_path, state)):
         destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -266,8 +309,11 @@ def _transition_status(new_status: str, *, detail: str | None = None) -> None:
             _verify_candidate_inputs(config)
         if not _valid_state(state, config, fresh=(new_status == "starting")):
             raise RuntimeError("Sprint 7 authorization is absent, malformed, consumed, or mismatched.")
-        if new_status == "starting" and (state["guest_turns"] != 0 or state["codex_requests"] != 0):
-            raise RuntimeError("Sprint 7 run has already consumed allowance; restart is forbidden.")
+        if new_status == "starting" and (
+            state["guest_turns"] != PARENT_GUEST_TURNS
+            or state["codex_requests"] != PARENT_REQUESTS
+        ):
+            raise RuntimeError("Sprint 7 continuation is consumed; restart is forbidden.")
         state["status"] = new_status
         if new_status == "starting":
             state["start_attempts"] = int(state.get("start_attempts", 0)) + 1
@@ -287,7 +333,8 @@ def _release_bootstrap_if_unused(reason: str) -> bool:
         state = _private_file(state_path)
         if not _valid_state(state, config) or state.get("status") not in {"starting", "running"}:
             return False
-        if state.get("guest_turns") != 0 or state.get("codex_requests") != 0:
+        if (state.get("guest_turns") != PARENT_GUEST_TURNS
+                or state.get("codex_requests") != PARENT_REQUESTS):
             return False
         state["status"] = "authorized"
         state["last_bootstrap_failure"] = re.sub(r"[^A-Za-z0-9_.:-]", "_", reason)[:80]
@@ -322,7 +369,7 @@ def _hash(value: Any) -> str | None:
 
 def _candidate_manifest_digest(manifest: dict[str, Any]) -> str:
     pinned = {name: manifest.get(name) for name in
-              ("run_id", "source_files", "matrix_sha256", "oracle_sha256")}
+              ("run_id", "source_files", "matrix_sha256", "oracle_sha256", "continuation")}
     encoded = json.dumps(pinned, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
@@ -351,8 +398,10 @@ def _verify_candidate_inputs(config: dict[str, Any]) -> None:
             or _candidate_manifest_digest(manifest) != config.get("candidate_sha256")
             or manifest.get("matrix_sha256") != config.get("matrix_sha256")
             or manifest.get("oracle_sha256") != config.get("oracle_sha256")
+            or manifest.get("continuation") != config.get("continuation")
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]):
         raise RuntimeError("Pinned Sprint 7 candidate manifest changed or lacks source file pins.")
+    _verify_parent_state(config["continuation"])
     repo_root = Path(__file__).resolve().parents[2]
     for relative, expected in manifest["source_files"].items():
         if (not isinstance(relative, str) or not isinstance(expected, str)
@@ -375,7 +424,7 @@ def _is_pinned_synthetic_turn(turn_number: int, utterance: str) -> bool:
         matrix = json.loads(Path(config["live_cases_path"]).read_text(encoding="utf-8"))
         cases = matrix.get("cases")
         case = cases[turn_number - 1] if isinstance(cases, list) and len(cases) == MAX_GUEST_TURNS else None
-        return (matrix.get("run_id") == RUN_ID and isinstance(case, dict)
+        return (matrix.get("run_id") == CASE_RUN_ID and isinstance(case, dict)
                 and case.get("turn") == turn_number and case.get("utterance") == utterance)
     except (OSError, json.JSONDecodeError, IndexError, TypeError):
         return False
@@ -412,7 +461,7 @@ def _capture_synthetic_json(text: str, turn: dict[str, Any], call: int) -> None:
         parsed = json.loads(text)
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         raise RuntimeError("Synthetic response capture requires JSON.") from exc
-    capture_dir = Path("/private/tmp/staylead-s7-room-advice-captures")
+    capture_dir = Path(f"/private/tmp/staylead-s7-{RUN_ID}-captures")
     capture_dir.mkdir(mode=0o700, exist_ok=True)
     if capture_dir.is_symlink() or not stat.S_ISDIR(capture_dir.lstat().st_mode):
         raise RuntimeError("Unsafe private capture directory.")
@@ -496,7 +545,6 @@ def create_runtime_app() -> Any:
     from staylead_platform.composition.configuration.settings import Settings
     from staylead_platform.composition.dependencies.guest_chat import build_provider
     from staylead_platform.entrypoints.app import create_app
-
     settings = Settings(
         _env_file=None, environment="development", database_url=config["database_url"],
         session_signing_secret=SecretStr(config["session_signing_secret"]),
@@ -511,11 +559,11 @@ def create_runtime_app() -> Any:
         raise RuntimeError("Codex CLI provider composition is disabled.")
     app = create_app(settings, provider=_observed_provider(provider))
 
+    from fastapi.responses import JSONResponse
+
     @app.on_event("startup")
     async def mark_runtime_running() -> None:
         _transition_status("running")
-
-    from fastapi.responses import JSONResponse
 
     @app.middleware("http")
     async def bounded_acceptance(request: Any, call_next: Any) -> Any:

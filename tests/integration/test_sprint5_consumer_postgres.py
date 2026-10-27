@@ -75,9 +75,10 @@ class BriefConsumerProvider:
             else:
                 check_in, check_out = "2027-05-10", "2027-05-13"
             operations = [
-                {"op": "set_dates", "check_in": check_in, "check_out": check_out},
-                {"op": "set_adults", "count": 2},
-                {"op": "add_child", "age": 9},
+                {"op": "set_dates", "check_in": check_in, "check_out": check_out,
+                 "current_turn_quote": "May 10 through May 13, 2027" if "May 11" not in question else "May 11 through May 14, 2027"},
+                {"op": "set_adults", "count": 2, "current_turn_quote": "two adults"},
+                {"op": "add_child", "age": 9, "current_turn_quote": "one child age 9"},
             ]
 
         if "candidate_index" in payload:
@@ -88,14 +89,6 @@ class BriefConsumerProvider:
             }
             if operations:
                 result["guest_patch"] = {"ops": operations}
-                result["guest_patch_authorizations"] = [
-                    {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
-                     "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027" if "May 11" not in question else "May 11 through May 14, 2027"},
-                    {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
-                     "intent": "explicit_request", "current_turn_quote": "two adults"},
-                    {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
-                     "intent": "explicit_request", "current_turn_quote": "one child age 9"},
-                ]
                 self.patch_proposed = True
             return self._result(result)
 
@@ -107,14 +100,7 @@ class BriefConsumerProvider:
             result = {"supported_claims": [], "unknowns": ["Your trip details were saved."],
                       "conflicts": [], "guest_patch": {"ops": operations},
                       "turn_intents": ["hotel_information", "guest_edit"],
-                      "guest_patch_authorizations": [
-                          {"operation_index": 0, "op": "set_dates", "target_fields": ["dates.check_in", "dates.check_out"],
-                           "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027" if "May 11" not in question else "May 11 through May 14, 2027"},
-                          {"operation_index": 1, "op": "set_adults", "target_fields": ["party.adults"],
-                           "intent": "explicit_request", "current_turn_quote": "two adults"},
-                          {"operation_index": 2, "op": "add_child", "target_fields": ["party.children"],
-                           "intent": "explicit_request", "current_turn_quote": "one child age 9"},
-                      ]}
+                      }
             self.patch_proposed = True
             return self._result(result)
 
@@ -127,7 +113,6 @@ class BriefConsumerProvider:
         result = {"supported_claims": supported, "unknowns": unknowns, "conflicts": []}
         if patch_enabled:
             result["turn_intents"] = ["hotel_information"]
-            result["guest_patch_authorizations"] = []
         brief = payload.get("guest_brief") or {}
         if "nights" in question.lower() and brief.get("data", {}).get("dates", {}).get("nights") is not None:
             nights = brief["data"]["dates"]["nights"]
@@ -158,22 +143,15 @@ class UnscopedPreparationPatchProvider:
         if candidates:
             value = {
                 "fact_ids": [candidates[0]["fact_id"]], "turn_intents": ["hotel_information"],
-                "guest_patch": {"ops": [{"op": "set_dates", "check_in": "2027-05-10", "check_out": "2027-05-13"}]},
-                "guest_patch_authorizations": [{
-                    "operation_index": 0, "op": "set_dates",
-                    "target_fields": ["dates.check_in", "dates.check_out"],
-                    "intent": "explicit_request", "current_turn_quote": "May 10 through May 13, 2027",
-                }],
+                "guest_patch": {"ops": [{"op": "set_dates", "check_in": "2027-05-10", "check_out": "2027-05-13",
+                                           "current_turn_quote": "May 10 through May 13, 2027"}]},
             }
         else:
             value = {
                 "supported_claims": [], "unknowns": [], "conflicts": [],
                 "turn_intents": ["hotel_information"],
-                "guest_patch": {"ops": [{"op": "set_adults", "count": 2}]},
-                "guest_patch_authorizations": [{
-                    "operation_index": 0, "op": "set_adults", "target_fields": ["party.adults"],
-                    "intent": "explicit_request", "current_turn_quote": question,
-                }],
+                "guest_patch": {"ops": [{"op": "set_adults", "count": 2,
+                                           "current_turn_quote": question}]},
             }
             if request.response_envelope_key:
                 value = {request.response_envelope_key: value}

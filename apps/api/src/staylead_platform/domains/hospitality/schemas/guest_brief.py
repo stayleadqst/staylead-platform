@@ -6,7 +6,7 @@ from datetime import date
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
@@ -14,43 +14,62 @@ from staylead_platform.platform.contracts.guest_brief import (
     ValidatedGuestBriefPatch,
 )
 
+CANONICAL_BED_TYPES = (
+    "bunk", "cot", "crib", "double", "extra_bed", "king", "queen", "single", "sofa_bed", "twin",
+)
+CanonicalBedType = Literal[
+    "bunk", "cot", "crib", "double", "extra_bed", "king", "queen", "single", "sofa_bed", "twin",
+]
 
-class SetDates(BaseModel):
+
+class _PatchOperation(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    current_turn_quote: str | None = Field(default=None, min_length=1, max_length=500, exclude=True)
+
+
+class SetDates(_PatchOperation):
     op: Literal["set_dates"]
     check_in: str | None = None
     check_out: str | None = None
 
 
-class SetAdults(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetAdults(_PatchOperation):
     op: Literal["set_adults"]
     count: int = Field(ge=1, le=30)
 
 
-class AddChild(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class AddChild(_PatchOperation):
     op: Literal["add_child"]
     age: int | None = Field(default=None, ge=0, le=17)
     guardian_adult_index: int | None = Field(default=None, ge=1, le=30)
     share_bed_with_guardian: bool | None = None
+    requires_separate_bed: Literal[True] | None = None
+
+    @model_validator(mode="after")
+    def separate_bed_cannot_share_with_guardian(self) -> AddChild:
+        if self.requires_separate_bed is True and self.share_bed_with_guardian is True:
+            raise ValueError("A child requiring a separate bed cannot share with the guardian.")
+        return self
 
 
-class SetChildAge(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetChildAge(_PatchOperation):
     op: Literal["set_child_age"]
     member_id: str
     age: int = Field(ge=0, le=17)
 
 
-class RemoveChild(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetChildSeparateBed(_PatchOperation):
+    op: Literal["set_child_separate_bed"]
+    child_id: str = Field(min_length=1, max_length=64)
+    requires_separate_bed: bool
+
+
+class RemoveChild(_PatchOperation):
     op: Literal["remove_child"]
     member_id: str
 
 
-class SetRoomRequirements(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetRoomRequirements(_PatchOperation):
     op: Literal["set_room_requirements"]
     budget_amount: int | None = Field(default=None, ge=0, le=10_000_000_000)
     budget_currency: str | None = Field(default=None, min_length=3, max_length=3)
@@ -61,7 +80,7 @@ class SetRoomRequirements(BaseModel):
     )
     hard_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
     preferred_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
-    hard_bed_types: list[str] | None = Field(default=None, max_length=8)
+    hard_bed_types: list[CanonicalBedType] | None = Field(default=None, max_length=8)
     preferred_bed_types: list[str] | None = Field(default=None, max_length=8)
     avoided_bed_types: list[str] | None = Field(default=None, max_length=8)
     max_rooms: int | None = Field(default=None, ge=1, le=10)
@@ -72,29 +91,26 @@ class SetRoomRequirements(BaseModel):
     ]] = Field(default_factory=list, max_length=11)
 
 
-class SetChildGuardian(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetChildGuardian(_PatchOperation):
     op: Literal["set_child_guardian"]
     child_id: str = Field(min_length=1, max_length=64)
     guardian_id: str = Field(min_length=1, max_length=64)
 
 
-class SetBedSharing(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SetBedSharing(_PatchOperation):
     op: Literal["set_bed_sharing"]
     member_ids: list[str] = Field(min_length=2, max_length=10)
     allow_share: bool
 
 
-class ClarifyField(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class ClarifyField(_PatchOperation):
     op: Literal["clarify"]
     field: str
     reason: str | None = Field(default=None, max_length=300)
 
 
 GuestBriefOperation = Annotated[
-    SetDates | SetAdults | AddChild | SetChildAge | RemoveChild | SetRoomRequirements
+    SetDates | SetAdults | AddChild | SetChildAge | SetChildSeparateBed | RemoveChild | SetRoomRequirements
     | SetChildGuardian | SetBedSharing | ClarifyField,
     Field(discriminator="op"),
 ]
@@ -110,11 +126,11 @@ class GuestPatchAuthorization(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     operation_index: int = Field(ge=0, le=11)
-    op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "remove_child",
+    op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "set_child_separate_bed", "remove_child",
                 "set_room_requirements", "set_child_guardian", "set_bed_sharing", "clarify"]
     target_fields: list[Annotated[str, Field(max_length=128, pattern=(
         r"^(?:dates\.(?:check_in|check_out)|party\.(?:adults|children|guardians|bed_sharing)|room_requirements|"
-        r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.age)?|room_requirements\."
+        r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.(?:age|requires_separate_bed))?|room_requirements\."
         r"(?:budget_amount|budget_currency|budget_basis|budget_strength|sharing|"
         r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
         r"preferred_bed_types|avoided_bed_types|max_rooms))$"
@@ -153,6 +169,36 @@ def validate_guest_patch_authorization(
             raise ValueError("Guest edit authorization does not match the current turn operation.")
 
 
+def _inline_patch_authorizations(payload: Any, operations: tuple[dict[str, Any], ...]) -> tuple[dict[str, Any], ...]:
+    patch = getattr(payload, "guest_patch", None)
+    proposed_ops = tuple(getattr(patch, "ops", ())) if patch is not None else ()
+    if len(proposed_ops) != len(operations):
+        raise ValueError("Every guest edit requires one inline current-turn quote.")
+    records = []
+    for index, (model_operation, operation) in enumerate(zip(proposed_ops, operations, strict=True)):
+        quote = getattr(model_operation, "current_turn_quote", None)
+        if not isinstance(quote, str) or not quote.strip():
+            raise ValueError("Every guest edit requires one inline current-turn quote.")
+        records.append({
+            "operation_index": index,
+            "op": operation.get("op"),
+            "target_fields": _patch_target_fields(operation),
+            "intent": "clarification" if operation.get("op") == "clarify" else "explicit_request",
+            "current_turn_quote": quote,
+        })
+    return tuple(records)
+
+
+def validate_inline_patch_quotes(patch: Any) -> None:
+    """Require wire quotes while leaving the internal canonical proposal quote-free."""
+    if patch is None:
+        return
+    for operation in getattr(patch, "ops", ()):
+        quote = getattr(operation, "current_turn_quote", None)
+        if not isinstance(quote, str) or not quote.strip():
+            raise ValueError("Every guest edit requires one inline current-turn quote.")
+
+
 def validate_preparation_metadata(
     payload: Any, patch: GuestBriefProposal | None, question: str,
 ) -> tuple[tuple[str, ...], tuple[dict[str, Any], ...]]:
@@ -160,10 +206,10 @@ def validate_preparation_metadata(
     valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("Preparation must classify at least one current-turn intent.")
-    authorizations = tuple(
-        item.model_dump(mode="json") for item in getattr(payload, "guest_patch_authorizations", ())
-    )
     operations = patch.operations if patch is not None else ()
+    if "guest_patch_authorizations" in getattr(payload, "model_fields_set", set()):
+        raise ValueError("Patch authorization is derived from inline operation quotes.")
+    authorizations = _inline_patch_authorizations(payload, operations)
     try:
         validate_guest_patch_authorization(operations, authorizations, question)
     except ValueError as exc:
@@ -216,6 +262,8 @@ def required_pending_clarification_fields(
         field for field in pending_fields
         if field in authorized_targets and not field.endswith(".age")
     ]
+    if "room_requirements.budget_strength" in pending_fields:
+        fields.append("room_requirements.budget_strength")
     if any(field in authorized_targets for field in ("dates.check_in", "dates.check_out")):
         fields.extend(
             field for field in ("dates.check_in", "dates.check_out")
@@ -234,11 +282,13 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
         targets = ["party.children"]
         if operation.get("guardian_adult_index") is not None:
             targets.append("party.guardians")
-        if operation.get("share_bed_with_guardian") is True:
+        if operation.get("share_bed_with_guardian") is not None:
             targets.append("party.bed_sharing")
         return targets
     if op == "set_child_age":
         return [f"party.children.{operation.get('member_id')}.age"]
+    if op == "set_child_separate_bed":
+        return [f"party.children.{operation.get('child_id')}.requires_separate_bed"]
     if op == "remove_child":
         return [f"party.children.{operation.get('member_id')}"]
     if op == "set_child_guardian":
@@ -375,6 +425,8 @@ def validate_guest_brief_proposal(
         elif isinstance(operation, AddChild):
             member_id = str(uuid4())
             child = {"member_id": member_id, "age": operation.age}
+            if operation.requires_separate_bed is True:
+                child["requires_separate_bed"] = True
             data["party"]["children"].append(child)
             fields.add(f"party.children.{member_id}")
             delta["party"].setdefault("children_added", []).append(child)
@@ -386,13 +438,15 @@ def validate_guest_brief_proposal(
                 data["party"].setdefault("guardians", {})[member_id] = guardian_id
                 delta["party"].setdefault("guardians", {})[member_id] = guardian_id
                 fields.add(f"party.guardians.{member_id}")
-                if operation.share_bed_with_guardian is True:
-                    group = {"member_ids": sorted((member_id, guardian_id)), "allow_share": True}
-                    data["party"].setdefault("bed_sharing", []).append(group)
-                    delta["party"].setdefault("bed_sharing", []).append(group)
-                    fields.add("party.bed_sharing")
             elif operation.share_bed_with_guardian is not None:
                 raise ValueError("Explicit child bed sharing requires an identified guardian adult.")
+            if operation.share_bed_with_guardian is not None:
+                guardian_id = f"adult-{operation.guardian_adult_index}"
+                group = {"member_ids": sorted((member_id, guardian_id)),
+                         "allow_share": operation.share_bed_with_guardian}
+                data["party"].setdefault("bed_sharing", []).append(group)
+                delta["party"].setdefault("bed_sharing", []).append(group)
+                fields.add("party.bed_sharing")
             if operation.age is None:
                 pending.add(f"party.children.{member_id}.age")
                 clarification = True
@@ -414,6 +468,24 @@ def validate_guest_brief_proposal(
                 changed = True
             pending.discard(f"party.children.{operation.member_id}.age")
             pending.discard("party.children.member")
+        elif isinstance(operation, SetChildSeparateBed):
+            fields.add(f"party.children.{operation.child_id}.requires_separate_bed")
+            try:
+                UUID(operation.child_id)
+            except ValueError as exc:
+                raise ValueError("A child edit must use a known stable member ID.") from exc
+            child = next((item for item in data["party"]["children"]
+                          if item.get("member_id") == operation.child_id), None)
+            if child is None:
+                raise ValueError("The referenced child is not in the current brief.")
+            if operation.requires_separate_bed:
+                if child.get("requires_separate_bed") is not True:
+                    child["requires_separate_bed"] = True
+                    delta["party"].setdefault("children_updated", []).append(dict(child))
+                    changed = True
+            elif child.pop("requires_separate_bed", None) is not None:
+                delta["party"].setdefault("children_updated", []).append(dict(child))
+                changed = True
         elif isinstance(operation, RemoveChild):
             fields.add(f"party.children.{operation.member_id}")
             try:
@@ -444,7 +516,7 @@ def validate_guest_brief_proposal(
         elif isinstance(operation, SetRoomRequirements):
             fields.add("room_requirements")
             if set(operation.clear_fields) & {
-                key for key in operation.model_fields_set - {"op", "clear_fields"}
+                key for key in operation.model_fields_set - {"op", "clear_fields", "current_turn_quote"}
                 if getattr(operation, key) is not None
             }:
                 raise ValueError("A room requirement cannot be set and cleared in one operation.")
@@ -454,12 +526,15 @@ def validate_guest_brief_proposal(
                     requirements.pop(key)
                     delta["room_requirements"][key] = None
                     changed = True
-            for key in operation.model_fields_set - {"op", "clear_fields"}:
+                pending.discard(f"room_requirements.{key}")
+            for key in operation.model_fields_set - {"op", "clear_fields", "current_turn_quote"}:
                 value = getattr(operation, key)
                 if value is not None and requirements.get(key) != value:
                     requirements[key] = value
                     delta["room_requirements"][key] = value
                     changed = True
+                if value is not None:
+                    pending.discard(f"room_requirements.{key}")
         elif isinstance(operation, SetBedSharing):
             fields.add("party.bed_sharing")
             all_members = {f"adult-{index}" for index in range(1, (data["party"].get("adults") or 0) + 1)}
@@ -480,7 +555,10 @@ def validate_guest_brief_proposal(
                     UUID(operation.field.split(".")[2])
                 except ValueError as exc:
                     raise ValueError("Child clarification must use a stable member ID.") from exc
-            if operation.field not in {"dates.check_in", "dates.check_out", "party.adults", "party.children.member", "room_requirements"} and not child_age_field:
+            if operation.field not in {
+                "dates.check_in", "dates.check_out", "party.adults", "party.children.member",
+                "room_requirements", "room_requirements.hard_bed_types", "room_requirements.budget_strength",
+            } and not child_age_field:
                 raise ValueError("The clarification field is outside the guest brief.")
             fields.add(operation.field)
             pending.add(operation.field)
@@ -493,6 +571,12 @@ def validate_guest_brief_proposal(
         delta.pop("room_requirements")
     if data.get("room_requirements") == {}:
         data.pop("room_requirements")
+    requirements = data.get("room_requirements") or {}
+    if requirements.get("budget_amount") is not None and requirements.get("budget_strength") not in {"hard", "target"}:
+        pending.add("room_requirements.budget_strength")
+        clarification = True
+    else:
+        pending.discard("room_requirements.budget_strength")
     if data["party"].get("guardians") == {}:
         data["party"].pop("guardians")
     data_changed = data != current.data

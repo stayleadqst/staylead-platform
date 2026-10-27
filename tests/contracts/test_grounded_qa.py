@@ -508,11 +508,12 @@ def test_model_schema_failure_has_safe_typed_diagnostics_without_model_values() 
         "unknowns": [], "conflicts": [],
         "guest_patch": {"ops": [{
             "op": "set_adults", "count": secretish_value, "private_key_name": secretish_value,
+            "current_turn_quote": "two adults",
         }]},
     })
     with pytest.raises(ConversationFailure, match="invalid answer") as failure:
         asyncio.run(build(provider).answer_committed_turn(
-            hotel_id="HTL-CITY01", question="breakfast", history=[],
+            hotel_id="HTL-CITY01", question="breakfast; make it two adults", history=[],
             brief=GuestBriefSnapshot(brief_version=0, data={}),
             preferred_language_tag="ja",
         ))
@@ -856,7 +857,8 @@ def test_low_overlap_preparation_combines_patch_selection_and_committed_answer_i
             provider.calls.append(request)
             return GenerationResult(
                 text=json.dumps({"fact_ids": ["F-HTL-CITY01-040"], "guest_patch": {
-                    "ops": [{"op": "add_child", "age": None}],
+                    "ops": [{"op": "add_child", "age": None,
+                             "current_turn_quote": "子どもを追加してください。"}],
                 }}), provider="fake", deployment="test", model="recorded-fake",
                 request_id="prepare-1", usage=Usage(input_tokens=21, output_tokens=17, total_tokens=38),
             )
@@ -880,6 +882,7 @@ def test_low_overlap_preparation_combines_patch_selection_and_committed_answer_i
     assert prepared.guest_patch.operations == ({
         "op": "add_child", "age": None,
         "guardian_adult_index": None, "share_bed_with_guardian": None,
+        "requires_separate_bed": None,
     },)
     assert not prepared.patch_authorizations
     assert provider.calls[0].instructions == FACT_SELECTION_INSTRUCTIONS
@@ -915,14 +918,15 @@ def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_
     captured = {
         "fact_ids": selected_ids,
         "guest_patch": {"ops": [
-            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-13"},
-            {"op": "set_adults", "count": 1},
+            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-13",
+             "current_turn_quote": "ở từ 2026-11-10 đến 2026-11-13"},
+            {"op": "set_adults", "count": 1, "current_turn_quote": "một mình"},
             {"op": "set_room_requirements", "budget_amount": 6_000_000,
              "budget_currency": "VND", "budget_basis": "stay_total", "budget_strength": "hard",
              "sharing": None, "hard_accessibility_needs": None,
              "preferred_accessibility_needs": None, "hard_bed_types": None,
              "preferred_bed_types": None, "avoided_bed_types": None, "max_rooms": 1,
-             "clear_fields": []},
+             "clear_fields": [], "current_turn_quote": "Ngân sách tối đa 6000000 VND cho toàn bộ tiền phòng"},
         ]},
         "guest_patch_authorizations": [
             {"operation_index": 0, "op": "set_dates",
@@ -987,10 +991,7 @@ def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_
 
     corrected = json.loads(json.dumps(captured))
     corrected["guest_patch"]["ops"][2]["max_rooms"] = None
-    corrected["guest_patch_authorizations"][2]["target_fields"] = [
-        "room_requirements.budget_amount", "room_requirements.budget_currency",
-        "room_requirements.budget_basis", "room_requirements.budget_strength",
-    ]
+    corrected.pop("guest_patch_authorizations")
     corrected["turn_intents"] = ["guest_edit", "room_advice"]
     orchestrator, provider, brief = run(corrected)
     prepared = asyncio.run(orchestrator.prepare_turn(
@@ -1000,7 +1001,10 @@ def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_
     assert prepared.preparation_calls == 1
     assert len(provider.calls) == 1
     assert prepared.turn_intents == ("guest_edit", "room_advice")
-    assert prepared.patch_authorizations[2]["target_fields"] == corrected["guest_patch_authorizations"][2]["target_fields"]
+    assert prepared.patch_authorizations[2]["target_fields"] == [
+        "room_requirements.budget_amount", "room_requirements.budget_currency",
+        "room_requirements.budget_basis", "room_requirements.budget_strength",
+    ]
     assert brief.brief_version == 0
     assert brief.data["party"]["adults"] is None
 
@@ -1089,7 +1093,8 @@ def test_explicit_current_date_resolves_pending_checkout_and_committed_claim_sta
                 assert incoming["guest_brief"]["data"]["dates"]["check_out"] == "2026-12-14"
                 body = {
                     "fact_ids": [],
-                    "guest_patch": {"ops": [{"op": "set_dates", "check_out": "2026-12-15"}]},
+                    "guest_patch": {"ops": [{"op": "set_dates", "check_out": "2026-12-15",
+                                               "current_turn_quote": "2026-12-15"}]},
                     "explicit_language_tag": "ko", "inferred_language_tag": None,
                 }
             elif request.instructions.startswith(COMMITTED_GROUNDED_QA_INSTRUCTIONS):
@@ -1380,7 +1385,7 @@ def test_preparation_schema_is_attached_to_high_overlap_answer_without_wrapping_
             "text": "Breakfast is served at 06:30-09:30.", "fact_ids": ["F-HTL-CITY01-040"],
         }],
         "unknowns": [], "conflicts": [], "guest_patch": None,
-        "guest_patch_authorizations": [], "turn_intents": ["hotel_information"],
+        "turn_intents": ["hotel_information"],
         "guest_claims": [], "guest_clarification": None,
         "conversational_acknowledgement": None, "guest_brief_refs": [],
         "explicit_language_tag": None, "inferred_language_tag": None, "label_bundle": {},
@@ -1583,11 +1588,8 @@ def test_patch_authorizations_bind_exact_current_question_and_operation_targets(
 def test_preparation_metadata_requires_intents_and_authorized_guest_edit() -> None:
     payload = FactSelection.model_validate({
         "fact_ids": [], "turn_intents": ["guest_edit"],
-        "guest_patch": {"ops": [{"op": "set_adults", "count": 3}]},
-        "guest_patch_authorizations": [{
-            "operation_index": 0, "op": "set_adults", "target_fields": ["party.adults"],
-            "intent": "explicit_request", "current_turn_quote": "three adults",
-        }],
+        "guest_patch": {"ops": [{"op": "set_adults", "count": 3,
+                                   "current_turn_quote": "three adults"}]},
     })
     intents, _ = validate_preparation_metadata(
         payload, GuestBriefProposal(({"op": "set_adults", "count": 3},)), "Make it three adults.",
@@ -1726,7 +1728,8 @@ def test_high_overlap_prepare_returns_provisional_answer_and_patch_in_first_call
             "fact_ids": ["F-HTL-CITY01-040"],
         }],
         "unknowns": [], "conflicts": [],
-        "guest_patch": {"ops": [{"op": "set_adults", "count": 2}]},
+        "guest_patch": {"ops": [{"op": "set_adults", "count": 2,
+                                   "current_turn_quote": "two adults"}]},
     })
     brief = GuestBriefSnapshot(0, {
         "dates": {"check_in": None, "check_out": None, "nights": None},

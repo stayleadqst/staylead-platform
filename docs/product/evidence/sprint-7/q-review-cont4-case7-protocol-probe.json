@@ -1,0 +1,23 @@
+{
+  "original_rejection": "The proposed guest edit lacks current-turn authorization.",
+  "grouped_authorization_metadata": "passes",
+  "after_metadata_only_M2_rejection": "The authorized guardian adult does not exist in the current brief.",
+  "corrected_offline_counterfactual": {
+    "adults": 1,
+    "child_age": 7,
+    "guardian": [
+      "adult-1"
+    ],
+    "dates": {
+      "check_in": "2026-11-10",
+      "check_out": "2026-11-12",
+      "nights": 2
+    },
+    "hard_access": [
+      "step-free",
+      "wheelchair-accessible bathroom"
+    ],
+    "status": "applied"
+  },
+  "limitation": "Offline protocol representability only; original actualcase7 rejected and uncommitted, not repaired-model PASS."
+}
