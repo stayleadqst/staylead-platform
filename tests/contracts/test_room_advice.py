@@ -408,6 +408,62 @@ def test_budget_strength_question_keeps_priority_when_rate_basis_is_also_unknown
     assert localized.questions[1]["reason"] == labels["question.rate_basis"]
 
 
+@pytest.mark.parametrize(("locale", "expected_text", "hotel_step"), [
+    ("en", "Your access needs are recorded", "ask the hotel to confirm"),
+    ("vi", "Tôi đã ghi nhận yêu cầu tiếp cận", "nhờ khách sạn xác nhận"),
+    ("zh", "我已记录您的无障碍需求", "向酒店确认"),
+    ("ja", "アクセシビリティのご要望を記録しました", "ホテルにご確認"),
+])
+def test_unverified_hard_accessibility_need_gives_hotel_confirmation_step(locale, expected_text, hotel_step) -> None:
+    room, rate = _catalog(), _rate()
+    context = replace(_context({
+        "dates": {"check_in": "2026-11-10", "check_out": "2026-11-12"},
+        "party": {"adults": 1, "children": []},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry", "wheelchair bathroom"]},
+    }, (room, rate)), locale=locale)
+    draft = RoomAdviceDraft(
+        "needs_clarification", questions=({"field": "room_requirements.hard_accessibility_needs"},),
+    )
+
+    result = __import__("asyncio").run(
+        HospitalityRoomAdvice().recommend(context=context, draft=draft),
+    )
+
+    assert result.status == "needs_clarification"
+    assert result.options == ()
+    question = result.questions[0]
+    assert question["field"] == "room_requirements.hard_accessibility_needs"
+    assert question["presentation_key"] == "question.accessibility_confirmation"
+    assert expected_text in question["reason"]
+    assert hotel_step in question["reason"]
+    assert "question.room" not in question["presentation_key"]
+
+
+@pytest.mark.parametrize("saved_needs,pending_fields", [
+    (None, ()),
+    (["step-free entry"], ("room_requirements.hard_accessibility_needs",)),
+])
+def test_accessibility_confirmation_message_requires_saved_nonpending_needs(saved_needs, pending_fields) -> None:
+    room, rate = _catalog(), _rate()
+    requirements = {"hard_accessibility_needs": saved_needs} if saved_needs else {}
+    context = replace(_context({
+        "party": {"adults": 1, "children": []},
+        "room_requirements": requirements,
+    }, (room, rate)), locale="en", pending_fields=pending_fields)
+    draft = RoomAdviceDraft(
+        "needs_clarification", questions=({"field": "room_requirements.hard_accessibility_needs"},),
+    )
+
+    result = __import__("asyncio").run(
+        HospitalityRoomAdvice().recommend(context=context, draft=draft),
+    )
+
+    question = result.questions[0]
+    assert question["presentation_key"] == "question.room"
+    assert question["reason"] == "Which room requirement should I use?"
+    assert "known_hard_accessibility_needs" not in result.explanation_inputs
+
+
 def test_preparation_native_and_pydantic_intents_are_in_parity_and_support_booking() -> None:
     assert set(get_args(GuestTurnIntent)) == set(TURN_INTENTS)
     assert FactSelection.model_validate({"turn_intents": ["booking_request"]}).turn_intents == ["booking_request"]
@@ -442,8 +498,28 @@ def test_preparation_native_and_pydantic_intents_are_in_parity_and_support_booki
     assert "Do not infer a room" in GUEST_BRIEF_PATCH_RULES
     assert "set `max_rooms` only when the guest explicitly states a" in GUEST_BRIEF_PATCH_RULES
     assert "maximum number of rooms" in GUEST_BRIEF_PATCH_RULES
-    assert "`adult-1` through `adult-N` may be used by a later sharing operation" in GUEST_BRIEF_PATCH_RULES
+    assert "canonical `adult-1` through `adult-N` IDs are valid member IDs for a" in GUEST_BRIEF_PATCH_RULES
+    assert "place that consent operation after `set_adults`" in GUEST_BRIEF_PATCH_RULES
     assert "targets are exactly" not in GUEST_BRIEF_PATCH_RULES
+
+
+def test_mixed_room_advice_prompt_preserves_source_numeric_literals() -> None:
+    from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
+        ConversationFailure,
+        _validate_supported_literals,
+    )
+
+    instructions = HospitalityRoomAdvice.preparation_instructions(
+        "en", include_hotel_answer=True,
+    )
+    assert "preserve every number exactly as it is" in instructions
+    assert "`3800000`, not" in instructions
+    assert "Do not reformat, round, convert, or calculate numbers in `hotel_answer`" in instructions
+
+    source = [{"value": {"amount": 3800000, "currency": "VND"}, "conditions": {}}]
+    _validate_supported_literals("Reference rate is 3800000 VND per room night.", source)
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        _validate_supported_literals("Reference rate is 3,800,000 VND per room night.", source)
 
 
 def test_new_child_keeps_guardian_separation_and_adult_sharing_as_separate_facts() -> None:
@@ -1449,6 +1525,8 @@ def test_candidate_translation_may_cover_only_m4_derived_checked_questions() -> 
     ("party.adults", {}, "question.party"),
     ("party.children.age", {}, "question.age"),
     ("room_requirements.max_rooms", {}, "question.room"),
+    ("room_requirements.hard_accessibility_needs", {"known_hard_accessibility_needs": True}, "question.accessibility_confirmation"),
+    ("room_requirements.hard_accessibility_needs", {}, "question.room"),
     ("room_advice", {"unknowns": ["rate_basis"]}, "question.rate_basis"),
     ("room_advice", {"unknowns": ["rate_validity_window"]}, "question.rate_validity_window"),
     ("room_advice", {"conflicts": ["hard_budget_exceeded"]}, "question.hard_budget_exceeded"),
@@ -1474,6 +1552,8 @@ def test_open_language_questions_cover_each_checked_reason_branch(field, explana
     ("party.adults", {}, "question.party"),
     ("party.children.age", {}, "question.age"),
     ("room_requirements.max_rooms", {}, "question.room"),
+    ("room_requirements.hard_accessibility_needs", {"known_hard_accessibility_needs": True}, "question.accessibility_confirmation"),
+    ("room_requirements.hard_accessibility_needs", {}, "question.room"),
     ("room_advice", {"unknowns": ["rate_basis"]}, "question.rate_basis"),
     ("room_advice", {"unknowns": ["rate_validity_window"]}, "question.rate_validity_window"),
     ("room_advice", {"conflicts": ["hard_budget_exceeded"]}, "question.hard_budget_exceeded"),

@@ -27,6 +27,10 @@ for a stated unknown/conflict; `accessibility_confirmation` only for an unmet/un
 hard accessibility need; `preference_tradeoff` for a checked unmet soft preference; and
 `charges_confirmation` for excluded or unknown fees. Give each rationale a supporting
 fact_ids list. Do not create other claim codes or claims.
+When answering a mixed hotel-information question, preserve every number exactly as it is
+spelled in the cited source fact. Copy numeric literals verbatim, including their grouping
+and decimal separators; for example, if the source value is `3800000`, write `3800000`, not
+`3,800,000`. Do not reformat, round, convert, or calculate numbers in `hotel_answer`.
 Do not calculate prices; server code does that. A reference rate is not a quote.
 The availability of rooms is always unknown. Never claim a room is available, held,
 booked, cheapest, or globally best. Do not relax a guest hard requirement."""

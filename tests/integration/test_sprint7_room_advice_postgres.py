@@ -541,6 +541,56 @@ def test_open_locale_presentation_persists_without_changing_checked_result(engin
         )
 
 
+def test_accessibility_question_presentation_key_survives_open_locale_cas(engine) -> None:
+    session_id, snapshot, hotel, source_refs = _scope(engine)
+    advice = RoomAdviceResult(
+        status="needs_clarification", brief_version=0, source_generation=snapshot.generation,
+        source_refs=tuple(source_refs), questions=({
+            "field": "room_requirements.hard_accessibility_needs",
+        },), explanation_inputs={
+            "unknowns": ["no checked room candidate"], "known_hard_accessibility_needs": True,
+        },
+    )
+    english = asdict(HospitalityRoomAdvice.relocalize(advice, "en"))
+    assert english["questions"][0]["presentation_key"] == "question.accessibility_confirmation"
+    saved = save_room_advice_result(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", request_id=f"s7-{uuid.uuid4()}",
+        payload=english, brief_version=0, source_generation=snapshot.generation,
+        config_version=hotel["config_version"], source_refs=source_refs, expected_state_version=0,
+    )
+    preference = commit_language_preference(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", language_tag="fr",
+        source="explicit", expected_revision=0,
+    )
+    french = asdict(HospitalityRoomAdvice.relocalize(
+        advice, "fr", {
+            "question.accessibility_confirmation": (
+                "Votre besoin est noté, mais aucune option vérifiée ne le confirme. "
+                "Veuillez demander confirmation à l'hôtel."
+            ),
+        },
+    ))
+    updated = update_room_advice_presentation(
+        engine, session_id=session_id, hotel_id="HTL-CITY01", result_id=saved["result_id"],
+        expected_result_version=saved["result_version"], expected_payload=english,
+        payload=french, expected_language_revision=preference["revision"],
+    )
+    persisted = get_room_advice_result(engine, session_id=session_id, hotel_id="HTL-CITY01")
+    assert updated["result_id"] == saved["result_id"]
+    assert persisted["payload"]["questions"][0]["presentation_key"] == "question.accessibility_confirmation"
+    assert persisted["payload"]["questions"][0]["reason"] == french["questions"][0]["reason"]
+    assert persisted["result_version"] == saved["result_version"]
+
+    forged_key = json.loads(json.dumps(french))
+    forged_key["questions"][0]["presentation_key"] = "question.forged_accessibility"
+    with pytest.raises(ValueError, match="invalid presentation key"):
+        update_room_advice_presentation(
+            engine, session_id=session_id, hotel_id="HTL-CITY01", result_id=saved["result_id"],
+            expected_result_version=saved["result_version"], expected_payload=french,
+            payload=forged_key, expected_language_revision=preference["revision"],
+        )
+
+
 def test_config_change_after_generation_pin_rejects_commit(engine) -> None:
     session_id, snapshot, hotel, source_refs = _scope(engine)
     pinned_config_version = hotel["config_version"]

@@ -14,6 +14,7 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     COMMITTED_GROUNDED_QA_INSTRUCTIONS,
     FACT_SELECTION_INSTRUCTIONS,
     GROUNDED_QA_INSTRUCTIONS,
+    GUEST_BRIEF_PATCH_RULES,
 )
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
@@ -764,6 +765,7 @@ def test_cjk_suffix_preserves_guest_date_and_count_literals(text: str, accepted:
     [
         ("The fee is 100000VND.", True),
         ("The fee is VND100000.", True),
+        ("The fee is 100,000 VND.", False),
         ("The fee is 100001VND.", False),
         ("The fee is VND100001.", False),
         ("The fee is 41 per guest.", False),
@@ -793,6 +795,38 @@ def test_numeric_literals_remain_complete_next_to_ascii_units(claim_text: str, a
                 hotel_id="HTL-CITY01", question="What is the deposit?", history=[],
                 selected_fact_ids=("F-HTL-CITY01-041",),
             ))
+
+
+def test_committed_hotel_answer_copies_cited_rate_number_without_reformatting() -> None:
+    fact_id = "F-HTL-BEACH02-REFERENCE_RATE-RATE-BEACH-FAM-REF"
+    facts = MemoryFacts()
+    facts.facts.append(KnowledgeFact(
+        fact_id=fact_id, hotel_id="HTL-BEACH02", topic="reference_rate",
+        subject="BEACH-FAM", field="nightly_rate", value="Reference rate is 3800000 VND per room night.",
+        conditions={}, status="confirmed", valid_from="2026-10-01", valid_to="2027-09-30",
+        provenance={"source_id": "SRC-BEACH-RATE", "source_version": "1", "section": "Rates"},
+    ))
+    brief = GuestBriefSnapshot(2, {
+        "dates": {"check_in": "2026-11-10", "check_out": "2026-11-12", "nights": 2},
+        "party": {"adults": 2, "children": [{"member_id": "child-1", "age": 7}]},
+    })
+
+    async def committed_claim(text: str):
+        provider = FakeProvider(answer={
+            "supported_claims": [{"text": text, "fact_ids": [fact_id]}],
+            "unknowns": [], "conflicts": [],
+        })
+        result = await build(provider, facts).answer_committed_turn(
+            hotel_id="HTL-BEACH02", question="What is the reference rate?", history=[], brief=brief,
+            selected_fact_ids=(fact_id,), turn_intents=("hotel_information",),
+        )
+        assert provider.calls[0].instructions == COMMITTED_GROUNDED_QA_INSTRUCTIONS
+        return result
+
+    exact = asyncio.run(committed_claim("The reference rate is 3800000 VND per room night."))
+    assert "3800000 VND" in exact.answer
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(committed_claim("The reference rate is 3,800,000 VND per room night."))
 
 
 def test_answer_model_payload_projects_only_semantic_fact_fields() -> None:
@@ -1020,6 +1054,108 @@ def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_
     assert brief.brief_version == 0
 
 
+def test_preparation_rules_keep_quotes_contiguous_and_bed_permission_distinct_from_type() -> None:
+    assert "one verbatim contiguous span" in GUEST_BRIEF_PATCH_RULES
+    assert "never translate broad size wording to `king`, `queen`, or another" in GUEST_BRIEF_PATCH_RULES
+    assert "standalone `set_bed_sharing` operation" in GUEST_BRIEF_PATCH_RULES
+    assert "canonical `adult-1` through `adult-N` IDs are valid member IDs" in GUEST_BRIEF_PATCH_RULES
+    assert "place that consent operation after `set_adults`" in GUEST_BRIEF_PATCH_RULES
+    assert "Do not re-emit complete saved values" in GUEST_BRIEF_PATCH_RULES
+    question = (
+        "我们是两位成年人，是情侣，可以同住并共用一张大床。入住日期为2026-11-10，退房日期为2026-11-13。"
+        "整个住宿的客房总预算上限为6000000 VND。请用中文比较合适的房型和参考费用。"
+    )
+    captured = {
+        "fact_ids": [],
+        "guest_patch": {"ops": [
+            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-13",
+             "current_turn_quote": "入住日期为2026-11-10，退房日期为2026-11-13"},
+            {"op": "set_adults", "count": 2, "current_turn_quote": "两位成年人"},
+            {"op": "set_room_requirements", "budget_amount": 6_000_000,
+             "budget_currency": "VND", "budget_basis": "stay_total", "budget_strength": "hard",
+             "sharing": "allow", "hard_bed_types": ["king"],
+             "current_turn_quote": "可以同住并共用一张大床。整个住宿的客房总预算上限为6000000 VND"},
+        ]},
+        "turn_intents": ["guest_edit", "room_advice"],
+        "explicit_language_tag": None, "inferred_language_tag": "zh",
+    }
+    parsed_capture = FactSelection.model_validate(captured)
+    captured_proposal = GuestBriefProposal(tuple(
+        item.model_dump(mode="json") for item in parsed_capture.guest_patch.ops
+    ))
+    with pytest.raises(ValueError, match="current-turn authorization"):
+        validate_preparation_metadata(parsed_capture, captured_proposal, question)
+
+    corrected = {
+        **captured,
+        "guest_patch": {"ops": [
+            {"op": "set_dates", "check_in": "2026-11-10", "check_out": "2026-11-13",
+             "current_turn_quote": "入住日期为2026-11-10，退房日期为2026-11-13"},
+            {"op": "set_adults", "count": 2, "current_turn_quote": "两位成年人"},
+            {"op": "set_bed_sharing", "member_ids": ["adult-1", "adult-2"], "allow_share": True,
+             "current_turn_quote": "可以同住并共用一张大床"},
+            {"op": "set_room_requirements", "budget_amount": 6_000_000,
+             "budget_currency": "VND", "budget_basis": "stay_total", "budget_strength": "hard",
+             "current_turn_quote": "整个住宿的客房总预算上限为6000000 VND"},
+        ]},
+    }
+    parsed = FactSelection.model_validate(corrected)
+    proposal = GuestBriefProposal(tuple(
+        item.model_dump(mode="json") for item in parsed.guest_patch.ops
+    ))
+    _, authorizations = validate_preparation_metadata(parsed, proposal, question)
+    assert [item["op"] for item in authorizations] == [
+        "set_dates", "set_adults", "set_bed_sharing", "set_room_requirements",
+    ]
+    requirement_op = parsed.guest_patch.ops[3]
+    assert "hard_bed_types" not in requirement_op.model_fields_set
+    assert "sharing" not in requirement_op.model_fields_set
+
+
+def test_same_requirements_patch_emits_only_child_age_change_and_explicit_accessibility_clear() -> None:
+    question = (
+        "Gardez les mêmes dates et les mêmes conditions pour l'enfant. "
+        "Mettez l'âge de l'enfant à 8 ans, retirez les besoins d'accessibilité et répondez en français."
+    )
+    captured = {
+        "fact_ids": [],
+        "guest_patch": {"ops": [
+            {"op": "set_child_age", "member_id": "11111111-1111-4111-8111-111111111111", "age": 8,
+             "current_turn_quote": "Mettez l'âge de l'enfant à 8 ans"},
+            {"op": "set_room_requirements", "clear_fields": ["hard_accessibility_needs"],
+             "current_turn_quote": "retirez les besoins d'accessibilité"},
+        ]},
+        "turn_intents": ["guest_edit", "room_advice"],
+        "explicit_language_tag": "fr", "inferred_language_tag": None,
+    }
+    parsed = FactSelection.model_validate(captured)
+    proposal = GuestBriefProposal(tuple(item.model_dump(mode="json") for item in parsed.guest_patch.ops))
+    _, authorizations = validate_preparation_metadata(parsed, proposal, question)
+    assert [item["op"] for item in authorizations] == ["set_child_age", "set_room_requirements"]
+
+    current = GuestBriefSnapshot(8, {
+        "dates": {"check_in": "2026-11-10", "check_out": "2026-11-12", "nights": 2},
+        "party": {
+            "adults": 1,
+            "children": [{"member_id": "11111111-1111-4111-8111-111111111111", "age": 7}],
+            "guardians": {"11111111-1111-4111-8111-111111111111": "adult-1"},
+            "bed_sharing": [{"member_ids": ["adult-1", "11111111-1111-4111-8111-111111111111"], "allow_share": True}],
+        },
+        "room_requirements": {
+            "sharing": "allow", "hard_accessibility_needs": ["step-free entry"],
+        },
+    })
+    updated = validate_guest_brief_proposal(current, proposal)
+    assert updated.data["dates"] == current.data["dates"]
+    assert updated.data["party"]["adults"] == 1
+    assert updated.data["party"]["children"] == [{
+        "member_id": "11111111-1111-4111-8111-111111111111", "age": 8,
+    }]
+    assert updated.data["party"]["guardians"] == current.data["party"]["guardians"]
+    assert updated.data["party"]["bed_sharing"] == current.data["party"]["bed_sharing"]
+    assert updated.data["room_requirements"]["sharing"] == "allow"
+    assert "hard_accessibility_needs" not in updated.data["room_requirements"]
+
 def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_patch_grammar() -> None:
     provider = FakeProvider(answer={
         "supported_claims": [{
@@ -1066,6 +1202,8 @@ def test_committed_prompt_handles_pending_clarification_and_mixed_faq_without_pa
     assert "The server attaches approved media" in instruction_text
     assert "Keep uncertainty concise" in instruction_text
     assert "Preserve numeric/date/time literals exactly" in instruction_text
+    assert "Copy numeric spelling including separators exactly" in instruction_text
+    assert "`3800000` stays `3800000`, never `3,800,000`" in instruction_text
     assert "`supported_claims` with supplied IDs" in instruction_text
     assert "`guest_brief_refs`" in instruction_text
 

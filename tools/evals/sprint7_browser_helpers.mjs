@@ -1,14 +1,37 @@
 /** Small pure helpers shared with offline tests for bounded browser branches. */
 export function selectionOptionForAcceptanceTurn(turnNumber, roomAdvice) {
-  if (turnNumber !== 8) return null;
+  if (turnNumber !== 7) return null;
   const options = Array.isArray(roomAdvice?.options) ? roomAdvice.options : [];
   return options.find((option) => typeof option?.option_id === "string" && option.option_id.length > 0) ?? null;
 }
 
-export function continuationParentMatches(continuation, parentRunId, guestTurns, codexRequests) {
-  return continuation?.parent_run_id === parentRunId
-    && continuation?.parent_guest_turns === guestTurns
-    && continuation?.parent_codex_requests === codexRequests;
+/** A hard-conflict result cannot expose a selectable option; unknown checks may remain partial. */
+export function roomAdviceHardChecksConsistent(roomAdvice) {
+  const options = Array.isArray(roomAdvice?.options) ? roomAdvice.options : [];
+  if (roomAdvice?.status === "conflict") return options.length === 0;
+  return options.every((option) => Array.isArray(option?.checks)
+    && option.checks.every((check) => check?.status !== "conflict"));
+}
+
+export function hasCanonicalSeparateBedConstraint(brief) {
+  return (brief?.room_requirements?.hard_bed_types ?? [])
+    .some((bed) => bed === "single" || bed === "twin");
+}
+
+export function retainsTwoHardAccessibilityNeeds(brief) {
+  const needs = brief?.room_requirements?.hard_accessibility_needs ?? [];
+  return needs.length === 2 && needs.every((need) => typeof need === "string" && need.trim().length > 0);
+}
+
+/** A turn's explicit pair-sharing authorization must be present in persisted M2 before continuing. */
+export function hasExactBedSharingConsent(brief, memberIds, allowShare) {
+  if (!Array.isArray(memberIds) || memberIds.length < 2 || typeof allowShare !== "boolean") return false;
+  const expected = [...memberIds].sort();
+  return (brief?.party?.bed_sharing ?? []).some((group) => {
+    const actual = group?.member_ids;
+    return group?.allow_share === allowShare && Array.isArray(actual) && actual.length === expected.length
+      && [...actual].sort().every((id, index) => id === expected[index]);
+  });
 }
 
 export function browserRunDirectory(runId, attemptSuffix) {

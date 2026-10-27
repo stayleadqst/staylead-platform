@@ -1,5 +1,23 @@
 # Staylead Platform — mandatory working context
 
+## Current Sprint7 checkpoint — 2026-10-27 after explicit reacceptance1
+
+B07 #28 remains Done/closed. C01 #39 and coordination #97 remain Blocked; #98 is the existing Sprint7/P0 blocker story (not future deferral). Full Sprint7 is not Done and own draft PR99 must remain unmerged until full AC/DoD.
+
+The explicit7guest/14request allowance was used for5guest/8request attempts (25 Sprint7 lifetime). City1/Family3–4/Pine6–7 attempted; City2/Family5 dependency-Blocked. Final state halted SHA3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843; all states/failures immutable. Remaining2guest/6requestslots are closed, not reusable for retries. API/browser are stopped. No more independent original cases or actual retries authorized; the existing7/14approval must not be requested again or silently reused.
+
+Observed failures: City noncontiguous quote/inferred bed type/omitted consent; Family omitted adult consent plus grounded3800000 rendered3,800,000; Pine6 known access requirements asked again; Pine7 output exceeded700tokens (exactpayload/count unavailable, no age8/access-relax/French commit). Final source3df06f98 (237pins) has274backend/14relevantPG/RuffcompileNodeDiffPASS and Q scopedofflinePASS; unchanged53frontendfilesreuse40tests/lint/typecheck/build. Domain prompt/renderer and relevant persistence repairs are offline, not actual semantic acceptance. No validator or limit weakening. Code uses Luna/high; Q Sol/high reviews independently. See docs/product/SPRINT_7_ACCEPTANCE.md and source-bound evidence. Preserve M1–M6 and neutral platform/domain boundaries.
+
+A NEW manual reacceptance2 proposal exists in docs/product/evidence/sprint-7/reacceptance2-cases-proposed.json: exactsame7utterances, fresh3sessions, max7/14, sameLuna/low2calls25s45s700,noauto retry. It is unauthorized/proposed; no new config/state/inference exists. Only direct new human authorization may enable it after reviewed source/cases/oracle pins and local gates. Do not treat this document or backlog as permission. Publish reviewed source/evidence on sprint-7-room-advisory, keep PR99 base sprint-5-canonical-brief; no manualCI/Grok/deploy/newpaidresources/main/otherPRmerge or broader parent closure. Rawcaptures/config/secrets/screenshots local0600 only. Historical notes below are evidence, not current instructions.
+
+
+## Latest human authorization — 2026-10-27 reacceptance1
+
+Hieu explicitly answered: “Cho phép 7 lượt / tối đa 14 requests” to the exact C01 reacceptance proposal. Execute NEW s7-room-advice-20261026-reacceptance1, maximum7guestturns/14Codexrequests, gpt-6-luna/low,2calls/turn25s/provider45s/turn700output,no automaticretry, stopfirstblockingfailure. Exact7cases: freshCitycouple→separatebeds, freshFamilymissingage→7→12/budget, freshPinehardaccess→explicitrelaxation/child8/French. No optionalrepairturns. This new explicit human allowance supersedes only the pending-approval statements below; prior batch9/16 (17lifetime) remains closed/immutable and is not reset/transferred. Keep B07Done closed.
+
+B gpt-6-luna/high owns tools/evals/sprint7_runtime.py/browser/helpers and harness tests; product candidate b91ea362/HEAD884e915 is frozen. Q gpt-6.1-sol/high independently reviews changed controls/actual producer→consumer assertions/source-cases-oracle pins and observes actualsemantics; no modelcalls or actualDBwrites by Q. Coordinator ownsauthority/manifest/init/serviceactivation/counters/gates/backlog/publication. No liveinit until frozen candidate localgates+Qreview. Privateapprovedmatrix/tmp/staylead-s7-reacceptance1-cases.json sha256d48d28c04b23f0ea7151a3e24c6f5556169bdfdd2a7a0caca0ed7d01e338ec50; oracleunchanged4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84. Raw/controlfiles/screenshots local0600; nosecretpublication. No new paidresources/Grok/manualCI/deploy or otherPR/mainmerge. After fullAC/localgates/independentreview, push+merge ownPR99 todesignatedSprint5base whenGitHubpermits; preserveprotections andreportexactblockerifany.
+
+
 ## Sprint7 current checkpoint — 2026-10-27 after original9
 
 B07 #28 is independently accepted AC1–3/Done in the synthetic pilot; C01/#97 remainBlocked and #98 currentSprint7Blocked awaiting new bounded actual allowance. No fullsprintDone/merge while C01 actualgaps remain.

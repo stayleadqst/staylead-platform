@@ -12,6 +12,7 @@ PRESENTATION_LABEL_KEYS = (
     "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
     "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
     "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+    "question.accessibility_confirmation",
     "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
     "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
 )
@@ -60,6 +61,7 @@ class RoomAdvicePresentationLabel(BaseModel):
         "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
         "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
         "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+        "question.accessibility_confirmation",
         "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
         "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
     ]

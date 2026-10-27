@@ -1363,7 +1363,13 @@ def update_room_advice_presentation(
                 raise ValueError("localized room advice contains an invalid presentation key")
             return expected
 
-        def question_key(field: Any) -> str:
+        def question_key(question: dict[str, Any]) -> str:
+            field = question.get("field")
+            if (field == "room_requirements.hard_accessibility_needs"
+                    and question.get("presentation_key") == "question.accessibility_confirmation"):
+                # The checked producer stores this marker only for a saved,
+                # non-pending hard need; preserve it through language-only CAS.
+                return "question.accessibility_confirmation"
             if field == "room_requirements.budget_strength":
                 return "question.budget_strength"
             unknowns = set(content.get("explanation_inputs", {}).get("unknowns", ()))
@@ -1406,7 +1412,7 @@ def update_room_advice_presentation(
         for question in content.get("questions", ()):
             if isinstance(question, dict):
                 question["presentation_key"] = checked_key(
-                    question.get("presentation_key"), question_key(question.get("field")),
+                    question.get("presentation_key"), question_key(question),
                 )
                 for key in ("reason", "locale", "locale_fallback"):
                     question.pop(key, None)

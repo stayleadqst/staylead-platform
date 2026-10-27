@@ -42,6 +42,10 @@ _QUESTION_TEMPLATES = {
     "question.age": "How old is each child?",
     "question.room": "Which room requirement should I use?",
     "question.budget_strength": "Is this budget a hard limit or a target?",
+    "question.accessibility_confirmation": (
+        "Your access needs are recorded, but no checked option has confirmed them. "
+        "Please ask the hotel to confirm whether the room can meet them."
+    ),
     "question.rate_basis": "Could you confirm whether this rate is per room per night?",
     "question.rate_validity_window": "These stay dates fall outside the source rate period. Could you confirm current pricing?",
     "question.hard_budget_exceeded": "This arrangement exceeds the confirmed budget. Would you like to adjust the budget or try another arrangement?",
@@ -58,6 +62,7 @@ _QUESTION_FIELD_KEYS = {
     "dates.check_in": "question.dates", "dates.check_out": "question.dates",
     "party.adults": "question.party", "party.children.age": "question.age",
     "room_requirements.budget_strength": "question.budget_strength",
+    "room_requirements.hard_accessibility_needs": "question.accessibility_confirmation",
     "room_advice": "question.room",
 }
 _OPEN_LOCALE_BUILTINS = {"en", "vi", "zh", "ja"}
@@ -101,6 +106,12 @@ def _valid_presentation_labels(raw: object) -> dict[str, str]:
 def _result_question_key(result: RoomAdviceResult, field: object) -> str:
     if field == "room_requirements.budget_strength":
         return "question.budget_strength"
+    if field == "room_requirements.hard_accessibility_needs":
+        return (
+            "question.accessibility_confirmation"
+            if result.explanation_inputs.get("known_hard_accessibility_needs") is True
+            else "question.room"
+        )
     unknowns = set(result.explanation_inputs.get("unknowns", ()))
     conflicts = set(result.explanation_inputs.get("conflicts", ()))
     if "rate_basis" in unknowns:
@@ -297,6 +308,8 @@ def _localized_question(
         key = "age"
     elif field == "room_requirements.budget_strength":
         key = "budget_strength"
+    elif field == "room_requirements.hard_accessibility_needs":
+        key = "accessibility_confirmation"
     elif field == "room_advice" or field.startswith("room_requirements."):
         key = "room"
     else:
@@ -306,19 +319,33 @@ def _localized_question(
         "en": {"dates": "What are your check-in and check-out dates?",
                "party": "How many adults will stay?", "age": "How old is each child?",
                "room": "Which room requirement should I use?",
-               "budget_strength": "Is this budget a hard limit or a target?"},
+               "budget_strength": "Is this budget a hard limit or a target?",
+               "accessibility_confirmation": (
+                   "Your access needs are recorded, but no checked option has confirmed them. "
+                   "Please ask the hotel to confirm whether the room can meet them."
+               )},
         "vi": {"dates": "Bạn nhận phòng và trả phòng vào ngày nào?",
                "party": "Có bao nhiêu người lớn sẽ lưu trú?", "age": "Mỗi trẻ bao nhiêu tuổi?",
                "room": "Tôi nên áp dụng yêu cầu phòng nào?",
-               "budget_strength": "Ngân sách này là giới hạn bắt buộc hay mức mục tiêu?"},
+               "budget_strength": "Ngân sách này là giới hạn bắt buộc hay mức mục tiêu?",
+               "accessibility_confirmation": (
+                   "Tôi đã ghi nhận yêu cầu tiếp cận, nhưng chưa có phương án nào được xác nhận là đáp ứng. "
+                   "Vui lòng nhờ khách sạn xác nhận phòng có đáp ứng các yêu cầu này không."
+               )},
         "zh": {"dates": "您的入住和退房日期是什么时候？",
                "party": "将有几位成人入住？", "age": "每位儿童分别几岁？",
                "room": "您希望我采用哪项房间要求？",
-               "budget_strength": "这项预算是硬性上限还是目标金额？"},
+               "budget_strength": "这项预算是硬性上限还是目标金额？",
+               "accessibility_confirmation": (
+                   "我已记录您的无障碍需求，但目前没有已核实的方案确认能够满足。请向酒店确认客房是否符合这些需求。"
+               )},
         "ja": {"dates": "チェックイン日とチェックアウト日を教えてください。",
                "party": "宿泊する大人は何人ですか？", "age": "お子様はそれぞれ何歳ですか？",
                "room": "どの客室条件を適用しますか？",
-               "budget_strength": "この予算は上限ですか、それとも目標額ですか？"},
+               "budget_strength": "この予算は上限ですか、それとも目標額ですか？",
+               "accessibility_confirmation": (
+                   "アクセシビリティのご要望を記録しましたが、確認済みの案では対応できると確認できていません。客室が要件を満たすかホテルにご確認ください。"
+               )},
     }
     label_key = _QUESTION_FIELD_KEYS.get(field)
     if label_key is None:
@@ -338,6 +365,9 @@ def _localized_result_question(
     conflicts = set(result.explanation_inputs.get("conflicts", ()))
     if field == "room_requirements.budget_strength":
         return _localized_question(field, locale, presentation_labels)
+    if (field == "room_requirements.hard_accessibility_needs"
+            and result.explanation_inputs.get("known_hard_accessibility_needs") is not True):
+        return _localized_question("room_advice", locale, presentation_labels)
     if "rate_basis" in unknowns:
         labels = {
             "en": "Could you confirm whether this rate is per room per night?",
@@ -658,11 +688,15 @@ server validates phrases and inserts checked amount/currency values itself.
             )
             return relocalize_checked(result)
         if draft.status != "ready" or not draft.options:
+            explanation_inputs = {"unknowns": ["no checked room candidate"]}
+            if (requirements.get("hard_accessibility_needs")
+                    and "room_requirements.hard_accessibility_needs" not in pending):
+                explanation_inputs["known_hard_accessibility_needs"] = True
             result = RoomAdviceResult(
                 status=(draft.status if draft.status != "ready" else "needs_clarification"),
                 brief_version=context.brief_version, source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
-                questions=tuple(questions), explanation_inputs={"unknowns": ["no checked room candidate"]},
+                questions=tuple(questions), explanation_inputs=explanation_inputs,
                 hotel_answer=draft.hotel_answer,
             )
             return relocalize_checked(result)

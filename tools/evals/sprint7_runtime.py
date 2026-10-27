@@ -13,9 +13,9 @@ Expected private files (mode 0600, both under /private/tmp):
           oracle_sha256
 state:  run_id, authority, candidate_sha256, matrix_sha256,
           authorized_for_live_calls=true, status='authorized',
-          max_guest_turns=9, max_codex_requests=18, max_calls_per_turn=2,
-          reserved_guest_turn_budget=9, reserved_request_budget=18,
-  guest_turns=8, codex_requests=14 (sealed parent counters; only original case 9 remains)
+  max_guest_turns=7, max_codex_requests=14, max_calls_per_turn=2,
+          reserved_guest_turn_budget=7, reserved_request_budget=14,
+  guest_turns=3, codex_requests=5 (exact sealed cont1 parent seed; only cases 6-7 map to new slots)
 
 The authorization record and pinned candidate manifest are supplied by the
 coordinator after approval. This runtime intentionally has no init/reset CLI.
@@ -37,19 +37,32 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261026-batch2-cont6"
-PARENT_RUN_ID = "s7-room-advice-20261026-batch2-cont5"
-CASE_RUN_ID = "s7-room-advice-20261026-batch2"
-PARENT_GUEST_TURNS = 8
-PARENT_REQUESTS = 14
-MAX_GUEST_TURNS = 9
-MAX_REQUESTS = 18
+RUN_ID = "s7-room-advice-20261026-reacceptance1-cont2"
+CASE_RUN_ID = "s7-room-advice-20261026-reacceptance1"
+PRIOR_RUN_ID = "s7-room-advice-20261026-batch2-cont6"
+PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-batch2-cont6-state.json")
+PRIOR_STATE_SHA256 = "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd"
+PARENT_RUN_ID = "s7-room-advice-20261026-reacceptance1-cont1"
+PARENT_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance1-cont1-state.json")
+PARENT_STATE_SHA256 = "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75"
+START_GUEST_TURNS = 3
+START_REQUESTS = 5
+APPROVED_CASE_TURNS = (6, 7)
+BUDGET_TURNS = (4, 5)
+MAX_CONTINUATION_GUEST_TURNS = START_GUEST_TURNS + 2
+MAX_CONTINUATION_REQUESTS = START_REQUESTS + 4
+MAX_GUEST_TURNS = 7
+MAX_REQUESTS = 14
 MAX_CALLS_PER_TURN = 2
 MAX_OUTPUT_TOKENS = 700
 PROVIDER_TIMEOUT_SECONDS = 25.0
 TURN_TIMEOUT_SECONDS = 45.0
 MODEL = "gpt-6-luna"
 EFFORT = "low"
+
+
+class _UnapprovedGuestTurn(RuntimeError):
+    """Raised before reservation when a request is not the next pinned utterance."""
 LIVE_ENV = "STAYLEAD_LIVE_EVAL"
 CONFIG_ENV = "STAYLEAD_S7_RUNTIME_CONFIG"
 STATE_ENV = "STAYLEAD_S7_RUN_STATE"
@@ -144,8 +157,15 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
         and state.get("reserved_request_budget") == MAX_REQUESTS
         and _counter(state.get("guest_turns"), MAX_GUEST_TURNS)
         and _counter(state.get("codex_requests"), MAX_REQUESTS)
-        and state.get("guest_turns", -1) >= PARENT_GUEST_TURNS
-        and state.get("codex_requests", -1) >= PARENT_REQUESTS
+        and state.get("guest_turns", -1) >= START_GUEST_TURNS
+        and state.get("codex_requests", -1) >= START_REQUESTS
+        and state.get("guest_turns", MAX_CONTINUATION_GUEST_TURNS + 1) <= MAX_CONTINUATION_GUEST_TURNS
+        and state.get("codex_requests", MAX_CONTINUATION_REQUESTS + 1) <= MAX_CONTINUATION_REQUESTS
+        and state.get("continuation_parent_state_sha256") == PARENT_STATE_SHA256
+        and (not fresh or (state.get("guest_turns") == START_GUEST_TURNS
+                           and state.get("codex_requests") == START_REQUESTS))
+        and isinstance(config.get("prior_allocation"), dict)
+        and config.get("continuation") == _continuation_record()
         and isinstance(state.get("authority"), str)
         and bool(state["authority"].strip())
         and config.get("provider") == "codex_cli"
@@ -158,38 +178,57 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
         and isinstance(config.get("live_cases_path"), str)
         and isinstance(config.get("oracle_path"), str)
         and isinstance(config.get("oracle_sha256"), str)
-        and _valid_continuation(config.get("continuation"))
-        and state.get("continuation_parent_state_sha256") == config["continuation"]["parent_state_sha256"]
+        and config["prior_allocation"] == _prior_allocation_record()
     )
 
 
-def _valid_continuation(value: Any) -> bool:
-    if not isinstance(value, dict):
-        return False
-    return (
-        value.get("parent_run_id") == PARENT_RUN_ID
-        and value.get("parent_guest_turns") == PARENT_GUEST_TURNS
-        and value.get("parent_codex_requests") == PARENT_REQUESTS
-        and isinstance(value.get("parent_state_path"), str)
-        and value["parent_state_path"].startswith("/private/tmp/")
-        and re.fullmatch(r"[a-f0-9]{64}", str(value.get("parent_state_sha256", ""))) is not None
-    )
+def _prior_allocation_record() -> dict[str, Any]:
+    return {
+        "run_id": PRIOR_RUN_ID, "state_sha256": PRIOR_STATE_SHA256,
+        "guest_turns": 9, "codex_requests": 16, "lifetime_prior_requests": 17,
+        "status": "closedimmutable",
+    }
 
 
-def _verify_parent_state(continuation: dict[str, Any]) -> dict[str, Any]:
-    if not _valid_continuation(continuation):
-        raise RuntimeError("Sprint 7 continuation authorization is malformed.")
-    parent_path = Path(continuation["parent_state_path"])
-    if _file_sha256(parent_path) != continuation["parent_state_sha256"]:
-        raise RuntimeError("Sprint 7 continuation parent state changed.")
-    parent = _private_file(parent_path)
-    if (parent.get("run_id") != PARENT_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != PARENT_GUEST_TURNS
-            or parent.get("codex_requests") != PARENT_REQUESTS
+def _continuation_record() -> dict[str, Any]:
+    return {
+        "parent_run_id": PARENT_RUN_ID,
+        "parent_state_path": str(PARENT_STATE_PATH),
+        "parent_state_sha256": PARENT_STATE_SHA256,
+        "parent_guest_turns": START_GUEST_TURNS,
+        "parent_codex_requests": START_REQUESTS,
+        "approved_case_turns": list(APPROVED_CASE_TURNS),
+        "budget_turns": list(BUDGET_TURNS),
+        "max_new_guest_turns": MAX_CONTINUATION_GUEST_TURNS - START_GUEST_TURNS,
+        "max_new_requests": MAX_CONTINUATION_REQUESTS - START_REQUESTS,
+    }
+
+
+def _verify_parent_continuation(value: Any, matrix_sha256: str) -> dict[str, Any]:
+    expected = _continuation_record()
+    if value != expected:
+        raise RuntimeError("Sprint 7 continuation is not the exact approved 3/5 remaining-case allocation.")
+    parent = _private_file(PARENT_STATE_PATH)
+    if (_file_sha256(PARENT_STATE_PATH) != PARENT_STATE_SHA256
+            or parent.get("run_id") != PARENT_RUN_ID or parent.get("status") != "halted"
+            or parent.get("guest_turns") != START_GUEST_TURNS
+            or parent.get("codex_requests") != START_REQUESTS
             or parent.get("max_guest_turns") != MAX_GUEST_TURNS
             or parent.get("max_codex_requests") != MAX_REQUESTS
-            or parent.get("max_calls_per_turn") != MAX_CALLS_PER_TURN):
-        raise RuntimeError("Sprint 7 continuation parent is not the exact sealed 8/14 state.")
+            or parent.get("matrix_sha256") != matrix_sha256):
+        raise RuntimeError("Sprint 7 continuation parent state changed or is not the exact sealed 3/5 state.")
+    return parent
+
+
+def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
+    if value != _prior_allocation_record():
+        raise RuntimeError("Prior Sprint 7 allocation is not the exact closed immutable receipt.")
+    parent = _private_file(PRIOR_STATE_PATH)
+    if (_file_sha256(PRIOR_STATE_PATH) != PRIOR_STATE_SHA256
+            or parent.get("run_id") != PRIOR_RUN_ID or parent.get("status") != "completed"
+            or parent.get("guest_turns") != 9 or parent.get("codex_requests") != 16
+            or parent.get("max_guest_turns") != 9 or parent.get("max_codex_requests") != 18):
+        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 9/16 allocation.")
     return parent
 
 
@@ -220,11 +259,10 @@ def prepare_private_run(
     *, approval_file: Path, candidate_manifest: Path, config_path: Path, state_path: Path,
     database_url: str, session_signing_secret: str,
 ) -> None:
-    """Create a private continuation only from explicit approval + pinned candidate.
+    """Create a private continuation from approval and a pinned candidate.
 
-    The coordinator calls this only after approving the exact parent state and
-    remaining case. It seeds the new namespace at the sealed 8/14 counters;
-    it cannot reset or transfer counters, and never overwrites control files.
+    Only the exact sealed 3/5 parent counters seed this bounded continuation;
+    the original failed namespace is read-only and is never reopened or overwritten.
     No secrets are read from the environment or printed.
     """
     approval = json.loads(approval_file.read_text(encoding="utf-8"))
@@ -245,6 +283,8 @@ def prepare_private_run(
         or approval.get("output_cap") != MAX_OUTPUT_TOKENS
         or not isinstance(approval.get("authority"), str)
         or not approval["authority"].strip()
+        or approval.get("case_matrix_sha256") != manifest.get("matrix_sha256")
+        or approval.get("continuation") != _continuation_record()
     ):
         raise RuntimeError("Approval does not authorize this exact Sprint 7 run and cap set.")
     candidate_sha = manifest.get("candidate_sha256")
@@ -257,10 +297,13 @@ def prepare_private_run(
             or not isinstance(manifest.get("oracle_sha256"), str)
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]
             or not manifest.get("live_cases_path") or not manifest.get("oracle_path")
-            or not _valid_continuation(manifest.get("continuation"))
+            or manifest.get("prior_allocation") != _prior_allocation_record()
+            or approval.get("prior_allocation") != manifest.get("prior_allocation")
+            or manifest.get("continuation") != _continuation_record()
             or approval.get("continuation") != manifest.get("continuation")):
         raise RuntimeError("Candidate manifest does not pin source, case and oracle bytes.")
-    _verify_parent_state(manifest["continuation"])
+    _verify_closed_prior_allocation(manifest["prior_allocation"])
+    _verify_parent_continuation(manifest["continuation"], matrix_sha)
     if not database_url or not session_signing_secret:
         raise RuntimeError("Private development database and signing secret are required.")
     for destination in (config_path, state_path):
@@ -277,6 +320,7 @@ def prepare_private_run(
         "live_cases_path": str(manifest.get("live_cases_path", "")),
         "oracle_path": str(manifest.get("oracle_path", "")),
         "oracle_sha256": manifest.get("oracle_sha256"),
+        "prior_allocation": manifest["prior_allocation"],
         "continuation": manifest["continuation"],
     }
     _verify_candidate_inputs(config)
@@ -288,8 +332,8 @@ def prepare_private_run(
         "max_calls_per_turn": MAX_CALLS_PER_TURN,
         "reserved_guest_turn_budget": MAX_GUEST_TURNS,
         "reserved_request_budget": MAX_REQUESTS,
-        "guest_turns": PARENT_GUEST_TURNS, "codex_requests": PARENT_REQUESTS,
-        "continuation_parent_state_sha256": manifest["continuation"]["parent_state_sha256"],
+        "guest_turns": START_GUEST_TURNS, "codex_requests": START_REQUESTS,
+        "continuation_parent_state_sha256": PARENT_STATE_SHA256,
     }
     for destination, value in ((config_path, config), (state_path, state)):
         destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -309,11 +353,9 @@ def _transition_status(new_status: str, *, detail: str | None = None) -> None:
             _verify_candidate_inputs(config)
         if not _valid_state(state, config, fresh=(new_status == "starting")):
             raise RuntimeError("Sprint 7 authorization is absent, malformed, consumed, or mismatched.")
-        if new_status == "starting" and (
-            state["guest_turns"] != PARENT_GUEST_TURNS
-            or state["codex_requests"] != PARENT_REQUESTS
-        ):
-            raise RuntimeError("Sprint 7 continuation is consumed; restart is forbidden.")
+        if new_status == "starting" and (state["guest_turns"] != START_GUEST_TURNS
+                                          or state["codex_requests"] != START_REQUESTS):
+            raise RuntimeError("Reacceptance continuation is consumed; restart is forbidden.")
         state["status"] = new_status
         if new_status == "starting":
             state["start_attempts"] = int(state.get("start_attempts", 0)) + 1
@@ -333,8 +375,7 @@ def _release_bootstrap_if_unused(reason: str) -> bool:
         state = _private_file(state_path)
         if not _valid_state(state, config) or state.get("status") not in {"starting", "running"}:
             return False
-        if (state.get("guest_turns") != PARENT_GUEST_TURNS
-                or state.get("codex_requests") != PARENT_REQUESTS):
+        if state.get("guest_turns") != START_GUEST_TURNS or state.get("codex_requests") != START_REQUESTS:
             return False
         state["status"] = "authorized"
         state["last_bootstrap_failure"] = re.sub(r"[^A-Za-z0-9_.:-]", "_", reason)[:80]
@@ -353,12 +394,49 @@ def _reserve(field: str, limit: int, label: str) -> int:
         if state.get("run_id") != RUN_ID or state.get("status") != "running":
             raise RuntimeError("Sprint 7 run is not active.")
         current = state.get(field)
-        if not _counter(current, limit) or current >= limit:
+        effective_limit = min(limit, MAX_CONTINUATION_REQUESTS) if field == "codex_requests" else limit
+        if not _counter(current, effective_limit) or current >= effective_limit:
             raise RuntimeError(f"Sprint 7 {label} limit reached; no call was launched.")
         state[field] = current + 1
         state[f"{field}_reserved_at_unix"] = time.time()
         _save_state(state_path, state)
         return current + 1
+
+
+def _reserve_approved_guest_turn(utterance: str) -> tuple[int, int]:
+    """Atomically verify the next approved utterance and reserve its turn slot."""
+    if LEASE_FD is None:
+        raise RuntimeError("Sprint 7 process lease is not held.")
+    config_path, state_path, _ = _paths()
+    with LOCK:
+        config = _private_file(config_path)
+        state = _private_file(state_path)
+        _verify_candidate_inputs(config)
+        if state.get("run_id") != RUN_ID or state.get("status") != "running":
+            raise RuntimeError("Sprint 7 run is not active.")
+        current = state.get("guest_turns")
+        if not _counter(current, MAX_CONTINUATION_GUEST_TURNS) or current >= MAX_CONTINUATION_GUEST_TURNS:
+            raise RuntimeError("Sprint 7 guest turn limit reached; no call was launched.")
+        budget_turn = current + 1
+        try:
+            case_turn = APPROVED_CASE_TURNS[BUDGET_TURNS.index(budget_turn)]
+        except ValueError:
+            raise _UnapprovedGuestTurn("No remaining approved case maps to this budget turn; no call was launched.") from None
+        try:
+            matrix = json.loads(Path(config["live_cases_path"]).read_text(encoding="utf-8"))
+            cases = matrix.get("cases")
+            case = (cases[case_turn - 1] if matrix.get("run_id") == CASE_RUN_ID
+                    and isinstance(cases, list) and len(cases) == MAX_GUEST_TURNS else None)
+        except (OSError, json.JSONDecodeError, TypeError, IndexError):
+            case = None
+        if (not isinstance(case, dict) or case.get("turn") != case_turn
+                or not isinstance(case.get("utterance"), str) or case["utterance"] != utterance):
+            raise _UnapprovedGuestTurn("Guest question does not match the next approved case; no call was launched.")
+        state["guest_turns"] = budget_turn
+        state["approved_case_turn"] = case_turn
+        state["guest_turns_reserved_at_unix"] = time.time()
+        _save_state(state_path, state)
+        return budget_turn, case_turn
 
 
 def _hash(value: Any) -> str | None:
@@ -369,7 +447,7 @@ def _hash(value: Any) -> str | None:
 
 def _candidate_manifest_digest(manifest: dict[str, Any]) -> str:
     pinned = {name: manifest.get(name) for name in
-              ("run_id", "source_files", "matrix_sha256", "oracle_sha256", "continuation")}
+              ("run_id", "source_files", "matrix_sha256", "oracle_sha256", "prior_allocation", "continuation")}
     encoded = json.dumps(pinned, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
@@ -398,10 +476,12 @@ def _verify_candidate_inputs(config: dict[str, Any]) -> None:
             or _candidate_manifest_digest(manifest) != config.get("candidate_sha256")
             or manifest.get("matrix_sha256") != config.get("matrix_sha256")
             or manifest.get("oracle_sha256") != config.get("oracle_sha256")
+            or manifest.get("prior_allocation") != config.get("prior_allocation")
             or manifest.get("continuation") != config.get("continuation")
             or not isinstance(manifest.get("source_files"), dict) or not manifest["source_files"]):
         raise RuntimeError("Pinned Sprint 7 candidate manifest changed or lacks source file pins.")
-    _verify_parent_state(config["continuation"])
+    _verify_closed_prior_allocation(config["prior_allocation"])
+    _verify_parent_continuation(config["continuation"], config["matrix_sha256"])
     repo_root = Path(__file__).resolve().parents[2]
     for relative, expected in manifest["source_files"].items():
         if (not isinstance(relative, str) or not isinstance(expected, str)
@@ -417,24 +497,11 @@ def _verify_candidate_inputs(config: dict[str, Any]) -> None:
         raise RuntimeError("Pinned Sprint 7 case matrix or independent oracle changed.")
 
 
-def _is_pinned_synthetic_turn(turn_number: int, utterance: str) -> bool:
-    config_path, _, _ = _paths()
-    config = _private_file(config_path)
-    try:
-        matrix = json.loads(Path(config["live_cases_path"]).read_text(encoding="utf-8"))
-        cases = matrix.get("cases")
-        case = cases[turn_number - 1] if isinstance(cases, list) and len(cases) == MAX_GUEST_TURNS else None
-        return (matrix.get("run_id") == CASE_RUN_ID and isinstance(case, dict)
-                and case.get("turn") == turn_number and case.get("utterance") == utterance)
-    except (OSError, json.JSONDecodeError, IndexError, TypeError):
-        return False
-
-
 def _event(record: dict[str, Any]) -> None:
     """Append only fixed metadata; never accept request/answer/config values."""
     _, _, path = _paths()
     allowed = {
-        "stage", "run_id", "turn", "call", "request_id_sha256", "input_sha256",
+        "stage", "run_id", "turn", "case_turn", "call", "request_id_sha256", "input_sha256",
         "instructions_sha256", "input_chars", "instructions_chars", "output_chars",
         "output_sha256", "latency_ms", "input_tokens", "output_tokens", "total_tokens",
         "status", "exception_class", "provider", "model", "effort",
@@ -466,9 +533,10 @@ def _capture_synthetic_json(text: str, turn: dict[str, Any], call: int) -> None:
     if capture_dir.is_symlink() or not stat.S_ISDIR(capture_dir.lstat().st_mode):
         raise RuntimeError("Unsafe private capture directory.")
     capture_dir.chmod(0o700)
-    target = capture_dir / f"turn-{turn['guest_turn']:02d}-call-{call:02d}.json"
+    target = capture_dir / f"budget-{turn['guest_turn']:02d}-case-{turn['approved_case_turn']:02d}-call-{call:02d}.json"
     document = json.dumps({
-        "run_id": RUN_ID, "turn": turn["guest_turn"], "call": call,
+        "run_id": RUN_ID, "budget_turn": turn["guest_turn"],
+        "approved_case_turn": turn["approved_case_turn"], "call": call,
         "synthetic_only": True, "response_sha256": _hash(text),
         "response_bytes": len(raw), "response": parsed,
     }, ensure_ascii=False, indent=2) + "\n"
@@ -494,7 +562,8 @@ def _observed_provider(provider: Any) -> Any:
         turn["calls"] += 1
         started = time.monotonic()
         base = {
-            "run_id": RUN_ID, "turn": turn["guest_turn"], "call": turn["calls"],
+            "run_id": RUN_ID, "turn": turn["guest_turn"], "case_turn": turn["approved_case_turn"],
+            "call": turn["calls"],
             "request_id_sha256": _hash(turn.get("request_id")),
             "input_sha256": _hash(request.input_text),
             "instructions_sha256": _hash(request.instructions),
@@ -583,25 +652,27 @@ def create_runtime_app() -> Any:
         if "answer_only_receipt_id" in payload or "retry" in payload or "resume" in payload:
             return JSONResponse(status_code=400, content={"error": {"code": "retry_resume_disabled"}})
         try:
-            number = _reserve("guest_turns", MAX_GUEST_TURNS, "guest turn")
+            number, case_number = _reserve_approved_guest_turn(payload["question"])
+        except _UnapprovedGuestTurn:
+            return JSONResponse(status_code=400, content={"error": {"code": "unapproved_guest_turn"}})
         except RuntimeError:
             return JSONResponse(status_code=429, content={"error": {"code": "acceptance_limit"}})
-        turn = {"guest_turn": number, "calls": 0,
+        turn = {"guest_turn": number, "approved_case_turn": case_number, "calls": 0,
                 "request_id": payload.get("request_id") if isinstance(payload.get("request_id"), str) else None,
-                "synthetic_pinned": _is_pinned_synthetic_turn(number, payload["question"])}
+                "synthetic_pinned": True}
         token = TURN.set(turn)
         started = time.monotonic()
         try:
             response = await call_next(request)
             status = response.status_code
-            _event({"stage": "http_completed", "run_id": RUN_ID, "turn": number,
+            _event({"stage": "http_completed", "run_id": RUN_ID, "turn": number, "case_turn": case_number,
                     "status": status, "latency_ms": round((time.monotonic() - started) * 1000, 1),
                     "request_id_sha256": _hash(turn["request_id"])})
             if status >= 400 or turn["calls"] == 0:
                 _transition_status("halted", detail="blocking_http_or_no_provider_call")
             return response
         except BaseException as exc:
-            _event({"stage": "http_failed", "run_id": RUN_ID, "turn": number,
+            _event({"stage": "http_failed", "run_id": RUN_ID, "turn": number, "case_turn": case_number,
                     "exception_class": type(exc).__name__,
                     "latency_ms": round((time.monotonic() - started) * 1000, 1)})
             _transition_status("halted", detail="blocking_http_exception")

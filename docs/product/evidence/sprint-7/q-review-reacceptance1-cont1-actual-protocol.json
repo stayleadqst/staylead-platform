@@ -1,0 +1,15 @@
+{
+  "case4_cause_verified": {
+    "code": "unsupported_output",
+    "reason": "unsupported_number",
+    "message": "The model returned an unsupported number."
+  },
+  "source_amount": 3800000,
+  "claim_numeric_forms": [
+    "3,800,000"
+  ],
+  "counterfactual": "Changingonlygrouped3,800,000\u2192raw3800000 passesexistingliteralguard; sourcepriceitselfissupported. No guardweakening/modelretry.",
+  "case3_primary_failure": "Explicitadultqueen-sharingconsentomittedfromM2; driverfailedtoassertit beforeadvancing",
+  "M2_case4": "Actuallyage7committedbrief2; answerfailedsupportednumberguard; onlypriorbrief1resultpersisted",
+  "effects": "Purefixture+literalvalidator probe; no paid/provider/DBwrites"
+}
