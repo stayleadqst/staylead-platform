@@ -26,6 +26,8 @@ from staylead_platform.infrastructure.persistence.store import (
     commit_language_preference,
     create_session,
     get_active_snapshot,
+    get_guest_brief,
+    get_guest_brief_receipt,
     get_room_advice_result,
     hotels,
     knowledge_facts,
@@ -178,6 +180,45 @@ class BookingIntentProvider(RoomAdviceProvider):
             text=json.dumps(value), provider="offline-fake", deployment="s7-test",
             model="mock-booking-intent", request_id=f"s7-booking-{len(self.calls)}",
             usage=Usage(input_tokens=2, output_tokens=2, total_tokens=4),
+        )
+
+
+class UnknownChildSharingProvider(RoomAdviceProvider):
+    def __init__(self) -> None:
+        super().__init__()
+        self.schemas: list[dict[str, object] | None] = []
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        payload = json.loads(request.input_text)
+        self.calls.append(payload)
+        self.schemas.append(request.response_schema)
+        question = str(payload["question"])
+        patch = {"ops": [
+            {"op": "set_adults", "count": 1, "current_turn_quote": "I am one adult"},
+            {"op": "add_child", "age": 7, "guardian_adult_index": 1,
+             "share_bed_with_guardian": None, "requires_separate_bed": None,
+             "current_turn_quote": "Our seven-year-old"},
+            {"op": "set_bed_sharing", "member_ids": ["adult-1", "child-1"],
+             "allow_share": True, "current_turn_quote": "Our seven-year-old may share my bed"},
+        ]}
+        if "candidate_index" in payload:
+            value = {
+                "fact_ids": [], "guest_patch": patch, "turn_intents": ["guest_edit"],
+                "explicit_language_tag": None, "inferred_language_tag": None,
+            }
+        else:
+            value = {
+                "supported_claims": [], "unknowns": [], "conflicts": [],
+                "guest_patch": patch, "turn_intents": ["guest_edit"], "guest_claims": [],
+                "guest_clarification": None, "conversational_acknowledgement": None,
+                "guest_brief_refs": [], "explicit_language_tag": None,
+                "inferred_language_tag": None, "label_bundle": {},
+            }
+        assert "Our seven-year-old" in question
+        return GenerationResult(
+            text=json.dumps(value), provider="offline-fake", deployment="s7-test",
+            model="mock-invalid-child-id", request_id="s7-invalid-child-id",
+            usage=Usage(input_tokens=4, output_tokens=5, total_tokens=9),
         )
 
 
@@ -770,6 +811,8 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
         with engine.begin() as connection:
             connection.execute(update(hotels).where(hotels.c.hotel_id == "HTL-CITY01")
                                .values(config_version=initial_config_version))
+
+
     call_two_brief = provider.calls[1]["committed_guest_brief"]
     assert call_two_brief["party"]["adults"] == 2
     assert call_two_brief["dates"] == {
@@ -875,6 +918,43 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     )
     assert old_result["currentness"] == "stale"
     assert old_result["selection"] is None
+
+
+def test_unknown_new_child_sharing_id_fails_as_model_output_without_brief_mutation(engine) -> None:
+    provider = UnknownChildSharingProvider()
+    settings = Settings(
+        _env_file=None, database_url=TEST_DSN, ai_provider="disabled",
+        session_signing_secret=SecretStr("sprint-seven-unknown-child-test-signing-secret"),
+    )
+    client = TestClient(create_app(settings, engine=engine, provider=provider))
+    opened = client.post("/v1/guest/sessions", json={"hotel_slug": "harbor-city-demo"})
+    assert opened.status_code == 201, opened.text
+    session = opened.json()
+    request_id = str(uuid.uuid4())
+    question = "I am one adult and guardian. Our seven-year-old may share my bed."
+    response = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/messages",
+        headers={"Authorization": f"Bearer {session['access_token']}"},
+        json={"request_id": request_id, "question": question},
+    )
+
+    assert response.status_code == 502, response.text
+    assert response.json()["error"]["code"] == "invalid_model_output"
+    assert provider.calls
+    assert provider.schemas[0] is not None
+    patch = provider.schemas[0]["properties"]["response"]["properties"]["guest_patch"]
+    operations = patch["anyOf"][0]["properties"]["ops"]["items"]["anyOf"]
+    operations = [variant for item in operations for variant in item.get("anyOf", (item,))]
+    sharing = next(item for item in operations
+                   if item["properties"]["op"].get("enum") == ["set_bed_sharing"])
+    assert "child-1" not in sharing["properties"]["member_ids"]["items"]["enum"]
+
+    brief = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01")
+    assert brief.brief_version == 0
+    assert brief.data["party"].get("children", []) == []
+    assert get_guest_brief_receipt(
+        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,
+    ) is None
 
 
 def test_messages_preserves_grounded_faq_with_room_advice_in_two_provider_calls(engine) -> None:

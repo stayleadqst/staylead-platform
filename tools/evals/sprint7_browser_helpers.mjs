@@ -5,6 +5,16 @@ export function selectionOptionForAcceptanceTurn(turnNumber, roomAdvice) {
   return options.find((option) => typeof option?.option_id === "string" && option.option_id.length > 0) ?? null;
 }
 
+/** A case advances only after its private coordinator semantic receipt is exact and passing. */
+export function semanticReviewReceiptValid(receipt, expected) {
+  return receipt !== null && typeof receipt === "object"
+    && receipt.run_id === expected.run_id
+    && receipt.candidate_sha256 === expected.candidate_sha256
+    && receipt.approved_case_turn === expected.approved_case_turn
+    && receipt.verdict === "pass"
+    && receipt.response_sha256 === expected.response_sha256;
+}
+
 /** A hard-conflict result cannot expose a selectable option; unknown checks may remain partial. */
 export function roomAdviceHardChecksConsistent(roomAdvice) {
   const options = Array.isArray(roomAdvice?.options) ? roomAdvice.options : [];
@@ -18,12 +28,20 @@ export function hasCanonicalSeparateBedConstraint(brief) {
     .some((bed) => bed === "single" || bed === "twin");
 }
 
-export function retainsTwoHardAccessibilityNeeds(brief) {
-  const needs = brief?.room_requirements?.hard_accessibility_needs ?? [];
-  return needs.length === 2 && needs.every((need) => typeof need === "string" && need.trim().length > 0);
+/** Separate-bed intent is explicit when sharing is denied or a canonical bed type is required. */
+export function hasExplicitSeparateBedResolution(brief) {
+  return hasExactBedSharingConsent(brief, ["adult-1", "adult-2"], false)
+    || hasCanonicalSeparateBedConstraint(brief);
 }
 
-/** A turn's explicit pair-sharing authorization must be present in persisted M2 before continuing. */
+/** The City2 browser branch accepts either explicit no-sharing or a canonical separate-bed type. */
+export function checkCity2Brief(brief) {
+  return brief?.room_requirements?.budget_amount === 6_500_000
+    && brief.room_requirements?.budget_strength === "hard"
+    && hasExplicitSeparateBedResolution(brief);
+}
+
+/** Adult consent must name exactly the two adults and allow sharing. */
 export function hasExactBedSharingConsent(brief, memberIds, allowShare) {
   if (!Array.isArray(memberIds) || memberIds.length < 2 || typeof allowShare !== "boolean") return false;
   const expected = [...memberIds].sort();
@@ -32,6 +50,21 @@ export function hasExactBedSharingConsent(brief, memberIds, allowShare) {
     return group?.allow_share === allowShare && Array.isArray(actual) && actual.length === expected.length
       && [...actual].sort().every((id, index) => id === expected[index]);
   });
+}
+
+export function retainsTwoHardAccessibilityNeeds(brief) {
+  const needs = brief?.room_requirements?.hard_accessibility_needs ?? [];
+  return needs.length === 2 && needs.every((need) => typeof need === "string" && need.trim().length > 0);
+}
+
+/** Require the checked-M2 accessibility question to explain hotel verification, not restate needs. */
+export function hasUsefulVietnameseAccessibilityVerification(question) {
+  return question?.field === "room_requirements.hard_accessibility_needs"
+    && question.presentation_key === "question.accessibility_confirmation"
+    && question.locale?.toLowerCase().startsWith("vi")
+    && question.locale_fallback === false
+    && question.reason?.includes("Tôi đã ghi nhận yêu cầu tiếp cận")
+    && question.reason?.includes("nhờ khách sạn xác nhận");
 }
 
 export function browserRunDirectory(runId, attemptSuffix) {

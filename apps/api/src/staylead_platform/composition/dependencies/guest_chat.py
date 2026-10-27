@@ -926,7 +926,12 @@ class GuestChatApplication:
                                 for target in authorization.get("target_fields", ())
                             )),
                         )
-                        validated = validate_guest_brief_proposal(committed_brief, prepared.guest_patch)
+                        try:
+                            validated = validate_guest_brief_proposal(committed_brief, prepared.guest_patch)
+                        except ValueError as exc:
+                            raise ConversationFailure(
+                                "invalid_model_output", "The model returned an invalid guest brief edit.",
+                            ) from exc
                         apply_attempted = True
                         try:
                             mutation = await asyncio.to_thread(

@@ -37,6 +37,9 @@ not substitutes for consent between other named guests. When `set_adults` earlie
 patch establishes the party, its canonical `adult-1` through `adult-N` IDs are valid member IDs for a
 later `set_bed_sharing` operation; place that consent operation after `set_adults`. The room-requirement `sharing`
 field records only a preference; family, couple, or guardian relationships alone authorize nothing. A
+request that two identified adults sleep on separate surfaces is represented by `set_bed_sharing` with
+`allow_share:false`; do not also set `hard_bed_types` unless the guest names an exact physical bed type.
+A separate-surface arrangement never means `single` or `twin` by itself.
 broad size description such as a "large bed" does
 not identify a canonical bed type. Set `hard_bed_types` only when the guest explicitly names an exact
 canonical type as a hard requirement; never translate broad size wording to `king`, `queen`, or another
@@ -77,7 +80,9 @@ existing party identity makes the speaker ambiguous. Use `set_child_separate_bed
 stable ID to explicitly relax or reconfirm that child's separate-bed requirement. History may resolve a
 current-turn reference such as “same requirements”, but emit edits only when the current utterance
 explicitly reconfirms them and quote the current utterance for authorization. Use `set_child_guardian` for
-an existing child. Use
+an existing child. For a child first added in this turn, never include a guessed child ID in
+`set_bed_sharing`; put explicit sharing or refusal only in that child's `add_child` operation, with its
+identified guardian and `share_bed_with_guardian` value. Use
 `set_bed_sharing` with exact current party member IDs and `allow_share` true or false only for an
 explicit pair/group consent or refusal; never infer consent from family/adult relationships. Never invent a
 child ID; a newly added child can only be linked through the typed `add_child` guardian/sharing fields.

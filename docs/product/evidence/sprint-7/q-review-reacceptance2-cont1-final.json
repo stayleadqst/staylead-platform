@@ -1,0 +1,42 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+  "candidate_sha256": "4797d219e4fed676574419d3d57d8135b1951da0762c483e8af799439ae521f4",
+  "verdict": "PASS_READINESS_ONLY_FOR_ORIGINAL_CASES3_TO7_WITHIN_SAME_APPROVED7_14",
+  "findings": [],
+  "domain_review_reused": "q-review-reacceptance2-bedtype-fix.json exact4 frozenhashes; no modelreliability/CityactualPASS inferred.",
+  "controls_verified": {
+    "parent": "Actual private halted2/4 state/hash4f18e653...c9feb, exactrun/path/approvedcase2; wrongparent/hash/seed/content rejects.",
+    "prior_allocation": "Actual private oldhalted5/8 state/hash3a13..., lifetime25receipt unchanged/unused2+6closed; no transfer.",
+    "same_allowance": "Seedglobal2/4, originalcase IDs and budgetturns3,4,5,6,7; maxnew5guest/10requests,maxend7/14; noCityretry/replay/Cityselection.",
+    "authority_cases_oracle": "Actualprivate0600authority matchesmanifestcontinuation+case3150/oracle4adda; continuationincludedindigest.",
+    "runtime_ingress": "Wrongutterance rejected beforeturn/requestreservation/provider; exactnextcase3 passesfakeconsumer. Two-callcap/failureaccounting/one-shot/candidatepin checks retained.",
+    "browser": "FreshFamily3–5/Pine6–7 groups only; actualsessionpublichotelIDshape; Pine7onlyselectionhelper+exactresult/version/latest/0calls.",
+    "semantic_gate": "Actual await function validreceipt passes; wrongrun/candidate/turn/verdict/APIresponsebodyhash, symlink,0644,missingtimeout reject; aftercaptures+machine/UI/Pineselection, beforeadvance; no provider/reservationswhilewait.",
+    "pins": "237repository+237snapshot match; candidate digest/actualruntimeverify_candidate_inputs PASS; final237hashrecheckPASS; no controlconfig/statecreatedbyQ."
+  },
+  "producer_consumer_proof": [
+    "Official canonical M2+checkedM4 producers for all5originalFamily/Pinecases pass actual browser checkBrief/checkRoom/per-case assertions.",
+    "Unknownchild nooptions + mandatoryunknownfeepartial results accepted; hardconstraints retained.",
+    "Missing explicit adult1/adult2 Familyconsent rejects beforeadvance.",
+    "Pine6dedicatedknownneeds/hotelverify explanation and Pine7actualFrenchcheckedlabels source shape accepted.",
+    "Prior relevant unknownfees-falsecomplete/genericPine/hardconflict negatives reused because branches unchanged."
+  ],
+  "tests": "10 targeted continuation/control tests PASS,3knownTestClient/on_eventwarnings; no broad unchanged product suites rerun.",
+  "reported_root_gates": "275backend/Ruff/compile/Node/offline-smoke/diff PASS; unchanged14PG/53frontend40gates reused; counts not summed with overlapping B101focused.",
+  "limitations": [
+    "Readiness only; no actual Family/Pine PASS until observed.",
+    "Actual City2 inventedexacttype failure and fullCitycoupledAC gap remainBlocked; noCityretry.",
+    "Description/promptremediation does not deterministically prevent semantic invention; no LLMreliability claim.",
+    "No Qactualprovider/API/DBcalls or writes; offline TestClient usesfakes only.",
+    "Rootsolewriter of semanticreceipt afterindependentQperturnactualPASS, bodyhashfromAPIcapture notfilehash."
+  ],
+  "evidence": [
+    "q-review-reacceptance2-cont1-pins.json",
+    "q-review-reacceptance2-cont1-bootstrap.mjs",
+    "q-review-reacceptance2-cont1-bootstrap-results.json",
+    "q-review-reacceptance2-cont1-producer.py",
+    "q-review-reacceptance2-cont1-producer-results.json",
+    "q-review-reacceptance2-cont1-semantic-gate.mjs",
+    "q-review-reacceptance2-cont1-semantic-gate-results.json"
+  ]
+}

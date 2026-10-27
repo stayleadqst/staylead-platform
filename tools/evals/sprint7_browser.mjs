@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Bounded continuation for unchanged approved Pine cases 6-7 after the sealed 3/5 parent run.
- * Starts one fresh Pine session; submits each remaining approved utterance once.
+ * Bounded cases 3–7 production-browser continuation for one reviewed candidate.
+ * Starts fresh Family and Pine sessions and submits only the approved case text once.
  * Selection/replay/GET checks use zero provider requests; stop at first blocker.
  * Screenshots and turn payloads remain private beneath /private/tmp.
  */
@@ -10,17 +10,19 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { browserRunDirectory, retainsTwoHardAccessibilityNeeds,
-  roomAdviceHardChecksConsistent, hasExactBedSharingConsent,
-  selectionOptionForAcceptanceTurn } from "./sprint7_browser_helpers.mjs";
+  roomAdviceHardChecksConsistent, hasExactBedSharingConsent, semanticReviewReceiptValid,
+  selectionOptionForAcceptanceTurn, hasUsefulVietnameseAccessibilityVerification } from "./sprint7_browser_helpers.mjs";
 import { validateSourceRefs } from "./sprint7_source_refs.mjs";
 
 const repo = process.cwd();
-const RUN_ID = "s7-room-advice-20261026-reacceptance1-cont2";
-const CASE_RUN_ID = "s7-room-advice-20261026-reacceptance1";
-const PARENT_RUN_ID = "s7-room-advice-20261026-reacceptance1-cont1";
-const APPROVED_CASE_TURNS = [6, 7];
-const BUDGET_TURNS = [4, 5];
-const HOTEL_ID = { "harbor-city-demo": "HTL-CITY01", "lagoon-family-demo": "HTL-BEACH02", "pine-ridge-demo": "HTL-RETREAT03" };
+const RUN_ID = "s7-room-advice-20261027-reacceptance2-cont1";
+const CASE_RUN_ID = "s7-room-advice-20261027-reacceptance2";
+const PARENT_RUN_ID = "s7-room-advice-20261027-reacceptance2";
+const PARENT_STATE_SHA256 = "4f18e653499684919c083856474068bb3d2a1b6bedb5c3b6d2ab6204dd8c9feb";
+const START_GUEST_TURNS = 2;
+const START_REQUESTS = 4;
+const APPROVED_CASE_TURNS = [3, 4, 5, 6, 7];
+const HOTEL_ID = { "lagoon-family-demo": "HTL-BEACH02", "pine-ridge-demo": "HTL-RETREAT03" };
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 const envPath = (key) => {
@@ -31,9 +33,8 @@ const envPath = (key) => {
 
 if (process.argv.includes("--offline-harness-smoke")) {
   console.log(JSON.stringify({ status: "offline-harness-smoke-ok", batch_namespace: RUN_ID,
-    case_namespace: CASE_RUN_ID, parent_namespace: PARENT_RUN_ID, approved_case_turns: APPROVED_CASE_TURNS,
-    guest_turn_cap: 7, request_cap: 14,
-    seed_counters: { guest_turns: 3, codex_requests: 5 }, no_browser: true, no_api_or_model: true }));
+    guest_turn_cap: 7, request_cap: 14, continuation_seed: { guest_turns: 2, codex_requests: 4 },
+    no_browser: true, no_api_or_model: true }));
   process.exit(0);
 }
 assert(process.env.STAYLEAD_LIVE_EVAL === "1", "STAYLEAD_LIVE_EVAL=1 is required; no browser/API/model request was sent");
@@ -48,7 +49,7 @@ const state = JSON.parse(await fs.readFile(statePath, "utf8"));
 const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 assert(state.run_id === RUN_ID && config.run_id === RUN_ID
   && state.candidate_sha256 === config.candidate_sha256 && state.matrix_sha256 === config.matrix_sha256,
-"Private config/state is not the authorized reacceptance1-cont2 namespace");
+"Private config/state is not the authorized reacceptance2 continuation namespace");
 const casesPath = process.env.STAYLEAD_S7_LIVE_CASES ?? config.live_cases_path;
 const oraclePath = config.oracle_path;
 assert(path.resolve(casesPath) === path.resolve(config.live_cases_path), "Case file differs from the candidate pin");
@@ -59,7 +60,7 @@ const oracle = JSON.parse(oracleRaw.toString("utf8"));
 assert(sha(casesRaw) === state.matrix_sha256 && sha(oracleRaw) === config.oracle_sha256,
   "Approved case matrix or independent oracle changed");
 assert(cases.run_id === CASE_RUN_ID && cases.authorized_for_live_calls === true && cases.cases?.length === 7,
-  "Approved reacceptance1 case matrix is invalid");
+  "Approved reacceptance2 case matrix is invalid");
 assert(cases.proposed_max_guest_turns === 7 && cases.proposed_max_requests === 14
   && cases.max_calls_per_turn === 2 && cases.provider_timeout_seconds === 25
   && cases.turn_timeout_seconds === 45 && cases.output_cap === 700
@@ -69,22 +70,40 @@ assert(cases.proposed_max_guest_turns === 7 && cases.proposed_max_requests === 1
 assert(state.status === "running" && state.authorized_for_live_calls === true
   && state.max_guest_turns === 7 && state.max_codex_requests === 14 && state.max_calls_per_turn === 2
   && state.reserved_guest_turn_budget === 7 && state.reserved_request_budget === 14
-  && state.guest_turns === 3 && state.codex_requests === 5,
-"Continuation must seed only the sealed parent 3/5 counters and preserve global bounds");
+  && state.guest_turns === START_GUEST_TURNS && state.codex_requests === START_REQUESTS
+  && state.approved_case_turn === START_GUEST_TURNS,
+"Continuation counters or approved-case position differ from the sealed 2/4 parent");
 const prior = config.prior_allocation;
-assert(prior?.run_id === "s7-room-advice-20261026-batch2-cont6"
-  && prior.state_sha256 === "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd"
-  && prior.guest_turns === 9 && prior.codex_requests === 16 && prior.lifetime_prior_requests === 17
-  && prior.status === "closedimmutable", "Prior allocation receipt does not match the sealed completed run");
+assert(prior?.run_id === "s7-room-advice-20261026-reacceptance1-cont2"
+  && prior.state_sha256 === "3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843"
+  && prior.guest_turns === 5 && prior.codex_requests === 8 && prior.lifetime_requests === 25
+  && prior.unused_guest_slots === 2 && prior.unused_request_slots === 6
+  && prior.unused_slots === "closed; no transfer/reset/reuse",
+"Prior allocation receipt does not match the sealed 5/8 run");
 const continuation = config.continuation;
 assert(continuation?.parent_run_id === PARENT_RUN_ID
-  && continuation.parent_state_path === "/private/tmp/staylead-s7-reacceptance1-cont1-state.json"
-  && continuation.parent_state_sha256 === "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75"
-  && continuation.parent_guest_turns === 3 && continuation.parent_codex_requests === 5
+  && continuation.parent_state_path === "/private/tmp/staylead-s7-reacceptance2-state.json"
+  && continuation.parent_state_sha256 === PARENT_STATE_SHA256
+  && continuation.parent_guest_turns === START_GUEST_TURNS
+  && continuation.parent_codex_requests === START_REQUESTS
   && JSON.stringify(continuation.approved_case_turns) === JSON.stringify(APPROVED_CASE_TURNS)
-  && JSON.stringify(continuation.budget_turns) === JSON.stringify(BUDGET_TURNS)
-  && continuation.max_new_guest_turns === 2 && continuation.max_new_requests === 4,
-"Continuation mapping or remaining allowance differs from the exact approved receipt");
+  && JSON.stringify(continuation.budget_turns) === JSON.stringify(APPROVED_CASE_TURNS)
+  && continuation.max_new_guest_turns === 5 && continuation.max_new_requests === 10
+  && state.continuation_parent_state_sha256 === PARENT_STATE_SHA256,
+"Continuation authority differs from the exact approved 3–7 allocation");
+const parentPath = continuation.parent_state_path;
+const parentInfo = await fs.lstat(parentPath);
+assert(parentInfo.isFile() && !parentInfo.isSymbolicLink() && (parentInfo.mode & 0o777) === 0o600,
+  "Continuation parent state must remain a read-only private 0600 file");
+const parentRaw = await fs.readFile(parentPath);
+const parent = JSON.parse(parentRaw.toString("utf8"));
+assert(sha(parentRaw) === PARENT_STATE_SHA256 && parent.run_id === PARENT_RUN_ID
+  && parent.status === "halted" && parent.guest_turns === START_GUEST_TURNS
+  && parent.codex_requests === START_REQUESTS && parent.approved_case_turn === START_GUEST_TURNS,
+"Continuation parent receipt is not the sealed halted 2/4 state");
+assert(APPROVED_CASE_TURNS.every((turn) => cases.cases[turn - 1]?.turn === turn)
+  && cases.cases.slice(0, START_GUEST_TURNS).length === START_GUEST_TURNS,
+"Continuation case matrix does not map cases 3–7 to their approved slots");
 assert(oracle.synthetic === true && Array.isArray(oracle.global_invariants), "Independent oracle is not pinned");
 const dataRoot = path.join(repo, "fixtures/hospitality/knowledge-v1");
 const sourceData = {};
@@ -137,21 +156,47 @@ async function writePrivateCapture(name, value) {
   await fs.chmod(target, 0o600);
   return target;
 }
-const report = { run_id: RUN_ID, case_run_id: CASE_RUN_ID, started_at: new Date().toISOString(), candidate_sha256: state.candidate_sha256,
+const report = { run_id: RUN_ID, started_at: new Date().toISOString(), candidate_sha256: state.candidate_sha256,
   live_cases_sha256: sha(casesRaw), oracle_sha256: sha(oracleRaw), browser: "chromium", live: true,
-  mock_api: false, prior_allocation_closed: true, parent_run_id: PARENT_RUN_ID,
-  parent_counters: { guest_turns: 3, codex_requests: 5 },
-  turns: [], selections: [], failure: null };
+  mock_api: false, prior_allocation_closed: true,
+  continuation_seed: { guest_turns: START_GUEST_TURNS, codex_requests: START_REQUESTS },
+  turns: [], selections: [], semantic_reviews: [], failure: null };
 let browser;
 let context;
 let page;
 let activeSession;
 const sessions = new Map();
 const expectedBrief = {
+  1: { adults: 2, children: [], dates: ["2026-11-10", "2026-11-13", 3] },
+  2: { adults: 2, children: [], dates: ["2026-11-10", "2026-11-13", 3] },
+  3: { adults: 2, children: [null], dates: ["2026-11-10", "2026-11-12", 2] },
+  4: { adults: 2, children: [7], dates: ["2026-11-10", "2026-11-12", 2] },
+  5: { adults: 2, children: [12], dates: ["2026-11-10", "2026-11-12", 2] },
   6: { adults: 1, children: [7], dates: ["2026-11-10", "2026-11-12", 2] },
   7: { adults: 1, children: [8], dates: ["2026-11-10", "2026-11-12", 2] },
 };
 const childIdsBySession = new Map();
+async function awaitSemanticReview(turnNo, responseSha256) {
+  const markerPath = path.join(runDir, `semantic-review-turn-${String(turnNo).padStart(2, "0")}.json`);
+  const expected = { run_id: RUN_ID, candidate_sha256: state.candidate_sha256,
+    approved_case_turn: turnNo, response_sha256: responseSha256 };
+  const deadline = Date.now() + 600_000;
+  while (Date.now() < deadline) {
+    try {
+      const info = await fs.lstat(markerPath);
+      assert(info.isFile() && !info.isSymbolicLink() && (info.mode & 0o777) === 0o600,
+        `turn ${turnNo} semantic receipt must be a regular 0600 file`);
+      const receipt = JSON.parse(await fs.readFile(markerPath, "utf8"));
+      assert(semanticReviewReceiptValid(receipt, expected), `turn ${turnNo} semantic receipt does not authorize advance`);
+      report.semantic_reviews.push({ turn: turnNo, verdict: "pass", response_sha256: responseSha256 });
+      return;
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+  throw new Error(`turn ${turnNo} semantic review receipt timed out; no next guest turn was sent`);
+}
 function checkBrief(turnNo, brief) {
   const expected = expectedBrief[turnNo];
   assert(brief?.party?.adults === expected.adults && brief.party.children?.length === expected.children.length,
@@ -160,6 +205,26 @@ function checkBrief(turnNo, brief) {
     && brief.dates?.nights === expected.dates[2], `turn ${turnNo} M2 date/nights differs from pinned case`);
   for (let index = 0; index < expected.children.length; index += 1) {
     assert(brief.party.children[index].age === expected.children[index], `turn ${turnNo} child age differs`);
+  }
+  if (turnNo >= 3 && turnNo <= 5) {
+    const child = brief.party.children[0];
+    assert(child.member_id && child.requires_separate_bed === true
+      && brief.party.guardians?.[child.member_id] === "adult-1",
+    `turn ${turnNo} did not preserve child identity, separate bed, and parent guardian`);
+    const sharing = brief.party.bed_sharing ?? [];
+    assert(!sharing.some((group) => group.member_ids?.includes(child.member_id) && group.allow_share === true),
+      `turn ${turnNo} allowed the child to share the separate bed`);
+    assert(hasExactBedSharingConsent(brief, ["adult-1", "adult-2"], true),
+      `turn ${turnNo} did not retain explicit adult sharing consent`);
+  }
+  if (turnNo === 5) {
+    assert(brief.room_requirements?.budget_amount === 6_000_000
+      && brief.room_requirements?.budget_currency === "VND"
+      && brief.room_requirements?.budget_basis === "stay_total"
+      && brief.room_requirements?.budget_strength == null,
+    "family budget amount/basis was lost or the unresolved hard-versus-target strength was invented");
+    assert((brief.pending_fields ?? []).includes("room_requirements.budget_strength"),
+      "family turn 5 did not preserve the unresolved budget-strength question in M2");
   }
   if (turnNo === 6) {
     assert(retainsTwoHardAccessibilityNeeds(brief),
@@ -257,9 +322,11 @@ try {
   browser = await chromium.launch({ headless: true });
   context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   page = await context.newPage();
-const groups = [
+  const groups = [
+    { session: "fresh-beach", hotel: "lagoon-family-demo", turns: [3, 4, 5] },
     { session: "fresh-pine", hotel: "pine-ridge-demo", turns: [6, 7] },
   ];
+  let beachChildId = null;
   for (const group of groups) {
     const hotelId = HOTEL_ID[group.hotel];
     assert(group.turns.every((turnNo) => cases.cases[turnNo - 1].session === group.session
@@ -281,13 +348,9 @@ const groups = [
     sessions.set(group.session, session);
     for (const turnNo of group.turns) {
       const testCase = cases.cases[turnNo - 1];
-      assert(testCase.turn === turnNo && APPROVED_CASE_TURNS.includes(turnNo)
-        && testCase.session === group.session && testCase.hotel_slug === group.hotel,
+      assert(testCase.turn === turnNo && testCase.session === group.session && testCase.hotel_slug === group.hotel,
         `case ${turnNo} changed identity/order`);
       const beforeState = JSON.parse(await fs.readFile(statePath, "utf8"));
-      const budgetTurn = beforeState.guest_turns + 1;
-      assert(BUDGET_TURNS[APPROVED_CASE_TURNS.indexOf(turnNo)] === budgetTurn,
-        `case ${turnNo} does not map to the next global budget turn`);
       const messageResponsePromise = page.waitForResponse((response) => response.request().method() === "POST"
         && new URL(response.url()).pathname.endsWith("/messages"), { timeout: 55000 });
       await page.locator("#guest-question").fill(testCase.utterance);
@@ -295,7 +358,6 @@ const groups = [
       const apiResponse = await messageResponsePromise;
       const responseText = await apiResponse.text();
       const capturePath = await writePrivateCapture(`turn-${String(turnNo).padStart(2, "0")}-api.json`, {
-        case_turn: turnNo, budget_turn: budgetTurn,
         status: apiResponse.status(), body_sha256: sha(responseText), body_text: responseText,
       });
       assert(apiResponse.status() >= 200 && apiResponse.status() < 300,
@@ -303,20 +365,35 @@ const groups = [
       const payload = JSON.parse(responseText);
       const brief = payload.guest_brief;
       const childId = checkBrief(turnNo, brief);
+      if (turnNo === 3) beachChildId = childId;
+      if (turnNo === 4 || turnNo === 5) assert(childId === beachChildId,
+        `turn ${turnNo} changed the child's stable member ID`);
       if (turnNo === 6) childIdsBySession.set(group.session, childId);
       if (turnNo === 7) assert(childId === childIdsBySession.get(group.session),
         "pine-7 changed the child's stable member ID after the explicit relaxation");
       const room = checkRoom(turnNo, payload.room_advice, hotelId, brief);
       if (turnNo === 7) assert(room.options.length > 0,
         `turn ${turnNo} did not produce a useful positive candidate set`);
+      if (turnNo === 5) assert(room.questions?.some((question) => question.field === "room_requirements.budget_strength"),
+        "family turn 5 failed to ask the unresolved budget-strength question");
+      if (turnNo === 3) {
+        const agePending = brief.pending_fields?.some((field) => field.includes(childId) && field.endsWith(".age"));
+        assert(agePending && room.status === "needs_clarification"
+          && room.questions.some((question) => question.field === "party.children.age"),
+        "age-unknown child did not remain pending and receive the consequential age question");
+      }
+      if (turnNo >= 3 && turnNo <= 5) {
+        assert(!(room.options ?? []).some((option) => option.cost?.status === "complete"),
+          `family-${turnNo} certified unknown mandatory child/bed charges as complete`);
+      }
       if (turnNo === 6) {
         assert((room.options ?? []).every((option) => !(option.checks ?? []).some((check) =>
           /access|wheelchair|bathroom|step_free/iu.test(check.code) && check.status === "pass")),
         "pine-6 certified unverified hard accessibility fit");
-        assert(room.questions.some((question) => /access|room_requirements/iu.test(question.field))
-          || room.options.some((option) => option.checks.some((check) =>
-            /access|wheelchair|bathroom|step_free/iu.test(check.code) && check.status === "unknown")),
-        "pine-6 did not explain the unresolved hard accessibility requirements");
+        const verificationQuestion = room.questions.find((question) =>
+          question.field === "room_requirements.hard_accessibility_needs");
+        assert(hasUsefulVietnameseAccessibilityVerification(verificationQuestion),
+        "pine-6 did not retain the known requirements and give the useful Vietnamese hotel-verification step");
       }
       if (turnNo === 7) {
         assert(payload.presentation?.language_tag?.toLowerCase().startsWith("fr"), "pine-7 did not render French");
@@ -339,7 +416,6 @@ const groups = [
       const answerTurn = page.locator(".turn").last();
       const visibleText = await answerTurn.innerText();
       await writePrivateCapture(`turn-${String(turnNo).padStart(2, "0")}-evidence.json`, {
-        case_turn: turnNo, budget_turn: budgetTurn,
         case_id: testCase.id ?? `source-case-${testCase.source_case}`, expected: testCase.expected,
         api_response: payload, visible_text: visibleText,
       });
@@ -350,8 +426,7 @@ const groups = [
         && afterState.approved_case_turn === turnNo
         && afterState.codex_requests === beforeState.codex_requests + calls,
       `turn ${turnNo} counters/trace differ or exceed two calls`);
-      report.turns.push({ case_turn: turnNo, budget_turn: budgetTurn, session: group.session,
-        hotel_id: hotelId, http_status: apiResponse.status(),
+      report.turns.push({ turn: turnNo, session: group.session, hotel_id: hotelId, http_status: apiResponse.status(),
         request_id_sha256: sha(payload.request_id ?? ""), result_id_sha256: sha(room.result_id),
         result_version: room.result_version, brief_version: brief.brief_version,
         source_generation: room.source_generation, source_ref_count: room.source_refs.length,
@@ -363,6 +438,12 @@ const groups = [
         const selected = await selectCurrentOption(turnNo, room, currentCard, session, afterState);
         assert(selected, `turn ${turnNo} did not expose a current option for the required UI selection`);
       }
+      if (turnNo === 3 || turnNo === 4 || turnNo === 5) {
+        const text = await currentCard.innerText();
+        assert(text.length > 0 && (room.questions.length > 0 || room.options.length > 0),
+          `family-${turnNo} omitted useful next-step or partial advice`);
+      }
+      await awaitSemanticReview(turnNo, sha(responseText));
     }
     await page.screenshot({ path: path.join(runDir, `${group.hotel}-desktop.png`), fullPage: true });
     await fs.chmod(path.join(runDir, `${group.hotel}-desktop.png`), 0o600);
@@ -374,14 +455,14 @@ const groups = [
   await fs.chmod(path.join(runDir, "pine-mobile.png"), 0o600);
   report.mobile_layout = { ...mobile, no_horizontal_overflow: true };
   const finalState = JSON.parse(await fs.readFile(statePath, "utf8"));
-  assert(finalState.guest_turns === 5 && finalState.approved_case_turn === 7
-    && finalState.codex_requests >= 7 && finalState.codex_requests <= 9,
-  "continuation counters differ from two approved cases, seeded 3/5, and remaining 2/4 bounds");
+  assert(finalState.guest_turns === 7 && finalState.approved_case_turn === 7
+    && finalState.codex_requests >= START_REQUESTS + APPROVED_CASE_TURNS.length
+    && finalState.codex_requests <= 14,
+    "continuation counters differ from the approved cases 3–7 and global request bound");
   report.counters = { guest_turns: finalState.guest_turns, codex_requests: finalState.codex_requests,
-    max_guest_turns: finalState.max_guest_turns, max_codex_requests: finalState.max_codex_requests,
-    parent_seed: { guest_turns: 3, codex_requests: 5 }, new_guest_turns: 2,
-    new_requests: finalState.codex_requests - 5, unused_guest_turns: 2,
-    unused_requests: 14 - finalState.codex_requests };
+    new_guest_turns: finalState.guest_turns - START_GUEST_TURNS,
+    new_requests: finalState.codex_requests - START_REQUESTS,
+    max_guest_turns: finalState.max_guest_turns, max_codex_requests: finalState.max_codex_requests };
   report.completed_at = new Date().toISOString();
   await fs.writeFile(reportPath, JSON.stringify(report, null, 2) + "\n", { flag: "wx", mode: 0o600 });
   console.log(JSON.stringify({ run_id: RUN_ID, turns: report.turns.length, report: reportPath, status: "completed" }));

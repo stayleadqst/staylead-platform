@@ -125,8 +125,10 @@ def build(
     committed_output_schema_factory: Callable[[tuple[str, ...]], dict[str, Any]] | None = None,
     response_envelope_key: str | None = None,
     committed_answer_validator: Callable[..., None] | None = None,
-    preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
-    preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
+    preparation_selection_schema_factory: Callable[[GuestBriefSnapshot | None], dict[str, Any]] | None = None,
+    preparation_answer_schema_factory: Callable[
+        [tuple[str, ...], tuple[str, ...], GuestBriefSnapshot | None], dict[str, Any]
+    ] | None = None,
     preparation_metadata_validator: Callable[..., Any] | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
@@ -1061,6 +1063,8 @@ def test_preparation_rules_keep_quotes_contiguous_and_bed_permission_distinct_fr
     assert "canonical `adult-1` through `adult-N` IDs are valid member IDs" in GUEST_BRIEF_PATCH_RULES
     assert "place that consent operation after `set_adults`" in GUEST_BRIEF_PATCH_RULES
     assert "Do not re-emit complete saved values" in GUEST_BRIEF_PATCH_RULES
+    assert "never include a guessed child ID in" in GUEST_BRIEF_PATCH_RULES
+    assert "only in that child's `add_child` operation" in GUEST_BRIEF_PATCH_RULES
     question = (
         "我们是两位成年人，是情侣，可以同住并共用一张大床。入住日期为2026-11-10，退房日期为2026-11-13。"
         "整个住宿的客房总预算上限为6000000 VND。请用中文比较合适的房型和参考费用。"
@@ -1504,15 +1508,25 @@ def test_committed_output_schema_is_sent_only_for_final_answer_call() -> None:
 
 def test_preparation_schema_is_attached_to_low_overlap_selection_and_accepts_flat_adapter_output() -> None:
     provider = FakeProvider(selection_ids=["F-HTL-CITY01-040"])
+    brief = GuestBriefSnapshot(0, {"dates": {}, "party": {
+        "adults": 1, "children": [{"member_id": "4ed1bb17-dde4-4964-ad7f-cfc9a088b553", "age": 7}],
+    }})
     prepared = asyncio.run(build(
         provider, preparation_selection_schema_factory=fact_selection_output_schema,
         response_envelope_key="response",
     ).prepare_turn(
         hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[],
-        brief=GuestBriefSnapshot(0, {"dates": {}, "party": {}}, ()),
+        brief=brief,
     ))
     assert len(provider.calls) == 1
-    assert provider.calls[0].response_schema == fact_selection_output_schema()
+    assert provider.calls[0].response_schema == fact_selection_output_schema(brief)
+    patch_schema = provider.calls[0].response_schema["properties"]["response"]["properties"]["guest_patch"]
+    ops = patch_schema["anyOf"][0]["properties"]["ops"]["items"]["anyOf"]
+    operations = [variant for item in ops for variant in item.get("anyOf", (item,))]
+    sharing = next(item for item in operations
+                   if item["properties"]["op"].get("enum") == ["set_bed_sharing"])
+    assert "4ed1bb17-dde4-4964-ad7f-cfc9a088b553" in sharing["properties"]["member_ids"]["items"]["enum"]
+    assert "child-1" not in sharing["properties"]["member_ids"]["items"]["enum"]
     assert provider.calls[0].response_envelope_key == "response"
     assert prepared.selected_fact_ids == ("F-HTL-CITY01-040",)
 
@@ -1529,16 +1543,19 @@ def test_preparation_schema_is_attached_to_high_overlap_answer_without_wrapping_
         "explicit_language_tag": None, "inferred_language_tag": None, "label_bundle": {},
     })
     facts = MemoryFacts()
+    brief = GuestBriefSnapshot(0, {"dates": {}, "party": {
+        "adults": 1, "children": [{"member_id": "4ed1bb17-dde4-4964-ad7f-cfc9a088b553", "age": 7}],
+    }})
     answer = asyncio.run(build(
         provider, facts, preparation_answer_schema_factory=preparation_answer_output_schema,
         response_envelope_key="response",
     ).answer(
         hotel_id="HTL-CITY01", question="Tell me the breakfast hours.", history=[],
         prefetched_facts=[asdict(fact) for fact in facts.facts if fact.hotel_id == "HTL-CITY01"],
-        extract_guest_patch=True,
+        extract_guest_patch=True, brief=brief,
     ))
     assert len(provider.calls) == 1
-    assert provider.calls[0].response_schema == preparation_answer_output_schema((), ())
+    assert provider.calls[0].response_schema == preparation_answer_output_schema((), (), brief)
     assert provider.calls[0].response_envelope_key == "response"
     assert "06:30" in answer.answer
 

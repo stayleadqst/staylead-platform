@@ -17,6 +17,7 @@ from staylead_platform.domains.hospitality.schemas.grounded_answer import (
 )
 from staylead_platform.domains.hospitality.schemas.guest_brief import (
     CANONICAL_BED_TYPES,
+    HARD_BED_TYPES_DESCRIPTION,
     GuestTurnIntent,
     SetRoomRequirements,
     validate_guest_brief_proposal,
@@ -707,6 +708,10 @@ def test_separate_beds_are_a_sharing_constraint_not_an_invented_bed_type() -> No
     assert native_hard_bed_types == list(CANONICAL_BED_TYPES)
     assert pydantic_hard_bed_types["anyOf"][0]["items"]["enum"] == native_hard_bed_types
     assert "separate beds" not in native_hard_bed_types
+    assert native_room_requirements["properties"]["hard_bed_types"]["description"] == HARD_BED_TYPES_DESCRIPTION
+    assert pydantic_hard_bed_types["description"] == HARD_BED_TYPES_DESCRIPTION
+    assert "represented by `set_bed_sharing` with" in GUEST_BRIEF_PATCH_RULES
+    assert "A separate-surface arrangement never means `single` or `twin` by itself." in GUEST_BRIEF_PATCH_RULES
     assert "A request for separate sleeping surfaces is not a" in GUEST_BRIEF_PATCH_RULES
     assert "`set_bed_sharing`" in GUEST_BRIEF_PATCH_RULES
 
@@ -728,7 +733,7 @@ def test_separate_beds_are_a_sharing_constraint_not_an_invented_bed_type() -> No
     room, rate = _catalog(
         room_id="CITY-TWN", beds=[{"type": "single", "count": 2, "occupant_capacity": 1}],
         max_occupancy=2,
-    ), _rate(amount=1_800_000)
+    ), _rate(amount=1_950_000)
     rate["value"]["room_type_id"] = "CITY-TWN"
     brief = {
         "dates": {"check_in": "2026-11-10", "check_out": "2026-11-13"},
@@ -742,10 +747,21 @@ def test_separate_beds_are_a_sharing_constraint_not_an_invented_bed_type() -> No
         assignments=tuple({"member_id": f"adult-{number}", "room_index": 0,
                            "bed_index": number - 1, "bed_type": "single"} for number in (1, 2)),
     )
+    misread_separate_beds = deepcopy(brief)
+    misread_separate_beds["room_requirements"] = {
+        **misread_separate_beds["room_requirements"], "hard_bed_types": ["twin"],
+    }
+    rejected = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=_context(misread_separate_beds, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
+    ))
+    assert rejected.status == "conflict"
+    assert rejected.options == ()
+
     result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
         context=_context(brief, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
     ))
     assert result.status == "ready"
+    assert result.options[0]["cost"]["total"] == 5_850_000
     checks = {check["code"]: check["status"] for check in result.options[0]["checks"]}
     assert checks["bed_configuration"] == "pass"
     assert len({assignment["bed_index"] for assignment in result.options[0]["assignments"]}) == 2

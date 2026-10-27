@@ -20,6 +20,10 @@ CANONICAL_BED_TYPES = (
 CanonicalBedType = Literal[
     "bunk", "cot", "crib", "double", "extra_bed", "king", "queen", "single", "sofa_bed", "twin",
 ]
+HARD_BED_TYPES_DESCRIPTION = (
+    "Exact canonical physical bed types only. A request for separate sleeping surfaces is an arrangement, "
+    "not a bed type; do not infer single or twin from it."
+)
 
 
 class _PatchOperation(BaseModel):
@@ -80,7 +84,9 @@ class SetRoomRequirements(_PatchOperation):
     )
     hard_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
     preferred_accessibility_needs: list[str] | None = Field(default=None, max_length=8)
-    hard_bed_types: list[CanonicalBedType] | None = Field(default=None, max_length=8)
+    hard_bed_types: list[CanonicalBedType] | None = Field(
+        default=None, max_length=8, description=HARD_BED_TYPES_DESCRIPTION,
+    )
     preferred_bed_types: list[str] | None = Field(default=None, max_length=8)
     avoided_bed_types: list[str] | None = Field(default=None, max_length=8)
     max_rooms: int | None = Field(default=None, ge=1, le=10)

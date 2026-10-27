@@ -286,8 +286,10 @@ class GroundedQAOrchestrator:
         committed_output_schema_factory: Callable[
             [tuple[str, ...], tuple[str, ...], tuple[str, ...], str, tuple[str, ...], tuple[str, ...]], dict[str, Any]
         ] | None = None,
-        preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
-        preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
+        preparation_selection_schema_factory: Callable[[GuestBriefSnapshot | None], dict[str, Any]] | None = None,
+        preparation_answer_schema_factory: Callable[
+            [tuple[str, ...], tuple[str, ...], GuestBriefSnapshot | None], dict[str, Any]
+        ] | None = None,
         preparation_metadata_validator: Callable[
             [Any, GuestBriefProposal | None, str], tuple[tuple[str, ...], tuple[dict[str, Any], ...]]
         ] | None = None,
@@ -355,7 +357,7 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selection_schema = (
-                    self._preparation_selection_schema_factory()
+                    self._preparation_selection_schema_factory(brief)
                     if extract_guest_patch and self._preparation_selection_schema_factory is not None else None
                 )
                 selected = await self._provider.generate(GenerationRequest(
@@ -450,7 +452,7 @@ class GroundedQAOrchestrator:
         try:
             allowed_brief_refs = _known_nonpending_brief_refs(brief)
             response_schema = (
-                self._preparation_answer_schema_factory(missing_label_keys, label_bundle_keys)
+                self._preparation_answer_schema_factory(missing_label_keys, label_bundle_keys, brief)
                 if extract_guest_patch and self._preparation_answer_schema_factory is not None
                 else self._committed_output_schema_factory(
                     missing_label_keys,
@@ -680,7 +682,7 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selection_schema = (
-                    self._preparation_selection_schema_factory()
+                    self._preparation_selection_schema_factory(brief)
                     if self._preparation_selection_schema_factory is not None else None
                 )
                 selected = await self._provider.generate(GenerationRequest(

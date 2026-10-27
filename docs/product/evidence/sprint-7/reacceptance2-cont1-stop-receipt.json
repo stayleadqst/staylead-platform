@@ -1,0 +1,19 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+  "status": "halted",
+  "guest_turns": 6,
+  "codex_requests": 11,
+  "state_sha256": "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5",
+  "lifetime_requests": 36,
+  "unused_guest_slots": 1,
+  "unused_request_slots": 3,
+  "unused_slots": "closed; no replay/reset/reallocation",
+  "actual_outcome": {
+    "city1": "PASS",
+    "city2": "FAIL invented hard twin",
+    "family3_5": "PASS",
+    "pine6": "FAIL invented child-1; HTTP500",
+    "pine7": "Blocked dependency; not attempted"
+  },
+  "no_further_calls": true
+}

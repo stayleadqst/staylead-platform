@@ -12,12 +12,15 @@ from staylead_platform.domains.hospitality.schemas.fact_selection import FactSel
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
 )
-from staylead_platform.domains.hospitality.schemas.guest_brief import validate_preparation_metadata
+from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    validate_guest_brief_proposal,
+    validate_preparation_metadata,
+)
 from staylead_platform.domains.hospitality.schemas.preparation_output import (
     fact_selection_output_schema,
     preparation_answer_output_schema,
 )
-from staylead_platform.platform.contracts.guest_brief import GuestBriefProposal
+from staylead_platform.platform.contracts.guest_brief import GuestBriefProposal, GuestBriefSnapshot
 
 
 def _assert_strict_objects(schema: dict[str, Any]) -> None:
@@ -178,3 +181,62 @@ def test_high_overlap_prep_schema_keeps_flat_provider_response_compatible() -> N
     )
     # Adapters that ignore schema/envelope hints continue returning the original flat domain object.
     HospitalityGroundedAnswer.model_validate(flat)
+
+
+def test_sharing_schema_uses_only_canonical_adults_and_current_saved_child_ids() -> None:
+    saved_child_id = "4ed1bb17-dde4-4964-ad7f-cfc9a088b553"
+    brief = GuestBriefSnapshot(3, {
+        "party": {"adults": 2, "children": [{"member_id": saved_child_id, "age": 7}]},
+    })
+
+    def member_id_enum(schema: dict[str, Any]) -> list[str]:
+        body = schema["properties"]["response"]
+        branch = next(item for item in body.get("anyOf", (body,))
+                      if "guest_patch" in item.get("properties", {}))
+        patch = branch["properties"]["guest_patch"]["anyOf"][0]
+        ops = patch["properties"]["ops"]["items"]["anyOf"]
+        operations = [variant for item in ops for variant in item.get("anyOf", (item,))]
+        operation = next(item for item in operations
+                         if item["properties"]["op"].get("enum") == ["set_bed_sharing"])
+        return operation["properties"]["member_ids"]["items"]["enum"]
+
+    for schema in (
+        fact_selection_output_schema(brief),
+        preparation_answer_output_schema(("send",), ("send",), brief),
+    ):
+        allowed_ids = member_id_enum(schema)
+        assert allowed_ids == [*(f"adult-{index}" for index in range(1, 31)), saved_child_id]
+        assert "child-1" not in allowed_ids
+
+    question = "We are two adults and our seven-year-old may share my bed; I am the guardian."
+    malformed = GuestBriefProposal(({
+        "op": "set_bed_sharing", "member_ids": ["adult-1", "child-1"], "allow_share": True,
+        "current_turn_quote": question,
+    },))
+    with pytest.raises(ValueError, match="distinct current party members"):
+        validate_guest_brief_proposal(brief, malformed)
+    valid_saved_child = GuestBriefProposal(({
+        "op": "set_bed_sharing", "member_ids": ["adult-1", saved_child_id], "allow_share": True,
+        "current_turn_quote": "our seven-year-old may share my bed",
+    },))
+    updated = validate_guest_brief_proposal(brief, valid_saved_child)
+    assert updated.data["party"]["bed_sharing"] == [{
+        "member_ids": sorted(("adult-1", saved_child_id)), "allow_share": True,
+    }]
+
+
+def test_new_child_sharing_is_valid_only_through_inline_add_child_consent() -> None:
+    brief = GuestBriefSnapshot(0, {"party": {"adults": 1, "children": []}})
+    question = "We are one adult and our seven-year-old may share my bed; I am the guardian."
+    proposal = GuestBriefProposal(({
+        "op": "add_child", "age": 7, "guardian_adult_index": 1,
+        "share_bed_with_guardian": True, "current_turn_quote": question,
+    },))
+
+    updated = validate_guest_brief_proposal(brief, proposal)
+    child = updated.data["party"]["children"][0]
+    child_id = child["member_id"]
+    assert updated.data["party"]["guardians"][child_id] == "adult-1"
+    assert updated.data["party"]["bed_sharing"] == [{
+        "member_ids": sorted(("adult-1", child_id)), "allow_share": True,
+    }]
