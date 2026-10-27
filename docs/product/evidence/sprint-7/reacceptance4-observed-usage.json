@@ -1,0 +1,30 @@
+{
+  "scope": "NEWmanualR4Pine2/4, actualhalted1/2; prior44excluded",
+  "guest_turns": 1,
+  "reserved_requests": 2,
+  "completed_responses_with_usage": 2,
+  "observed_input_tokens": 24865,
+  "observed_output_tokens": 514,
+  "lifetime_requests": 46,
+  "requests": [
+    {
+      "turn": 1,
+      "call": 1,
+      "input_tokens": 12900,
+      "output_tokens": 481,
+      "latency_ms": 9285.9
+    },
+    {
+      "turn": 1,
+      "call": 2,
+      "input_tokens": 11965,
+      "output_tokens": 33,
+      "latency_ms": 3229.4
+    }
+  ],
+  "agent_tokens": "unavailable",
+  "billing_amount": "unavailable",
+  "unused_guest_slots": 1,
+  "unused_request_slots": 2,
+  "unused": "closed; dependentcase2notattempted/no reuse"
+}

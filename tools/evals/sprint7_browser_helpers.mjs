@@ -1,6 +1,6 @@
 /** Small pure helpers shared with offline tests for bounded browser branches. */
 export function selectionOptionForAcceptanceTurn(turnNumber, roomAdvice) {
-  if (![1, 2, 4].includes(turnNumber)) return null;
+  if (turnNumber !== 2) return null;
   const options = Array.isArray(roomAdvice?.options) ? roomAdvice.options : [];
   return options.find((option) => typeof option?.option_id === "string" && option.option_id.length > 0) ?? null;
 }

@@ -1059,6 +1059,8 @@ def test_captured_room_advice_preparation_fails_closed_on_packed_targets_before_
 def test_preparation_rules_keep_quotes_contiguous_and_bed_permission_distinct_from_type() -> None:
     assert "one verbatim contiguous span" in GUEST_BRIEF_PATCH_RULES
     assert "never translate broad size wording to `king`, `queen`, or another" in GUEST_BRIEF_PATCH_RULES
+    assert "Permission to share one bed, including a broad \"large bed\" description, does not itself create" in GUEST_BRIEF_PATCH_RULES
+    assert "is not a reason to ask a `hard_bed_types` clarification" in GUEST_BRIEF_PATCH_RULES
     assert "standalone `set_bed_sharing` operation" in GUEST_BRIEF_PATCH_RULES
     assert "canonical `adult-1` through `adult-N` IDs are valid member IDs" in GUEST_BRIEF_PATCH_RULES
     assert "place that consent operation after `set_adults`" in GUEST_BRIEF_PATCH_RULES

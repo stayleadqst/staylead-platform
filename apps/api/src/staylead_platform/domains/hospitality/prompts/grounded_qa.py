@@ -43,7 +43,11 @@ A separate-surface arrangement never means `single` or `twin` by itself.
 broad size description such as a "large bed" does
 not identify a canonical bed type. Set `hard_bed_types` only when the guest explicitly names an exact
 canonical type as a hard requirement; never translate broad size wording to `king`, `queen`, or another
-enum. If the exact type is necessary to fulfill the request but remains unclear, ask a clarification.
+enum. Permission to share one bed, including a broad "large bed" description, does not itself create
+a hard physical bed-type requirement and is not a reason to ask a `hard_bed_types` clarification. Ask
+that clarification only when the guest explicitly requires a physical type and the exact required type
+is unclear or unsupported. If the exact type is necessary to fulfill an explicit hard requirement but
+remains unclear, ask a clarification.
 For this current question, classify one or more `turn_intents`: `hotel_information`, `guest_state`,
 `guest_edit`, `courtesy`, `room_advice`, `booking_request`. `room_advice` means the guest wants
 room-type/party-fit advice; `booking_request` means they want the configured official booking channel.

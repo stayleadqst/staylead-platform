@@ -1,64 +1,61 @@
 # Sprint 7 — báo cáo thực thi
 
-2026-10-27 (Asia/Saigon). **Sprint 7 chưa hoàn tất. B07 #28 Done; C01 #39, điều phối #97 và S7-F1 #98 Blocked.** [PR99](https://github.com/stayleadqst/staylead-platform/pull/99) giữ Draft, chưa merge, base `sprint-5-canonical-brief`. Không đóng epic/parent hoặc tạo story trùng.
+2026-10-27 (Asia/Saigon). **Sprint7 chưa hoàn tất. B07 #28 Done; C01 #39, điều phối #97 và S7-F1 #98 Blocked.** [PR99](https://github.com/stayleadqst/staylead-platform/pull/99) Draft/unmerged, base `sprint-5-canonical-brief`. Không tạo story trùng hoặc đóng broaderparent/epic.
 
 ## Kết quả hiện hành
 
-Batch manual mới được Hieu duyệt4lượt/tối đa8requests đã dừng **4/8**, tổng Sprint7 **44requests**. City1→2 và Pine3 PASS; Pine4 FAIL. Family3–5 và B07 đã PASS được dùng lại. Browser/API đã dừng; mọi state/capture/failure giữ nguyên. Không retry, sửa lịch sử nghiệm thu hoặc dùng allowance cũ cho lần chạy mới.
+Batch NEW Pine2/4 được Hieu duyệt dừng tại **1lượt/2requests**, tổng Sprint7 **46runtime provider requests**. Pine1 FAIL vì tự tạo pendinghard_bed_types; Pine2 phụ thuộc và chưa chạy. Unused1guest/2requests đóng, không retry/reset/transfer/amendedinput/historyrepair. API/browser đã dừng. AcceptedCity/Family/B07 tiếp tục dùng lại; không biến các failure cũ thành PASS.
 
-| Công việc | Owner / model / effort | Stage / candidate | Kiểm chứng | Blocker / next action |
+| Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 | --- | --- | --- | --- | --- |
-| City Chinese → sửa giường | Q / gpt-6.1-sol/high | Actual PASS trên345a7141 | STD5.4m/TWN5.85m so sánh tiếng Trung; sửafalse-sharing/hard6.5m, không suyhardtype/maxrooms; hai giườngsingle riêng; cardcũstale/disabled, POST409, chọnmới đúngv2; nguồn/state/DBđúng | Giữ PASS, không chạy lại |
-| Family thiếu tuổi→7→12/budget | Q / gpt-6.1-sol/high | Actual PASS trên4797d219 | Cùng childUUID/guardian/consent/giườngriêng/ngày; nguồn5.2m/7.6m; phíunknown/nulltotal, không bịa budgetstrength | Giữ PASS, không chạy lại |
-| Pine hardaccess | Q / gpt-6.1-sol/high | Actual Pine3 PASS trên345a7141 | UUIDserver/tuổi7/guardian/share/ngày/hardaccess đúng; tiếng Việt đưa bước khách sạn xác nhận, không tự bỏ điều kiện hay chứng nhận fit | Giữ bằng chứng, chuỗi edit cần freshcontext khi nghiệm thu lại |
-| Pine relaxation/French | B / gpt-6-luna/high | Offline fix0eb86e8c,237pins | Nativeclear context/set-only/clear-only; canonicalquestionfields; fakeAPI→PG tuổi8/clear/M4/Frenchpersist PASS | Pine4 actualFAIL còn nguyên; cần actual2lượt sau bản sửa |
-| Review độc lập | Q / gpt-6.1-sol/high | Final scoped offline PASS0eb86e8c | Capture sai bị loại, correctedquote→M2/M4/FrenchLOFT4.4m/feesunknown qua; kiểm pins và regression | Actual Pinechain vẫn cần nghiệm thu |
-| Tích hợp/delivery | Coordinator / metadata model-effort không có | Nhánh sprint-7-room-advisory; publication đang chuẩn bị | 275backend +16PG PASS; Ruff/compile/diff PASS; frontend53pins không đổi, dùng lại40tests/lint/typecheck/build; controlsNodeSmoke không đổi | Chưa Done/merge trước fullactualAC/DoD |
+| B07 #28 | Q / gpt-6.1-sol/high | ActualAC1–3 PASS, closedDone | Bookingintent/trustedboundary/language/privacy trong technicalpilot; không claim bookingendpoint thật hoạt động | Giữ Done, không chạy lại |
+| City Chinese→sửa giường | Q / gpt-6.1-sol/high | ActualR3 City1→2 PASS | STD5.4m/TWN5.85m comparison; false-sharing/hard6.5m/noinventedtype/maxrooms; distinctsingles; staleUI/POST409/newv2selection0extraLLM; source/DB/version đúng | Giữ PASS |
+| Family thiếu tuổi→7→12/budget | Q / gpt-6.1-sol/high | ActualR2 Family3–5 PASS | Stablechild/guardian/consent/separatebed/dates;5.2m/7.6m knownbase, feesunknown/nulltotal, budgetstrength không bịa | Giữ PASS |
+| Pine2case chain | Q / gpt-6.1-sol/high | R3initialverificationPASS; latestR4Pine1FAIL/Pine2Blocked | Party/date/access đúng nhưng unrequestedpending gây sai clarification; chưa có fullFrench/currentselection | Cần actualfreshPine2case trên reviewedfix/profile mới được duyệt |
+| Offline remediation | B / gpt-6-luna/high | Implemented/frozen1435c5fc,237pins | Knownaccessmarker qua unrelatedpending, promptpermission rule, driverhardtype/pendingnegative; canonicalvalidator không đổi | Promptadherence chưa được actualverify |
+| Independentreview | Q / gpt-6.1-sol/high | ScopedofflinePASS1435c5fc |237repo/snapshot/digest/exact6delta; causal/positive/negative/source/driver probes; đọc rootgates | Không claim actualmodelPASS hoặc modelupgradeguarantee |
+| Integration/delivery | Coordinator / exactmodel-effort metadata không có | Ownbranch/PR99; publication đang chuẩn bị |280backend16PG/RuffcompileDiff/NodeSmokePASS; frontend53pins không đổi dùng lại40tests/lint/typecheck/build | FullactualAC/DoD trướcDone/merge |
 
-## Failure thực tế và bản sửa
+## Actual failure và nguyên nhân
 
-Pine4 HTTP200/bodySHA `90329d014920d5ccf54919b242713fd416b6f41a34fa936235c5a7aa51a9aabc` sửa đúng cùng childUUID lên8 và giữ guardian/sharing/ngày, nhưng vẫn lưu `hard_accessibility_needs=['wheelchair-accessible bathroom']` dù khách đồng ý bỏ cả hai yêu cầu. Model liệt kê10field không liên quan trong `clear_fields`, bỏ sót field cần clear. DB đã commit brief/state2,2requests/results hoàn thành,4messages; không có selection. Không sửa DB để biến failure thành PASS.
+LatestR4 candidate221027b1,2Pinecasecontrols-only trên product0eb, đã qua23focusedharness/APItests vàQreadiness. Pine1HTTP200/bodySHA `95da645df994aeee849e7618a1dfad62e909fb4c2e42ab20753a70d0163494e8` lưu đúngadult1/childUUIDage7/guardian/sharing/date/twohardaccessneeds. Model thêm `clarify(room_requirements.hard_bed_types)` chỉ vì permission “chung giường lớn” không nêu physicaltype. Quote support không chứng minh clarification đó cần thiết. CanonicalM2 đã commit brief/state1,pendinghard_bed_types,1completedrequest/result,2messages,noselection; source refs vẫn current/approved. Không sửa actualstate.
 
-Call2 còn trả `questions[].field='accessibility_confirmation'`. Schema cũ chấp nhận arbitrarystr; renderer không nhận đó là canonicalpath, đổi sang question.generic/room và loại labelFrench tương ứng, dẫn đến ENfallback. Không có Frenchpositiveoptions/rationale/currentselection. Đây là lỗi extraction và lỗi question-fieldcontract riêng biệt.
+M4 earlybranch khi có pendingroomrequirement đã trả result trước khi gắn `known_hard_accessibility_needs`. Saved/nonpendingaccessquestion vì thế render generic “Tôi nên áp dụng yêu cầu phòng nào?”; fieldroom_advice cũng generic. Đây là primaryM3semanticmisclassification và secondarydeterministicrenderingmetadata defect. Driver dừng đúng trước marker01; Pine2 chưa chạy vì không có quyền tự xóa pendingkhông liên quan trong originalnextutterance.
 
-Bản sửa offline `0eb86e8c747e5674c45867fd358c007e767f91586ac1dc51761dd90c30d1c6cd` dùng trusted `GuestBriefSnapshot` hiện có để giới hạn clear vào các field đang có giá trị (kể cả budget0), không tạo emptyenum; nativewire tách set-only/clear-only, mixededits dùng các operation hiện có. Canonical M2 validator giữ nguyên, không parser ngôn ngữ/alias/capincrease. Questionfieldnative/Pydantic/prompt dùng canonicalpaths và canonicalUUID-age path, từ chối presentationalias. Không sửa platform/domain boundary hoặc frontend.
+[Actualreview và ACmatrix](evidence/sprint-7/q-review-reacceptance4-actual.json) · [Actualmanifest221027b1](evidence/sprint-7/candidate-manifest-reacceptance4-v2.json) · [Readiness](evidence/sprint-7/q-review-reacceptance4-final.json) · [Authorityreceipt](evidence/sprint-7/reacceptance4-authorization-receipt.json) · [Stopreceipt](evidence/sprint-7/reacceptance4-stop-receipt.json). Finalhalted1/2 SHA `16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c`, lifetime46. Không có marker01/turn2 hoặc inference sau offlinefix.
 
-Regression fakeprovider qua API→M2→M4→PostgreSQL xác nhận tuổi7→8 cùngUUID/guardian/ngày, bỏ hardaccess, LOFT2.2m/đêm×2=4.4m knownbase; phí trẻunknown nên totalnull/incomplete. Rationale và câu hỏi tiếng Pháp được project/persist đúng. Corrected partialremaining-needs, mixedset/clear qua hai operation và budget0 có kiểm tra; guard set/clear collision, quote/intent/source vẫn giữ. Đây là schema/prompt remediation được kiểm tra offline, chưa chứng minh model thật tuân thủ.
+## Reviewed offline fix và giới hạn
 
-## Bằng chứng và quality gates
+Candidate **1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d**,237pins,exact6delta từactual221027b1. Prompt phân biệt permission/broadbedsize với hardphysicaltyperequirement/clarification; genuineexplicitunsupportedhardtype và realconflict vẫn được giữ pending. **Originalbadcapture vẫn qua staticparser/currentquote/canonicalM2**; không claim server đã nhận biết semanticnecessity. Prompt change là adherencehypothesis, chưa actualmodelproof.
 
-[Actual review và AC matrix](evidence/sprint-7/q-review-reacceptance3-actual.json) · [Actual manifest345a7141](evidence/sprint-7/candidate-manifest-reacceptance3-v1.json) · [Readiness](evidence/sprint-7/q-review-reacceptance3-final.json) · [Stop receipt](evidence/sprint-7/reacceptance3-stop-receipt.json) · [Authority receipt](evidence/sprint-7/reacceptance3-authorization-receipt.json).
+M4 deterministicfix giữ knownaccesshotelverification qua unrelatedpending chỉ khi accesscógiátrị và không tự pending/wholeobjectpending. Absent/accesspending/wholepending vẫn hỏi guest, không tự chứng nhận hotelcapability. Browser cảPine1/2 từ chối hard_bed_types hoặc pendinghard_bed_types không được khách yêu cầu. Không NLparser/alias/dropbadstate/validatorweakening/capincrease; existingclear-only/set-only/currentUUID/canonicalquestion/Frenchprojectionguards giữ nguyên.
 
-State halted4/8 SHA `e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b`. Root chỉ ghi semanticPASS receipts01–03 sauQ; không04. City stale409 và selections dùng0provider. Tất cả8outputs≤700tokens, providercalls≤25s, HTTPturns≤45s. Allowance đã hết; không call thêm sau bản sửa.
+[Finalmanifest](evidence/sprint-7/candidate-manifest-reacceptance4-final-remediation.json) · [Independentreview](evidence/sprint-7/q-review-reacceptance4-final-remediation.json) · [Localgates](evidence/sprint-7/reacceptance4-final-remediation-local-gates.json): **280contracts/architecture/API PASS**(3existingwarnings),**16isolatedPG PASS**(1existingwarning), Ruff/compile/diff/NodeSyntaxSmokePASS. Builder194focusedPASS; Q6focusedPASS cùng exactcapture/VI+FRknownaccess/unrelatedpending/absent+pendingnegatives/validPineproducer+driver mutants. Không cộng tests chồng nhau thành unique totals. Frontend53pins không đổi: dùng lại40tests/lint/typecheck/build. Defaulttests/startup0liveLLM; PG dùng isolatedstaylead_sprint7, actualacceptanceDB chỉ read-only ngoài approvedbrowserrun.
 
-[Final offline manifest0eb86e8c](evidence/sprint-7/candidate-manifest-reacceptance3-final-pine.json),237pins · [Local gates](evidence/sprint-7/reacceptance3-final-pine-local-gates.json):275contracts/architecture/API PASS(3existingwarnings),16isolatedPG PASS(1existingwarning), Ruff/compile/diff PASS. Builder81focusedcontracts +1newfakeAPI/PG regression PASS. Không cộng các suite chồng nhau thành số tests độc lập. Frontend53pins không đổi: dùng lại40tests/lint/typecheck/build; controls không đổi sau actual345a7141: dùng lại Node syntax/smoke. Defaulttests/startup không gọi LLM thật; PGtest dùng `staylead_sprint7`, không ghi database nghiệm thu. Q kiểm tra actualDB bằng transaction read-only.
+Các clear/questionfieldfix trước tại0eb vẫn có fakeAPI→PG proof: samechildage7→8/guardian/date, clearbothhardaccess, FrenchLOFT2.2m/night×2=4.4m knownbase, unknownchildfees/nulltotal,persistedFrench. Actualfullchain đó vẫn chưa được nghiệm thu.
 
-[Review cuối](evidence/sprint-7/q-review-reacceptance3-final-pine.json) xác nhận237repo/snapshotpins/digest, đúng7filedelta, originalbadclear và fieldalias bị loại, positive/negative probes đạt; reviewer không gọi model hoặc ghi actualDB. AcceptedCity/Family/B07 tiếp tục hợp lệ, proposalPine2/4 là scope tối thiểu còn lại.
+## Backlog
 
-Raw model/API captures, configs/signingsecret, DBdumps và screenshots chỉ local0600; public chỉ source/authoredcases và summaries/hashes đã lọc.
-
-## Backlog và phần còn lại
-
-| Story | Đã kiểm chứng | Còn thiếu | Trạng thái |
+| Story | Đã kiểm chứng | Còn thiếu | State |
 | --- | --- | --- | --- |
-| #28 B07 | Actual technicalpilot bookingintent/trust/language/privacy, independentAC1–3 PASS | Không có trong phạm vi được duyệt; không claim endpointbooking thật hoạt động | Done/closed |
-| #39 C01 | Citychain, Familychain, Pineinitial; M4/source/math/state/UI guards | Actual Pine hardaccess→samechildage8/clear/French/currentselection trên bản sửa; fullAC1–8 | Blocked |
-| #98 S7-F1 | Nguyên nhân/capture/counterfactual và bản sửa offline hiện hành | Actual Pinechain trên bản sửa | Blocked / Sprint7 / P0 |
-| #97 điều phối | Team/limits/gates/accepted evidence được giữ | FullactualAC/DoD/delivery | Blocked |
+| #28 B07 | ActualtechnicalpilotAC1–3 PASS | None trong scopeđượcduyệt | Done/closed |
+| #39 C01 | City/Familychains, priorPineinitial; offlineM4/math/source/state/UI guards | FreshPinehardaccess→samechildage8/clearboth/French/currentselection; fullAC1–8 | Blocked |
+| #98 S7-F1 | Exactrootcauses/attempts/evidence/currentofflinefixreviewed | ActualPinesemanticacceptance/profiledecision | Blocked / Sprint7 / P0 |
+| #97 coordination | Team/gates/closedlimits/evidence maintained | FullAC/DoD/verifieddelivery | Blocked |
 
-#98 là follow-up hiện có cho các defect liên quan; cập nhật problem/impact/attempts/evidence/AC/epicE3/priorityP0/affected#39/#97, không tạo trùng hoặc âm thầm defer. B07 và acceptedCity/Family giữ nguyên.
+Existing#98 giữ đầy đủproblem/impact/attempts/evidence/AC/epicE3/priorityP0/affected#39/#97; không tạo story trùng, defer ngầm hoặc mở lạiB07. Failure histories bất biến.
 
-## Đề xuất manual còn lại — chưa được phép
+## Đề xuất mới — Pine2/4 với Sol/low, chưa được phép
 
-[Proposal reacceptance4](evidence/sprint-7/reacceptance4-cases-proposed.json): **freshPine2lượt/tối đa4requests**, đúng hai câu gốc (R3turn3→4, sourcecase7→8), giữ gpt-6-luna/low,2calls/lượt,25sprovider/45sturn/700output,noautomaticretry/stopfirstblockingfailure. City/Family/B07 dùng lại PASS. Proposal `authorized_for_live_calls:false`, không có newconfig/state/inference. Chỉ hỏi allowance MỚI sau concrete reviewedpublication; không hỏi lại hoặc dùng lại4/8 đã đóng.
+[Proposalreacceptance5](evidence/sprint-7/reacceptance5-sol-cases-proposed.json) dùng **đúng hai Pinecaseobjects/câu gốc**, một phiênfresh, max2guest/4requests,2calls/lượt,25sprovider/45sturn/700output,noautomaticretry/firstblockingfailurestop/nofallback. City/Family/B07 không chạy lại. Đề xuất đổi riêng inferenceprofile từgpt-6-luna/low sang **gpt-6.1-sol/low** vì primarysemanticmisclassification vẫn lặp; builder vẫnLuna/high, reviewerSol/high. Không tự đổi currentruntimeMODEL hoặc defaults, chưa newconfig/state/inference. Cần explicitNEWallowance và modelchangeapproval sau concretepublication; không tái dùng phần dư1/2 đã đóng.
 
-Q đánh giá fullC01AC1–8 sau actual/reuse; chỉ Done/merge ownPR99 khi đầy đủAC/DoD/localgates/review và GitHub cho phép. Không manualCI/rerun/waitgate, bypasscheck, Grok/deploy/newpaidresources/main/otherPRmerge/broaderclosure. Workflow tự động có thể chạy sau branchupdate; không claimCI PASS.
+[OpenAI Docs](https://developers.openai.com/api/docs/models/gpt-6.1-sol) xác nhận Sol hỗ trợlow vàstructuredoutputs; localCLImetadata có Sol/low. Điều đó không chứng minh accountaccess thực tế, comparativequality,25s/700success hoặc chi phí. Không có controlledcomparison/guaranteedfix/savingsclaim; đây là boundedtrialproposal, authorizedfalse. CácAC/DoD/source/state/semanticguards giữ nguyên; fullactualQ trướcDone/ownPR99mergekhiGitHubchophép.
 
-## Usage và delivery
+## Usage/delivery
 
-[Observed usage R3](evidence/sprint-7/reacceptance3-observed-usage.json):8responses report98877input/3178outputtokens, kể cả failure; tổng lifetime44requests gồm36trước đó. Agenttokens và billingamount không có; số liệu adapter không phải claim hóa đơn. [R2usage](evidence/sprint-7/reacceptance2-observed-usage.json) và lịch sử giữ nguyên.
+[ObservedR4usage](evidence/sprint-7/reacceptance4-observed-usage.json):2responses report24865input/514outputtokens, lifetime46 gồm44trước đó; agenttokens/billingamount không có. Unused1guest2requests đóng, không reset/transfer. API/browserstopped; rawmodel/API/config/signingsecret/DBdumps/screenshots local0600; public chỉsource/authoredcases và sanitizedsummaries/hashes.
 
-Acceptedbaseline `a46a63eb4b589b8518f9477ebd66e81d89a0f054`; publishedHEAD trước recovery này `ba37ca1be1ad32a660227126a57aa0ff93c00edf`. Commit/tree publication mới ghi trong PR/backlog và deliveryreceipt saureview. PR99 vẫnDraft/unmerged. Ba synthetic hotels/chín roomtypes không chứng minh realhotelapproval/liveavailability; bookingdestinations là ví dụ.
+Ownbranch `sprint-7-room-advisory`; acceptedbaseline `a46a63eb4b589b8518f9477ebd66e81d89a0f054`; publishedHEAD trước recovery này `4548c181448a07a8788755af1a170f97579bd382`. Publicationcommit/tree mới ghi trong PR/backlog/deliveryreceipt sau review. PR99Draft/unmerged/baseSprint5; no manualCI/rerun/waitgate/checkbypass/Grok/deploy/newpaidresources/main/otherPRmerge/broaderclosure. Automaticworkflows có thể chạy sau branchupdate; không claimCI PASS. Synthetic3hotels/9roomtypes không chứng minh realhotelapproval/liveavailability; bookingdestinations là ví dụ.
 
 ## Historical actual failures — retained evidence
 

@@ -482,6 +482,57 @@ def test_accessibility_confirmation_message_requires_saved_nonpending_needs(save
     assert "known_hard_accessibility_needs" not in result.explanation_inputs
 
 
+def test_known_accessibility_confirmation_survives_unrelated_bed_type_clarification() -> None:
+    room, rate = _catalog(), _rate()
+    context = replace(_context({
+        "party": {"adults": 1, "children": []},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry", "wheelchair bathroom"]},
+    }, (room, rate)), locale="vi", pending_fields=("room_requirements.hard_bed_types",))
+    draft = RoomAdviceDraft("needs_clarification", questions=(
+        {"field": "room_requirements.hard_accessibility_needs"},
+        {"field": "room_requirements.hard_bed_types"},
+    ))
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(context=context, draft=draft))
+
+    assert result.status == "needs_clarification"
+    assert result.options == ()
+    assert result.explanation_inputs["known_hard_accessibility_needs"] is True
+    access_question = next(question for question in result.questions
+                           if question["field"] == "room_requirements.hard_accessibility_needs")
+    type_question = next(question for question in result.questions
+                         if question["field"] == "room_requirements.hard_bed_types")
+    assert access_question["presentation_key"] == "question.accessibility_confirmation"
+    assert "Tôi đã ghi nhận yêu cầu tiếp cận" in access_question["reason"]
+    assert "nhờ khách sạn xác nhận" in access_question["reason"]
+    assert type_question["presentation_key"] == "question.room"
+    assert type_question["reason"] == "Tôi nên áp dụng yêu cầu phòng nào?"
+
+
+@pytest.mark.parametrize("saved_needs,pending_fields", [
+    (None, ("room_requirements.hard_bed_types",)),
+    (["step-free entry"], ("room_requirements.hard_accessibility_needs", "room_requirements.hard_bed_types")),
+    (["step-free entry"], ("room_requirements",)),
+])
+def test_unrelated_pending_does_not_confirm_absent_or_pending_access_needs(saved_needs, pending_fields) -> None:
+    room, rate = _catalog(), _rate()
+    requirements = {"hard_accessibility_needs": saved_needs} if saved_needs else {}
+    context = replace(_context({
+        "party": {"adults": 1, "children": []}, "room_requirements": requirements,
+    }, (room, rate)), locale="vi", pending_fields=pending_fields)
+    draft = RoomAdviceDraft("needs_clarification", questions=(
+        {"field": "room_requirements.hard_accessibility_needs"},
+    ))
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(context=context, draft=draft))
+
+    question = next(item for item in result.questions
+                    if item["field"] == "room_requirements.hard_accessibility_needs")
+    assert question["presentation_key"] == "question.room"
+    assert question["reason"] == "Tôi nên áp dụng yêu cầu phòng nào?"
+    assert "known_hard_accessibility_needs" not in result.explanation_inputs
+
+
 def test_preparation_native_and_pydantic_intents_are_in_parity_and_support_booking() -> None:
     assert set(get_args(GuestTurnIntent)) == set(TURN_INTENTS)
     assert FactSelection.model_validate({"turn_intents": ["booking_request"]}).turn_intents == ["booking_request"]

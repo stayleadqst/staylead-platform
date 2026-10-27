@@ -61,8 +61,9 @@ class Sprint7HarnessTests(unittest.TestCase):
             "run_id": runtime.RUN_ID, "authority": "offline synthetic test",
             "candidate_sha256": self.candidate_sha, "matrix_sha256": self.matrix_sha,
             "authorized_for_live_calls": True, "status": "authorized",
-            "max_guest_turns": 4, "max_codex_requests": 8, "max_calls_per_turn": 2,
-            "reserved_guest_turn_budget": 4, "reserved_request_budget": 8,
+            "max_guest_turns": runtime.MAX_GUEST_TURNS, "max_codex_requests": runtime.MAX_REQUESTS,
+            "max_calls_per_turn": runtime.MAX_CALLS_PER_TURN,
+            "reserved_guest_turn_budget": runtime.MAX_GUEST_TURNS, "reserved_request_budget": runtime.MAX_REQUESTS,
             "guest_turns": 0, "codex_requests": 0, "approved_case_turn": 0,
             "prior_allocation_state_sha256": runtime.PRIOR_STATE_SHA256,
         }
@@ -120,24 +121,24 @@ class Sprint7HarnessTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         report = json.loads(result.stdout)
         self.assertEqual(report["batch_namespace"], runtime.RUN_ID)
-        self.assertEqual((report["guest_turn_cap"], report["request_cap"]), (4, 8))
+        self.assertEqual((report["guest_turn_cap"], report["request_cap"]), (2, 4))
         self.assertEqual(report["fresh_counters"], {"guest_turns": 0, "codex_requests": 0})
         self.assertTrue(report["no_browser"] and report["no_api_or_model"])
 
     def test_fresh_caps_and_closed_prior_receipt_are_exact(self):
         self.assertTrue(runtime._valid_state(self.state, self.config, fresh=True))
-        self.assertEqual(runtime.RUN_ID, "s7-room-advice-20261027-reacceptance3")
+        self.assertEqual(runtime.RUN_ID, "s7-room-advice-20261027-reacceptance4")
         self.assertEqual(runtime.CASE_RUN_ID, runtime.RUN_ID)
-        self.assertEqual((runtime.MAX_GUEST_TURNS, runtime.MAX_REQUESTS, runtime.MAX_CALLS_PER_TURN), (4, 8, 2))
+        self.assertEqual((runtime.MAX_GUEST_TURNS, runtime.MAX_REQUESTS, runtime.MAX_CALLS_PER_TURN), (2, 4, 2))
         self.assertEqual((runtime.PROVIDER_TIMEOUT_SECONDS, runtime.TURN_TIMEOUT_SECONDS,
                           runtime.MAX_OUTPUT_TOKENS, runtime.MODEL, runtime.EFFORT),
                          (25.0, 45.0, 700, "gpt-6-luna", "low"))
         prior = runtime._prior_allocation_record()
-        self.assertEqual((prior["guest_turns"], prior["codex_requests"], prior["lifetime_requests"]), (6, 11, 36))
+        self.assertEqual((prior["guest_turns"], prior["codex_requests"], prior["lifetime_requests"]), (4, 8, 44))
         self.assertEqual(prior["state_sha256"], runtime.PRIOR_STATE_SHA256)
         for changed in (
-            {**self.state, "max_guest_turns": 5},
-            {**self.state, "max_codex_requests": 9},
+            {**self.state, "max_guest_turns": 3},
+            {**self.state, "max_codex_requests": 5},
             {**self.state, "guest_turns": 1, "approved_case_turn": 1},
             {**self.state, "codex_requests": True},
             {**self.state, "prior_allocation_state_sha256": "0" * 64},
@@ -150,10 +151,10 @@ class Sprint7HarnessTests(unittest.TestCase):
             runtime._verify_closed_prior_allocation(altered)
 
     def test_old_authorization_cannot_be_reused_for_new_namespace(self):
-        old_state = {**self.state, "run_id": "s7-room-advice-20261027-reacceptance2-cont1"}
-        old_config = {**self.config, "run_id": "s7-room-advice-20261027-reacceptance2-cont1"}
+        old_state = {**self.state, "run_id": runtime.PRIOR_RUN_ID}
+        old_config = {**self.config, "run_id": runtime.PRIOR_RUN_ID}
         self.assertFalse(runtime._valid_state(old_state, old_config))
-        self.assertNotEqual(runtime.LEASE_PATH.name, "staylead-s7-s7-room-advice-20261027-reacceptance2-cont1.process.lock")
+        self.assertNotEqual(runtime.LEASE_PATH.name, f"staylead-s7-{runtime.PRIOR_RUN_ID}.process.lock")
 
     def test_explicit_live_opt_in_and_0600_private_file_are_required(self):
         with self._env(), self.assertRaisesRegex(RuntimeError, "STAYLEAD_LIVE_EVAL=1"):
@@ -195,7 +196,7 @@ class Sprint7HarnessTests(unittest.TestCase):
                 runtime.LEASE_FD = first_fd
 
     def test_question_allowlist_rejects_before_turn_reservation(self):
-        self._replace_cases(["approved one", "approved two", "approved three", "approved four"])
+        self._replace_cases(["approved one", "approved two"])
         self.state["status"] = "running"
         self._write(self.state_path, self.state)
         with self._lease(), self._env():
@@ -216,7 +217,7 @@ class Sprint7HarnessTests(unittest.TestCase):
         from staylead_platform.composition.dependencies import guest_chat
         from staylead_platform.entrypoints import app as app_module
 
-        self._replace_cases(["approved one", "approved two", "approved three", "approved four"])
+        self._replace_cases(["approved one", "approved two"])
 
         class CountingProvider:
             calls = 0
@@ -256,17 +257,17 @@ class Sprint7HarnessTests(unittest.TestCase):
                 runtime._release_process_lease()
 
     def test_case_and_oracle_hashes_are_checked_before_reservation(self):
-        self._replace_cases(["approved one", "approved two", "approved three", "approved four"])
+        self._replace_cases(["approved one", "approved two"])
         self.state["status"] = "running"
         self._write(self.state_path, self.state)
         original = self.live_cases_path.read_bytes()
         self.live_cases_path.write_text('{"cases":["changed"]}', encoding="utf-8")
         with self._lease(), self._env(), self.assertRaisesRegex(RuntimeError, "case matrix or independent oracle changed"):
-            runtime._reserve("guest_turns", 4, "guest turn")
+            runtime._reserve("guest_turns", runtime.MAX_GUEST_TURNS, "guest turn")
         self.assertEqual(json.loads(self.state_path.read_text())["guest_turns"], 0)
         self.live_cases_path.write_bytes(original)
         with self._lease(), self._env():
-            self.assertEqual(runtime._reserve("guest_turns", 4, "guest turn"), 1)
+            self.assertEqual(runtime._reserve("guest_turns", runtime.MAX_GUEST_TURNS, "guest turn"), 1)
 
     def test_provider_failure_keeps_reserved_request_and_halts(self):
         class BrokenProvider:
@@ -322,9 +323,60 @@ class Sprint7HarnessTests(unittest.TestCase):
         script = f'''import {{ selectionOptionForAcceptanceTurn }} from "{helper}";
 import assert from "node:assert/strict";
 const room = {{ options: [{{ option_id: "current" }}] }};
-for (const turn of [1, 2, 4]) assert.equal(selectionOptionForAcceptanceTurn(turn, room), room.options[0]);
-assert.equal(selectionOptionForAcceptanceTurn(3, {{ status: "needs_clarification", options: [] }}), null);
+assert.equal(selectionOptionForAcceptanceTurn(2, room), room.options[0]);
+for (const turn of [1, 3, 4]) assert.equal(selectionOptionForAcceptanceTurn(turn, room), null);
+assert.equal(selectionOptionForAcceptanceTurn(1, {{ status: "needs_clarification", options: [] }}), null);
 assert.equal(selectionOptionForAcceptanceTurn(5, room), null);
+'''
+        result = subprocess.run(["node", "--input-type=module", "-e", script], cwd=repo,
+                                text=True, capture_output=True, check=False, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_actual_pine_brief_guard_rejects_unrequested_budget_on_both_turns(self):
+        repo = Path(__file__).parents[2]
+        browser = repo / "tools/evals/sprint7_browser.mjs"
+        helper = (repo / "tools/evals/sprint7_browser_helpers.mjs").as_uri()
+        script = f'''import fs from "node:fs";
+import assert from "node:assert/strict";
+import {{ checkPinePartyBrief, retainsTwoHardAccessibilityNeeds }} from "{helper}";
+const source = fs.readFileSync({json.dumps(str(browser))}, "utf8");
+const start = source.indexOf("function checkBrief(");
+assert.notEqual(start, -1);
+const open = source.indexOf("{{", start);
+let depth = 0;
+let end = -1;
+for (let index = open; index < source.length; index += 1) {{
+  if (source[index] === "{{") depth += 1;
+  if (source[index] === "}}" && --depth === 0) {{ end = index + 1; break; }}
+}}
+assert.notEqual(end, -1);
+const expectedBrief = {{
+  1: {{ adults: 1, children: [7], dates: ["2026-11-10", "2026-11-12", 2] }},
+  2: {{ adults: 1, children: [8], dates: ["2026-11-10", "2026-11-12", 2] }},
+}};
+const members = new Map([["fresh-pine", "child-current-id"]]);
+const checkBrief = new Function("expectedBrief", "childIdsBySession", "checkPinePartyBrief",
+  "retainsTwoHardAccessibilityNeeds", "assert", `${{source.slice(start, end)}}; return checkBrief;`) (
+    expectedBrief, members, checkPinePartyBrief, retainsTwoHardAccessibilityNeeds,
+    (condition, message) => {{ if (!condition) throw new Error(message); }});
+function brief(age) {{ return {{ party: {{ adults: 1, children: [{{ member_id: "child-current-id", age }}],
+  guardians: {{ "child-current-id": "adult-1" }}, bed_sharing: [{{
+    member_ids: ["adult-1", "child-current-id"], allow_share: true }}] }},
+  dates: {{ check_in: "2026-11-10", check_out: "2026-11-12", nights: 2 }},
+  pending_fields: [], room_requirements: {{ hard_accessibility_needs: age === 7 ? ["step_free", "wheelchair_bathroom"] : [],
+    hard_bed_types: [] }} }}; }}
+assert.equal(checkBrief(1, brief(7)), "child-current-id");
+assert.equal(checkBrief(2, brief(8)), "child-current-id");
+for (const turn of [1, 2]) assert.throws(() => checkBrief(turn, {{ ...brief(turn === 1 ? 7 : 8),
+  room_requirements: {{ ...brief(turn === 1 ? 7 : 8).room_requirements, budget_amount: 1 }} }}),
+  /invented an unrequested budget/);
+for (const turn of [1, 2]) {{
+  const current = brief(turn === 1 ? 7 : 8);
+  assert.throws(() => checkBrief(turn, {{ ...current, room_requirements: {{
+    ...current.room_requirements, hard_bed_types: ["king"] }} }}), /invented or left pending/);
+  assert.throws(() => checkBrief(turn, {{ ...current, pending_fields: ["room_requirements.hard_bed_types"] }}),
+    /invented or left pending/);
+}}
 '''
         result = subprocess.run(["node", "--input-type=module", "-e", script], cwd=repo,
                                 text=True, capture_output=True, check=False, timeout=15)
@@ -375,43 +427,45 @@ assert.equal(checkPinePartyBrief({{ ...pine, party: {{ ...pine.party, bed_sharin
                                 text=True, capture_output=True, check=False, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    @unittest.skipUnless(Path("/private/tmp/staylead-s7-reacceptance3-cases.json").is_file()
-                         and Path("/private/tmp/staylead-s7-reacceptance3-authority.json").is_file(),
-                         "requires the coordinator-approved private reacceptance3 matrix")
-    def test_approved_matrix_exact_digest_four_turn_grouping_and_prior_receipt(self):
-        private_path = Path("/private/tmp/staylead-s7-reacceptance3-cases.json")
+    @unittest.skipUnless(Path("/private/tmp/staylead-s7-reacceptance4-cases.json").is_file()
+                         and Path("/private/tmp/staylead-s7-reacceptance4-authority.json").is_file(),
+                         "requires the coordinator-approved private reacceptance4 matrix")
+    def test_approved_matrix_exact_digest_two_pine_turns_and_prior_receipt(self):
+        private_path = Path("/private/tmp/staylead-s7-reacceptance4-cases.json")
         cases = runtime._private_file(private_path)
         self.assertEqual(runtime._file_sha256(private_path),
-                         "9a8d77345f34b0a1b3b77c560b676995883d5ca22781db5ad50fc5b13e4656e6")
+                         "dd7119bd77b717d22a15b1a3d381ee3351ae4e00678944bfcaa526577222832a")
         self.assertEqual(cases["run_id"], runtime.RUN_ID)
         self.assertTrue(cases["authorized_for_live_calls"])
         self.assertEqual((cases["proposed_max_guest_turns"], cases["proposed_max_requests"],
-                          cases["max_calls_per_turn"], len(cases["cases"])), (4, 8, 2, 4))
-        self.assertEqual([case["session"] for case in cases["cases"]],
-                         ["fresh-city", "fresh-city", "fresh-pine", "fresh-pine"])
-        self.assertEqual([case["turn"] for case in cases["cases"]], [1, 2, 3, 4])
+                          cases["max_calls_per_turn"], len(cases["cases"])), (2, 4, 2, 2))
+        self.assertEqual([case["session"] for case in cases["cases"]], ["fresh-pine", "fresh-pine"])
+        self.assertEqual([case["turn"] for case in cases["cases"]], [1, 2])
+        self.assertEqual([case["source_case"] for case in cases["cases"]], [7, 8])
+        self.assertEqual([case["approved_previous_turn"] for case in cases["cases"]], [6, 7])
         self.assertEqual(cases["no_automatic_retry"], True)
         self.assertEqual(cases["stop_at_first_blocking_failure"], True)
-        authority_path = Path("/private/tmp/staylead-s7-reacceptance3-authority.json")
+        authority_path = Path("/private/tmp/staylead-s7-reacceptance4-authority.json")
         authority = runtime._private_file(authority_path)
         self.assertEqual(authority["run_id"], runtime.RUN_ID)
         self.assertEqual(authority["case_matrix_sha256"], runtime._file_sha256(private_path))
         self.assertEqual((authority["max_guest_turns"], authority["max_codex_requests"],
-                          authority["max_calls_per_turn"]), (4, 8, 2))
+                          authority["max_calls_per_turn"]), (2, 4, 2))
         self.assertIsNone(authority["continuation"])
         self.assertEqual(authority["prior_allocation"], runtime._prior_allocation_record())
         prior = runtime._prior_allocation_record()
+        runtime._verify_closed_prior_allocation(prior)
         self.assertEqual((prior["run_id"], prior["guest_turns"], prior["codex_requests"],
                           prior["lifetime_requests"], prior["state_sha256"]),
-                         (runtime.PRIOR_RUN_ID, 6, 11, 36, runtime.PRIOR_STATE_SHA256))
+                         (runtime.PRIOR_RUN_ID, 4, 8, 44, runtime.PRIOR_STATE_SHA256))
 
-    def test_browser_run_directory_is_unique_to_reacceptance3_namespace(self):
+    def test_browser_run_directory_is_unique_to_reacceptance4_namespace(self):
         repo = Path(__file__).parents[2]
         helper = (repo / "tools/evals/sprint7_browser_helpers.mjs").as_uri()
         script = f'''import {{ browserRunDirectory }} from "{helper}";
 import assert from "node:assert/strict";
-assert.equal(browserRunDirectory("s7-room-advice-20261027-reacceptance3", "r1"),
-  "/private/tmp/staylead-s7-browser-s7-room-advice-20261027-reacceptance3-r1");
+assert.equal(browserRunDirectory("s7-room-advice-20261027-reacceptance4", "r1"),
+  "/private/tmp/staylead-s7-browser-s7-room-advice-20261027-reacceptance4-r1");
 assert.throws(() => browserRunDirectory("../overwrite", "r2"), /Invalid private browser run directory/);
 '''
         result = subprocess.run(["node", "--input-type=module", "-e", script], cwd=repo,
@@ -445,12 +499,12 @@ for (const bad of [{{ ...expected, verdict: "fail" }}, {{ ...expected, approved_
         self.assertIn('"status": 200', value)
 
     def test_initializer_binds_fresh_approval_to_matrix_candidate_and_never_overwrites(self):
-        self._replace_cases(["approved one", "approved two", "approved three", "approved four"])
+        self._replace_cases(["approved one", "approved two"])
         approval = self.root / "approval.json"
         config_path = self.root / "new-runtime.json"
         state_path = self.root / "new-state.json"
         record = {"run_id": runtime.RUN_ID, "authorized_for_live_calls": True,
-            "authority": "approved synthetic test", "max_guest_turns": 4, "max_codex_requests": 8,
+            "authority": "approved synthetic test", "max_guest_turns": 2, "max_codex_requests": 4,
             "max_calls_per_turn": 2, "model": runtime.MODEL, "effort": runtime.EFFORT,
             "provider_timeout_seconds": 25, "turn_timeout_seconds": 45, "output_cap": 700,
             "case_matrix_sha256": self.matrix_sha, "prior_allocation": self.prior_allocation,
@@ -471,7 +525,7 @@ for (const bad of [{{ ...expected, verdict: "fail" }}, {{ ...expected, approved_
                 session_signing_secret="synthetic")
         new_state = runtime._private_file(state_path)
         self.assertEqual((new_state["guest_turns"], new_state["codex_requests"],
-                          new_state["reserved_guest_turn_budget"], new_state["reserved_request_budget"]), (0, 0, 4, 8))
+                          new_state["reserved_guest_turn_budget"], new_state["reserved_request_budget"]), (0, 0, 2, 4))
         self.assertIsNone(runtime._private_file(config_path)["continuation"])
         before = state_path.read_bytes()
         with self.assertRaisesRegex(RuntimeError, "Refusing to initialize"):

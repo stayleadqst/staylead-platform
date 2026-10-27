@@ -670,6 +670,11 @@ server validates phrases and inserts checked amount/currency values itself.
             pending.add("room_requirements.budget_strength")
         if "room_requirements.budget_strength" in pending:
             questions.append({"field": "room_requirements.budget_strength"})
+        has_known_nonpending_access_needs = (
+            bool(requirements.get("hard_accessibility_needs"))
+            and "room_requirements.hard_accessibility_needs" not in pending
+            and "room_requirements" not in pending
+        )
         other_pending_room_requirements = (
             pending - {"room_requirements.budget_strength"}
             if budget_strength_unknown else pending
@@ -678,19 +683,21 @@ server validates phrases and inserts checked amount/currency values itself.
             field.startswith("room_requirements.") for field in other_pending_room_requirements
         ):
             questions.append({"field": "room_advice"})
+            explanation_inputs = {"unknowns": ["room requirements"]}
+            if has_known_nonpending_access_needs:
+                explanation_inputs["known_hard_accessibility_needs"] = True
             result = RoomAdviceResult(
                 status="needs_clarification", brief_version=context.brief_version,
                 source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
                 questions=tuple(questions),
-                explanation_inputs={"unknowns": ["room requirements"]},
+                explanation_inputs=explanation_inputs,
                 hotel_answer=draft.hotel_answer,
             )
             return relocalize_checked(result)
         if draft.status != "ready" or not draft.options:
             explanation_inputs = {"unknowns": ["no checked room candidate"]}
-            if (requirements.get("hard_accessibility_needs")
-                    and "room_requirements.hard_accessibility_needs" not in pending):
+            if has_known_nonpending_access_needs:
                 explanation_inputs["known_hard_accessibility_needs"] = True
             result = RoomAdviceResult(
                 status=(draft.status if draft.status != "ready" else "needs_clarification"),

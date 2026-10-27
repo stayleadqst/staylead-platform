@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Bounded fresh four-turn production-browser acceptance for one reviewed candidate.
- * Starts fresh City and Pine sessions and submits only approved case text once.
+ * Bounded fresh two-turn Pine production-browser acceptance for one reviewed candidate.
+ * Starts one fresh Pine session and submits only approved case text once.
  * Selection/replay/GET checks use zero provider requests; stop at first blocker.
  * Screenshots and turn payloads remain private beneath /private/tmp.
  */
@@ -10,21 +10,21 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { browserRunDirectory, retainsTwoHardAccessibilityNeeds,
-  roomAdviceHardChecksConsistent, hasExactBedSharingConsent, semanticReviewReceiptValid,
+  roomAdviceHardChecksConsistent, semanticReviewReceiptValid,
   selectionOptionForAcceptanceTurn, hasUsefulVietnameseAccessibilityVerification,
-  checkCity2Brief, hasDistinctAssignedBeds, hasUsefulRoomOptions, checkPinePartyBrief }
+  hasUsefulRoomOptions, checkPinePartyBrief }
   from "./sprint7_browser_helpers.mjs";
 import { validateSourceRefs } from "./sprint7_source_refs.mjs";
 
 const repo = process.cwd();
-const RUN_ID = "s7-room-advice-20261027-reacceptance3";
+const RUN_ID = "s7-room-advice-20261027-reacceptance4";
 const CASE_RUN_ID = RUN_ID;
-const PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance2-cont1";
-const PRIOR_STATE_SHA256 = "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5";
+const PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance3";
+const PRIOR_STATE_SHA256 = "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b";
 const START_GUEST_TURNS = 0;
 const START_REQUESTS = 0;
-const APPROVED_CASE_TURNS = [1, 2, 3, 4];
-const HOTEL_ID = { "harbor-city-demo": "HTL-CITY01", "pine-ridge-demo": "HTL-RETREAT03" };
+const APPROVED_CASE_TURNS = [1, 2];
+const HOTEL_ID = { "pine-ridge-demo": "HTL-RETREAT03" };
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 const envPath = (key) => {
@@ -35,7 +35,7 @@ const envPath = (key) => {
 
 if (process.argv.includes("--offline-harness-smoke")) {
   console.log(JSON.stringify({ status: "offline-harness-smoke-ok", batch_namespace: RUN_ID,
-    guest_turn_cap: 4, request_cap: 8, fresh_counters: { guest_turns: 0, codex_requests: 0 },
+    guest_turn_cap: 2, request_cap: 4, fresh_counters: { guest_turns: 0, codex_requests: 0 },
     no_browser: true, no_api_or_model: true }));
   process.exit(0);
 }
@@ -51,7 +51,7 @@ const state = JSON.parse(await fs.readFile(statePath, "utf8"));
 const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 assert(state.run_id === RUN_ID && config.run_id === RUN_ID
   && state.candidate_sha256 === config.candidate_sha256 && state.matrix_sha256 === config.matrix_sha256,
-"Private config/state is not the authorized fresh reacceptance3 namespace");
+"Private config/state is not the authorized fresh reacceptance4 namespace");
 const casesPath = process.env.STAYLEAD_S7_LIVE_CASES ?? config.live_cases_path;
 const oraclePath = config.oracle_path;
 assert(path.resolve(casesPath) === path.resolve(config.live_cases_path), "Case file differs from the candidate pin");
@@ -61,40 +61,41 @@ const cases = JSON.parse(casesRaw.toString("utf8"));
 const oracle = JSON.parse(oracleRaw.toString("utf8"));
 assert(sha(casesRaw) === state.matrix_sha256 && sha(oracleRaw) === config.oracle_sha256,
   "Approved case matrix or independent oracle changed");
-assert(cases.run_id === CASE_RUN_ID && cases.authorized_for_live_calls === true && cases.cases?.length === 4,
-  "Approved reacceptance3 case matrix is invalid");
-assert(cases.proposed_max_guest_turns === 4 && cases.proposed_max_requests === 8
+assert(cases.run_id === CASE_RUN_ID && cases.authorized_for_live_calls === true && cases.cases?.length === 2,
+  "Approved reacceptance4 case matrix is invalid");
+assert(cases.proposed_max_guest_turns === 2 && cases.proposed_max_requests === 4
   && cases.max_calls_per_turn === 2 && cases.provider_timeout_seconds === 25
   && cases.turn_timeout_seconds === 45 && cases.output_cap === 700
   && cases.model === "gpt-6-luna" && cases.effort === "low"
   && cases.no_automatic_retry === true && cases.stop_at_first_blocking_failure === true,
 "Approved global caps or stop rules changed");
 assert(state.status === "running" && state.authorized_for_live_calls === true
-  && state.max_guest_turns === 4 && state.max_codex_requests === 8 && state.max_calls_per_turn === 2
-  && state.reserved_guest_turn_budget === 4 && state.reserved_request_budget === 8
+  && state.max_guest_turns === 2 && state.max_codex_requests === 4 && state.max_calls_per_turn === 2
+  && state.reserved_guest_turn_budget === 2 && state.reserved_request_budget === 4
   && state.guest_turns === START_GUEST_TURNS && state.codex_requests === START_REQUESTS
   && state.approved_case_turn === START_GUEST_TURNS && config.continuation === null,
 "Fresh counters or approved-case position differ from the authorized 0/0 namespace");
 const prior = config.prior_allocation;
 assert(prior?.run_id === PRIOR_RUN_ID && prior.status === "halted"
-  && prior.guest_turns === 6 && prior.codex_requests === 11 && prior.lifetime_requests === 36
-  && prior.state_sha256 === PRIOR_STATE_SHA256 && prior.unused_guest_slots === 1
-  && prior.unused_request_slots === 3 && prior.unused_slots === "closed; no replay/reset/reallocation"
-  && prior.actual_outcome?.city1 === "PASS" && prior.actual_outcome?.city2 === "FAIL invented hard twin"
-  && prior.actual_outcome?.family3_5 === "PASS" && prior.actual_outcome?.pine6 === "FAIL invented child-1; HTTP500"
-  && prior.actual_outcome?.pine7 === "Blocked dependency; not attempted" && prior.no_further_calls === true,
-"Prior allocation receipt differs from the exact closed 6/11 receipt");
-const priorPath = "/private/tmp/staylead-s7-reacceptance2-cont1-state.json";
+  && prior.guest_turns === 4 && prior.codex_requests === 8 && prior.lifetime_requests === 44
+  && prior.state_sha256 === PRIOR_STATE_SHA256 && prior.unused_guest_slots === 0
+  && prior.unused_request_slots === 0
+  && prior.actual_outcome?.city1 === "PASS" && prior.actual_outcome?.city2 === "PASS"
+  && prior.actual_outcome?.pine3 === "PASS"
+  && prior.actual_outcome?.pine4 === "FAIL failed explicit access relaxation; no semantic receipt4"
+  && prior.runners === "API46945/browser9109 stopped; no retry",
+"Prior allocation receipt differs from the exact closed 4/8 receipt");
+const priorPath = "/private/tmp/staylead-s7-reacceptance3-state.json";
 const priorInfo = await fs.lstat(priorPath);
 assert(priorInfo.isFile() && !priorInfo.isSymbolicLink() && (priorInfo.mode & 0o777) === 0o600,
   "Prior state receipt must remain a read-only private 0600 file");
 const priorRaw = await fs.readFile(priorPath);
 const priorState = JSON.parse(priorRaw.toString("utf8"));
 assert(sha(priorRaw) === PRIOR_STATE_SHA256 && priorState.run_id === PRIOR_RUN_ID
-  && priorState.status === "halted" && priorState.guest_turns === 6 && priorState.codex_requests === 11,
-"Prior state receipt is not the sealed halted 6/11 allocation");
+  && priorState.status === "halted" && priorState.guest_turns === 4 && priorState.codex_requests === 8,
+"Prior state receipt is not the sealed halted 4/8 allocation");
 assert(APPROVED_CASE_TURNS.every((turn) => cases.cases[turn - 1]?.turn === turn),
-"Fresh case matrix does not map all four cases to their approved slots");
+"Fresh case matrix does not map both cases to their approved slots");
 assert(oracle.synthetic === true && Array.isArray(oracle.global_invariants), "Independent oracle is not pinned");
 const dataRoot = path.join(repo, "fixtures/hospitality/knowledge-v1");
 const sourceData = {};
@@ -156,13 +157,11 @@ let browser;
 let context;
 let page;
 const expectedBrief = {
-  1: { adults: 2, children: [], dates: ["2026-11-10", "2026-11-13", 3] },
-  2: { adults: 2, children: [], dates: ["2026-11-10", "2026-11-13", 3] },
-  3: { adults: 1, children: [7], dates: ["2026-11-10", "2026-11-12", 2] },
-  4: { adults: 1, children: [8], dates: ["2026-11-10", "2026-11-12", 2] },
+  1: { adults: 1, children: [7], dates: ["2026-11-10", "2026-11-12", 2] },
+  2: { adults: 1, children: [8], dates: ["2026-11-10", "2026-11-12", 2] },
 };
 const childIdsBySession = new Map();
-let cityPriorResult = null;
+let pinePriorResult = null;
 async function awaitSemanticReview(turnNo, responseSha256) {
   const markerPath = path.join(runDir, `semantic-review-turn-${String(turnNo).padStart(2, "0")}.json`);
   const expected = { run_id: RUN_ID, candidate_sha256: state.candidate_sha256,
@@ -193,39 +192,22 @@ function checkBrief(turnNo, brief) {
   for (let index = 0; index < expected.children.length; index += 1) {
     assert(brief.party.children[index].age === expected.children[index], `turn ${turnNo} child age differs`);
   }
+  assert(checkPinePartyBrief(brief, expectedBrief[turnNo].children[0]),
+    `turn ${turnNo} lost child identity, guardian, or explicit bed-sharing consent`);
+  assert(brief.room_requirements?.budget_amount == null,
+    `Pine turn ${turnNo} invented an unrequested budget`);
+  assert(!(brief.room_requirements?.hard_bed_types ?? []).length
+    && !(brief.pending_fields ?? []).includes("room_requirements.hard_bed_types"),
+  `Pine turn ${turnNo} invented or left pending an unrequested hard bed type`);
   if (turnNo === 1) {
-    assert(brief.room_requirements?.budget_amount === 6_000_000
-      && brief.room_requirements?.budget_currency === "VND"
-      && brief.room_requirements?.budget_basis === "stay_total"
-      && brief.room_requirements?.budget_strength === "hard",
-    "City turn 1 did not preserve the explicit hard stay-total VND budget");
-    assert(hasExactBedSharingConsent(brief, ["adult-1", "adult-2"], true),
-      "City turn 1 did not retain explicit couple sharing consent");
-    assert(!(brief.room_requirements?.hard_bed_types ?? []).length,
-      "City turn 1 inferred an exact physical bed type from broad wording");
-    assert(brief.room_requirements?.max_rooms == null,
-      "City turn 1 inferred a room-count limit");
-  }
-  if (turnNo === 2) {
-    assert(checkCity2Brief(brief), "City turn 2 did not preserve hard budget and separate-bed intent");
-    assert(!(brief.room_requirements?.hard_bed_types ?? []).length,
-      "City turn 2 invented an unnamed physical bed type");
-  }
-  if (turnNo === 3 || turnNo === 4) {
-    assert(checkPinePartyBrief(brief, expectedBrief[turnNo].children[0]),
-      `turn ${turnNo} lost child identity, guardian, or explicit bed-sharing consent`);
-  }
-  if (turnNo === 3) {
     assert(retainsTwoHardAccessibilityNeeds(brief),
-      "Pine turn 3 did not preserve both hard accessibility needs");
-    assert(brief.room_requirements?.budget_amount == null, "Pine turn 3 invented a budget");
-  }
-  if (turnNo === 4) {
-    assert(brief.party.children?.[0]?.age === 8, "Pine turn 4 did not apply the explicit age correction");
+      "Pine turn 1 did not preserve both hard accessibility needs");
+  } else {
+    assert(brief.party.children?.[0]?.age === 8, "Pine turn 2 did not apply the explicit age correction");
     assert(!(brief.room_requirements?.hard_accessibility_needs ?? []).length,
-      "Pine turn 4 did not clear the explicitly relaxed access requirements");
+      "Pine turn 2 did not clear the explicitly relaxed access requirements");
     assert(brief.party.children?.[0]?.member_id === childIdsBySession.get("fresh-pine"),
-      "Pine turn 4 changed the child's stable member ID");
+      "Pine turn 2 changed the child's stable member ID");
   }
   return brief.party.children?.[0]?.member_id ?? null;
 }
@@ -309,8 +291,7 @@ try {
   context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   page = await context.newPage();
   const groups = [
-    { session: "fresh-city", hotel: "harbor-city-demo", turns: [1, 2] },
-    { session: "fresh-pine", hotel: "pine-ridge-demo", turns: [3, 4] },
+    { session: "fresh-pine", hotel: "pine-ridge-demo", turns: [1, 2] },
   ];
   for (const group of groups) {
     const hotelId = HOTEL_ID[group.hotel];
@@ -348,67 +329,48 @@ try {
       const payload = JSON.parse(responseText);
       const brief = payload.guest_brief;
       const childId = checkBrief(turnNo, brief);
-      if (turnNo === 3) childIdsBySession.set(group.session, childId);
+      if (turnNo === 1) childIdsBySession.set(group.session, childId);
       const room = checkRoom(turnNo, payload.room_advice, hotelId, brief);
-      if (turnNo === 1 || turnNo === 2 || turnNo === 4) assert(hasUsefulRoomOptions(room),
+      if (turnNo === 2) assert(hasUsefulRoomOptions(room),
         `turn ${turnNo} did not produce a useful positive candidate set`);
-      if (turnNo === 1 || turnNo === 2) {
-        assert(payload.presentation?.language_tag?.toLowerCase().startsWith("zh"),
-          `City turn ${turnNo} did not preserve the requested Chinese presentation`);
-        const rationale = room.options.flatMap((option) => option.rationale ?? []);
-        assert(rationale.length > 0 && rationale.every((item) => item.locale?.toLowerCase().startsWith("zh")
-          && item.locale_fallback === false && /\p{Script=Han}/u.test(item.text ?? "")),
-        `City turn ${turnNo} omitted checked Chinese rationale`);
-      }
-      if (turnNo === 2) {
-        assert(room.options.some((option) => option.rooms.some((item) => item.room_type_id === "CITY-TWN")
-          && hasDistinctAssignedBeds(option, ["adult-1", "adult-2"])),
-        "City turn 2 did not show two distinct checked sleeping surfaces for the adults");
-      }
-      if (turnNo === 3) {
+      if (turnNo === 1) {
         assert((room.options ?? []).every((option) => !(option.checks ?? []).some((check) =>
           /access|wheelchair|bathroom|step_free/iu.test(check.code) && check.status === "pass")),
-        "Pine turn 3 certified unverified hard accessibility fit");
+        "Pine turn 1 certified unverified hard accessibility fit");
         const verificationQuestion = room.questions.find((question) =>
           question.field === "room_requirements.hard_accessibility_needs");
         assert(hasUsefulVietnameseAccessibilityVerification(verificationQuestion),
-        "Pine turn 3 did not retain known requirements and give the Vietnamese hotel-verification step");
+        "Pine turn 1 did not retain known requirements and give the Vietnamese hotel-verification step");
       }
-      if (turnNo === 4) {
-        assert(payload.presentation?.language_tag?.toLowerCase().startsWith("fr"), "Pine turn 4 did not render French");
+      if (turnNo === 2) {
+        assert(payload.presentation?.language_tag?.toLowerCase().startsWith("fr"), "Pine turn 2 did not render French");
         const rationale = (room.options ?? []).flatMap((option) => option.rationale ?? []);
         assert(rationale.length > 0 && rationale.every((item) => item.locale?.toLowerCase().startsWith("fr")
-          && item.locale_fallback === false && item.text), "Pine turn 4 rationale has missing French text or fallback");
+          && item.locale_fallback === false && item.text), "Pine turn 2 rationale has missing French text or fallback");
         assert((room.questions ?? []).every((item) => item.locale?.toLowerCase().startsWith("fr")
-          && item.locale_fallback === false && item.reason), "Pine turn 4 questions have missing French text or fallback");
+          && item.locale_fallback === false && item.reason), "Pine turn 2 questions have missing French text or fallback");
       }
       assert(Array.isArray(room.options) && Array.isArray(room.questions), `turn ${turnNo} result structure missing`);
       const currentCard = page.locator('[data-testid="room-advice"]').last();
       await currentCard.waitFor({ state: "visible", timeout: 30000 });
-      if (turnNo === 1 || turnNo === 2) {
-        assert((await currentCard.getAttribute("lang"))?.toLowerCase().startsWith("zh"),
-          `City turn ${turnNo} room card is not lang=zh`);
-        const visible = await currentCard.innerText();
-        for (const item of room.options.flatMap((option) => option.rationale ?? [])) {
-          assert(visible.includes(item.text), `City turn ${turnNo} card omitted a checked Chinese rationale`);
-        }
-      }
       if (turnNo === 2) {
-        assert(cityPriorResult, "City turn 1 selected result receipt is missing");
+        assert(pinePriorResult, "Pine turn 1 result receipt is missing");
         const priorCard = page.locator('[data-testid="room-advice"]').first();
         await priorCard.locator('[data-testid="room-advice-stale"]').waitFor({ state: "visible", timeout: 15000 });
         const priorSelect = priorCard.locator('[data-testid="room-select"]').first();
-        assert(await priorSelect.isDisabled(), "City turn 1 stale result remained selectable after the edit");
-        const staleResponse = await fetch(`${apiUrl}/v1/guest/sessions/${session.session_id}`
-          + `/room-advice/${cityPriorResult.result_id}/selection`, {
-          method: "POST", headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
-          body: JSON.stringify({ result_version: cityPriorResult.result_version,
-            option_id: cityPriorResult.option_id }),
-        });
-        assert(staleResponse.status === 409, `City stale-result selection returned ${staleResponse.status}, not 409`);
-        report.selections.push({ turn: 1, stale_replay_status: staleResponse.status, model_calls: 0 });
+        if (await priorSelect.count()) assert(await priorSelect.isDisabled(), "Pine turn 1 stale result remained selectable after the edit");
+        if (pinePriorResult.option_id) {
+          const staleResponse = await fetch(`${apiUrl}/v1/guest/sessions/${session.session_id}`
+            + `/room-advice/${pinePriorResult.result_id}/selection`, {
+            method: "POST", headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
+            body: JSON.stringify({ result_version: pinePriorResult.result_version,
+              option_id: pinePriorResult.option_id }),
+          });
+          assert(staleResponse.status === 409, `Pine stale-result selection returned ${staleResponse.status}, not 409`);
+          report.selections.push({ turn: 1, stale_replay_status: staleResponse.status, model_calls: 0 });
+        }
       }
-      if (turnNo === 4) {
+      if (turnNo === 2) {
         assert((await currentCard.getAttribute("lang"))?.toLowerCase().startsWith("fr"), "French Pine card is not lang=fr");
         const visible = await currentCard.innerText();
         for (const item of room.options.flatMap((option) => option.rationale ?? [])) {
@@ -437,19 +399,17 @@ try {
         capture: path.basename(capturePath),
       });
       if (turnNo === 1) {
-        const selected = await selectCurrentOption(turnNo, room, currentCard, session, afterState);
-        assert(selected, "City turn 1 did not expose a current option for UI selection");
-        cityPriorResult = { result_id: room.result_id, result_version: room.result_version,
-          option_id: selected.option.option_id };
+        pinePriorResult = { result_id: room.result_id, result_version: room.result_version,
+          option_id: room.options?.[0]?.option_id ?? null };
       }
-      if (turnNo === 2 || turnNo === 4) {
+      if (turnNo === 2) {
         const selected = await selectCurrentOption(turnNo, room, currentCard, session, afterState);
         assert(selected, `turn ${turnNo} did not expose a current option for the required UI selection`);
       }
-      if (turnNo === 3) {
+      if (turnNo === 1) {
         const text = await currentCard.innerText();
         assert(text.length > 0 && (room.questions.length > 0 || room.options.length > 0),
-          `Pine turn ${turnNo} omitted useful next-step or partial advice`);
+          "Pine turn 1 omitted useful next-step or partial advice");
       }
       await awaitSemanticReview(turnNo, sha(responseText));
     }
@@ -463,9 +423,9 @@ try {
   await fs.chmod(path.join(runDir, "reacceptance-mobile.png"), 0o600);
   report.mobile_layout = { ...mobile, no_horizontal_overflow: true };
   const finalState = JSON.parse(await fs.readFile(statePath, "utf8"));
-  assert(finalState.guest_turns === 4 && finalState.approved_case_turn === 4
-    && finalState.codex_requests >= APPROVED_CASE_TURNS.length && finalState.codex_requests <= 8,
-    "fresh counters differ from the four approved cases and global request bound");
+  assert(finalState.guest_turns === 2 && finalState.approved_case_turn === 2
+    && finalState.codex_requests >= APPROVED_CASE_TURNS.length && finalState.codex_requests <= 4,
+    "fresh counters differ from the two approved cases and global request bound");
   report.counters = { guest_turns: finalState.guest_turns, codex_requests: finalState.codex_requests,
     new_guest_turns: finalState.guest_turns - START_GUEST_TURNS,
     new_requests: finalState.codex_requests - START_REQUESTS,

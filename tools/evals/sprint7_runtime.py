@@ -13,9 +13,9 @@ Expected private files (mode 0600, both under /private/tmp):
           oracle_sha256
 state:  run_id, authority, candidate_sha256, matrix_sha256,
           authorized_for_live_calls=true, status='authorized',
-  max_guest_turns=4, max_codex_requests=8, max_calls_per_turn=2,
-  reserved_guest_turn_budget=4, reserved_request_budget=8,
-  guest_turns=0, codex_requests=0 (fresh namespace; cases 1–4 only)
+  max_guest_turns=2, max_codex_requests=4, max_calls_per_turn=2,
+  reserved_guest_turn_budget=2, reserved_request_budget=4,
+  guest_turns=0, codex_requests=0 (fresh namespace; cases 1–2 only)
 
 The authorization record and pinned candidate manifest are supplied by the
 coordinator after approval. This runtime intentionally has no init/reset CLI.
@@ -37,16 +37,16 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261027-reacceptance3"
-CASE_RUN_ID = "s7-room-advice-20261027-reacceptance3"
-PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance2-cont1"
-PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance2-cont1-state.json")
-PRIOR_STATE_SHA256 = "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5"
-MAX_GUEST_TURNS = 4
-MAX_REQUESTS = 8
+RUN_ID = "s7-room-advice-20261027-reacceptance4"
+CASE_RUN_ID = "s7-room-advice-20261027-reacceptance4"
+PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance3"
+PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance3-state.json")
+PRIOR_STATE_SHA256 = "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b"
+MAX_GUEST_TURNS = 2
+MAX_REQUESTS = 4
 START_GUEST_TURNS = 0
 START_REQUESTS = 0
-APPROVED_CASE_TURNS = (1, 2, 3, 4)
+APPROVED_CASE_TURNS = (1, 2)
 MAX_CALLS_PER_TURN = 2
 MAX_OUTPUT_TOKENS = 700
 PROVIDER_TIMEOUT_SECONDS = 25.0
@@ -177,15 +177,14 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
 
 def _prior_allocation_record() -> dict[str, Any]:
     return {
-        "run_id": PRIOR_RUN_ID, "status": "halted", "guest_turns": 6, "codex_requests": 11,
-        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 36,
-        "unused_guest_slots": 1, "unused_request_slots": 3,
-        "unused_slots": "closed; no replay/reset/reallocation",
+        "run_id": PRIOR_RUN_ID, "status": "halted", "guest_turns": 4, "codex_requests": 8,
+        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 44,
+        "unused_guest_slots": 0, "unused_request_slots": 0,
         "actual_outcome": {
-            "city1": "PASS", "city2": "FAIL invented hard twin", "family3_5": "PASS",
-            "pine6": "FAIL invented child-1; HTTP500", "pine7": "Blocked dependency; not attempted",
+            "city1": "PASS", "city2": "PASS", "pine3": "PASS",
+            "pine4": "FAIL failed explicit access relaxation; no semantic receipt4",
         },
-        "no_further_calls": True,
+        "runners": "API46945/browser9109 stopped; no retry",
     }
 
 
@@ -195,9 +194,9 @@ def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
     parent = _private_file(PRIOR_STATE_PATH)
     if (_file_sha256(PRIOR_STATE_PATH) != PRIOR_STATE_SHA256
             or parent.get("run_id") != PRIOR_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != 6 or parent.get("codex_requests") != 11
-            or parent.get("max_guest_turns") != 7 or parent.get("max_codex_requests") != 14):
-        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 6/11 allocation.")
+            or parent.get("guest_turns") != 4 or parent.get("codex_requests") != 8
+            or parent.get("max_guest_turns") != 4 or parent.get("max_codex_requests") != 8):
+        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 4/8 allocation.")
     return parent
 
 
