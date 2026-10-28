@@ -1,5 +1,23 @@
 # Staylead Platform — mandatory working context
 
+## Latest execution checkpoint — 2026-10-28 after Sol2/4
+
+R5Sol/low explicit human allowance exhausted2guest/4requests,lifetime50; actualcandidateff917ce6, API43586exit143/browser76255exit1, stateHALTED SHA9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee. Pine1PASS(correctchild7guardian/share/dates/hardaccess,pending[],VIhotelverification,currentrefs); Pine2M2correctsamechild8clearbothretainedothers,but proposalroom_index1/bed_index1 forsoleGardenqueen causesroom_count_mismatch/nooptions/currentselection,derivedquestionENfallback. No marker02/retry/historyrepair. Earlier0a bootstrapfailedbeforecalls/0/0becauseLuna-onlyadapter; sealedoriginalfiles, correctedexplicitLuna+Sol/lowallowlist/defaultLuna unchanged, realconstructorCLItestPASS.
+
+Offlineindexfixcandidate327ea219c0503f66b2ac940ea0b94c228e1d9e7259e86e671ae995097ab0b5cf237pins: exactprompt/test2delta fromactualff917, BOTHroomcontiguous0..n-1 andexpandedsourcebedinstance0-basedinstructions/example; M4unchanged, nocorrectioncoercion, badcaptureremainsrejected. Root284backend16isolatedPG/RuffcompileDiffPASS; frontend53pins unchangedreuse40/lint/typecheck/build; B80roomtestsPASS. PromptadherenceafterfixNOTactualverified. QscopedindependentreviewPASS(exact2delta/all237pins/badindicesreject/correctedcopyFrench5m/mixedroomnegatives). Newproposalreacceptance6Sol2/4exactoriginalcasesfreshsession/reuseCityFamilyB07 isUNAUTHORIZEDpendingNEWmanualallowance; no newconfig/state/run. Priorapprovalsbelowhistorical/closed, noresettransferretrycapincrease. B07Done;39/97/98BlockedSprint7P0untilfullACDoD; existing98coversblocker,noduplicate/broaderclosure. No manualCI/rerun/waitgate/deploy/Grok/newpaidresources/checkbypass; rawlocal0600.
+
+
+## Current authority — 2026-10-28 Sol acceptance
+
+Hieu explicitly approved “Cho phép Sol/low 2/4” for NEW fresh Pine run `s7-room-advice-20261028-reacceptance5-sol`: exact two original utterances on reviewed/published product1435c5fc/PR99ac95180, inference gpt-6.1-sol/low, maximum2guestturns/4requests,2calls/turn,25s/provider,45s/turn,700output,noautoretry,nofallback,stopfirstblockingfailure. PriorR4 remains sealedHALTED1/2/lifetime46; unused1/2 CLOSED. This explicit approval supersedes prior pending-approval notes only. City/Family/B07 PASS reused; full C01/Sprint7 notDone until remaining actualAC/DoD pass.
+
+| Work / deliverable | Owner — model / effort | Scope | Dependency | Evidence |
+|---|---|---|---|---|
+| Adapt opt-in acceptance controls | B — gpt-6-luna / high | Namespace/model/counters only; product frozen | Explicit human approval | Focused tests/Node smoke |
+| Independent controls and actual semantic review | Q — gpt-6.1-sol / high | Read-only; no API/model/actualDB writes | Frozen controls; each response | Pinned review/body hashes/READONLY DB |
+| Integration, activation, root semantic markers, delivery | Coordinator — current session, exact model/effort unavailable | Preserve limits, raw local0600, fullAC before Done/merge | Local gates+Q | Manifest/state/counters/acceptance report |
+
+
 ## Current Sprint7 checkpoint — 2026-10-27 after Pine2/4
 
 B07#28Doneclosed; C01#39/#97/#98Blocked/Sprint7/P0untilfullactualAC/DoD. Existing98coversrelateddefects/no duplicate/broaderclosure. PR99Draft/unmerged/baseSprint5, publishedHEAD4548c18beforecurrentrecovery. Allhistoricalnotesbelowareevidence,notrenewedauthority; followcurrentM1–M6/rules.

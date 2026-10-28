@@ -1,0 +1,49 @@
+{
+  "verdict": "APPROVED_SCOPE_INPUTS_PASS; controls readiness pending freeze",
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "case_sha256": "607a92dcb433bf463150648e9cad548e0b7b47a78932d1d8f5ca1cd38ea625eb",
+  "authority_sha256": "f75dfe89efb65c4f7a9058177e8b1183c4ecea1285f32444d6574e864f7628a8",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "private_regular_0600": true,
+  "exact_published_two_case_objects": true,
+  "model_effort": [
+    "gpt-6.1-sol",
+    "low"
+  ],
+  "bounds": [
+    2,
+    4,
+    2,
+    25,
+    45,
+    700
+  ],
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance4",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "state_sha256": "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c",
+    "lifetime_requests": 46,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 2,
+    "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+    "actual_outcome": {
+      "pine1": "FAIL unrequested hardbedtype clarification; generic VI access question",
+      "pine2": "Blocked dependency/notattempted"
+    },
+    "runners": "API45685/browser9067 stopped; no retry"
+  },
+  "continuation": null,
+  "fresh_expected_counters": [
+    0,
+    0
+  ],
+  "no_retry_or_fallback": true,
+  "actual_required": [
+    "Pine1 age7,guardian/sharing/dates/bothhardaccess/noinventedbudget/nohardphysicaltypeorpending; truthfulVIhotelverification/currentrefs",
+    "Pine2 samechildUUID8/currentexplicitclearbothonly/Frenchcheckedrationalequestions/currentUIselectionexactresult0provider/knownbaseunknownfeesnulltotal"
+  ],
+  "reuse": "Accepted City/Family/B07; unchanged product1435 offline review",
+  "no_Q_activation_or_provider_or_DB_write": true
+}

@@ -8,7 +8,7 @@ read or changed.
 
 Expected private files (mode 0600, both under /private/tmp):
   config: run_id, authority, candidate_sha256, matrix_sha256, database_url,
-          session_signing_secret, provider='codex_cli', model='gpt-6-luna',
+          session_signing_secret, provider='codex_cli', model='gpt-6.1-sol',
           effort='low', candidate_manifest_path, live_cases_path, oracle_path,
           oracle_sha256
 state:  run_id, authority, candidate_sha256, matrix_sha256,
@@ -37,11 +37,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261027-reacceptance4"
-CASE_RUN_ID = "s7-room-advice-20261027-reacceptance4"
-PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance3"
-PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance3-state.json")
-PRIOR_STATE_SHA256 = "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b"
+RUN_ID = "s7-room-advice-20261028-reacceptance5-sol"
+CASE_RUN_ID = "s7-room-advice-20261028-reacceptance5-sol"
+PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance4"
+PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance4-state.json")
+PRIOR_STATE_SHA256 = "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c"
 MAX_GUEST_TURNS = 2
 MAX_REQUESTS = 4
 START_GUEST_TURNS = 0
@@ -51,7 +51,7 @@ MAX_CALLS_PER_TURN = 2
 MAX_OUTPUT_TOKENS = 700
 PROVIDER_TIMEOUT_SECONDS = 25.0
 TURN_TIMEOUT_SECONDS = 45.0
-MODEL = "gpt-6-luna"
+MODEL = "gpt-6.1-sol"
 EFFORT = "low"
 
 
@@ -177,14 +177,15 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
 
 def _prior_allocation_record() -> dict[str, Any]:
     return {
-        "run_id": PRIOR_RUN_ID, "status": "halted", "guest_turns": 4, "codex_requests": 8,
-        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 44,
-        "unused_guest_slots": 0, "unused_request_slots": 0,
+        "run_id": PRIOR_RUN_ID, "status": "halted", "guest_turns": 1, "codex_requests": 2,
+        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 46,
+        "unused_guest_slots": 1, "unused_request_slots": 2,
+        "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
         "actual_outcome": {
-            "city1": "PASS", "city2": "PASS", "pine3": "PASS",
-            "pine4": "FAIL failed explicit access relaxation; no semantic receipt4",
+            "pine1": "FAIL unrequested hardbedtype clarification; generic VI access question",
+            "pine2": "Blocked dependency/notattempted",
         },
-        "runners": "API46945/browser9109 stopped; no retry",
+        "runners": "API45685/browser9067 stopped; no retry",
     }
 
 
@@ -194,9 +195,9 @@ def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
     parent = _private_file(PRIOR_STATE_PATH)
     if (_file_sha256(PRIOR_STATE_PATH) != PRIOR_STATE_SHA256
             or parent.get("run_id") != PRIOR_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != 4 or parent.get("codex_requests") != 8
-            or parent.get("max_guest_turns") != 4 or parent.get("max_codex_requests") != 8):
-        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 4/8 allocation.")
+            or parent.get("guest_turns") != 1 or parent.get("codex_requests") != 2
+            or parent.get("max_guest_turns") != 2 or parent.get("max_codex_requests") != 4):
+        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 1/2 allocation.")
     return parent
 
 

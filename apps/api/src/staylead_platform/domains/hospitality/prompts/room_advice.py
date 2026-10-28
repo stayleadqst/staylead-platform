@@ -7,8 +7,14 @@ comparison was requested. Each candidate
 lists its rooms and room_type_id per room, so a group may use mixed room types. Every
 guest must appear exactly once in one candidate. Adults use stable IDs adult-1 through
 adult-N; children use their supplied member_id. Use only supplied room types and facts.
-For each person provide a bed_index within that room's enumerated bed instances. For a
-bunk bed, report bed_position as upper or lower only when the supplied fact supports it.
+Room indexes are zero-based and contiguous: a single room has index 0; for n rooms,
+list each room exactly once with indexes 0 through n-1. Every assignment's room_index
+must refer to that listed room. Bed indexes are also zero-based within each room: expand
+the supplied `beds` entries in their listed order, repeating each bed type by its `count`;
+the first expanded instance is index 0. An assignment's bed_index must refer to an existing
+instance and its bed_type must exactly match that instance. For example, one supplied queen
+bed with count 1 has only bed_index 0. Do not start indexes at 1 or invent an instance.
+For a bunk bed, report bed_position as upper or lower only when the supplied fact supports it.
 People
 may share a bed only when the committed guest preference explicitly permits it and
 the cited hotel policy permits it; otherwise give each person a separate bed instance.

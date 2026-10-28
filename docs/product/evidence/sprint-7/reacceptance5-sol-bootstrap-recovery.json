@@ -1,0 +1,23 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "allocation": "SAME explicit Sol/low 2 guest / 4 request approval, no additional allowance",
+  "bootstrap1": {
+    "candidate_sha256": "0a7411831fd809dd79bc18d473d8d89cab4db9f5ce4118e4a287226e62667a39",
+    "status": "halted",
+    "guest_turns": 0,
+    "codex_requests": 0,
+    "state_sha256": "0c41c6dbc7b55279e28376f5f890075ff8eaf806ec878b4059e233ab710f9f68",
+    "config_sha256": "dbb452a7b7c9d7d8c79a64d99611f3b4d0eafcca3e94ce478dd4ed5058938eff",
+    "api_exit": 2,
+    "cause": "CodexCLIProvider constructor Luna-only profile guard",
+    "model_retry": false,
+    "guest_retry": false
+  },
+  "bootstrap2": {
+    "config_path": "/private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-config.json",
+    "state_path": "/private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-state.json",
+    "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+    "same_approved_cases_sha256": "607a92dcb433bf463150648e9cad548e0b7b47a78932d1d8f5ca1cd38ea625eb"
+  },
+  "raw_policy": "Raw files remain local0600; report contains sanitized hashes only."
+}

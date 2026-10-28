@@ -1,0 +1,20 @@
+{
+  "gpt-6-luna": {
+    "construction": "PASS",
+    "type": "CodexCLIProvider"
+  },
+  "gpt-6.1-sol": {
+    "construction": "ValueError",
+    "message": "The local Codex provider uses the approved gpt-6-luna/low profile."
+  },
+  "actual_state": {
+    "status": "authorized",
+    "counters": [
+      0,
+      0
+    ],
+    "last_bootstrap_failure": "root_zero_call_bootstrap_diagnosis",
+    "sha256": "598065e3e484e591098170ae6d8d53e22212767ed704334369b1fcaafce742fb"
+  },
+  "limitation": "Pure constructor only; no provider generate/subprocess/API/DB call. Initial readiness incorrectly omitted real constructor feasibility; same candidate is not startup-ready for Sol."
+}

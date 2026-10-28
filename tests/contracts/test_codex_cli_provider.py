@@ -101,6 +101,31 @@ def test_codex_cli_is_opt_in_and_confined_to_development_or_test() -> None:
         )
 
 
+def test_codex_cli_accepts_only_the_luna_and_sol_low_profiles() -> None:
+    luna = build_provider(Settings(_env_file=None, ai_provider="codex_cli"))
+    assert isinstance(luna, CodexCLIProvider)
+    assert luna.invocation_metadata["model"] == "gpt-6-luna"
+    assert luna.invocation_metadata["reasoning_effort"] == "low"
+
+    sol = build_provider(Settings(
+        _env_file=None, ai_provider="codex_cli", codex_cli_model="gpt-6.1-sol",
+        codex_cli_reasoning_effort="low",
+    ))
+    assert isinstance(sol, CodexCLIProvider)
+    assert sol.invocation_metadata["model"] == "gpt-6.1-sol"
+    assert sol.invocation_metadata["reasoning_effort"] == "low"
+    args = sol._arguments(Path("/tmp/sol-response.json"))
+    assert args[args.index("--model") + 1] == "gpt-6.1-sol"
+
+    for model, effort in (
+        ("gpt-6-astra", "low"),
+        ("gpt-6.1-sol", "medium"),
+        ("gpt-6-luna", "high"),
+    ):
+        with pytest.raises(ValueError, match="approved Luna/low or Sol/low"):
+            CodexCLIProvider(model=model, reasoning_effort=effort)
+
+
 def test_codex_cli_sends_json_only_over_stdin_and_disables_user_tools(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

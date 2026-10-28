@@ -591,6 +591,86 @@ def test_mixed_room_advice_prompt_preserves_source_numeric_literals() -> None:
         _validate_supported_literals("Reference rate is 3,800,000 VND per room night.", source)
 
 
+def test_room_advice_prompt_defines_zero_based_contiguous_room_and_bed_indexes() -> None:
+    instructions = " ".join(HospitalityRoomAdvice.preparation_instructions("en").split())
+    assert "Room indexes are zero-based and contiguous" in instructions
+    assert "indexes 0 through n-1" in instructions
+    assert "Bed indexes are also zero-based within each room" in instructions
+    assert "the first expanded instance is index 0" in instructions
+    assert "one supplied queen bed with count 1 has only bed_index 0" in instructions
+
+
+def test_zero_based_room_and_bed_indexes_are_checked_without_repairing_candidates() -> None:
+    room = _catalog(room_id="PINE-GARDEN", beds=[
+        {"type": "queen", "count": 1, "occupant_capacity": 2},
+    ])
+    room["fact_id"] = "F-GARDEN"
+    rate = _rate()
+    rate["fact_id"] = "F-GARDEN-RATE"
+    rate["value"].update(room_type_id="PINE-GARDEN", rate_id="RATE-GARDEN")
+    brief = {"dates": {"check_in": "2026-11-10", "check_out": "2026-11-12"},
+             "party": {"adults": 1, "children": []}}
+
+    def recommend(*, room_index: int, bed_index: int):
+        candidate = RoomAdviceCandidate(
+            option_id="garden", rooms=({"room_index": room_index, "room_type_id": "PINE-GARDEN"},),
+            assignments=({"member_id": "adult-1", "room_index": room_index,
+                          "bed_index": bed_index, "bed_type": "queen"},),
+        )
+        return __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+            context=_context(brief, (room, rate)), draft=RoomAdviceDraft("ready", (candidate,)),
+        ))
+
+    accepted = recommend(room_index=0, bed_index=0)
+    assert len(accepted.options) == 1
+    assert accepted.options[0]["rooms"] == [{"room_index": 0, "room_type_id": "PINE-GARDEN"}]
+    assert accepted.options[0]["assignments"][0]["bed_index"] == 0
+
+    captured_one_based = recommend(room_index=1, bed_index=1)
+    assert captured_one_based.options == ()
+    assert "room_count_mismatch" in captured_one_based.explanation_inputs["conflicts"]
+
+    invalid_bed_only = recommend(room_index=0, bed_index=1)
+    assert invalid_bed_only.options == ()
+    assert "candidate_fails_hard_room_check" in invalid_bed_only.explanation_inputs["conflicts"]
+
+
+def test_mixed_room_candidate_indexes_must_be_contiguous_from_zero() -> None:
+    family = _catalog(room_id="FAMILY")
+    twin = _catalog(room_id="TWIN")
+    twin["fact_id"] = "F-TWIN"
+    family_rate = _rate()
+    family_rate["value"].update(room_type_id="FAMILY", rate_id="RATE-FAMILY")
+    twin_rate = _rate()
+    twin_rate["fact_id"] = "F-RATE-TWIN"
+    twin_rate["value"].update(room_type_id="TWIN", rate_id="RATE-TWIN")
+    brief = {"party": {"adults": 2, "children": []}}
+
+    def run(room_indexes: tuple[int, int]):
+        candidate = RoomAdviceCandidate(
+            option_id="mixed", rooms=(
+                {"room_index": room_indexes[0], "room_type_id": "FAMILY"},
+                {"room_index": room_indexes[1], "room_type_id": "TWIN"},
+            ), assignments=(
+                {"member_id": "adult-1", "room_index": room_indexes[0], "bed_index": 0, "bed_type": "queen"},
+                {"member_id": "adult-2", "room_index": room_indexes[1], "bed_index": 0, "bed_type": "queen"},
+            ),
+        )
+        return __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+            context=_context(brief, (family, family_rate, twin, twin_rate)),
+            draft=RoomAdviceDraft("ready", (candidate,)),
+        ))
+
+    valid = run((0, 1))
+    assert len(valid.options) == 1
+    assert [item["room_index"] for item in valid.options[0]["rooms"]] == [0, 1]
+    assert [item["room_index"] for item in valid.options[0]["assignments"]] == [0, 1]
+
+    gap = run((0, 2))
+    assert gap.options == ()
+    assert "room_count_mismatch" in gap.explanation_inputs["conflicts"]
+
+
 def test_new_child_keeps_guardian_separation_and_adult_sharing_as_separate_facts() -> None:
     question = (
         "Stay 2026-11-10 to 2026-11-12. We are two adults and one child. "

@@ -17,10 +17,10 @@ import { browserRunDirectory, retainsTwoHardAccessibilityNeeds,
 import { validateSourceRefs } from "./sprint7_source_refs.mjs";
 
 const repo = process.cwd();
-const RUN_ID = "s7-room-advice-20261027-reacceptance4";
+const RUN_ID = "s7-room-advice-20261028-reacceptance5-sol";
 const CASE_RUN_ID = RUN_ID;
-const PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance3";
-const PRIOR_STATE_SHA256 = "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b";
+const PRIOR_RUN_ID = "s7-room-advice-20261027-reacceptance4";
+const PRIOR_STATE_SHA256 = "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c";
 const START_GUEST_TURNS = 0;
 const START_REQUESTS = 0;
 const APPROVED_CASE_TURNS = [1, 2];
@@ -51,7 +51,7 @@ const state = JSON.parse(await fs.readFile(statePath, "utf8"));
 const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 assert(state.run_id === RUN_ID && config.run_id === RUN_ID
   && state.candidate_sha256 === config.candidate_sha256 && state.matrix_sha256 === config.matrix_sha256,
-"Private config/state is not the authorized fresh reacceptance4 namespace");
+"Private config/state is not the authorized fresh reacceptance5 Sol namespace");
 const casesPath = process.env.STAYLEAD_S7_LIVE_CASES ?? config.live_cases_path;
 const oraclePath = config.oracle_path;
 assert(path.resolve(casesPath) === path.resolve(config.live_cases_path), "Case file differs from the candidate pin");
@@ -62,11 +62,11 @@ const oracle = JSON.parse(oracleRaw.toString("utf8"));
 assert(sha(casesRaw) === state.matrix_sha256 && sha(oracleRaw) === config.oracle_sha256,
   "Approved case matrix or independent oracle changed");
 assert(cases.run_id === CASE_RUN_ID && cases.authorized_for_live_calls === true && cases.cases?.length === 2,
-  "Approved reacceptance4 case matrix is invalid");
+  "Approved reacceptance5 Sol case matrix is invalid");
 assert(cases.proposed_max_guest_turns === 2 && cases.proposed_max_requests === 4
   && cases.max_calls_per_turn === 2 && cases.provider_timeout_seconds === 25
   && cases.turn_timeout_seconds === 45 && cases.output_cap === 700
-  && cases.model === "gpt-6-luna" && cases.effort === "low"
+  && cases.model === "gpt-6.1-sol" && cases.effort === "low"
   && cases.no_automatic_retry === true && cases.stop_at_first_blocking_failure === true,
 "Approved global caps or stop rules changed");
 assert(state.status === "running" && state.authorized_for_live_calls === true
@@ -77,23 +77,24 @@ assert(state.status === "running" && state.authorized_for_live_calls === true
 "Fresh counters or approved-case position differ from the authorized 0/0 namespace");
 const prior = config.prior_allocation;
 assert(prior?.run_id === PRIOR_RUN_ID && prior.status === "halted"
-  && prior.guest_turns === 4 && prior.codex_requests === 8 && prior.lifetime_requests === 44
-  && prior.state_sha256 === PRIOR_STATE_SHA256 && prior.unused_guest_slots === 0
-  && prior.unused_request_slots === 0
-  && prior.actual_outcome?.city1 === "PASS" && prior.actual_outcome?.city2 === "PASS"
-  && prior.actual_outcome?.pine3 === "PASS"
-  && prior.actual_outcome?.pine4 === "FAIL failed explicit access relaxation; no semantic receipt4"
-  && prior.runners === "API46945/browser9109 stopped; no retry",
-"Prior allocation receipt differs from the exact closed 4/8 receipt");
-const priorPath = "/private/tmp/staylead-s7-reacceptance3-state.json";
+  && prior.guest_turns === 1 && prior.codex_requests === 2 && prior.lifetime_requests === 46
+  && prior.state_sha256 === PRIOR_STATE_SHA256 && prior.unused_guest_slots === 1
+  && prior.unused_request_slots === 2
+  && prior.unused_slots === "closed; dependent originalturn2 notattempted; no retry/reset/reallocation"
+  && prior.actual_outcome?.pine1 === "FAIL unrequested hardbedtype clarification; generic VI access question"
+  && prior.actual_outcome?.pine2 === "Blocked dependency/notattempted"
+  && prior.runners === "API45685/browser9067 stopped; no retry",
+"Prior allocation receipt differs from the exact closed 1/2 receipt");
+const priorPath = "/private/tmp/staylead-s7-reacceptance4-state.json";
 const priorInfo = await fs.lstat(priorPath);
 assert(priorInfo.isFile() && !priorInfo.isSymbolicLink() && (priorInfo.mode & 0o777) === 0o600,
   "Prior state receipt must remain a read-only private 0600 file");
 const priorRaw = await fs.readFile(priorPath);
 const priorState = JSON.parse(priorRaw.toString("utf8"));
 assert(sha(priorRaw) === PRIOR_STATE_SHA256 && priorState.run_id === PRIOR_RUN_ID
-  && priorState.status === "halted" && priorState.guest_turns === 4 && priorState.codex_requests === 8,
-"Prior state receipt is not the sealed halted 4/8 allocation");
+  && priorState.status === "halted" && priorState.guest_turns === 1 && priorState.codex_requests === 2
+  && priorState.max_guest_turns === 2 && priorState.max_codex_requests === 4,
+"Prior state receipt is not the sealed halted 1/2 allocation");
 assert(APPROVED_CASE_TURNS.every((turn) => cases.cases[turn - 1]?.turn === turn),
 "Fresh case matrix does not map both cases to their approved slots");
 assert(oracle.synthetic === true && Array.isArray(oracle.global_invariants), "Independent oracle is not pinned");
