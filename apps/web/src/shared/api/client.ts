@@ -21,6 +21,7 @@ export type GuestPresentation = Readonly<{
   direction: "ltr" | "rtl";
   preference_revision: number;
   labels: Readonly<Record<string, string>>;
+  local_guide_labels?: Readonly<Record<string, string>>;
   labels_fallback?: boolean;
   freshness: "current" | "stale";
   receipt_id: string | null;

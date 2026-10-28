@@ -12,7 +12,12 @@ from staylead_platform.composition.dependencies.guest_chat import (
     GuestChatError,
     create_guest_chat_application,
 )
+from staylead_platform.composition.dependencies.operator_guide import (
+    create_operator_guide_application,
+)
 from staylead_platform.composition.startup.domain_profile import select_domain_profile
+from staylead_platform.entrypoints.operator.router import router as operator_router
+from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.platform.contracts.ai_provider import AIProvider
 
 MAX_QUESTION_CHARS = 2000
@@ -53,13 +58,21 @@ def create_app(
     *,
     provider: AIProvider | None = None,
     engine: Engine | None = None,
+    operator_guide: Any | None = None,
 ) -> FastAPI:
     selected_settings = settings or Settings()
     profile = select_domain_profile(selected_settings.domain)
-    guest_chat = create_guest_chat_application(selected_settings, engine=engine, provider=provider)
+    database = engine or create_database_engine(selected_settings.database_url)
+    guest_chat = create_guest_chat_application(selected_settings, engine=database, provider=provider)
+    selected_operator_guide = operator_guide
+    if selected_operator_guide is None:
+        selected_operator_guide = create_operator_guide_application(selected_settings, engine=database)
     app = FastAPI(title="StayLead Platform API", version="0.1.0")
     app.state.domain_profile = profile
     app.state.guest_chat = guest_chat
+    app.state.settings = selected_settings
+    app.state.operator_guide = selected_operator_guide
+    app.include_router(operator_router)
 
     @app.exception_handler(HTTPException)
     async def structured_http_error(_request: Any, exc: HTTPException) -> JSONResponse:

@@ -11,7 +11,7 @@ from staylead_platform.domains.hospitality.schemas.guest_brief import (
 )
 from staylead_platform.platform.contracts.guest_brief import GuestBriefSnapshot
 
-TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request")
+TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request")
 ROOM_REQUIREMENT_FIELDS = (
     "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
     "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
@@ -122,6 +122,29 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
                 "minItems": 1, "maxItems": len(clearable_fields),
             },
         }))
+    guide_fields = {
+        "venue_kinds": {"anyOf": [_array({"type": "string", "enum": ["dining", "attraction"]}, maximum=2, minimum=1), {"type": "null"}]},
+        "interests": {"anyOf": [_array({"type": "string", "enum": ["quiet", "budget", "culture", "social", "nature", "indoor", "history"]}, maximum=7), {"type": "null"}]},
+        "pace": {"anyOf": [{"type": "string", "enum": ["relaxed", "moderate", "active"]}, {"type": "null"}]},
+        "budget_amount": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 10000000}, {"type": "null"}]},
+        "budget_currency": {"anyOf": [{"type": "string", "enum": ["VND"]}, {"type": "null"}]},
+        "budget_basis": {"anyOf": [{"type": "string", "enum": ["per_person"]}, {"type": "null"}]},
+        "budget_strength": {"anyOf": [{"type": "string", "enum": ["hard", "target"]}, {"type": "null"}]},
+        "hard_accessibility_needs": {"anyOf": [_array({"type": "string", "enum": ["step_free", "wheelchair_access"]}, maximum=2), {"type": "null"}]},
+        "allergy_requirements": {"anyOf": [_array({"type": "string", "enum": ["peanut", "shellfish", "dairy", "gluten"]}, maximum=4), {"type": "null"}]},
+        "child_safety_required": {"anyOf": [{"type": "boolean"}, {"type": "null"}]},
+    }
+    guide_clearable = [field for field in guide_fields if field in ((brief.data.get("local_guide_preferences") or {}) if brief else {})]
+    guide_set = _operation_schema("set_local_guide_preferences", {
+        **guide_fields, "clear_fields": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
+    })
+    guide_variants = [guide_set]
+    if guide_clearable:
+        guide_variants.append(_operation_schema("set_local_guide_preferences", {
+            **{field: {"type": "null"} for field in guide_fields},
+            "clear_fields": {"type": "array", "items": {"type": "string", "enum": guide_clearable},
+                             "minItems": 1, "maxItems": len(guide_clearable)},
+        }))
     ops = [
         _operation_schema("set_dates", {
             "check_in": _nullable_string(maximum=10), "check_out": _nullable_string(maximum=10),
@@ -136,6 +159,7 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
         }),
         _operation_schema("remove_child", {"member_id": _string(maximum=64)}),
         {"anyOf": room_requirement_variants},
+        {"anyOf": guide_variants},
         _operation_schema("set_child_guardian", {
             "child_id": _string(maximum=64), "guardian_id": _string(maximum=64),
         }),

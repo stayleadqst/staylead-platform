@@ -1,0 +1,90 @@
+{
+  "classification": "actual production browser\u2192Nextproxy\u2192API\u2192M1 PostgreSQL, offline synthetic only",
+  "initial_backend_candidate": "d608bf2f91cec28338095c19bad5264ee3901dff33e9239b8ad683a46d081965",
+  "corrected_css_sha256": "6499629e256bbc10601061fa2e1b16765602811673a77918e5ed87b7fcb4ee34",
+  "steps": [
+    {
+      "scenario": "unauthenticated",
+      "status": 401
+    },
+    {
+      "scenario": "wrongproperty",
+      "status": 403
+    },
+    {
+      "scenario": "import",
+      "status": 200,
+      "lifecycle": "noop",
+      "generation": 1
+    },
+    {
+      "scenario": "activate",
+      "status": 200,
+      "lifecycle": "applied",
+      "generation": 2
+    },
+    {
+      "scenario": "activate",
+      "status": 200,
+      "lifecycle": "applied",
+      "generation": 3
+    },
+    {
+      "scenario": "real signed guest token direct API preview",
+      "status": 401
+    },
+    {
+      "scenario": "refresh",
+      "status": 200,
+      "lifecycle": "applied",
+      "generation": 4
+    },
+    {
+      "scenario": "refresh",
+      "source": "S8-GUIDE-SECONDARY",
+      "status": 200,
+      "generation": 5,
+      "lifecycle": "applied"
+    },
+    {
+      "scenario": "revoke",
+      "source": "S8-GUIDE-PRIMARY",
+      "status": 200,
+      "generation": 6,
+      "lifecycle": "revoked"
+    },
+    {
+      "scenario": "delete",
+      "source": "S8-GUIDE-SECONDARY",
+      "status": 200,
+      "generation": 7,
+      "lifecycle": "deleted"
+    }
+  ],
+  "mobile": {
+    "viewport": 390,
+    "body": 390
+  },
+  "sourceConflictResolved": true,
+  "finalSourceStatuses": [
+    {
+      "id": "S8-GUIDE-PRIMARY",
+      "status": "revoked"
+    },
+    {
+      "id": "S8-GUIDE-SECONDARY",
+      "status": "deleted"
+    }
+  ],
+  "credentialCleared": true,
+  "modelCalls": 0,
+  "provider": "disabled",
+  "execution": "linked offline segments; original selector timeout and mobileoverflow preserved, no model state or budgets involved",
+  "screenshot_hashes": {
+    "staylead-s8-operator-mobile-fixed.png": "6ac6493bb264f1f3f8cf9c20904a8ceecb7bd3e3c72b213521d8ead1784f3fae",
+    "staylead-s8-operator-final-desktop.png": "d4be59c47b345c5291244a5712e48d2b5801044206788983903f11ac4b108f1b"
+  },
+  "guest_facts_after_revoke_delete": 0,
+  "evidence_reuse": "Q independently reviewed reuse of unchanged successful operator backend path across scoped fixes; current CSS screenshot matches final source",
+  "final_product_candidate": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182"
+}

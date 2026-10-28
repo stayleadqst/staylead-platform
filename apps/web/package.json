@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test:contracts": "node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/booking-channel.test.mjs tests/chat-state.test.mjs tests/guest-brief-format.test.mjs tests/media-format.test.mjs tests/presentation.test.mjs tests/proxy-url.test.mjs tests/room-advice-presentation.test.mjs"
+    "test:contracts": "node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/booking-channel.test.mjs tests/chat-state.test.mjs tests/guest-brief-format.test.mjs tests/local-guide-presentation.test.mjs tests/media-format.test.mjs tests/presentation.test.mjs tests/proxy-url.test.mjs tests/room-advice-presentation.test.mjs"
   },
   "dependencies": {
     "next": "16.4.2",

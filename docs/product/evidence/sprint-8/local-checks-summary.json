@@ -1,0 +1,42 @@
+{
+  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "backend": {
+    "command": "STAYLEAD_AI_PROVIDER=disabled STAYLEAD_S8_B_DATABASE_URL=<isolated C DB> STAYLEAD_TEST_DATABASE_URL=<isolated C DB> python -m pytest -q tests/sprint8_local_guide tests/contracts/{test_grounded_qa,test_guest_brief,test_hospitality_preparation_output,test_room_advice,test_hospitality_claim_format,test_sprint8_operator_identity,test_sprint8_operator_transport,test_sprint8_acceptance_harness}.py tests/architecture tests/integration/test_sprint8_operator_api.py plus two selected existing room/FAQ API regressions",
+    "result": "263 passed, one upstream Starlette/httpx warning; before final narrow mixed-channel guard",
+    "final_affected_native": "99 passed after final guard; actual Ajv positive/negative native schema; Q independent7cases PASS",
+    "warning": "Counts overlap; do not sum into a unique total."
+  },
+  "static": {
+    "command": "cwd apps/api: ruff check --config pyproject.toml src ../../tests ../../tools/evals/sprint8_runtime.py; python -m compileall -q src ../../tools/evals/sprint8_runtime.py; git diff --check",
+    "result": "PASS on final source"
+  },
+  "web": {
+    "contracts": 43,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "production_build": "PASS",
+    "build_environment": {
+      "NEXT_PUBLIC_STAYLEAD_DOMAIN": "hospitality",
+      "NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION": "1"
+    },
+    "reuse": "Final CSS-only fix rebuilt/linted; unchanged TS/contracts checks reused"
+  },
+  "independent": "PASS all7 findings closed,273product+4controls hashes verified; actual model UNVERIFIED",
+  "live": {
+    "authorized": false,
+    "model_requests": 0,
+    "retries": 0,
+    "runtime_state_initialized": false
+  },
+  "usage": {
+    "coding_tokens": "unavailable",
+    "coding_retries": "unavailable",
+    "active_agent_hours": "unavailable",
+    "initial_forecast": "15\u201327 active agent-hours, uncalibrated; not a deadline or measured actual"
+  },
+  "services": {
+    "operator_api": "stopped exit143",
+    "production_web": "stopped exit143",
+    "isolated_postgres": "local only; retained for handoff until checks complete"
+  }
+}

@@ -25,6 +25,14 @@ from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     GROUNDED_QA_INSTRUCTIONS,
 )
 from staylead_platform.domains.hospitality.recommendations.rooms import HospitalityRoomAdvice
+from staylead_platform.domains.hospitality.registration.local_guide import HospitalityLocalGuide
+from staylead_platform.domains.hospitality.registration.local_guide_labels import (
+    LOCAL_GUIDE_LABEL_KEYS,
+    local_guide_label_source_texts,
+    local_guide_source_status_label,
+    local_guide_unknown_label,
+    resolve_local_guide_label_bundle,
+)
 from staylead_platform.domains.hospitality.schemas.fact_selection import FactSelection
 from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     HospitalityGroundedAnswer,
@@ -88,6 +96,7 @@ from staylead_platform.platform.contracts.knowledge import (
     SourceVersionRef,
 )
 from staylead_platform.platform.contracts.language import language_direction, normalize_language_tag
+from staylead_platform.platform.contracts.local_guide import LocalGuideResult
 from staylead_platform.platform.contracts.room_advice import RoomAdviceContext, RoomAdviceResult
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationAnswer,
@@ -138,6 +147,17 @@ def _booking_channel(settings: Settings, hotel_slug: str) -> dict[str, Any]:
         "contact": safe_contact,
         "destination_kind": "synthetic_demo" if synthetic else "configured",
     }
+
+
+def _answer_label_request(language_tag: str, turn_intents: tuple[str, ...]) -> tuple[tuple[str, ...], tuple[str, ...], dict[str, str]]:
+    """Keep local-guide labels capability-scoped to its committed second call."""
+    if "local_guide" in turn_intents:
+        language = language_tag.split("-", 1)[0].lower()
+        keys = LOCAL_GUIDE_LABEL_KEYS
+        missing = () if language == "en" else keys
+        return missing, keys, local_guide_label_source_texts() if missing else {}
+    missing = tuple(missing_label_keys(language_tag))
+    return missing, LABEL_KEYS, label_source_texts(missing)
 
 
 def _room_advice_json(result: RoomAdviceResult) -> dict[str, Any]:
@@ -244,9 +264,16 @@ def create_guest_chat_application(
     media_repository = PostgresMediaRepository(database)
     orchestrator = None
     retriever = None
+    repository = None
     if selected_provider:
         repository = PostgresKnowledgeFactRepository(database)
         retriever = KnowledgeRetriever(repository)
+        local_guide = HospitalityLocalGuide(
+            repository,
+            lambda hotel_id, now, timeout: get_active_snapshot(
+                database, hotel_id, now=now, timeout_seconds=timeout,
+            ),
+        )
         orchestrator = GroundedQAOrchestrator(
             provider=selected_provider,
             retriever=retriever,
@@ -266,8 +293,9 @@ def create_guest_chat_application(
             response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,
             room_advice=HospitalityRoomAdvice(),
+            local_guide=local_guide,
         )
-    return GuestChatApplication(settings, database, orchestrator, media_repository, retriever)
+    return GuestChatApplication(settings, database, orchestrator, media_repository, retriever, repository)
 
 
 def _citation_reference(fact: dict[str, Any], source: SourceVersionRef) -> dict[str, Any]:
@@ -352,6 +380,73 @@ def _evidence_bindings(
     ) for value in grouped.values()]
 
 
+def _local_guide_payload_and_bindings(
+    result: LocalGuideResult, snapshot: ActiveKnowledgeSnapshot,
+    repository: PostgresKnowledgeFactRepository | None,
+    *, timeout_seconds: float, label_bundle: dict[str, str] | None = None,
+) -> tuple[dict[str, Any], list[EvidenceBinding]]:
+    """Bind the domain projection to the exact guest-approved M1 facts in this turn."""
+    if result.hotel_id != snapshot.hotel_id or result.generation != snapshot.generation:
+        raise StaleSource("local-guide result does not match this hotel's current snapshot")
+    fact_ids = tuple(dict.fromkeys(result.fact_ids))
+    if fact_ids and repository is None:
+        raise StaleSource("local-guide fact repository is unavailable")
+    facts = repository.get_guest_facts(
+        result.hotel_id, set(fact_ids), timeout_seconds=timeout_seconds,
+    ) if fact_ids and repository else []
+    facts_by_id = {fact.fact_id: fact for fact in facts}
+    if set(facts_by_id) != set(fact_ids):
+        raise StaleSource("local-guide facts are no longer guest-visible")
+    sources = {source.source_id: source for source in snapshot.sources}
+    locale = result.metadata.get("locale") if isinstance(result.metadata, dict) else None
+    grouped: dict[str, list[str]] = {}
+    for fact in facts:
+        provenance = fact.provenance
+        source_id = provenance.get("source_id")
+        source = sources.get(source_id)
+        if (source is None or source.hotel_id != result.hotel_id
+                or source.status != "approved" or not source.guest_approved
+                or provenance.get("source_version") != source.source_version
+                or provenance.get("source_hash") != source.source_hash
+                or provenance.get("source_generation") != source.hotel_generation):
+            raise StaleSource("local-guide source is no longer current and approved")
+        grouped.setdefault(source_id, []).append(fact.fact_id)
+    refs: list[dict[str, Any]] = []
+    bindings: list[EvidenceBinding] = []
+    for source_id, bound_ids in sorted(grouped.items()):
+        source = sources[source_id]
+        refs.append({"source": {
+            "hotel_id": source.hotel_id, "source_id": source.source_id,
+            "source_generation": source.hotel_generation,
+            "source_version": source.source_version, "source_hash": source.source_hash,
+            "status": source.status, "guest_approved": source.guest_approved,
+            "valid_from": source.valid_from, "valid_to": source.valid_to,
+            "localized_status": local_guide_source_status_label(source.status, locale),
+        }, "fact_ids": sorted(bound_ids)})
+        bindings.append(EvidenceBinding(source=source, fact_ids=tuple(sorted(bound_ids))))
+    payload = asdict(result)
+    payload["source_refs"] = refs
+    payload["fact_ids"] = list(fact_ids)
+    local_labels = resolve_local_guide_label_bundle(
+        locale if isinstance(locale, str) else None,
+        {key: value for key, value in (label_bundle or {}).items() if key in LOCAL_GUIDE_LABEL_KEYS},
+    )
+    for claim in payload["supported_claims"]:
+        claim["localized_unknowns"] = [
+            local_guide_unknown_label(code, locale, local_labels)
+            for code in claim.get("unknown_codes", ())
+        ]
+    unknown_codes = tuple(dict.fromkeys(
+        code for claim in payload["supported_claims"] for code in claim.get("unknown_codes", ())
+    ))
+    payload["localized_unknowns"] = [local_guide_unknown_label(code, locale, local_labels) for code in unknown_codes]
+    payload["localized_conflicts"] = [
+        local_guide_unknown_label("conflict_unconfirmed", locale, local_labels)
+        for _conflict in payload.get("conflicts", ())
+    ]
+    return payload, bindings
+
+
 def _remaining_seconds(deadline: float) -> float:
     remaining = deadline - asyncio.get_running_loop().time()
     if remaining <= 0:
@@ -396,12 +491,14 @@ class GuestChatApplication:
     def __init__(
         self, settings: Settings, engine: Engine, orchestrator: GroundedQAOrchestrator | None,
         media_repository: Any | None = None, knowledge_retriever: KnowledgeRetriever | None = None,
+        knowledge_fact_repository: PostgresKnowledgeFactRepository | None = None,
     ) -> None:
         self._settings = settings
         self._engine = engine
         self._orchestrator = orchestrator
         self._media_repository = media_repository or PostgresMediaRepository(engine)
         self._knowledge_retriever = knowledge_retriever
+        self._knowledge_fact_repository = knowledge_fact_repository
 
     def lookup_hotel(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -796,6 +893,8 @@ class GuestChatApplication:
         language_only_room_advice = False
         room_advice_response: dict[str, Any] | None = None
         room_advice_bindings: list[EvidenceBinding] = []
+        local_guide_response: dict[str, Any] | None = None
+        local_guide_bindings: list[EvidenceBinding] = []
         try:
             async with asyncio.timeout_at(deadline):
                 remaining = _remaining_seconds(deadline)
@@ -856,13 +955,16 @@ class GuestChatApplication:
                     if pure_booking_request:
                         answer = _booking_channel_only_answer(tuple(saved_turn_intents))
                     elif not room_advice_requested:
+                        resumed_label_request = _answer_label_request(
+                            current_language["language_tag"], tuple(saved_turn_intents),
+                        )
                         answer = await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=source_turn["content"], history=history,
                             brief=committed_brief, deadline=deadline,
                             preferred_language_tag=(current_language_row or {}).get("language_tag"),
-                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
-                            label_bundle_keys=LABEL_KEYS,
-                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            missing_label_keys=resumed_label_request[0],
+                            label_bundle_keys=resumed_label_request[1],
+                            label_source_texts=resumed_label_request[2],
                             turn_intents=tuple(saved_turn_intents),
                             authorized_targets=tuple(saved_authorized_targets),
                         )
@@ -967,14 +1069,17 @@ class GuestChatApplication:
                         apply_attempted = False
                         committed_brief = mutation.brief
                         receipt_id_for_answer = request_id
+                        committed_label_request = _answer_label_request(
+                            current_language["language_tag"], prepared.turn_intents,
+                        )
                         answer = None if room_advice_requested else _booking_channel_only_answer(prepared.turn_intents, prepared) if pure_booking_request else await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
                             preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
-                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
-                            label_bundle_keys=LABEL_KEYS,
-                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            missing_label_keys=committed_label_request[0],
+                            label_bundle_keys=committed_label_request[1],
+                            label_source_texts=committed_label_request[2],
                             turn_intents=prepared.turn_intents,
                             authorized_targets=brief_context.authorized_targets,
                         )
@@ -983,29 +1088,35 @@ class GuestChatApplication:
                             answer = None
                         elif pure_booking_request:
                             answer = _booking_channel_only_answer(prepared.turn_intents, prepared)
-                        elif language_race:
+                        elif language_race or "local_guide" in prepared.turn_intents:
+                            committed_label_request = _answer_label_request(
+                                current_language["language_tag"], prepared.turn_intents,
+                            )
                             answer = await self._orchestrator.answer_committed_turn(
                                 hotel_id=claims.hotel_id, question=transcript_question, history=history,
                                 brief=committed_brief, deadline=deadline,
                                 selected_fact_ids=prepared.selected_fact_ids,
                                 preferred_language_tag=current_language["language_tag"],
-                                missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
-                                label_bundle_keys=LABEL_KEYS,
-                                label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                                missing_label_keys=committed_label_request[0],
+                                label_bundle_keys=committed_label_request[1],
+                                label_source_texts=committed_label_request[2],
                                 turn_intents=prepared.turn_intents,
                                 authorized_targets=brief_context.authorized_targets if brief_context else (),
                             )
                         else:
                             answer = prepared.provisional_answer
                     else:
+                        committed_label_request = _answer_label_request(
+                            current_language["language_tag"], prepared.turn_intents,
+                        )
                         answer = None if room_advice_requested else _booking_channel_only_answer(prepared.turn_intents, prepared) if pure_booking_request else await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=transcript_question, history=history,
                             brief=committed_brief, deadline=deadline,
                             selected_fact_ids=prepared.selected_fact_ids,
                             preferred_language_tag=current_language["language_tag"] if current_language["source"] != "fallback" else None,
-                            missing_label_keys=tuple(missing_label_keys(current_language["language_tag"])),
-                            label_bundle_keys=LABEL_KEYS,
-                            label_source_texts=label_source_texts(tuple(missing_label_keys(current_language["language_tag"]))),
+                            missing_label_keys=committed_label_request[0],
+                            label_bundle_keys=committed_label_request[1],
+                            label_source_texts=committed_label_request[2],
                             turn_intents=prepared.turn_intents,
                             authorized_targets=brief_context.authorized_targets if brief_context else (),
                         )
@@ -1174,7 +1285,23 @@ class GuestChatApplication:
                 # validated canonical brief fields. A supplied brief alone does not
                 # make an ordinary grounded FAQ stale on a later trip edit.
                 brief_dependent = bool(answer.brief_dependent)
-                brief_version_used = answer.brief_version_used if brief_dependent else None
+                if answer.local_guide_result is not None:
+                    try:
+                        local_guide_response, local_guide_bindings = await asyncio.to_thread(
+                            _local_guide_payload_and_bindings,
+                            answer.local_guide_result, snapshot, self._knowledge_fact_repository,
+                            timeout_seconds=_remaining_seconds(deadline), label_bundle=answer.label_bundle,
+                        )
+                    except StaleSource:
+                        raise
+                    except Exception as exc:
+                        raise GuestChatError(503, "local_guide_unavailable", "The local guide could not be verified.", retryable=True) from exc
+                    brief_dependent = True
+                brief_version_used = (
+                    answer.brief_version_used
+                    if answer.brief_version_used is not None
+                    else committed_brief.brief_version if brief_dependent and committed_brief is not None else None
+                )
                 cited_fact_ids = {str(fact["fact_id"]) for fact in answer.citations if fact.get("fact_id")}
                 try:
                     candidate_media = await asyncio.to_thread(
@@ -1205,7 +1332,7 @@ class GuestChatApplication:
                     if source is None or fact.get("provenance", {}).get("source_version") != source.source_version:
                         raise StaleSource("retrieved evidence no longer matches active source state")
                     evidence.append(_citation_reference(fact, source))
-                bindings = [*_evidence_bindings(evidence, media, snapshot), *room_advice_bindings]
+                bindings = [*_evidence_bindings(evidence, media, snapshot), *room_advice_bindings, *local_guide_bindings]
                 trace = {
                     "provider": answer.provider, "deployment": answer.deployment, "model": answer.model,
                     "provider_request_id": answer.provider_request_id,
@@ -1255,7 +1382,10 @@ class GuestChatApplication:
                     current_language["language_tag"] if current_language["source"] != "fallback"
                     else normalize_language_tag(answer.inferred_language_tag) or "und"
                 )
-                answer_labels = resolve_label_bundle(answer_locale, answer.label_bundle)
+                core_label_bundle = {
+                    key: value for key, value in answer.label_bundle.items() if key in LABEL_KEYS
+                }
+                answer_labels = resolve_label_bundle(answer_locale, core_label_bundle)
                 answer_presentation = {
                     "language_tag": answer_locale,
                     "direction": language_direction(answer_locale),
@@ -1265,6 +1395,14 @@ class GuestChatApplication:
                     "freshness": "current",
                     "receipt_id": receipt_id_for_answer,
                 }
+                if answer.local_guide_result is not None:
+                    local_guide_bundle = {
+                        key: value for key, value in answer.label_bundle.items()
+                        if key in LOCAL_GUIDE_LABEL_KEYS
+                    }
+                    answer_presentation["local_guide_labels"] = resolve_local_guide_label_bundle(
+                        answer_locale, local_guide_bundle,
+                    )
                 try:
                     latest_language_row = await asyncio.to_thread(
                         get_language_preference, self._engine, session_id=session_id,
@@ -1277,6 +1415,7 @@ class GuestChatApplication:
                 answer_presentation["freshness"] = "stale" if language_stale else "current"
                 remaining = _remaining_seconds(deadline)
                 room_advice_fields = {"room_advice": room_advice_response} if room_advice_response is not None else {}
+                local_guide_fields = {"local_guide": local_guide_response} if local_guide_response is not None else {}
                 booking_fields = {"booking_request": {"requested": True}} if booking_requested else {}
                 result = await asyncio.to_thread(
                     complete_request,
@@ -1292,7 +1431,7 @@ class GuestChatApplication:
                                      "language_preference": latest_language,
                                      "presentation": answer_presentation,
                                      "answer_eligibility": "stale" if language_stale else "current",
-                                     **brief_fields, **room_advice_fields, **booking_fields},
+                                     **brief_fields, **room_advice_fields, **local_guide_fields, **booking_fields},
                     brief_version_used=brief_version_used,
                     brief_dependent=brief_dependent,
                     brief_receipt_id=receipt_id_for_answer,

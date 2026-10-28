@@ -8,6 +8,7 @@ import re
 import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Any, Literal, TypedDict
 
@@ -24,6 +25,11 @@ from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
     GuestBriefSnapshot,
     PreparedGuestTurn,
+)
+from staylead_platform.platform.contracts.local_guide import (
+    LocalGuideCapability,
+    LocalGuideRequest,
+    LocalGuideResult,
 )
 from staylead_platform.platform.contracts.room_advice import (
     RoomAdviceContext,
@@ -146,6 +152,7 @@ class ConversationAnswer:
     acknowledgement: str | None = None
     turn_intents: tuple[str, ...] = ()
     patch_authorizations: tuple[dict[str, Any], ...] = ()
+    local_guide_result: LocalGuideResult | None = None
 
 
 def _numeric_forms(text: str) -> set[str]:
@@ -297,6 +304,7 @@ class GroundedQAOrchestrator:
         response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
         room_advice: RoomAdviceUseCase | None = None,
+        local_guide: LocalGuideCapability | None = None,
     ) -> None:
         self._provider = provider
         self._retriever = retriever
@@ -316,6 +324,7 @@ class GroundedQAOrchestrator:
         self._response_envelope_key = response_envelope_key
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
         self._room_advice = room_advice
+        self._local_guide = local_guide
 
     async def answer(
         self, *, hotel_id: str, question: str, history: list[dict[str, str]],
@@ -332,6 +341,15 @@ class GroundedQAOrchestrator:
         authorized_targets: tuple[str, ...] = (),
     ) -> ConversationAnswer:
         provider_results: list[GenerationResult] = []
+        local_guide_result = None
+        if "local_guide" in turn_intents and self._local_guide is not None:
+            capability_timeout = self._remaining(deadline)
+            local_guide_result = await asyncio.wait_for(self._local_guide.recommend(LocalGuideRequest(
+                hotel_id=hotel_id, question=question, locale=preferred_language_tag,
+                brief_version=brief.brief_version if brief is not None else 0,
+                brief_data=dict(brief.data) if brief is not None else {}, now=datetime.now(UTC),
+                timeout_seconds=capability_timeout,
+            )), timeout=capability_timeout)
         retrieved = None
         if prefetched_facts is not None:
             relevant_facts = list(prefetched_facts)
@@ -406,6 +424,15 @@ class GroundedQAOrchestrator:
         answer_history = _answer_context(
             history, {fact["fact_id"] for fact in relevant_facts}, limit=8,
         )
+        local_guide_context = {
+            "local_guide_recommendations": ([
+                {key: claim.get(key) for key in (
+                    "venue_id", "name", "kind", "fit_status", "reason_codes", "tradeoff_codes",
+                    "sponsored", "sponsor_label", "price", "duration_minutes", "hours_status", "unknown_codes",
+                )} for claim in local_guide_result.supported_claims
+            ] if local_guide_result is not None else []),
+            "local_guide_unknowns": list(local_guide_result.unknowns) if local_guide_result else [],
+        }
         evidence = json.dumps({
             "hotel_id": hotel_id,
             "question": question,
@@ -419,6 +446,7 @@ class GroundedQAOrchestrator:
             "label_bundle_keys": list(label_bundle_keys),
             "label_source_texts": label_source_texts or {},
             "turn_intents": list(turn_intents),
+            **local_guide_context,
         }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 18000:
             evidence = json.dumps({
@@ -433,6 +461,7 @@ class GroundedQAOrchestrator:
                 "label_bundle_keys": list(label_bundle_keys),
                 "label_source_texts": label_source_texts or {},
                 "turn_intents": list(turn_intents),
+                **local_guide_context,
             }, ensure_ascii=False, separators=(",", ":"))
         if len(evidence) > 22000:
             raise ConversationFailure("context_limit", "The relevant context exceeds the request limit.")
@@ -610,7 +639,7 @@ class GroundedQAOrchestrator:
                 *([acknowledgement] if acknowledgement is not None else []),
             )
         )
-        if not has_meaningful_text and not patch_has_operations:
+        if not has_meaningful_text and not patch_has_operations and local_guide_result is None:
             if rejected_guest_claim_failure is not None:
                 raise rejected_guest_claim_failure
             raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
@@ -654,6 +683,7 @@ class GroundedQAOrchestrator:
             explicit_language_tag=_clean_language_tag(getattr(payload, "explicit_language_tag", None)),
             inferred_language_tag=_clean_language_tag(getattr(payload, "inferred_language_tag", None)),
             label_bundle=label_bundle,
+            local_guide_result=local_guide_result,
         )
 
     async def prepare_turn(

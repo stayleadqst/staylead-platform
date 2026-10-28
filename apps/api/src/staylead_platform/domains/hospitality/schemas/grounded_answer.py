@@ -240,6 +240,34 @@ def committed_answer_output_schema(
             "type": "object", "properties": {key: dict(value) for key, value in properties.items()},
             "required": list(properties), "additionalProperties": False,
         })
+    # A local-guide capability result is rendered from trusted server-side facts;
+    # the model's committed turn may therefore contain only its bounded labels.
+    # Keep this escape hatch exclusive to guide-only turns with no required
+    # clarification, and disallow claims/refs so it cannot satisfy another channel.
+    pending_can_be_asked = any(
+        field == "dates.check_out" or field.endswith(".age") for field in pending_fields
+    )
+    missing_guest_state = (
+        "guest_state" in turn_intents and not allowed_guest_refs
+        and not authorized_targets and not pending_fields
+    )
+    if (
+        "local_guide" in turn_intents
+        and set(turn_intents).issubset({"local_guide", "guest_edit"})
+        and not clarification_fields
+        and not pending_can_be_asked
+        and not missing_guest_state
+    ):
+        branch_properties = {key: dict(value) for key, value in properties.items()}
+        for channel in ("supported_claims", "unknowns", "conflicts", "guest_claims", "guest_brief_refs"):
+            branch_properties[channel] = dict(branch_properties[channel])
+            branch_properties[channel]["maxItems"] = 0  # type: ignore[index]
+        branch_properties["guest_clarification"] = {"type": "null"}
+        branch_properties["conversational_acknowledgement"] = {"type": "null"}
+        branches.append({
+            "type": "object", "properties": branch_properties,
+            "required": list(properties), "additionalProperties": False,
+        })
     return {
         "type": "object",
         "properties": {"response": {"anyOf": branches}},

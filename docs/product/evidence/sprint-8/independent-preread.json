@@ -1,0 +1,37 @@
+{
+  "candidate": "68dc0b6dc0216dcb268248cbfffef528921026cc444f75f8eb73152150a067db",
+  "ai_provider": "disabled",
+  "actual_app_composition": true,
+  "results": [
+    {
+      "case": "missing",
+      "status": 401,
+      "expected": 401,
+      "sql_statements": 0
+    },
+    {
+      "case": "guest",
+      "status": 401,
+      "expected": 401,
+      "sql_statements": 0
+    },
+    {
+      "case": "invalid",
+      "status": 401,
+      "expected": 401,
+      "sql_statements": 0
+    },
+    {
+      "case": "wrong-property",
+      "status": 403,
+      "expected": 403,
+      "sql_statements": 0
+    },
+    {
+      "case": "read-only-write",
+      "status": 403,
+      "expected": 403,
+      "sql_statements": 0
+    }
+  ]
+}
