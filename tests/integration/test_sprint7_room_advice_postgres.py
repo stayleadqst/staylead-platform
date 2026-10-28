@@ -483,6 +483,15 @@ def engine():
     database.dispose()
 
 
+def _confirm(client: TestClient, session: dict[str, object], challenge: dict[str, object], request_id: str):
+    return client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations",
+        headers={"Authorization": f"Bearer {session['access_token']}"},
+        json={"request_id": request_id,
+              "confirmation_token": challenge["brief_confirmation"]["token"]},
+    )
+
+
 def _scope(engine):
     snapshot = get_active_snapshot(engine, "HTL-CITY01")
     assert snapshot is not None
@@ -832,7 +841,13 @@ def test_pure_booking_response_omission_preserves_selected_current_advice(engine
         "question": "Two adults, we can share a queen bed, check in 2026-11-01 and check out 2026-11-04. Recommend a room.",
     })
     assert advised.status_code == 200, advised.text
-    advice = advised.json()["room_advice"]
+    challenge = advised.json()
+    assert challenge["confirmation_required"] is True
+    assert len(provider.calls) == 1
+    confirmed = _confirm(client, session, challenge, str(uuid.uuid4()))
+    assert confirmed.status_code == 200, confirmed.text
+    advice = confirmed.json()["room_advice"]
+    assert len(provider.calls) == 2
     assert advice["currentness"] == "current" and advice["options"]
     selected = client.post(
         f"{endpoint}/room-advice/{advice['result_id']}/selection", headers=headers,
@@ -883,11 +898,19 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     first_response = client.post(endpoint, headers=headers, json={
         "request_id": first_request_id, "question": first_question,
     })
-    assert len(provider.calls) == 2, provider.calls
     assert first_response.status_code == 200, first_response.text
-    first = first_response.json()
+    challenge = first_response.json()
+    assert challenge["confirmation_required"] is True
+    assert len(provider.calls) == 1, "reviewing a brief edit must stop before M2 and room advice"
+    confirm_id = str(uuid.uuid4())
+    confirmed = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": confirm_id, "confirmation_token": challenge["brief_confirmation"]["token"]},
+    )
+    assert confirmed.status_code == 200, confirmed.text
+    first = confirmed.json()
     advice = first["room_advice"]
-    assert len(provider.calls) == 2
+    assert len(provider.calls) == 2, "confirmation continues with a bounded committed-answer/room-advice turn"
     assert advice["status"] == "ready", advice.get("explanation_inputs")
     assert advice["availability"] == "unknown"
     assert advice["currentness"] == "current"
@@ -895,7 +918,7 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     assert advice["options"][0]["cost"]["total"] == 5_400_000
     assert advice["options"][0]["cost"]["currency"] == "VND"
     freshness_endpoint = f"/v1/guest/sessions/{session['session_id']}/freshness"
-    initial_freshness = client.post(freshness_endpoint, headers=headers, json={"request_id": first_request_id})
+    initial_freshness = client.post(freshness_endpoint, headers=headers, json={"request_id": confirm_id})
     assert initial_freshness.status_code == 200, initial_freshness.text
     assert initial_freshness.json() == {"status": "current", "answer_eligibility": "current",
                                         "room_advice_currentness": "current"}
@@ -908,7 +931,7 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
                            .values(config_version="s7-freshness-config-change"))
     try:
         config_freshness = client.post(
-            freshness_endpoint, headers=headers, json={"request_id": first_request_id},
+            freshness_endpoint, headers=headers, json={"request_id": confirm_id},
         )
         assert config_freshness.status_code == 200, config_freshness.text
         assert config_freshness.json()["status"] == "stale"
@@ -966,9 +989,10 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     assert latest_read.json()["result_version"] == advice["result_version"]
     assert latest_read.json()["options"][0]["cost"] == advice["options"][0]["cost"]
 
-    replay = client.post(endpoint, headers=headers, json={
-        "request_id": first_request_id, "question": first_question,
-    })
+    replay = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": confirm_id, "confirmation_token": challenge["brief_confirmation"]["token"]},
+    )
     assert replay.status_code == 200, replay.text
     assert replay.json()["room_advice"]["result_id"] == result_id
     assert replay.json()["room_advice"]["options"][0]["rationale"][0]["locale"] == "fr"
@@ -982,15 +1006,16 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
             knowledge_sources.c.source_id == source_id,
         ).values(lifecycle_status="revoked"))
     try:
-        stale_replay = client.post(endpoint, headers=headers, json={
-            "request_id": first_request_id, "question": first_question,
-        })
+        stale_replay = client.post(
+            f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+            json={"request_id": confirm_id, "confirmation_token": challenge["brief_confirmation"]["token"]},
+        )
         assert stale_replay.status_code == 200, stale_replay.text
         assert stale_replay.json()["room_advice"]["currentness"] == "stale"
         assert stale_replay.json()["room_advice"]["selection"] is None
         assert stale_replay.json()["answer_eligibility"] == "stale"
         source_freshness = client.post(
-            freshness_endpoint, headers=headers, json={"request_id": first_request_id},
+            freshness_endpoint, headers=headers, json={"request_id": confirm_id},
         )
         assert source_freshness.status_code == 200, source_freshness.text
         assert source_freshness.json()["room_advice_currentness"] == "stale"
@@ -1004,9 +1029,17 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
             ).values(lifecycle_status="approved"))
 
     second_question = "Add one more night; checkout is 2026-11-05. Recheck rooms."
-    second = client.post(endpoint, headers=headers, json={
+    second_prepared = client.post(endpoint, headers=headers, json={
         "request_id": str(uuid.uuid4()), "question": second_question,
     })
+    assert second_prepared.status_code == 200, second_prepared.text
+    assert second_prepared.json()["confirmation_required"] is True
+    second_confirm_id = str(uuid.uuid4())
+    second = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": second_confirm_id,
+              "confirmation_token": second_prepared.json()["brief_confirmation"]["token"]},
+    )
     assert second.status_code == 200, second.text
     updated_advice = second.json()["room_advice"]
     assert len(provider.calls) == 6
@@ -1014,7 +1047,7 @@ def test_messages_commits_two_adult_room_advice_selects_and_recalculates(engine)
     assert updated_advice["options"][0]["cost"]["total"] == 7_200_000
     assert updated_advice["currentness"] == "current"
     superseded_freshness = client.post(
-        freshness_endpoint, headers=headers, json={"request_id": first_request_id},
+        freshness_endpoint, headers=headers, json={"request_id": confirm_id},
     )
     assert superseded_freshness.status_code == 200, superseded_freshness.text
     assert superseded_freshness.json()["room_advice_currentness"] == "stale"
@@ -1048,7 +1081,21 @@ def test_pine_accessibility_clear_age_update_reaches_french_persisted_advice(eng
         "request_id": str(uuid.uuid4()), "question": first_question,
     })
     assert first.status_code == 200, first.text
-    assert first.json()["room_advice"]["status"] == "needs_clarification"
+    first_challenge = first.json()
+    assert first_challenge["confirmation_required"] is True
+    assert first_challenge["trace"]["calls"] == 1
+    assert first_challenge["trace"]["preparation_calls"] == 1
+    assert first_challenge["trace"]["provider_request_ids"]
+    first_confirm_id = str(uuid.uuid4())
+    first_confirm = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": first_confirm_id,
+              "confirmation_token": first_challenge["brief_confirmation"]["token"]},
+    )
+    assert first_confirm.status_code == 200, first_confirm.text
+    assert first_confirm.json()["trace"]["calls"] == 2
+    assert first_confirm.json()["trace"]["preparation_calls"] == 1
+    assert first_confirm.json()["room_advice"]["status"] == "needs_clarification"
     saved = get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-RETREAT03")
     child_id = saved.data["party"]["children"][0]["member_id"]
     provider.child_id = child_id
@@ -1065,7 +1112,15 @@ def test_pine_accessibility_clear_age_update_reaches_french_persisted_advice(eng
         "request_id": str(uuid.uuid4()), "question": second_question,
     })
     assert second.status_code == 200, second.text
-    response = second.json()
+    second_challenge = second.json()
+    assert second_challenge["confirmation_required"] is True
+    second_confirm = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": str(uuid.uuid4()),
+              "confirmation_token": second_challenge["brief_confirmation"]["token"]},
+    )
+    assert second_confirm.status_code == 200, second_confirm.text
+    response = second_confirm.json()
     advice = response["room_advice"]
     assert advice["status"] in {"ready", "partial"}, advice.get("explanation_inputs")
     assert advice["options"][0]["rooms"][0]["room_type_id"] == "PINE-LOFT"
@@ -1164,7 +1219,12 @@ def test_messages_preserves_grounded_faq_with_room_advice_in_two_provider_calls(
         },
     )
     assert response.status_code == 200, response.text
-    body = response.json()
+    challenge = response.json()
+    assert challenge["confirmation_required"] is True
+    assert challenge["trace"]["calls"] == challenge["trace"]["preparation_calls"] == 1
+    confirmed = _confirm(client, session, challenge, str(uuid.uuid4()))
+    assert confirmed.status_code == 200, confirmed.text
+    body = confirmed.json()
     assert len(provider.calls) == body["trace"]["calls"] == 2
     assert body["answer"] == "The hotel is Harbor City Demo [F-HTL-CITY01-001]."
     assert [item["fact_id"] for item in body["evidence"]] == ["F-HTL-CITY01-001"]

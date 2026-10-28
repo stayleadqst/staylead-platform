@@ -37,7 +37,7 @@ function getBackendBase(): URL | undefined {
   }
 }
 
-async function readBoundedBody(request: NextRequest): Promise<string | undefined> {
+async function readBoundedBody(request: NextRequest, limit = MAX_BODY_BYTES): Promise<string | undefined> {
   if (!request.body) return "";
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -46,7 +46,7 @@ async function readBoundedBody(request: NextRequest): Promise<string | undefined
     const { done, value } = await reader.read();
     if (done) break;
     total += value.byteLength;
-    if (total > MAX_BODY_BYTES) {
+    if (total > limit) {
       await reader.cancel();
       return undefined;
     }
@@ -90,6 +90,7 @@ async function forward(request: NextRequest, context: RouteContext) {
   const method = request.method.toUpperCase();
   let backendPath: string;
   let requiresJsonBody = false;
+  let bodyLimit = MAX_BODY_BYTES;
   let binaryLimit: number | undefined;
 
   if (method === "GET" && path.length === 1 && path[0] === "health") {
@@ -105,6 +106,13 @@ async function forward(request: NextRequest, context: RouteContext) {
   ) {
     backendPath = `/v1/guest/sessions/${path[1]}/messages`;
     requiresJsonBody = true;
+  } else if (
+    method === "POST" && path.length === 3 && path[0] === "sessions"
+    && SESSION_ID_PATTERN.test(path[1]) && path[2] === "brief-confirmations"
+  ) {
+    backendPath = `/v1/guest/sessions/${path[1]}/brief-confirmations`;
+    requiresJsonBody = true;
+    bodyLimit = 40 * 1024;
   } else if (
     method === "GET" && path.length === 3 && path[0] === "sessions"
     && SESSION_ID_PATTERN.test(path[1]) && path[2] === "room-advice"
@@ -153,7 +161,7 @@ async function forward(request: NextRequest, context: RouteContext) {
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
       return proxyError(415, "unsupported_media_type", "A JSON request body is required.");
     }
-    body = await readBoundedBody(request);
+    body = await readBoundedBody(request, bodyLimit);
     if (body === undefined) return proxyError(413, "request_too_large", "The request body is too large.");
     try {
       JSON.parse(body);
@@ -169,6 +177,7 @@ async function forward(request: NextRequest, context: RouteContext) {
     || (method === "GET" && path.length === 3 && path[2] === "room-advice")
     || (method === "POST" && path.length === 5 && path[2] === "room-advice" && path[4] === "selection")
     || (method === "POST" && path.length === 3 && path[2] === "freshness")
+    || (method === "POST" && path.length === 3 && path[2] === "brief-confirmations")
     || (method === "GET" && path.length === 4 && path[2] === "media");
   if (scopedGuestRequest && authorization?.startsWith("Bearer ")) {
     headers.set("authorization", authorization);

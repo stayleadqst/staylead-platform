@@ -362,7 +362,17 @@ def test_guest_preference_commit_reaches_shortlist_and_later_edit_preserves_hard
         "question": "Please find a quiet dinner under 100000 VND per person, peanut-safe and step-free.",
     })
     assert first.status_code == 200, first.text
-    first_body = first.json()
+    first_challenge = first.json()
+    assert first_challenge["confirmation_required"] is True
+    assert first_challenge["guest_brief"]["brief_version"] == 0
+    assert provider.calls and len(provider.calls) == 1
+    first_confirmed = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": str(uuid4()),
+              "confirmation_token": first_challenge["brief_confirmation"]["token"]},
+    )
+    assert first_confirmed.status_code == 200, first_confirmed.text
+    first_body = first_confirmed.json()
     assert first_body["guest_brief"]["brief_version"] == 1
     first_preferences = first_body["guest_brief"]["local_guide_preferences"]
     assert first_preferences["budget_amount"] == 100000
@@ -382,9 +392,18 @@ def test_guest_preference_commit_reaches_shortlist_and_later_edit_preserves_hard
     assert any("contamination croisée" in text.lower()
                for text in allergy_claim["localized_unknowns"]), allergy_claim["localized_unknowns"]
 
-    second = client.post(endpoint, headers=headers, json={
+    second_challenge = client.post(endpoint, headers=headers, json={
         "request_id": str(uuid4()), "question": "Prefer indoor visits.",
     })
+    assert second_challenge.status_code == 200, second_challenge.text
+    assert second_challenge.json()["confirmation_required"] is True
+    assert second_challenge.json()["guest_brief"]["brief_version"] == 1
+    assert len(provider.calls) == 3
+    second = client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations", headers=headers,
+        json={"request_id": str(uuid4()),
+              "confirmation_token": second_challenge.json()["brief_confirmation"]["token"]},
+    )
     assert second.status_code == 200, second.text
     second_body = second.json()
     assert second_body["guest_brief"]["brief_version"] == 2
@@ -397,3 +416,4 @@ def test_guest_preference_commit_reaches_shortlist_and_later_edit_preserves_hard
     assert provider.calls[-1]["guest_brief"]["data"]["local_guide_preferences"] == prefs_after_edit
     assert len(provider.calls) == 4
     assert first_body["trace"]["calls"] == second_body["trace"]["calls"] == 2
+    assert first_body["trace"]["preparation_calls"] == second_body["trace"]["preparation_calls"] == 1

@@ -68,6 +68,7 @@ from staylead_platform.infrastructure.persistence.store import (
     commit_language_preference,
     complete_partial_request,
     complete_request,
+    complete_request_with_response_only,
     create_session,
     fail_request,
     get_active_snapshot,
@@ -81,6 +82,7 @@ from staylead_platform.infrastructure.persistence.store import (
     get_room_advice_result,
     get_session,
     recent_messages,
+    record_guest_brief_answer,
     reserve_request,
     save_room_advice_result,
     select_room_advice_option,
@@ -88,7 +90,11 @@ from staylead_platform.infrastructure.persistence.store import (
     validate_evidence_current,
 )
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError, Usage
-from staylead_platform.platform.contracts.guest_brief import GuestBriefContext, GuestBriefSnapshot
+from staylead_platform.platform.contracts.guest_brief import (
+    GuestBriefContext,
+    GuestBriefSnapshot,
+    ValidatedGuestBriefPatch,
+)
 from staylead_platform.platform.contracts.knowledge import (
     ActiveKnowledgeSnapshot,
     EligibleAsset,
@@ -110,6 +116,12 @@ from staylead_platform.platform.conversation.responses.presentation_labels impor
     labels_fallback,
     missing_label_keys,
     resolve_label_bundle,
+)
+from staylead_platform.platform.guest_context.sessions.brief_confirmation import (
+    InvalidBriefConfirmation,
+    brief_state_changes,
+    issue_brief_confirmation,
+    verify_brief_confirmation,
 )
 from staylead_platform.platform.guest_context.sessions.signing import (
     InvalidSessionToken,
@@ -460,6 +472,35 @@ def _sum_known_usage(first: int | None, second: int | None) -> int | None:
     return None if first is None or second is None else first + second
 
 
+def _merge_confirmation_trace(response: dict[str, Any], prepared: object) -> dict[str, Any]:
+    """Combine the saved preparation trace with one answer-only continuation exactly once."""
+    preparation = prepared if isinstance(prepared, dict) else {}
+    continuation = response.get("trace")
+    if not preparation or not isinstance(continuation, dict):
+        return response
+    trace = dict(continuation)
+    prep_calls = preparation.get("calls", 0)
+    continuation_calls = trace.get("calls", 0)
+    if isinstance(prep_calls, int) and isinstance(continuation_calls, int):
+        trace["calls"] = prep_calls + continuation_calls
+    prep_usage = preparation.get("usage", {})
+    continuation_usage = trace.get("usage", {})
+    if isinstance(prep_usage, dict) and isinstance(continuation_usage, dict):
+        trace["usage"] = {
+            key: _sum_known_usage(prep_usage.get(key), continuation_usage.get(key))
+            for key in ("input_tokens", "output_tokens", "total_tokens")
+        }
+    prep_ids = preparation.get("provider_request_ids", [])
+    continuation_ids = trace.get("provider_request_ids", [])
+    if isinstance(prep_ids, list) and isinstance(continuation_ids, list):
+        trace["provider_request_ids"] = [*prep_ids, *continuation_ids]
+        if trace["provider_request_ids"]:
+            trace["provider_request_id"] = trace["provider_request_ids"][-1]
+    trace["preparation_calls"] = prep_calls if isinstance(prep_calls, int) else 0
+    trace["preparation_provider_request_ids"] = prep_ids if isinstance(prep_ids, list) else []
+    return {**response, "trace": trace}
+
+
 def _is_database_timeout(exc: OperationalError) -> bool:
     return getattr(getattr(exc, "orig", None), "sqlstate", None) in {"55P03", "57014"}
 
@@ -513,7 +554,7 @@ class GuestChatApplication:
         return {
             "hotel_id": hotel["hotel_id"], "hotel_slug": hotel["slug"],
             "public_config": public_config, "config_version": hotel["config_version"],
-            "guest_contract_version": "1",
+            "guest_contract_version": "2",
         }
 
     def _room_advice_scope(self, session_id: str, token: str) -> str:
@@ -712,6 +753,7 @@ class GuestChatApplication:
     async def send_message(
         self, *, session_id: str, token: str, request_id: str, question: str | None,
         answer_only_receipt_id: str | None = None,
+        turn_deadline_monotonic: float | None = None,
     ) -> dict[str, Any]:
         if not self._settings.session_signing_secret:
             raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
@@ -723,8 +765,15 @@ class GuestChatApplication:
             raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
         loop = asyncio.get_running_loop()
         turn_timeout = max(1.0, min(self._settings.ai_turn_timeout_seconds, 90.0))
-        deadline = loop.time() + turn_timeout
-        deadline_monotonic = time.monotonic() + turn_timeout
+        if turn_deadline_monotonic is None:
+            deadline_monotonic = time.monotonic() + turn_timeout
+            deadline = loop.time() + turn_timeout
+        else:
+            deadline_monotonic = turn_deadline_monotonic
+            remaining = max(0.0, deadline_monotonic - time.monotonic())
+            if remaining <= 0:
+                raise GuestChatError(504, "provider_timeout", "The request exceeded its time limit.", retryable=True)
+            deadline = loop.time() + remaining
         cancellation_event = Event()
         try:
             async with asyncio.timeout_at(deadline):
@@ -887,6 +936,7 @@ class GuestChatApplication:
         committed_brief: GuestBriefSnapshot | None = None
         prepared = None
         resumed_receipt = None
+        saved_selected_fact_ids: tuple[str, ...] = ()
         language_race = False
         room_advice_requested = False
         booking_requested = False
@@ -934,6 +984,10 @@ class GuestChatApplication:
                         saved_answer_payload.get("authorized_targets")
                         if isinstance(saved_answer_payload, dict) else None
                     )
+                    raw_selected_fact_ids = (
+                        saved_answer_payload.get("selected_fact_ids")
+                        if isinstance(saved_answer_payload, dict) else None
+                    )
                     if (
                         not isinstance(saved_turn_intents, list) or not saved_turn_intents
                         or any(not isinstance(item, str) for item in saved_turn_intents)
@@ -944,6 +998,9 @@ class GuestChatApplication:
                             409, "brief_resume_unavailable",
                             "The saved answer is missing its current-turn scope and cannot be resumed safely.",
                         )
+                    if (isinstance(raw_selected_fact_ids, list)
+                            and all(isinstance(item, str) for item in raw_selected_fact_ids)):
+                        saved_selected_fact_ids = tuple(raw_selected_fact_ids)
                     room_advice_requested = "room_advice" in saved_turn_intents
                     booking_requested = "booking_request" in saved_turn_intents
                     pure_booking_request = tuple(saved_turn_intents) == ("booking_request",)
@@ -962,6 +1019,7 @@ class GuestChatApplication:
                         answer = await self._orchestrator.answer_committed_turn(
                             hotel_id=claims.hotel_id, question=source_turn["content"], history=history,
                             brief=committed_brief, deadline=deadline,
+                            selected_fact_ids=saved_selected_fact_ids,
                             preferred_language_tag=(current_language_row or {}).get("language_tag"),
                             missing_label_keys=resumed_label_request[0],
                             label_bundle_keys=resumed_label_request[1],
@@ -1035,6 +1093,76 @@ class GuestChatApplication:
                             raise ConversationFailure(
                                 "invalid_model_output", "The model returned an invalid guest brief edit.",
                             ) from exc
+                        review_changes = brief_state_changes(
+                            committed_brief.data, validated.data,
+                            committed_brief.pending_fields, tuple(validated.pending_fields),
+                        )
+                        if review_changes:
+                            if not self._settings.session_signing_secret:
+                                raise GuestChatError(
+                                    503, "session_signing_unavailable",
+                                    "Guest trip updates cannot be confirmed right now.",
+                                )
+                            confirmation_token, confirmation = issue_brief_confirmation(
+                                secret=self._settings.session_signing_secret.get_secret_value(),
+                                session_id=session_id, hotel_id=claims.hotel_id,
+                                request_id=request_id,
+                                source_utterance_id=source_utterance_id,
+                                question=transcript_question,
+                                expected_brief_version=committed_brief.brief_version,
+                                operations=prepared.guest_patch.operations,
+                                turn_intents=prepared.turn_intents,
+                                authorized_targets=brief_context.authorized_targets,
+                                selected_fact_ids=prepared.selected_fact_ids,
+                                changes=review_changes,
+                                validated_patch=validated,
+                            )
+                            confirmation_response = {
+                                "request_id": request_id,
+                                "status": "confirmation_required",
+                                "confirmation_required": True,
+                                "trace": {
+                                    "provider": prepared.provider,
+                                    "deployment": prepared.deployment,
+                                    "model": prepared.model,
+                                    "provider_request_id": (prepared.provider_request_ids[-1]
+                                                            if prepared.provider_request_ids else None),
+                                    "provider_request_ids": list(prepared.provider_request_ids),
+                                    "calls": prepared.preparation_calls,
+                                    "preparation_calls": prepared.preparation_calls,
+                                    "usage": {
+                                        "input_tokens": prepared.input_tokens,
+                                        "output_tokens": prepared.output_tokens,
+                                        "total_tokens": prepared.total_tokens,
+                                    },
+                                    "retrieved_fact_ids": list(prepared.retrieval_fact_ids),
+                                    "failure_stage": "confirmation_required",
+                                    "answer_validation": "not_run",
+                                },
+                                "brief_confirmation": {
+                                    "token": confirmation_token,
+                                    "expected_brief_version": confirmation.expected_brief_version,
+                                    "changes": list(confirmation.changes),
+                                    "expires_at": datetime.fromtimestamp(
+                                        confirmation.expires_at, UTC,
+                                    ).isoformat(),
+                                },
+                                "guest_brief": _brief_payload(committed_brief),
+                            }
+                            try:
+                                await asyncio.to_thread(
+                                    complete_request_with_response_only,
+                                    self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+                                    request_id=request_id, question=reservation_question,
+                                    response=confirmation_response,
+                                    timeout_seconds=_remaining_seconds(deadline),
+                                )
+                            except Exception as exc:
+                                raise GuestChatError(
+                                    503, "confirmation_storage_unavailable",
+                                    "The proposed trip update could not be held for confirmation.", retryable=True,
+                                ) from exc
+                            return confirmation_response
                         apply_attempted = True
                         try:
                             mutation = await asyncio.to_thread(
@@ -1218,8 +1346,8 @@ class GuestChatApplication:
                             locale=current_language["language_tag"] if current_language["source"] != "fallback" else None,
                             turn_intents=tuple(intent_tags),
                             hotel_information_fact_ids=(
-                                tuple(prepared.selected_fact_ids)
-                                if prepared is not None and "hotel_information" in intent_tags else ()
+                                tuple(prepared.selected_fact_ids if prepared is not None else saved_selected_fact_ids)
+                                if "hotel_information" in intent_tags else ()
                             ),
                         )
                         room_result, room_generation = await self._orchestrator.recommend_committed_room_advice(
@@ -1263,7 +1391,9 @@ class GuestChatApplication:
                         )
                         if "hotel_information" in intent_tags and room_result.hotel_answer is not None:
                             raw_hotel_answer = asdict(room_result.hotel_answer)
-                            selected_ids = set(prepared.selected_fact_ids if prepared is not None else ())
+                            selected_ids = set(
+                                prepared.selected_fact_ids if prepared is not None else saved_selected_fact_ids
+                            )
                             facts_by_id = {str(fact.get("fact_id")): fact for fact in current_facts}
                             hotel_claims = raw_hotel_answer.get("supported_claims", [])
                             if any(not set(claim.get("fact_ids", ())) <= selected_ids
@@ -1553,10 +1683,253 @@ class GuestChatApplication:
                 await self._fail_request(session_id, request_id, "request_cancelled")
             raise
 
+    async def confirm_brief_edit(
+        self, *, session_id: str, token: str, request_id: str, confirmation_token: str,
+    ) -> dict[str, Any]:
+        """Confirm a signed, version-bound proposal without preparing or reinterpreting it."""
+        if not self._settings.session_signing_secret:
+            raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
+        secret = self._settings.session_signing_secret.get_secret_value()
+        try:
+            session_claims = verify_token(token, secret=secret)
+        except InvalidSessionToken as exc:
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
+        if session_claims.session_id != session_id:
+            raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
+        try:
+            confirmation = verify_brief_confirmation(confirmation_token, secret=secret)
+        except InvalidBriefConfirmation as exc:
+            raise GuestChatError(409, "invalid_brief_confirmation", "This trip update confirmation is invalid or expired.") from exc
+        if confirmation.session_id != session_id or confirmation.hotel_id != session_claims.hotel_id:
+            raise GuestChatError(403, "brief_confirmation_scope_mismatch", "This trip update belongs to another chat.")
+
+        turn_timeout = max(1.0, min(self._settings.ai_turn_timeout_seconds, 90.0))
+        deadline = asyncio.get_running_loop().time() + turn_timeout
+        deadline_monotonic = time.monotonic() + turn_timeout
+        confirmation_identity = hashlib.sha256(confirmation_token.encode("ascii")).hexdigest()
+        reservation_question = f"brief-confirmation:{confirmation_identity}"
+        try:
+            session, original = await asyncio.gather(
+                asyncio.to_thread(
+                    get_session, self._engine, session_id,
+                    timeout_seconds=_remaining_seconds(deadline),
+                ),
+                asyncio.to_thread(
+                    get_completed_response, self._engine, session_id=session_id,
+                    hotel_id=confirmation.hotel_id, request_id=confirmation.request_id,
+                    timeout_seconds=_remaining_seconds(deadline),
+                ),
+            )
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "The trip update could not be checked.", retryable=True) from exc
+        if (not session or session["hotel_id"] != confirmation.hotel_id
+                or session["expires_at"] <= datetime.now(UTC)):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        if (not original or original.get("confirmation_required") is not True
+                or original.get("brief_confirmation", {}).get("token") != confirmation_token):
+            raise GuestChatError(404, "brief_confirmation_unavailable", "This trip update is no longer available to confirm.")
+
+        try:
+            cached = await asyncio.to_thread(
+                reserve_request, self._engine,
+                session_id=session_id, hotel_id=confirmation.hotel_id, request_id=request_id,
+                question=reservation_question,
+                timeout_seconds=_remaining_seconds(deadline),
+                deadline_monotonic=deadline_monotonic,
+            )
+        except IdempotencyConflict as exc:
+            raise GuestChatError(409, "idempotency_conflict", "request_id was used with different confirmation data.") from exc
+        except RequestInProgress as exc:
+            raise GuestChatError(409, "request_in_progress", "This confirmation is still processing.", retryable=True) from exc
+        except RuntimeError as exc:
+            if str(exc) == "brief_apply_no_effect":
+                raise GuestChatError(
+                    503, "brief_apply_no_effect",
+                    "The trip update was not applied. Confirm it again as a new request.", retryable=True,
+                ) from exc
+            if str(exc) == "brief_apply_outcome_unknown":
+                raise GuestChatError(
+                    503, "brief_apply_outcome_unknown",
+                    "We could not confirm whether the trip update was saved. Retry this same request to check.",
+                    retryable=True,
+                ) from exc
+            raise GuestChatError(409, "request_failed", "This confirmation already failed; submit a new request_id.") from exc
+        if cached is not None:
+            if cached.get("status") == "completed":
+                answer_request_id = str(uuid.uuid5(
+                    uuid.NAMESPACE_URL, f"staylead-brief-confirmation-answer:{session_id}:{request_id}",
+                ))
+                refreshed = await self.send_message(
+                    session_id=session_id, token=token, request_id=answer_request_id,
+                    question=None, answer_only_receipt_id=request_id,
+                    turn_deadline_monotonic=deadline_monotonic,
+                )
+                return _merge_confirmation_trace(
+                    {**refreshed, "request_id": request_id}, original.get("trace"),
+                )
+            return cached
+
+        mutation_result = None
+        apply_attempted = False
+        cancellation_event = Event()
+        try:
+            current = await asyncio.to_thread(
+                get_guest_brief, self._engine, session_id=session_id, hotel_id=confirmation.hotel_id,
+                timeout_seconds=_remaining_seconds(deadline),
+            )
+            if current.brief_version != confirmation.expected_brief_version:
+                raise GuestChatError(409, "brief_confirmation_stale", "Trip details changed; ask again before confirming this update.")
+            mutation = ValidatedGuestBriefPatch(
+                data=confirmation.validated_data,
+                pending_fields=confirmation.validated_pending_fields,
+                applied_delta=confirmation.validated_applied_delta,
+                status=confirmation.validated_status,
+                source_fields=confirmation.validated_source_fields,
+            )
+            actual_changes = brief_state_changes(
+                current.data, mutation.data, current.pending_fields, mutation.pending_fields,
+            )
+            if not actual_changes or actual_changes != confirmation.changes:
+                raise GuestChatError(409, "brief_confirmation_stale", "The proposed trip update no longer matches current details.")
+            context = GuestBriefContext(
+                session_id=session_id, hotel_id=confirmation.hotel_id,
+                request_id=request_id, expected_brief_version=confirmation.expected_brief_version,
+                source_utterance_id=confirmation.source_utterance_id,
+                source_utterance=confirmation.question,
+                turn_intents=confirmation.turn_intents,
+                authorized_targets=confirmation.authorized_targets,
+            )
+            apply_attempted = True
+            mutation_result = await asyncio.to_thread(
+                apply_guest_brief_patch, self._engine, context=context, mutation=mutation,
+                payload_hash=hashlib.sha256(confirmation.proposal_hash.encode("ascii")).hexdigest(),
+                timeout_seconds=_remaining_seconds(deadline),
+                deadline_monotonic=deadline_monotonic,
+                cancellation_event=cancellation_event,
+            )
+            apply_attempted = False
+            try:
+                answer_write_budget = _remaining_seconds(deadline)
+                await asyncio.to_thread(
+                    record_guest_brief_answer, self._engine, context=context,
+                    brief_version_used=mutation_result.brief.brief_version,
+                    answer_status="failed",
+                    answer_payload={
+                        "turn_intents": list(confirmation.turn_intents),
+                        "authorized_targets": list(confirmation.authorized_targets),
+                        "selected_fact_ids": list(confirmation.selected_fact_ids),
+                    },
+                    timeout_seconds=answer_write_budget,
+                )
+            except TimeoutError as exc:
+                raise await self._partial_failure(
+                    session_id=session_id, hotel_id=confirmation.hotel_id,
+                    request_id=request_id, receipt_id=request_id,
+                    brief_version_used=mutation_result.brief.brief_version,
+                    code="provider_timeout",
+                    message="The trip details were saved, but the answer exceeded its time limit.",
+                    deadline=deadline, preparation_trace=original.get("trace"),
+                ) from exc
+            answer_request_id = str(uuid.uuid5(
+                uuid.NAMESPACE_URL, f"staylead-brief-confirmation-answer:{session_id}:{request_id}",
+            ))
+            try:
+                response = await self.send_message(
+                    session_id=session_id, token=token, request_id=answer_request_id,
+                    question=None, answer_only_receipt_id=request_id,
+                    turn_deadline_monotonic=deadline_monotonic,
+                )
+            except GuestChatError as exc:
+                raise await self._partial_failure(
+                    session_id=session_id, hotel_id=confirmation.hotel_id,
+                    request_id=request_id, receipt_id=request_id,
+                    brief_version_used=mutation_result.brief.brief_version,
+                    code=exc.code, message=str(exc), deadline=deadline,
+                    status=exc.status, preparation_trace=original.get("trace"),
+                ) from exc
+            response = {**response, "request_id": request_id}
+            response = _merge_confirmation_trace(response, original.get("trace"))
+            return await asyncio.to_thread(
+                complete_request_with_response_only, self._engine,
+                session_id=session_id, hotel_id=confirmation.hotel_id,
+                request_id=request_id, question=reservation_question, response=response,
+                timeout_seconds=_remaining_seconds(deadline),
+            )
+        except GuestChatError as exc:
+            if mutation_result is None:
+                await self._fail_request(session_id, request_id, exc.code)
+            raise
+        except VersionConflict as exc:
+            await self._fail_request(session_id, request_id, "brief_confirmation_stale")
+            raise GuestChatError(409, "brief_confirmation_stale", "Trip details changed; ask again before confirming this update.") from exc
+        except asyncio.CancelledError:
+            cancellation_event.set()
+            if mutation_result is not None:
+                await asyncio.shield(self._partial_failure(
+                    session_id=session_id, hotel_id=confirmation.hotel_id,
+                    request_id=request_id, receipt_id=request_id,
+                    brief_version_used=mutation_result.brief.brief_version,
+                    code="request_cancelled",
+                    message="The trip details were saved, but the answer was interrupted.",
+                    deadline=deadline, preparation_trace=original.get("trace"),
+                ))
+            elif apply_attempted:
+                await asyncio.shield(self._resolve_apply_outcome_unknown(
+                    session_id=session_id, hotel_id=confirmation.hotel_id,
+                    request_id=request_id, deadline=deadline,
+                    uncertain_if_missing=True,
+                ))
+            else:
+                await asyncio.shield(self._fail_request(
+                    session_id, request_id, "request_cancelled",
+                ))
+            raise
+        except Exception as exc:
+            if mutation_result is None:
+                applied = False
+                receipt_check_failed = False
+                try:
+                    saved_receipt = await asyncio.to_thread(
+                        get_guest_brief_receipt, self._engine,
+                        session_id=session_id, hotel_id=confirmation.hotel_id,
+                        receipt_id=request_id, timeout_seconds=0.5,
+                    )
+                    saved_brief_receipt = (saved_receipt or {}).get("receipt")
+                    applied = bool(saved_brief_receipt and
+                                   saved_brief_receipt.brief_version_after
+                                   > saved_brief_receipt.brief_version_before)
+                except (SQLAlchemyError, TimeoutError):
+                    receipt_check_failed = True
+                code = ("brief_apply_outcome_unknown" if applied or receipt_check_failed
+                        else "brief_confirmation_failed")
+                if applied:
+                    raise await self._partial_failure(
+                        session_id=session_id, hotel_id=confirmation.hotel_id,
+                        request_id=request_id, receipt_id=request_id,
+                        brief_version_used=saved_brief_receipt.brief_version_after,
+                        code=code,
+                        message="The trip details were saved, but confirmation processing was interrupted.",
+                        deadline=deadline, preparation_trace=original.get("trace"),
+                    ) from exc
+                await self._fail_request(session_id, request_id, code)
+                message = ("The trip update may have been saved; retry this confirmation with the same request ID."
+                           if code == "brief_apply_outcome_unknown" else "The trip update could not be confirmed.")
+                raise GuestChatError(503, code, message, retryable=True) from exc
+            raise await self._partial_failure(
+                session_id=session_id, hotel_id=confirmation.hotel_id,
+                request_id=request_id, receipt_id=request_id,
+                brief_version_used=mutation_result.brief.brief_version,
+                code="storage_unavailable",
+                message="The trip details were saved, but the answer could not be completed.",
+                deadline=deadline, status=503,
+                preparation_trace=original.get("trace"),
+            ) from exc
+
     async def _partial_failure(
         self, *, session_id: str, hotel_id: str, request_id: str, receipt_id: str,
         brief_version_used: int, code: str, message: str, deadline: float, status: int = 502,
         validation_diagnostics: dict[str, Any] | None = None,
+        preparation_trace: dict[str, Any] | None = None,
     ) -> GuestChatError:
         brief = await asyncio.to_thread(
             get_guest_brief, self._engine, session_id=session_id, hotel_id=hotel_id,
@@ -1594,6 +1967,8 @@ class GuestChatApplication:
         }
         if validation_diagnostics is not None:
             partial["error"]["validation_diagnostics"] = validation_diagnostics
+        if preparation_trace is not None:
+            partial["preparation_trace"] = preparation_trace
         partial = await asyncio.to_thread(
             complete_partial_request, self._engine, session_id=session_id, hotel_id=hotel_id,
             request_id=request_id, response=partial, brief_receipt_id=receipt_id,

@@ -1,0 +1,105 @@
+{
+  "candidate": "891515af41444208931c671cad0b54dbaa57f18f5cd6e4296fe19c5965f79ce0",
+  "artifacts": {
+    "resumed-root-final.log": {
+      "sha256": "cc8af8760dacadbf6466ce896cc42b3de47fc8a96fa536b728658177c09f5025",
+      "bytes": 640
+    },
+    "resumed-affected-contracts.log": {
+      "sha256": "7163fc6cfdfb557bfab94a6c3d2c9137d6bd5224f1f949cb9fef3506bcd0beb3",
+      "bytes": 99
+    },
+    "recovery-web-contracts.log": {
+      "sha256": "f5612bbe10f9ef4fe20fd74e62a730facef6eca06f93e1d6810f4b1206e9e258",
+      "bytes": 16301
+    },
+    "recovery-web-lint.log": {
+      "sha256": "c9df0521faedcfa6540a0cb2b1d4fe30dfb75f1a349a8ba3d044906388448d4e",
+      "bytes": 49
+    },
+    "recovery-web-typecheck.log": {
+      "sha256": "a6c8d8a9024091b9649ee62d659ac28b8535accb01a820f318c77d27cbd2949a",
+      "bytes": 133
+    },
+    "recovery-web-build.log": {
+      "sha256": "f78c01ee35c4ed3653df5c11bac31fcbc774dbaf81af21cb141ff3b69ef89d21",
+      "bytes": 843
+    },
+    "resumed-browser-final-confirmation.log": {
+      "sha256": "7ed41dbc467fb64bae75e405e6a4823687e200948a2e1d9191eb5290f538937a",
+      "bytes": 538
+    },
+    "resumed-browser-final-default.log": {
+      "sha256": "3947ab62540e53e59a8f9d04de598eb8cc5e167d5d2dbf63659a69673cdbee03",
+      "bytes": 553
+    },
+    "resumed-browser-final-html.log": {
+      "sha256": "b26baafb6c29f58e1fcb8d52aff97a45ba8b167849deb70eb50e0b9fef153c40",
+      "bytes": 404
+    },
+    "resumed-browser-final-db.json": {
+      "sha256": "fb0f29fffc548c69165a9c615bc91ae7a49c4711f4c6cffa82a033861e5d403d",
+      "bytes": 1704
+    },
+    "recovery-browser.log": {
+      "sha256": "c9db37d933bedbc32e3c7bc077c13b5769176b73f1d9c86d49f857cf922d7e2e",
+      "bytes": 461
+    },
+    "delivery-ruff.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "resumed-browser-final/b09-browser-canceled-brief.png": {
+      "sha256": "d80d4c19cfccb9af0d03987c1bd63f2238274eca5dccd0c616cc3e5bf6906cf4",
+      "bytes": 158166,
+      "local_only": true
+    },
+    "resumed-browser-final/b09-browser-confirmed-brief.png": {
+      "sha256": "a7f789f784b52a160518357829478ec2fa8d5d2f0468ed0a5ce69ce07e086b56",
+      "bytes": 181641,
+      "local_only": true
+    },
+    "resumed-browser-final/b09-browser-html-refusal.png": {
+      "sha256": "46a23ceb7875dc25d26b1a4625178e96b7e4a3faa21bf850a7b70649cc57e596",
+      "bytes": 150026,
+      "local_only": true
+    },
+    "resumed-browser-final/b09-browser-positive.png": {
+      "sha256": "504a58af3dc2ad82345936eb22f926aa91cd4981ffbaad32f85610527b06df1f",
+      "bytes": 311119,
+      "local_only": true
+    },
+    "resumed-browser-final/b09-browser-refusal.png": {
+      "sha256": "2f0090292b1285338b9bf40748ee9bf7486deee42c5d269922a1def5224a3b07",
+      "bytes": 283744,
+      "local_only": true
+    }
+  },
+  "product_model_calls": 0,
+  "counts_overlap": true,
+  "builder_checks": {
+    "affected_suite_before_recovery_fix": 46,
+    "mandatory_asyncio_optional_uvloop_after_parameterization": 2,
+    "final_recovery_B09_contracts_and_API": 16,
+    "final_recovery_focused": 1,
+    "provenance": "Executed builder terminal results; no persisted output log for46; coordinator independently verified affected subsets and Q independently verified final recovery."
+  },
+  "root_checks": {
+    "final_B09_API_schema_before_recovery_delta": 23,
+    "inherited_contracts": 17,
+    "final_web_contracts": 45,
+    "final_web_lint_typecheck_build": "PASS",
+    "canonical_Ruff_compile_NodeSyntax_diff": "PASS"
+  },
+  "browser": {
+    "confirmed_cancel_FAQ_refusal_HTML": "Actual production web/proxy/offline API/isolated PG PASS",
+    "no_effect_recovery": "First503response local interception only; explicit new-ID second confirmation actually reached API/PG200; no automatic retry",
+    "earlier_confirmation_failures": 3,
+    "failures_preserved": [
+      "resumed-browser-confirmation.log",
+      "resumed-browser-confirmation-diagnostic.log",
+      "resumed-browser-frozen-api.log"
+    ]
+  },
+  "limits": "No live model/source/hotel/production acceptance or billing-cap claim. Screenshots/ephemeral tokens remain local."
+}

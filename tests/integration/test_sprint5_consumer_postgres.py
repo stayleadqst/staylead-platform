@@ -181,26 +181,67 @@ def _post(client: TestClient, session: dict[str, Any], body: dict[str, str]):
     )
 
 
+def _confirm(client: TestClient, session: dict[str, Any], challenge_response: dict[str, Any], request_id: str):
+    challenge = challenge_response.get("brief_confirmation")
+    assert challenge_response.get("confirmation_required") is True and isinstance(challenge, dict)
+    return client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations",
+        headers={"Authorization": f"Bearer {session['access_token']}"},
+        json={"request_id": request_id, "confirmation_token": challenge["token"]},
+    )
+
+
 def test_mixed_edit_commits_before_answer_and_brief_remains_available_after_history_window(engine) -> None:
     provider = BriefConsumerProvider()
     client, session = _client(engine, provider)
     response = _post(client, session, {"request_id": str(uuid.uuid4()), "question": EDIT})
     assert response.status_code == 200, response.text
-    first = response.json()
+    challenge = response.json()
+    assert challenge["confirmation_required"] is True
+    assert challenge["guest_brief"]["brief_version"] == 0
+    assert provider.calls == 1
+    assert challenge["trace"]["calls"] == challenge["trace"]["preparation_calls"] == 1
+    child_change = next(
+        change for change in challenge["brief_confirmation"]["changes"]
+        if change["field"] == "party.children"
+    )
+    proposed_child_id = child_change["after"][0]["member_id"]
+    confirmation_request_id = str(uuid.uuid4())
+    confirmed = _confirm(client, session, challenge, confirmation_request_id)
+    assert confirmed.status_code == 200, confirmed.text
+    first = confirmed.json()
     assert first["status"] == "completed"
     assert first["guest_brief"]["brief_version"] == 1
     assert first["guest_brief"]["dates"]["nights"] == 3
     assert len(first["guest_brief"]["party"]["children"]) == 1
+    assert first["guest_brief"]["party"]["children"][0]["member_id"] == proposed_child_id
     assert first["brief_receipt"]["answer_status"] == "completed"
     assert first["evidence"], "the mixed breakfast question should retain hotel evidence"
-    assert first["trace"]["calls"] <= 2
+    assert first["trace"]["calls"] == 2
+    assert first["trace"]["preparation_calls"] == 1
+    assert len(first["trace"]["provider_request_ids"]) == 2
+    assert first["trace"]["usage"] == {
+        "input_tokens": 6, "output_tokens": 8, "total_tokens": 14,
+    }
     assert any(item.get("guest_brief", {}).get("brief_version") == 1 for item in provider.inputs if "facts" in item)
+    assert any(
+        any(child.get("member_id") == proposed_child_id
+            for child in item.get("guest_brief", {}).get("data", {}).get("party", {}).get("children", []))
+        for item in provider.inputs if item.get("guest_brief_patch_enabled") is False
+    ), "the committed answer must consume the child identity shown in the confirmation review"
     committed_calls = [item for item in provider.inputs if item.get("guest_brief_patch_enabled") is False]
     assert committed_calls
     committed_instructions = committed_calls[-1]["instructions"]
     assert len(committed_instructions) < 3000
     assert "guest_patch" not in committed_instructions
     assert "set_dates" not in committed_instructions
+
+    calls_after_confirm = provider.calls
+    replay = _confirm(client, session, challenge, confirmation_request_id)
+    assert replay.status_code == 200, replay.text
+    replay_child_id = replay.json()["guest_brief"]["party"]["children"][0]["member_id"]
+    assert replay_child_id == proposed_child_id
+    assert provider.calls == calls_after_confirm, "same-ID confirmation replay must not reapply or call the provider"
 
     for _ in range(5):
         faq = _post(client, session, {"request_id": str(uuid.uuid4()), "question": "What are the breakfast hours?"})
@@ -258,10 +299,13 @@ def test_breakfast_preparation_rejects_unscoped_patch_as_invalid_model_output(en
 def test_unknown_provider_usage_remains_unavailable_in_api_trace(engine) -> None:
     provider = BriefConsumerProvider(unknown_usage=True)
     client, session = _client(engine, provider)
-    response = _post(client, session, {"request_id": str(uuid.uuid4()), "question": EDIT})
+    prepared = _post(client, session, {"request_id": str(uuid.uuid4()), "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    response = _confirm(client, session, prepared.json(), str(uuid.uuid4()))
     assert response.status_code == 200, response.text
     result = response.json()
-    assert result["trace"]["calls"] == 2, "the test must exercise preparation plus committed-answer aggregation"
+    assert result["trace"]["calls"] == 2, "confirmation combines one preparation and one committed-answer call"
+    assert result["trace"]["preparation_calls"] == 1
     assert result["trace"]["usage"] == {
         "input_tokens": None,
         "output_tokens": None,
@@ -273,7 +317,10 @@ def test_cached_replay_freshness_lookup_failure_keeps_same_request_recoverable(e
     provider = BriefConsumerProvider()
     client, session = _client(engine, provider)
     request_id = str(uuid.uuid4())
-    first = _post(client, session, {"request_id": request_id, "question": EDIT})
+    prepared = _post(client, session, {"request_id": request_id, "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    action_id = str(uuid.uuid4())
+    first = _confirm(client, session, prepared.json(), action_id)
     assert first.status_code == 200, first.text
     assert first.json()["status"] == "completed"
     calls_after_completion = provider.calls
@@ -281,13 +328,15 @@ def test_cached_replay_freshness_lookup_failure_keeps_same_request_recoverable(e
         raise OperationalError("synthetic cached freshness lookup failure", None, Exception("synthetic"))
 
     with patch.object(guest_chat_composition, "get_guest_brief", fail_cached_freshness):
-        uncertain = _post(client, session, {"request_id": request_id, "question": EDIT})
+        uncertain = _confirm(client, session, prepared.json(), action_id)
     assert uncertain.status_code == 503, uncertain.text
     assert uncertain.json()["error"]["code"] == "freshness_unavailable"
 
-    replay = _post(client, session, {"request_id": request_id, "question": EDIT})
+    replay = _confirm(client, session, prepared.json(), action_id)
     assert replay.status_code == 200, replay.text
     assert replay.json()["status"] == "completed"
+    assert replay.json()["trace"]["calls"] == 2
+    assert len(replay.json()["trace"]["provider_request_ids"]) == 2
     assert len(replay.json()["guest_brief"]["party"]["children"]) == 1
     assert provider.calls == calls_after_completion
 
@@ -296,28 +345,34 @@ def test_postcommit_failure_replays_same_id_and_resumes_without_resubmitting_edi
     provider = BriefConsumerProvider(fail_final_answer_once=True)
     client, session = _client(engine, provider)
     request_id = str(uuid.uuid4())
-    failed = _post(client, session, {"request_id": request_id, "question": EDIT})
+    prepared = _post(client, session, {"request_id": request_id, "question": EDIT})
+    assert prepared.status_code == 200, prepared.text
+    assert prepared.json()["confirmation_required"] is True
+    assert provider.calls == 1
+    action_id = str(uuid.uuid4())
+    failed = _confirm(client, session, prepared.json(), action_id)
     assert failed.status_code == 502, failed.text
     partial = failed.json()
     assert partial["status"] == "partial_success"
     assert partial["guest_brief"]["brief_version"] == 1
     assert partial["brief_receipt"]["status"] == "partial_success"
     assert partial["answer_status"] == "failed"
+    assert partial["preparation_trace"] == prepared.json()["trace"]
     persisted_scope = get_guest_brief_receipt(
-        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=request_id,
+        engine, session_id=session["session_id"], hotel_id="HTL-CITY01", receipt_id=action_id,
     )["answer_payload"]
     assert persisted_scope["turn_intents"] == ["hotel_information", "guest_edit"]
     assert persisted_scope["authorized_targets"] == ["dates.check_in", "dates.check_out", "party.adults", "party.children"]
     failed_calls = provider.calls
 
-    replay = _post(client, session, {"request_id": request_id, "question": EDIT})
+    replay = _confirm(client, session, prepared.json(), action_id)
     assert replay.status_code == 200, replay.text
     assert replay.json()["status"] == "partial_success"
     assert replay.json()["guest_brief"]["brief_version"] == 1
     assert provider.calls == failed_calls
 
     resumed = _post(client, session, {
-        "request_id": str(uuid.uuid4()), "answer_only_receipt_id": request_id,
+        "request_id": str(uuid.uuid4()), "answer_only_receipt_id": action_id,
     })
     assert resumed.status_code == 200, resumed.text
     assert resumed.json()["status"] == "completed"
@@ -342,8 +397,11 @@ def test_lost_apply_ack_returns_partial_and_same_id_recovery_never_duplicates_ch
         apply_original(*args, **kwargs)
         raise OperationalError("synthetic commit acknowledgement unavailable", None, Exception("synthetic"))
 
+    prepared = _post(client, session, {"request_id": request_id, "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    action_id = str(uuid.uuid4())
     with patch.object(guest_chat_composition, "apply_guest_brief_patch", commit_then_lose_ack):
-        first = _post(client, session, {"request_id": request_id, "question": EDIT})
+        first = _confirm(client, session, prepared.json(), action_id)
     assert first.status_code == 502, first.text
     partial = first.json()
     assert partial["status"] == "partial_success"
@@ -351,14 +409,14 @@ def test_lost_apply_ack_returns_partial_and_same_id_recovery_never_duplicates_ch
     assert len(partial["guest_brief"]["party"]["children"]) == 1
     calls_after_commit = provider.calls
 
-    replay = _post(client, session, {"request_id": request_id, "question": EDIT})
+    replay = _confirm(client, session, prepared.json(), action_id)
     assert replay.status_code == 200, replay.text
     assert replay.json()["status"] == "partial_success"
     assert len(replay.json()["guest_brief"]["party"]["children"]) == 1
     assert provider.calls == calls_after_commit
 
     resumed = _post(client, session, {
-        "request_id": str(uuid.uuid4()), "answer_only_receipt_id": request_id,
+        "request_id": str(uuid.uuid4()), "answer_only_receipt_id": action_id,
     })
     assert resumed.status_code == 200, resumed.text
     assert resumed.json()["brief_receipt"]["answer_status"] == "completed"
@@ -376,8 +434,11 @@ def test_apply_commit_delayed_ack_past_deadline_returns_partial_and_same_id_reco
         time.sleep(1.5)
         return result
 
+    prepared = _post(client, session, {"request_id": request_id, "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    action_id = str(uuid.uuid4())
     with patch.object(guest_chat_composition, "apply_guest_brief_patch", commit_then_delay_ack):
-        timed_out = _post(client, session, {"request_id": request_id, "question": EDIT})
+        timed_out = _confirm(client, session, prepared.json(), action_id)
     assert timed_out.status_code == 502, timed_out.text
     partial = timed_out.json()
     assert partial["status"] == "partial_success"
@@ -385,7 +446,7 @@ def test_apply_commit_delayed_ack_past_deadline_returns_partial_and_same_id_reco
     assert len(partial["guest_brief"]["party"]["children"]) == 1
     calls_after_timeout = provider.calls
 
-    replay = _post(client, session, {"request_id": request_id, "question": EDIT})
+    replay = _confirm(client, session, prepared.json(), action_id)
     assert replay.status_code == 200, replay.text
     assert replay.json()["status"] == "partial_success"
     assert len(replay.json()["guest_brief"]["party"]["children"]) == 1
@@ -411,14 +472,17 @@ def test_uncertain_receipt_lookup_keeps_same_id_and_replay_recovers_without_prov
             raise OperationalError("synthetic receipt lookup failure", None, Exception("synthetic"))
         return receipt_lookup_original(*args, **kwargs)
 
+    prepared = _post(client, session, {"request_id": request_id, "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    action_id = str(uuid.uuid4())
     with patch.object(guest_chat_composition, "apply_guest_brief_patch", commit_then_lose_ack), \
             patch.object(guest_chat_composition, "get_guest_brief_receipt", fail_first_receipt_lookup):
-        first = _post(client, session, {"request_id": request_id, "question": EDIT})
+        first = _confirm(client, session, prepared.json(), action_id)
         assert first.status_code == 503, first.text
         assert first.json()["error"]["code"] == "brief_apply_outcome_unknown"
         calls_after_uncertain = provider.calls
 
-        replay = _post(client, session, {"request_id": request_id, "question": EDIT})
+        replay = _confirm(client, session, prepared.json(), action_id)
 
     assert replay.status_code == 200, replay.text
     assert replay.json()["status"] == "partial_success"
@@ -430,7 +494,9 @@ def test_dependent_replay_goes_stale_but_pure_faq_does_not_after_later_edit(engi
     provider = BriefConsumerProvider()
     client, session = _client(engine, provider)
     first_id = str(uuid.uuid4())
-    first = _post(client, session, {"request_id": first_id, "question": EDIT})
+    prepared = _post(client, session, {"request_id": first_id, "question": EDIT})
+    assert prepared.status_code == 200 and prepared.json()["confirmation_required"] is True
+    first = _confirm(client, session, prepared.json(), str(uuid.uuid4()))
     assert first.status_code == 200, first.text
 
     dependent_id = str(uuid.uuid4())
@@ -442,7 +508,9 @@ def test_dependent_replay_goes_stale_but_pure_faq_does_not_after_later_edit(engi
     assert faq.status_code == 200, faq.text
     assert faq.json().get("brief_dependent") is not True
 
-    changed = _post(client, session, {"request_id": str(uuid.uuid4()), "question": EDIT_LATER})
+    changed_prepared = _post(client, session, {"request_id": str(uuid.uuid4()), "question": EDIT_LATER})
+    assert changed_prepared.status_code == 200 and changed_prepared.json()["confirmation_required"] is True
+    changed = _confirm(client, session, changed_prepared.json(), str(uuid.uuid4()))
     assert changed.status_code == 200, changed.text
     stale_replay = _post(client, session, {"request_id": dependent_id, "question": "How many nights is my stay?"})
     assert stale_replay.status_code == 200, stale_replay.text

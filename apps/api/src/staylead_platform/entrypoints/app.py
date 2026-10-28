@@ -21,7 +21,7 @@ from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.platform.contracts.ai_provider import AIProvider
 
 MAX_QUESTION_CHARS = 2000
-GUEST_CONTRACT_VERSION = "1"
+GUEST_CONTRACT_VERSION = "2"
 
 
 class CreateSessionRequest(BaseModel):
@@ -40,6 +40,12 @@ class MessageRequest(BaseModel):
         if (self.question is None) == (self.answer_only_receipt_id is None):
             raise ValueError("Provide either a question or an answer-only receipt reference.")
         return self
+
+
+class BriefConfirmationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    request_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
+    confirmation_token: str = Field(min_length=1, max_length=32_768)
 
 
 class FreshnessRequest(BaseModel):
@@ -128,6 +134,21 @@ def create_app(
             session_id=session_id, token=authorization[7:],
             request_id=body.request_id, question=body.question,
             answer_only_receipt_id=body.answer_only_receipt_id,
+        )
+
+    @app.post("/v1/guest/sessions/{session_id}/brief-confirmations", tags=["guest chat"])
+    async def confirm_guest_brief_edit(
+        session_id: str,
+        body: BriefConfirmationRequest,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, Any]:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        return await guest_chat.confirm_brief_edit(
+            session_id=session_id,
+            token=authorization[7:],
+            request_id=body.request_id,
+            confirmation_token=body.confirmation_token,
         )
 
     @app.post("/v1/guest/sessions/{session_id}/freshness", tags=["guest chat"])

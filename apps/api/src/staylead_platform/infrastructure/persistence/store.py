@@ -2081,6 +2081,43 @@ def complete_request(
     return result
 
 
+def complete_request_with_response_only(
+    engine: Engine, *, session_id: str, hotel_id: str, request_id: str,
+    question: str, response: dict[str, Any], timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Persist a scoped response without inventing transcript messages or advancing session state."""
+    digest = hashlib.sha256(question.encode("utf-8")).hexdigest()
+    saved_response = dict(response)
+    if saved_response.get("request_id") != request_id:
+        raise ValueError("Response request ID must match its reservation.")
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        row = connection.execute(select(requests).where(and_(
+            requests.c.session_id == session_id,
+            requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id,
+        )).with_for_update()).mappings().first()
+        if row is None or row["payload_hash"] != digest:
+            raise ScopeError("request scope is invalid")
+        if row["status"] == "completed":
+            existing = row["response"] if isinstance(row["response"], dict) else {}
+            if existing.get("request_id") != request_id:
+                raise IdempotencyConflict("request response is invalid")
+            return dict(existing)
+        if row["status"] != "processing":
+            raise RequestInProgress("request is not in a completable state")
+        updated = connection.execute(update(requests).where(and_(
+            requests.c.session_id == session_id,
+            requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id,
+            requests.c.payload_hash == digest,
+            requests.c.status == "processing",
+        )).values(status="completed", response=saved_response))
+        if updated.rowcount != 1:
+            raise RequestInProgress("request reservation changed before completion")
+    return saved_response
+
+
 def fail_request(
     engine: Engine, *, session_id: str, request_id: str, code: str,
     timeout_seconds: float | None = None,

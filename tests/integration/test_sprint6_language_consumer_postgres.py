@@ -40,6 +40,15 @@ def engine():
     database.dispose()
 
 
+def _confirm(client: TestClient, session: dict[str, Any], challenge: dict[str, Any], request_id: str):
+    return client.post(
+        f"/v1/guest/sessions/{session['session_id']}/brief-confirmations",
+        headers={"Authorization": f"Bearer {session['access_token']}"},
+        json={"request_id": request_id,
+              "confirmation_token": challenge["brief_confirmation"]["token"]},
+    )
+
+
 class LanguageProvider:
     def __init__(self) -> None:
         self.inputs: list[dict[str, Any]] = []
@@ -348,7 +357,13 @@ def test_committed_safe_portion_trace_and_answer_persist_across_same_id_replay(e
         "question": "Please answer in Vietnamese and save my stay from December 10 to 13 for two adults and one child.",
     }
 
-    response = client.post(endpoint, headers=headers, json=body)
+    prepared = client.post(endpoint, headers=headers, json=body)
+    assert prepared.status_code == 200, prepared.text
+    challenge = prepared.json()
+    assert challenge["status"] == "confirmation_required"
+    assert challenge["trace"]["calls"] == challenge["trace"]["preparation_calls"] == 1
+    confirmation_request_id = str(uuid.uuid4())
+    response = _confirm(client, session, challenge, confirmation_request_id)
     assert response.status_code == 200, response.text
     result = response.json()
     assert result["status"] == "completed"
@@ -374,7 +389,7 @@ def test_committed_safe_portion_trace_and_answer_persist_across_same_id_replay(e
     assert result["brief_receipt"]["answer_status"] == "completed"
     assert provider.calls == 2
 
-    replay = client.post(endpoint, headers=headers, json=body)
+    replay = _confirm(client, session, challenge, confirmation_request_id)
     assert replay.status_code == 200, replay.text
     replayed = replay.json()
     assert replayed["answer"] == result["answer"]
@@ -442,7 +457,12 @@ def test_checkout_clarification_and_thanks_survive_api_same_id_replay(engine) ->
     }
     first = client.post(endpoint, headers=headers, json=first_body)
     assert first.status_code == 200, first.text
-    clarified = first.json()
+    first_challenge = first.json()
+    assert first_challenge["confirmation_required"] is True
+    first_confirmation_id = str(uuid.uuid4())
+    first_confirmed = _confirm(client, session, first_challenge, first_confirmation_id)
+    assert first_confirmed.status_code == 200, first_confirmed.text
+    clarified = first_confirmed.json()
     assert clarified["language_preference"] == {"language_tag": "hi", "source": "explicit", "revision": 1}
     assert clarified["guest_brief"]["brief_version"] == 1
     assert clarified["guest_brief"]["dates"]["check_out"] is None
@@ -460,7 +480,11 @@ def test_checkout_clarification_and_thanks_survive_api_same_id_replay(engine) ->
     }
     second = client.post(endpoint, headers=headers, json=second_body)
     assert second.status_code == 200, second.text
-    resolved = second.json()
+    second_challenge = second.json()
+    assert second_challenge["confirmation_required"] is True
+    second_confirmed = _confirm(client, session, second_challenge, str(uuid.uuid4()))
+    assert second_confirmed.status_code == 200, second_confirmed.text
+    resolved = second_confirmed.json()
     assert resolved["language_preference"] == {"language_tag": "hi", "source": "explicit", "revision": 1}
     assert resolved["guest_brief"]["brief_version"] == 2
     assert resolved["guest_brief"]["dates"] == {
@@ -491,7 +515,7 @@ def test_checkout_clarification_and_thanks_survive_api_same_id_replay(engine) ->
     assert replayed["trace"]["calls"] == 2
     assert provider.calls == 6, "same-ID replay must return persisted acknowledgement without another model call"
 
-    old_clarification = client.post(endpoint, headers=headers, json=first_body)
+    old_clarification = _confirm(client, session, first_challenge, first_confirmation_id)
     assert old_clarification.status_code == 200, old_clarification.text
     assert old_clarification.json()["answer_eligibility"] == "stale"
     assert provider.calls == 6, "replaying a stale clarification must not call the provider"
