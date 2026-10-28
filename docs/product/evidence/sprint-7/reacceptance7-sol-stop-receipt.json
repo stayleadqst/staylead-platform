@@ -1,0 +1,16 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol",
+  "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "status": "completed",
+  "guest_turns": 2,
+  "codex_requests": 4,
+  "state_sha256": "4665e22612dc04d3532c60cfec98fc280d06fa81b1805008025e9221a36f8da6",
+  "lifetime_requests": 56,
+  "unused_guest_slots": 0,
+  "unused_request_slots": 0,
+  "actual_outcome": {
+    "pine1": "PASS",
+    "pine2": "PASS FrenchGarden5mknownbase/unknownfees/currentselection"
+  },
+  "runners": "browser62167exit0/API25527SIGTERMexit143; bothmarkersPASS, no retry"
+}

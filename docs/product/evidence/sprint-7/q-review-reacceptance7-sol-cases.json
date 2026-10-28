@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS exact approved inputs; final controls readiness pending freeze",
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol",
+  "cases_sha256": "c684ea8fe0675aaa820597f3ebdb800273f6c64f8c378ade2e70264770ed4088",
+  "authority_sha256": "a9bd2eba5c9a9c008aa78e85f420370220a145d3e5c3bfae2cb6dea2af8233ff",
+  "same_exact_published_case_objects": true,
+  "private_modes": "0600 both",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "prior_record_exact": true,
+  "prior_sealed_state_sha256": "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27",
+  "prior": "HALTED1/2 lifetime52 unused1/2closed; no transfer",
+  "new_scope": "Fresh0/0 separate manually approved2/4 Sol/low; no continuation; no automatic retry/fallback; two original Pine utterances in one fresh session",
+  "no_calls_or_mutations": true
+}

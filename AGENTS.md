@@ -1,5 +1,15 @@
 # Staylead Platform — mandatory working context
 
+## Final Sprint7 acceptance checkpoint — 2026-10-28
+
+IndependentQPASS fullC01AC1–8/B07AC1–3/scopedSprint7DoD. ActualR7candidate2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5/all237pins unchanged; productdd0. BothoriginalPinePASS: age7hardaccess→sameUUID8/clearONLYtwoaccess/FrenchGarden5mknownbase/unknownfeesnulltotal/currentselection0extraLLM; usefulVIverificationonly, no inventedrequirements. CityR3/FamilyR2/B07 actualPASS reused, priorfailures unchanged. Browser62167exit0/mobile390PASS/API25527exit143stopped. R7sealedCOMPLETED2/4 SHA4665e22612dc04d3532c60cfec98fc280d06fa81b1805008025e9221a36f8da6/lifetime56/no retry/fallback/unusedslots. No furtherinferenceauthorized. Root292backend16PG/23controls/RuffcompileDiffPASS; frontend53pinsunchangedreuse40/lint/typecheck/build; Qfullmatrixin q-review-reacceptance7-sol-actual.json. No functionalblocker; authorizedpublication/close39,98,97 andownPR99ready+mergeintoSprint5whenGitHubpermitsremain. Do not reopenB07, rerunacceptedcases/tests, restoreoldR0R1R2rules, closebroaderparents/deploy/Grok/newpaidresources/manualCI/protectionbypass. Allolderpending/failureapprovalnotesbelowhistorical/consumed. Preserve rawlocal0600/syntheticlimitations.
+
+
+## Current direct authority — 2026-10-28 R7
+
+Hieu explicitly approved NEW “Cho phép batch mới Sol/low 2/4” on productdd0cc688/PR99commita63bdfb. Execute fresh s7-room-advice-20261028-reacceptance7-sol, exacttwooriginalPineutterances/onefreshsession,Sol/low,max2guest4requests,2calls25s45s700,noautoretry/nofallback,stopfirstblockingfailure; reuseCity/Family/B07PASS. PriorR6HALTED1/2/lifetime52/stateSHA4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27 andunused1/2CLOSED preserved. This direct human approval supersedes pending-approval notes below only; full semanticAC/DoD unchanged. B Luna/high3opt-incontrols-only; Q Sol/high independentreadiness/actualREADONLY; rootpins/init/markers/delivery. Gate+review beforeactivation; fullactualAC/localQ beforeDone/ownPR99mergewhenGitHubpermits.
+
+
 ## Latest checkpoint — 2026-10-28 after R6 first-failure stop
 
 R6humanSol/low2/4allowanceclosedHALTED1guest2requests/lifetime52,stateSHA4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27; unused1/2CLOSED/noresettransferretry. Actuala7b93fae Pine1correctM2/knownaccessVIverification but EXTRAmodelroom_advicegenericquestion asksalreadyknownrequirements→strictAC2FAIL; Qreadonlybrief/state1,1completedreq/result,2messages,noselection/current10refs. Nomarker01/turn2. API62558exit143/browser35519SIGTERMthenSIGKILLexit137stopped. Allpreviousapprovalnotesbelowhistorical/consumed.

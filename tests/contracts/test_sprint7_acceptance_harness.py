@@ -127,7 +127,7 @@ class Sprint7HarnessTests(unittest.TestCase):
 
     def test_fresh_caps_and_closed_prior_receipt_are_exact(self):
         self.assertTrue(runtime._valid_state(self.state, self.config, fresh=True))
-        self.assertEqual(runtime.RUN_ID, "s7-room-advice-20261028-reacceptance6-sol")
+        self.assertEqual(runtime.RUN_ID, "s7-room-advice-20261028-reacceptance7-sol")
         self.assertEqual(runtime.CASE_RUN_ID, runtime.RUN_ID)
         self.assertEqual((runtime.MAX_GUEST_TURNS, runtime.MAX_REQUESTS, runtime.MAX_CALLS_PER_TURN), (2, 4, 2))
         self.assertEqual((runtime.PROVIDER_TIMEOUT_SECONDS, runtime.TURN_TIMEOUT_SECONDS,
@@ -137,7 +137,7 @@ class Sprint7HarnessTests(unittest.TestCase):
         self.assertEqual((prior["run_id"], prior["guest_turns"], prior["codex_requests"],
                           prior["lifetime_requests"], prior["unused_guest_slots"],
                           prior["unused_request_slots"]),
-                         ("s7-room-advice-20261028-reacceptance5-sol", 2, 4, 50, 0, 0))
+                         ("s7-room-advice-20261028-reacceptance6-sol", 1, 2, 52, 1, 2))
         self.assertEqual(prior["state_sha256"], runtime.PRIOR_STATE_SHA256)
         for changed in (
             {**self.state, "max_guest_turns": 3},
@@ -430,14 +430,14 @@ assert.equal(checkPinePartyBrief({{ ...pine, party: {{ ...pine.party, bed_sharin
                                 text=True, capture_output=True, check=False, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    @unittest.skipUnless(Path("/private/tmp/staylead-s7-reacceptance6-sol-cases.json").is_file()
-                         and Path("/private/tmp/staylead-s7-reacceptance6-sol-authority.json").is_file(),
-                         "requires the coordinator-approved private reacceptance6 Sol matrix")
+    @unittest.skipUnless(Path("/private/tmp/staylead-s7-reacceptance7-sol-cases.json").is_file()
+                         and Path("/private/tmp/staylead-s7-reacceptance7-sol-authority.json").is_file(),
+                         "requires the coordinator-approved private reacceptance7 Sol matrix")
     def test_approved_matrix_exact_digest_two_pine_turns_and_prior_receipt(self):
-        private_path = Path("/private/tmp/staylead-s7-reacceptance6-sol-cases.json")
+        private_path = Path("/private/tmp/staylead-s7-reacceptance7-sol-cases.json")
         cases = runtime._private_file(private_path)
         self.assertEqual(runtime._file_sha256(private_path),
-                         "23e0baa5abdf9372cdafea134b0665b87f161965b571667fa9c9e98453fe0c3e")
+                         "c684ea8fe0675aaa820597f3ebdb800273f6c64f8c378ade2e70264770ed4088")
         self.assertEqual(cases["run_id"], runtime.RUN_ID)
         self.assertTrue(cases["authorized_for_live_calls"])
         self.assertEqual((cases["model"], cases["effort"]), ("gpt-6.1-sol", "low"))
@@ -449,10 +449,10 @@ assert.equal(checkPinePartyBrief({{ ...pine, party: {{ ...pine.party, bed_sharin
         self.assertEqual([case["approved_previous_turn"] for case in cases["cases"]], [6, 7])
         self.assertEqual(cases["no_automatic_retry"], True)
         self.assertEqual(cases["stop_at_first_blocking_failure"], True)
-        authority_path = Path("/private/tmp/staylead-s7-reacceptance6-sol-authority.json")
+        authority_path = Path("/private/tmp/staylead-s7-reacceptance7-sol-authority.json")
         authority = runtime._private_file(authority_path)
         self.assertEqual(runtime._file_sha256(authority_path),
-                         "d1fd022a6126201fc17eb610926f1338f5a987e51483d495c78a6380fc707469")
+                         "a9bd2eba5c9a9c008aa78e85f420370220a145d3e5c3bfae2cb6dea2af8233ff")
         self.assertEqual(authority["run_id"], runtime.RUN_ID)
         self.assertEqual(authority["case_matrix_sha256"], runtime._file_sha256(private_path))
         self.assertEqual((authority["max_guest_turns"], authority["max_codex_requests"],
@@ -463,15 +463,15 @@ assert.equal(checkPinePartyBrief({{ ...pine, party: {{ ...pine.party, bed_sharin
         runtime._verify_closed_prior_allocation(prior)
         self.assertEqual((prior["run_id"], prior["guest_turns"], prior["codex_requests"],
                           prior["lifetime_requests"], prior["state_sha256"]),
-                         (runtime.PRIOR_RUN_ID, 2, 4, 50, runtime.PRIOR_STATE_SHA256))
+                         (runtime.PRIOR_RUN_ID, 1, 2, 52, runtime.PRIOR_STATE_SHA256))
 
-    def test_browser_run_directory_is_unique_to_reacceptance6_namespace(self):
+    def test_browser_run_directory_is_unique_to_reacceptance7_namespace(self):
         repo = Path(__file__).parents[2]
         helper = (repo / "tools/evals/sprint7_browser_helpers.mjs").as_uri()
         script = f'''import {{ browserRunDirectory }} from "{helper}";
 import assert from "node:assert/strict";
-assert.equal(browserRunDirectory("s7-room-advice-20261028-reacceptance6-sol", "r1"),
-  "/private/tmp/staylead-s7-browser-s7-room-advice-20261028-reacceptance6-sol-r1");
+assert.equal(browserRunDirectory("s7-room-advice-20261028-reacceptance7-sol", "r1"),
+  "/private/tmp/staylead-s7-browser-s7-room-advice-20261028-reacceptance7-sol-r1");
 assert.throws(() => browserRunDirectory("../overwrite", "r2"), /Invalid private browser run directory/);
 '''
         result = subprocess.run(["node", "--input-type=module", "-e", script], cwd=repo,

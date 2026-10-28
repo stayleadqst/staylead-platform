@@ -37,11 +37,11 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s7-room-advice-20261028-reacceptance6-sol"
-CASE_RUN_ID = "s7-room-advice-20261028-reacceptance6-sol"
-PRIOR_RUN_ID = "s7-room-advice-20261028-reacceptance5-sol"
-PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-state.json")
-PRIOR_STATE_SHA256 = "9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee"
+RUN_ID = "s7-room-advice-20261028-reacceptance7-sol"
+CASE_RUN_ID = "s7-room-advice-20261028-reacceptance7-sol"
+PRIOR_RUN_ID = "s7-room-advice-20261028-reacceptance6-sol"
+PRIOR_STATE_PATH = Path("/private/tmp/staylead-s7-reacceptance6-sol-state.json")
+PRIOR_STATE_SHA256 = "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27"
 MAX_GUEST_TURNS = 2
 MAX_REQUESTS = 4
 START_GUEST_TURNS = 0
@@ -178,16 +178,16 @@ def _valid_state(state: dict[str, Any], config: dict[str, Any], *, fresh: bool =
 def _prior_allocation_record() -> dict[str, Any]:
     return {
         "run_id": PRIOR_RUN_ID,
-        "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
-        "status": "halted", "guest_turns": 2, "codex_requests": 4,
-        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 50,
-        "unused_guest_slots": 0, "unused_request_slots": 0,
+        "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+        "status": "halted", "guest_turns": 1, "codex_requests": 2,
+        "state_sha256": PRIOR_STATE_SHA256, "lifetime_requests": 52,
+        "unused_guest_slots": 1, "unused_request_slots": 2,
+        "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
         "actual_outcome": {
-            "pine1": "PASS",
-            "pine2": "FAIL room_count_mismatch; no positive option/current selection; French question fallback EN",
+            "pine1": "FAIL AC2 unnecessary generic room_advice question despite all relevant saved nonpending requirements",
+            "pine2": "Blocked dependency/notattempted",
         },
-        "runners": "API43586 SIGTERM/browser76255 exited1; no marker02/retry",
-        "bootstrap1_consumption": "0/0; sealed preserved",
+        "runners": "API62558 SIGTERM exit143; browser35519 SIGTERM then exact ownedPID13138 SIGKILL exit137; no marker01/turn2/retry",
     }
 
 
@@ -197,9 +197,9 @@ def _verify_closed_prior_allocation(value: Any) -> dict[str, Any]:
     parent = _private_file(PRIOR_STATE_PATH)
     if (_file_sha256(PRIOR_STATE_PATH) != PRIOR_STATE_SHA256
             or parent.get("run_id") != PRIOR_RUN_ID or parent.get("status") != "halted"
-            or parent.get("guest_turns") != 2 or parent.get("codex_requests") != 4
+            or parent.get("guest_turns") != 1 or parent.get("codex_requests") != 2
             or parent.get("max_guest_turns") != 2 or parent.get("max_codex_requests") != 4):
-        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 2/4 allocation.")
+        raise RuntimeError("Prior Sprint 7 state changed or is not the exact sealed 1/2 allocation.")
     return parent
 
 
