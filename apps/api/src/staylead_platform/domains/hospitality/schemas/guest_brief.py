@@ -254,6 +254,25 @@ def validate_preparation_metadata(
     return intents, authorizations
 
 
+def allow_empty_booking_request_preparation_answer(
+    payload: Any, turn_intents: tuple[str, ...],
+) -> bool:
+    """Allow preparation to defer a pure booking request to its server-side channel."""
+    patch = getattr(payload, "guest_patch", None)
+    return (
+        turn_intents == ("booking_request",)
+        and not getattr(payload, "supported_claims", ())
+        and not getattr(payload, "unknowns", ())
+        and not getattr(payload, "conflicts", ())
+        and not getattr(patch, "ops", ())
+        and not getattr(payload, "guest_patch_authorizations", ())
+        and not getattr(payload, "guest_claims", ())
+        and not getattr(payload, "guest_brief_refs", ())
+        and getattr(payload, "guest_clarification", None) is None
+        and getattr(payload, "conversational_acknowledgement", None) is None
+    )
+
+
 def validate_committed_turn_channels(
     payload: Any, intents: tuple[str, ...], pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
 ) -> None:

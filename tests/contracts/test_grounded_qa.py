@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from staylead_platform.domains.hospitality.grounded_claim_format import (
     format_grounded_claim,
 )
@@ -24,6 +23,7 @@ from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     committed_answer_output_schema,
 )
 from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    allow_empty_booking_request_preparation_answer,
     validate_committed_turn_channels,
     validate_guest_brief_proposal,
     validate_guest_patch_authorization,
@@ -149,6 +149,7 @@ def build(
         [tuple[str, ...], tuple[str, ...], GuestBriefSnapshot | None], dict[str, Any]
     ] | None = None,
     preparation_metadata_validator: Callable[..., Any] | None = None,
+    empty_preparation_answer_validator: Callable[..., bool] | None = None,
 ) -> GroundedQAOrchestrator:
     return GroundedQAOrchestrator(
         provider=provider,
@@ -167,6 +168,7 @@ def build(
         preparation_selection_schema_factory=preparation_selection_schema_factory,
         preparation_answer_schema_factory=preparation_answer_schema_factory,
         preparation_metadata_validator=preparation_metadata_validator,
+        empty_preparation_answer_validator=empty_preparation_answer_validator,
     )
 
 
@@ -1627,6 +1629,91 @@ def test_preparation_schema_is_attached_to_high_overlap_answer_without_wrapping_
     assert provider.calls[0].response_schema == preparation_answer_output_schema((), (), brief)
     assert provider.calls[0].response_envelope_key == "response"
     assert "06:30" in answer.answer
+
+
+def _empty_preparation_payload(turn_intents: list[str]) -> dict[str, Any]:
+    return {
+        "supported_claims": [], "unknowns": [], "conflicts": [],
+        "guest_patch": None, "turn_intents": turn_intents,
+        "guest_claims": [], "guest_clarification": None,
+        "conversational_acknowledgement": None, "guest_brief_refs": [],
+        "explicit_language_tag": None, "inferred_language_tag": None,
+        "label_bundle": {},
+    }
+
+
+def test_empty_pure_booking_request_is_allowed_only_by_domain_preparation_predicate() -> None:
+    provider = FakeProvider(answer=_empty_preparation_payload(["booking_request"]))
+    brief = GuestBriefSnapshot(0, {"dates": {}, "party": {}})
+    common = {
+        "preparation_answer_schema_factory": preparation_answer_output_schema,
+        "preparation_metadata_validator": validate_preparation_metadata,
+        "committed_answer_validator": validate_committed_turn_channels,
+    }
+
+    with pytest.raises(ConversationFailure, match="must state unknowns or conflicts"):
+        asyncio.run(build(provider, **common).answer(
+            hotel_id="HTL-CITY01", question="How can I contact the hotel?", history=[],
+            brief=brief, extract_guest_patch=True, prefetched_facts=[],
+        ))
+
+    answer = asyncio.run(build(
+        provider, **common,
+        empty_preparation_answer_validator=allow_empty_booking_request_preparation_answer,
+    ).answer(
+        hotel_id="HTL-CITY01", question="How can I contact the hotel?", history=[],
+        brief=brief, extract_guest_patch=True, prefetched_facts=[],
+    ))
+    assert answer.answer == ""
+    assert answer.turn_intents == ("booking_request",)
+
+
+@pytest.mark.parametrize("turn_intents", [
+    ["hotel_information"],
+    ["hotel_information", "booking_request"],
+    ["guest_edit"],
+    ["courtesy"],
+    ["local_guide"],
+])
+def test_empty_preparation_for_other_intents_remains_rejected(turn_intents: list[str]) -> None:
+    provider = FakeProvider(answer=_empty_preparation_payload(turn_intents))
+    brief = GuestBriefSnapshot(0, {"dates": {}, "party": {}})
+    with pytest.raises(ConversationFailure, match="must state unknowns or conflicts"):
+        asyncio.run(build(
+            provider,
+            preparation_answer_schema_factory=preparation_answer_output_schema,
+            preparation_metadata_validator=validate_preparation_metadata,
+            committed_answer_validator=validate_committed_turn_channels,
+            empty_preparation_answer_validator=allow_empty_booking_request_preparation_answer,
+        ).answer(
+            hotel_id="HTL-CITY01", question="How can I contact the hotel?", history=[],
+            brief=brief, extract_guest_patch=True, prefetched_facts=[],
+        ))
+
+
+def test_empty_booking_request_predicate_does_not_allow_foreign_or_rejected_content() -> None:
+    brief = GuestBriefSnapshot(0, {"dates": {}, "party": {"adults": 2, "children": []}})
+    common = {
+        "preparation_answer_schema_factory": preparation_answer_output_schema,
+        "preparation_metadata_validator": validate_preparation_metadata,
+        "committed_answer_validator": validate_committed_turn_channels,
+        "empty_preparation_answer_validator": allow_empty_booking_request_preparation_answer,
+    }
+    foreign = _empty_preparation_payload(["booking_request"])
+    foreign["unknowns"] = ["The hotel contact is not available."]
+    with pytest.raises(ConversationFailure, match="content outside this turn's scope"):
+        asyncio.run(build(FakeProvider(answer=foreign), **common).answer(
+            hotel_id="HTL-CITY01", question="How can I contact the hotel?", history=[],
+            brief=brief, extract_guest_patch=True, prefetched_facts=[],
+        ))
+
+    rejected = _empty_preparation_payload(["booking_request"])
+    rejected["guest_claims"] = [{"text": "You said 3 adults.", "refs": ["party.adults"]}]
+    with pytest.raises(ConversationFailure, match="unsupported number"):
+        asyncio.run(build(FakeProvider(answer=rejected), **common).answer(
+            hotel_id="HTL-CITY01", question="How can I contact the hotel?", history=[],
+            brief=brief, extract_guest_patch=True, prefetched_facts=[],
+        ))
 
 
 def test_committed_output_schema_scopes_hotel_channels_to_current_turn_intent() -> None:

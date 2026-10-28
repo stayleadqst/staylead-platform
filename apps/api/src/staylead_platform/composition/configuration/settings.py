@@ -34,6 +34,7 @@ class Settings(BaseSettings):
         "pine-ridge-demo": "https://booking.example/hotels/pine-ridge-demo",
     })
     booking_contact_by_hotel: dict[str, str] = Field(default_factory=dict)
+    booking_contact_hours_by_hotel: dict[str, str] = Field(default_factory=dict)
     azure_openai_base_url: str | None = Field(default=None, validation_alias="AZURE_OPENAI_BASE_URL")
     azure_openai_api_key: SecretStr | None = Field(default=None, validation_alias="AZURE_OPENAI_API_KEY")
     azure_openai_model_deployment: str = Field(

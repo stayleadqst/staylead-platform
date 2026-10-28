@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import type { GuestTurnResultRendererProps } from "@/composition/domain_registry";
 import { safeBookingDestination } from "@/domains/hospitality/registration/booking-channel";
 import { roomAdviceCostView } from "@/domains/hospitality/registration/room-advice-cost";
@@ -10,6 +12,7 @@ import { formatLocalGuidePrice, localGuideSourceLine, localGuideVerificationText
 type BookingChannelData = {
   destination_url: string | null;
   contact: string | null;
+  contact_hours?: string | null;
   destination_kind: "synthetic_demo" | "configured";
 };
 type RoomAdvice = {
@@ -117,7 +120,10 @@ function LocalGuidePanel({ result, languageTag, suppliedLabels, stale, freshness
 const LABELS = {
   en: {
     bookingTitle: "Continue to booking", bookingOpen: "Open the configured booking channel",
-    bookingContact: "Configured hotel contact", bookingMissing: "No booking link or contact is configured for this hotel yet.",
+    bookingContact: "Contact hotel", bookingContactValue: "Configured hotel contact", bookingHours: "Contact hours",
+    bookingHoursUnknown: "Contact hours are not configured.", bookingContactMissing: "No hotel contact is configured.",
+    bookingNoAction: "Showing these details does not contact the hotel or send a message.",
+    bookingMissing: "No booking link or contact is configured for this hotel yet.",
     bookingDemo: "Demonstration link only; it does not open a real booking site.",
     bookingNext: "Check price, availability, and terms on the destination site. Opening this link does not reserve a room or make a payment.",
     bookingRequested: "You asked how to continue with booking. Use this hotel-configured channel.",
@@ -134,7 +140,10 @@ const LABELS = {
   },
   vi: {
     bookingTitle: "Tiếp tục đặt phòng", bookingOpen: "Mở kênh đặt phòng do khách sạn cấu hình",
-    bookingContact: "Liên hệ khách sạn đã cấu hình", bookingMissing: "Khách sạn chưa cấu hình liên kết hoặc thông tin liên hệ đặt phòng.",
+    bookingContact: "Liên hệ khách sạn", bookingContactValue: "Thông tin liên hệ do khách sạn cấu hình",
+    bookingHours: "Giờ liên hệ", bookingHoursUnknown: "Chưa cấu hình giờ liên hệ.", bookingContactMissing: "Khách sạn chưa cấu hình thông tin liên hệ.",
+    bookingNoAction: "Hiển thị thông tin này không liên hệ với khách sạn và không gửi tin nhắn.",
+    bookingMissing: "Khách sạn chưa cấu hình liên kết hoặc thông tin liên hệ đặt phòng.",
     bookingDemo: "Chỉ là liên kết minh họa; không mở trang đặt phòng thật.",
     bookingNext: "Hãy kiểm tra giá, tình trạng phòng và điều khoản trên trang đích. Mở liên kết không giữ phòng hoặc thanh toán.",
     bookingRequested: "Bạn muốn biết cách tiếp tục đặt phòng. Hãy dùng kênh do khách sạn cấu hình.",
@@ -149,7 +158,10 @@ const LABELS = {
     selectionFailed: "Không thể chọn phương án này. Hãy tải lại gợi ý rồi thử lại.",
   },
   zh: {
-    bookingTitle: "继续预订", bookingOpen: "打开酒店配置的预订渠道", bookingContact: "酒店配置的联系方式",
+    bookingTitle: "继续预订", bookingOpen: "打开酒店配置的预订渠道",
+    bookingContact: "联系酒店", bookingContactValue: "酒店配置的联系方式", bookingHours: "联系时间",
+    bookingHoursUnknown: "尚未配置联系时间。", bookingContactMissing: "尚未配置酒店联系方式。",
+    bookingNoAction: "显示这些信息不会联系酒店，也不会发送消息。",
     bookingMissing: "酒店尚未配置预订链接或联系方式。", bookingDemo: "仅为演示链接，不会打开真实预订网站。",
     bookingNext: "请在目标网站确认价格、房态和条款。打开链接不会预留客房或付款。", bookingRequested: "您询问了如何继续预订，请使用酒店配置的渠道。",
     roomOptions: "客房建议", roomOption: "方案", roomSelect: "选择此方案", roomSelected: "已选择方案",
@@ -161,7 +173,10 @@ const LABELS = {
     records: "使用的酒店记录", unknownCheck: "无法确认此项", selectionFailed: "无法选择此方案，请刷新建议后重试。",
   },
   ja: {
-    bookingTitle: "予約に進む", bookingOpen: "ホテル設定の予約窓口を開く", bookingContact: "ホテル設定の連絡先",
+    bookingTitle: "予約に進む", bookingOpen: "ホテル設定の予約窓口を開く",
+    bookingContact: "ホテルに連絡", bookingContactValue: "ホテル設定の連絡先", bookingHours: "連絡可能時間",
+    bookingHoursUnknown: "連絡可能時間は設定されていません。", bookingContactMissing: "ホテルの連絡先は設定されていません。",
+    bookingNoAction: "この情報を表示してもホテルへの連絡やメッセージ送信は行われません。",
     bookingMissing: "予約リンクまたは連絡先はまだ設定されていません。", bookingDemo: "デモ用リンクです。実際の予約サイトは開きません。",
     bookingNext: "リンク先で料金、空室状況、条件をご確認ください。リンクを開いても部屋の確保や支払いは行われません。",
     bookingRequested: "予約方法についてのお問い合わせです。ホテルが設定した窓口をご利用ください。",
@@ -235,11 +250,22 @@ function unknownCheckLabel(code: string, labels: ReturnType<typeof labelsFor>) {
 function BookingChannel({ channel, languageTag, requested }: { channel?: BookingChannelData; languageTag: string; requested: boolean }) {
   const labels = labelsFor(languageTag);
   const destination = safeBookingDestination(channel?.destination_url);
+  const [contactExpanded, setContactExpanded] = useState(requested);
+  const contactVisible = contactExpanded;
   return <aside className="booking-channel" aria-label={labels.bookingTitle} lang={languageTag} dir={directionForLanguageTag(languageTag)}>
     <h2>{labels.bookingTitle}</h2>
     {requested && <p>{labels.bookingRequested}</p>}
-    {destination ? <a href={destination} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{labels.bookingOpen}</a>
-      : channel?.contact ? <p>{labels.bookingContact}: {channel.contact}</p> : <p>{labels.bookingMissing}</p>}
+    {destination && <p><a href={destination} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{labels.bookingOpen}</a></p>}
+    {!destination && !channel?.contact && <p>{labels.bookingMissing}</p>}
+    <button className="text-button" type="button" aria-expanded={contactVisible}
+      onClick={() => setContactExpanded((expanded) => !expanded)}>{labels.bookingContact}</button>
+    {contactVisible && <div className="booking-contact-details">
+      {channel?.contact ? <p>{labels.bookingContactValue}: <span dir="auto">{channel.contact}</span></p>
+        : <p>{labels.bookingContactMissing}</p>}
+      {channel?.contact_hours ? <p>{labels.bookingHours}: <span dir="auto">{channel.contact_hours}</span></p>
+        : <p>{labels.bookingHours}: {labels.bookingHoursUnknown}</p>}
+      <p className="status-note">{labels.bookingNoAction}</p>
+    </div>}
     {channel?.destination_kind === "synthetic_demo" && <p className="status-note" role="note">{labels.bookingDemo}</p>}
     <p className="status-note">{labels.bookingNext}</p>
     {labels.fallbackLocale && <p className="status-note" lang="en">{labels.fallback}</p>}
@@ -257,7 +283,8 @@ export function HospitalityTurnResultRenderer(props: GuestTurnResultRendererProp
   const guideStaleMessage = props.staleMessage ?? labelsFor(props.languageTag).roomStale;
   if (!response && !bookingChannel) return null;
   if (!result) return <>
-    {bookingChannel && <BookingChannel channel={bookingChannel} languageTag={props.languageTag} requested={Boolean(response?.booking_request)} />}
+    {bookingChannel && <BookingChannel key={response?.booking_request ? "requested" : "idle"}
+      channel={bookingChannel} languageTag={props.languageTag} requested={Boolean(response?.booking_request)} />}
     {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
       suppliedLabels={props.localGuideLabels} stale={guideStale} freshnessError={props.freshnessError}
       staleMessage={guideStaleMessage} />}
@@ -265,7 +292,7 @@ export function HospitalityTurnResultRenderer(props: GuestTurnResultRendererProp
   const labels = labelsFor(props.languageTag);
   const stale = result.currentness !== "current" || props.stale || props.freshnessError;
   return <>
-    {Boolean(response?.booking_request) && <BookingChannel channel={bookingChannel} languageTag={props.languageTag} requested />}
+    {Boolean(response?.booking_request) && <BookingChannel key="requested" channel={bookingChannel} languageTag={props.languageTag} requested />}
     {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
       suppliedLabels={props.localGuideLabels} stale={guideStale || result.currentness !== "current"}
       freshnessError={props.freshnessError} staleMessage={guideStaleMessage} />}
