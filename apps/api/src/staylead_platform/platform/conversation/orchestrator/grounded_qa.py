@@ -300,6 +300,7 @@ class GroundedQAOrchestrator:
         preparation_metadata_validator: Callable[
             [Any, GuestBriefProposal | None, str], tuple[tuple[str, ...], tuple[dict[str, Any], ...]]
         ] | None = None,
+        empty_preparation_answer_validator: Callable[[Any, tuple[str, ...]], bool] | None = None,
         committed_answer_validator: Callable[[Any, tuple[str, ...], tuple[str, ...], tuple[str, ...]], None] | None = None,
         response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
@@ -320,6 +321,7 @@ class GroundedQAOrchestrator:
         self._preparation_selection_schema_factory = preparation_selection_schema_factory
         self._preparation_answer_schema_factory = preparation_answer_schema_factory
         self._preparation_metadata_validator = preparation_metadata_validator
+        self._empty_preparation_answer_validator = empty_preparation_answer_validator
         self._committed_answer_validator = committed_answer_validator
         self._response_envelope_key = response_envelope_key
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
@@ -642,7 +644,14 @@ class GroundedQAOrchestrator:
         if not has_meaningful_text and not patch_has_operations and local_guide_result is None:
             if rejected_guest_claim_failure is not None:
                 raise rejected_guest_claim_failure
-            raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
+            allow_empty_preparation = (
+                extract_guest_patch
+                and selected_patch is None
+                and self._empty_preparation_answer_validator is not None
+                and self._empty_preparation_answer_validator(payload, answer_turn_intents)
+            )
+            if not allow_empty_preparation:
+                raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
         answer_unknowns = (
             *payload.unknowns,

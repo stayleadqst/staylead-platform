@@ -32,12 +32,14 @@ import {
   sendGuestMessage,
 } from "@/shared/api/client";
 import { copyPlainText, directionForLanguageTag, hasCompleteLabelBundle, labelsForLanguage, normalizeLanguageTag, type CopyResult } from "@/shared/chat/presentation";
+import { assistantOutageCopy, isAssistantOutage } from "@/shared/chat/assistant-outage";
 
 type ChatTurn = {
   id: string;
   question: string;
   answer?: GuestMessageResponse;
   error?: string;
+  outageNotice?: boolean;
   retryMode?: RetryMode;
   sending?: boolean;
   stale?: boolean;
@@ -251,6 +253,7 @@ export function GuestChat({
               briefSnapshot: answer.guest_brief ?? item.briefSnapshot,
               resumeReceiptId: partialReceipt?.request_id,
               partialSuccess: true, sending: false,
+              outageNotice: true,
               sameIdOnly: false,
               error: "Your trip details were updated, but the answer did not finish.", retryMode: undefined }
           : item));
@@ -276,7 +279,7 @@ export function GuestChat({
             stale: answer.brief_narrative_stale === true
               || (answer.brief_version_used !== undefined && answer.guest_brief !== undefined
                 && answer.brief_version_used !== answer.guest_brief.brief_version),
-            sending: false, error: undefined, retryMode: undefined }
+            sending: false, error: undefined, outageNotice: false, retryMode: undefined }
           : item);
         return answerOnlyReceiptId
           ? resolveAnswerOnlyReceipt(completed, answerOnlyReceiptId, id)
@@ -302,6 +305,7 @@ export function GuestChat({
             appliedDelta: partial?.applied_delta ?? item.appliedDelta,
             resumeReceiptId: partial?.brief_receipt.request_id ?? item.resumeReceiptId,
             partialSuccess: Boolean(partial),
+            outageNotice: isAssistantOutage(error),
             retryMode: partial ? undefined
               : errorCode === "brief_apply_no_effect" || errorCode === "request_failed" ? display.retryMode
                 : item.sameIdOnly || errorCode === "brief_apply_outcome_unknown"
@@ -446,7 +450,7 @@ export function GuestChat({
             appliedDelta: response.applied_delta ?? item.appliedDelta,
             briefSnapshot: response.guest_brief ?? item.briefSnapshot,
             resumeReceiptId: response.status === "partial_success" ? response.brief_receipt?.request_id : undefined,
-            partialSuccess: response.status === "partial_success", sending: false,
+            partialSuccess: response.status === "partial_success", outageNotice: response.status === "partial_success", sending: false,
             error: response.status === "partial_success"
               ? "Your trip details were updated, but the answer did not finish." : undefined }
         : item));
@@ -464,6 +468,7 @@ export function GuestChat({
             appliedDelta: partial?.applied_delta ?? item.appliedDelta,
             resumeReceiptId: partial?.brief_receipt.request_id ?? item.resumeReceiptId,
             partialSuccess: Boolean(partial), briefConfirmation: partial ? undefined : item.briefConfirmation,
+            outageNotice: isAssistantOutage(error),
             confirmationRequestId: partial || errorCode === "brief_apply_no_effect" ? undefined : confirmRequestId,
             retryMode: partial ? undefined : failure.retryMode }
         : item));
@@ -567,6 +572,13 @@ export function GuestChat({
                       Start a new chat
                     </button>
                   )}
+                  {turn.outageNotice && (() => {
+                    const notice = assistantOutageCopy(turn.languageTag ?? activeLanguageTag);
+                    return <p className="status-note" lang={notice.language} dir={directionForLanguageTag(notice.language)}>
+                      {notice.message}
+                      {notice.fallbackVisible && <small lang="en" dir="ltr"> {notice.fallback}</small>}
+                    </p>;
+                  })()}
                 </div>
               )}
               {turn.receipt && <>

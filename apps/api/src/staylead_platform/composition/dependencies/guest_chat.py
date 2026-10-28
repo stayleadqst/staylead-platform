@@ -40,6 +40,7 @@ from staylead_platform.domains.hospitality.schemas.grounded_answer import (
     committed_answer_output_schema,
 )
 from staylead_platform.domains.hospitality.schemas.guest_brief import (
+    allow_empty_booking_request_preparation_answer,
     validate_committed_turn_channels,
     validate_guest_brief_proposal,
     validate_preparation_metadata,
@@ -152,12 +153,21 @@ def _booking_channel(settings: Settings, hotel_slug: str) -> dict[str, Any]:
                 destination = raw_url
         except ValueError:
             destination = None
-    contact = settings.booking_contact_by_hotel.get(hotel_slug)
-    safe_contact = contact.strip()[:240] if isinstance(contact, str) and contact.strip() else None
+    def safe_public_text(value: object, maximum: int) -> str | None:
+        if not isinstance(value, str):
+            return None
+        cleaned = value.strip()
+        if not cleaned or len(cleaned) > maximum or any(ord(char) < 32 or ord(char) == 127 for char in cleaned):
+            return None
+        return cleaned
+
+    safe_contact = safe_public_text(settings.booking_contact_by_hotel.get(hotel_slug), 240)
+    safe_contact_hours = safe_public_text(settings.booking_contact_hours_by_hotel.get(hotel_slug), 160)
     synthetic = bool(destination and urlsplit(destination).hostname and urlsplit(destination).hostname.endswith(".example"))
     return {
         "destination_url": destination,
         "contact": safe_contact,
+        "contact_hours": safe_contact_hours,
         "destination_kind": "synthetic_demo" if synthetic else "configured",
     }
 
@@ -302,6 +312,7 @@ def create_guest_chat_application(
             preparation_selection_schema_factory=fact_selection_output_schema,
             preparation_answer_schema_factory=preparation_answer_output_schema,
             preparation_metadata_validator=validate_preparation_metadata,
+            empty_preparation_answer_validator=allow_empty_booking_request_preparation_answer,
             committed_answer_validator=validate_committed_turn_channels,
             response_envelope_key="response",
             max_output_tokens=settings.ai_max_output_tokens,

@@ -1,0 +1,32 @@
+{
+  "operation_id": "sprint10-create-coordination-20261028",
+  "target": "github.com/stayleadqst/staylead-platform/issues",
+  "intent": "Tạo sprint record chính bằng tiếng Việt, liên kết duy nhất story #29; không nhận Done hoặc backdate planning",
+  "authority": "Hieu trực tiếp cho phép tạo/cập nhật GitHub, gồm thông báo tự phát sinh, trong phản hồi async ngày2026-10-28",
+  "attempts": [
+    {
+      "number": 1,
+      "outcome": "automatic_review_rejected_before_mutation",
+      "reason": "external notification concern",
+      "github_issue_created": false
+    },
+    {
+      "number": 2,
+      "outcome": "created_and_exact_body_readback_verified",
+      "issue": 105,
+      "url": "https://github.com/stayleadqst/staylead-platform/issues/105",
+      "authority": "explicit_human_approval_for_GitHub_auto_notifications"
+    }
+  ],
+  "expected_precondition": "Không có sprint coordination issue Sprint10 hiện hành; giữ #29 đủ AC1–3",
+  "status": "complete_verified",
+  "uncertain_write": false,
+  "story_update": {
+    "issue": 29,
+    "body_exact_readback": true,
+    "assignees": [
+      "stayleadqst"
+    ],
+    "stage": "In Progress"
+  }
+}
