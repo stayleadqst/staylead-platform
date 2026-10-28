@@ -1,5 +1,13 @@
 # Staylead Platform — mandatory working context
 
+## Sprint 9 / B09 final technical acceptance — 2026-10-28
+
+Fresh independent Q PASS full #30 B09 AC1–3/technical DoD on candidate `891515af41444208931c671cad0b54dbaa57f18f5cd6e4296fe19c5965f79ce0`/282 files. See `docs/product/evidence/b09/independent-final-review.json`. Initial P1 unauthorized M2 edits, uvloop clock mismatch and P2 cancellation-replay recovery are fixed and verified. Source/test leases closed; C may complete already-authorized commit/push/own PR/merge from `pilot-b09-security` into existing `sprint-5-canonical-brief`, then stop after #30. No new live inference, second story, deployment or CI dispatch/rerun. Earlier in-progress/repair notes below are history.
+
+## Current B09 bounded pilot — 2026-10-28
+
+Hieu now authorizes implementation/local validation/fresh Q review/commit/push/PR/merge for **only #30 B09** on `pilot-b09-security`, based on verified integration `sprint-5-canonical-brief@d304238a1cb2b427650e03a2de81af92aa6ae255`. Stop after this story. No new live inference, whole-backlog automation/scheduler, deployment, shared infrastructure or credentials changes, manual CI/rerun or protection bypass. S7/S8 Done and their inference allowances remain closed. Read `docs/execution/B09_EXECUTION.md` for actual leases, independent expected matrix and local resource binding. C owns integration/evidence; B `/root/b_consumer` Luna/high owns B09 tests/helpers, product edits only after reproduced defect + precise lease; fresh Q `/root/q_b09` Sol/high does not edit candidate. Earlier prep-only or sprint permission/status notes below are historical and do not override this direct approval. Preserve M1–M6, full AC1–3, D4 existing token/session policy and unrelated files.
+
 ## Sprint 8 final actual acceptance — 2026-10-28
 
 FinalindependentQ PASS fullscopedG1–G4/L1–L4/C1–C3/DoD, noopenactionablecorefinding. Reportdocs/product/evidence/sprint-8/independent-final-review.json. AllservicesincludingisolatedPGstopped; finaldeliverydocs/evidenceonly, sourcepinsunchanged. OwnPR103ready+mergeintoexistingSprint5baseauthorizedwhenGitHubpermits; no newapprovalneededforthatdelivery.

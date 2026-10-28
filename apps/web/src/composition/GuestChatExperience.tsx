@@ -27,6 +27,7 @@ export function GuestChatExperience({ hotelSlug }: { hotelSlug: string }) {
         syntheticDisclosure={registration.content.syntheticDisclosure}
         AnswerRenderer={AnswerRenderer}
         GuestBriefRenderer={GuestBriefRenderer}
+        formatBriefConfirmationChanges={registration.formatBriefConfirmationChanges}
         TurnResultRenderer={TurnResultRenderer}
         TurnResultActions={registration.turnResultActions}
       />

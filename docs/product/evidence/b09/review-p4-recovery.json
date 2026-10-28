@@ -1,0 +1,33 @@
+{
+  "reviewer": "/root/q_b09_final",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "reviewed_product_candidate": "e99cb8ec87c1167c9b30c8bceded9187ecd6e3d980b2c63b476755483a5454a6",
+  "candidate_note": "Product unchanged from frozen manifest during reproduction; primary P1 test parameterized asyncio+optional uvloop after manifest. Final repin pending repair.",
+  "verdict": "NO_FULL_AC_PASS",
+  "finding": {
+    "priority": "P2",
+    "scope": "AC3 confirmation recovery",
+    "problem": "Confirmation reserve_request RuntimeError mapping missing; same-ID retry after canceled apply with positively reconciled no receipt returns HTTP500 instead of terminal known-no-effect response.",
+    "expected": "Typed brief_apply_no_effect refusal permits only a new deliberate confirmation ID after server reconciliation; unknown outcome keeps same ID.",
+    "observed": {
+      "scenario": "same-ID confirmation retry after canceled-before-commit apply",
+      "first_cancel_regression": "PASS",
+      "initial_request_status": "error",
+      "initial_error_code": "brief_apply_outcome_unknown",
+      "replay_http_status": 500,
+      "replay_body": "Internal Server Error",
+      "brief_version": 0,
+      "provider_calls": 0
+    }
+  },
+  "method": "Read-only candidate source review; actual TestClient/isolated B09 verify PostgreSQL cancellation regression followed by exact same-ID signed-challenge replay, no candidate edits. Initial sandbox connection failure retried only with scoped private DB access.",
+  "scope_status": {
+    "AC1": "No remaining actionable finding in review",
+    "AC2": "No remaining actionable finding in review",
+    "AC3": "Pending recovery repair and fresh delta review"
+  },
+  "expiry_assessment": "Five-minute token expiry refusal, including completed confirmation replay, documented and nonblocking; no side effects or new retention policy.",
+  "product_live_model_calls": 0,
+  "tokens": "unavailable"
+}

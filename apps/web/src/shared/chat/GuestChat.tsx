@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
-import type { AnswerRendererProps, GuestBriefRendererProps, GuestTurnResultRendererProps, TurnResultActions, DomainTarget } from "@/composition/registration";
+import type { AnswerRendererProps, GuestBriefRendererProps, GuestBriefConfirmationChange, GuestBriefConfirmationLine, GuestTurnResultRendererProps, TurnResultActions, DomainTarget } from "@/composition/registration";
 import { formatMediaTime } from "@/shared/chat/media-format";
 import {
   canStartRequest,
@@ -25,7 +25,9 @@ import {
   GuestSession,
   GuestBriefReceipt,
   GuestBriefSnapshot,
+  GuestBriefConfirmation,
   checkGuestFreshness,
+  confirmGuestBriefEdit,
   fetchGuestMedia,
   sendGuestMessage,
 } from "@/shared/api/client";
@@ -47,6 +49,9 @@ type ChatTurn = {
   recovered?: boolean;
   briefSnapshot?: GuestBriefSnapshot;
   answerOnlyReceiptId?: string;
+  briefConfirmation?: GuestBriefConfirmation;
+  confirmationDismissed?: boolean;
+  confirmationRequestId?: string;
   sameIdOnly?: boolean;
   languageTag?: string;
   scopeSessionId?: string;
@@ -56,12 +61,63 @@ function requestId() {
   return crypto.randomUUID();
 }
 
+function confirmationText(languageTag: string) {
+  const language = normalizeLanguageTag(languageTag)?.split("-")[0].toLowerCase();
+  const copy: Record<string, { lang: string; title: string; before: string; after: string; confirm: string; cancel: string; canceled: string }> = {
+    en: { lang: "en", title: "Review trip changes before saving", before: "Before", after: "Proposed", confirm: "Confirm changes", cancel: "Cancel", canceled: "Changes were not saved." },
+    vi: { lang: "vi", title: "Xem lại thay đổi trước khi lưu", before: "Hiện tại", after: "Đề xuất", confirm: "Xác nhận thay đổi", cancel: "Hủy", canceled: "Các thay đổi chưa được lưu." },
+    fr: { lang: "fr", title: "Vérifiez les changements avant l’enregistrement", before: "Actuel", after: "Proposé", confirm: "Confirmer les changements", cancel: "Annuler", canceled: "Les changements n’ont pas été enregistrés." },
+    zh: { lang: "zh", title: "保存前请检查行程更改", before: "当前", after: "建议", confirm: "确认更改", cancel: "取消", canceled: "更改尚未保存。" },
+    ja: { lang: "ja", title: "保存前に変更内容を確認してください", before: "現在", after: "提案", confirm: "変更を確認", cancel: "キャンセル", canceled: "変更は保存されていません。" },
+    ar: { lang: "ar", title: "راجع تغييرات الرحلة قبل الحفظ", before: "الحالي", after: "المقترح", confirm: "تأكيد التغييرات", cancel: "إلغاء", canceled: "لم يتم حفظ التغييرات." },
+  };
+  return copy[language ?? ""] ?? copy.en;
+}
+
+function reviewValue(value: unknown, present: boolean | undefined): string {
+  if (present === false) return "—";
+  if (value === undefined || value === null) return "—";
+  return typeof value === "string" ? value : JSON.stringify(value) ?? String(value);
+}
+
+function BriefConfirmationReview({
+  confirmation, languageTag, formatChanges, onConfirm, onCancel, disabled,
+}: {
+  confirmation: GuestBriefConfirmation;
+  languageTag: string;
+  formatChanges?: (changes: readonly GuestBriefConfirmationChange[]) => readonly GuestBriefConfirmationLine[];
+  onConfirm: () => void;
+  onCancel: () => void;
+  disabled: boolean;
+}) {
+  const copy = confirmationText(languageTag);
+  const lines = formatChanges?.(confirmation.changes) ?? confirmation.changes.map((change) => ({
+    field: change.field,
+    before: reviewValue(change.before, change.before_present),
+    after: reviewValue(change.after, change.after_present),
+  }));
+  return <section className="brief-confirmation" aria-label={copy.title}
+    dir={directionForLanguageTag(languageTag)}>
+    <h2 lang={copy.lang} dir={directionForLanguageTag(copy.lang)}>{copy.title}</h2>
+    <ul>
+      {lines.map((line, index) => <li key={`${line.field}-${index}`}>
+        <strong lang="en" dir="auto">{line.field}</strong>
+        <span lang="en" dir="auto">{copy.before}: {line.before}</span>
+        <span lang="en" dir="auto">{copy.after}: {line.after}</span>
+      </li>)}
+    </ul>
+    <button type="button" lang={copy.lang} disabled={disabled} onClick={onConfirm}>{copy.confirm}</button>
+    <button type="button" lang={copy.lang} disabled={disabled} onClick={onCancel}>{copy.cancel}</button>
+  </section>;
+}
+
 export function GuestChat({
   hotelSlug,
   brand,
   syntheticDisclosure,
   AnswerRenderer,
   GuestBriefRenderer,
+  formatBriefConfirmationChanges,
   TurnResultRenderer,
   TurnResultActions: turnResultActions,
   target,
@@ -71,6 +127,7 @@ export function GuestChat({
   syntheticDisclosure: string;
   AnswerRenderer: ComponentType<AnswerRendererProps>;
   GuestBriefRenderer: ComponentType<GuestBriefRendererProps>;
+  formatBriefConfirmationChanges?: (changes: readonly GuestBriefConfirmationChange[]) => readonly GuestBriefConfirmationLine[];
   TurnResultRenderer: ComponentType<GuestTurnResultRendererProps>;
   TurnResultActions?: TurnResultActions;
   target: DomainTarget;
@@ -200,6 +257,13 @@ export function GuestChat({
         await refreshPreviousAnswers();
         return;
       }
+      if (answer.status === "confirmation_required" && answer.brief_confirmation) {
+        setTurns((current) => current.map((item) => item.id === turn.id
+          ? { ...item, id, answer, briefConfirmation: answer.brief_confirmation,
+              confirmationDismissed: false, sending: false, error: undefined, retryMode: undefined }
+          : item));
+        return;
+      }
       setTurns((current) => {
         const completed = current.map((item) => item.id === turn.id
           ? { ...item, id, answer, receipt: answer.brief_receipt ?? item.receipt,
@@ -249,7 +313,8 @@ export function GuestChat({
     }
   }, [acceptBrief, session, target]);
 
-  const unresolvedRequest = hasUnresolvedRequest(turns);
+  const unresolvedRequest = hasUnresolvedRequest(turns)
+    || turns.some((turn) => Boolean(turn.briefConfirmation) && !turn.confirmationDismissed);
 
   const recheckAnswer = useCallback(async (turnId: string, response: GuestMessageResponse) => {
     if (!session || freshnessInFlight.current.has(response.request_id)) return;
@@ -355,6 +420,65 @@ export function GuestChat({
     void deliver(resumeTurn, resumeTurn.id, turn.resumeReceiptId);
   }
 
+  async function confirmBriefUpdate(turn: ChatTurn) {
+    const challenge = turn.briefConfirmation;
+    if (!session || !challenge || busy || !claimRequest(generation.current, activeRequest)) return;
+    const currentGeneration = generation.current;
+    const confirmRequestId = turn.confirmationRequestId ?? requestId();
+    setBusy(true);
+    setTurns((current) => current.map((item) => item.id === turn.id
+      ? { ...item, sending: true, error: undefined }
+      : item));
+    try {
+      const response = await confirmGuestBriefEdit({
+        sessionId: session.session_id,
+        accessToken: session.access_token,
+        requestId: confirmRequestId,
+        confirmationToken: challenge.token,
+        target,
+      });
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      acceptBrief(response.guest_brief, currentGeneration);
+      setTurns((current) => current.map((item) => item.id === turn.id
+        ? { ...item, id: confirmRequestId, answer: response, briefConfirmation: undefined,
+            confirmationRequestId: undefined, retryMode: undefined,
+            receipt: response.brief_receipt ?? item.receipt,
+            appliedDelta: response.applied_delta ?? item.appliedDelta,
+            briefSnapshot: response.guest_brief ?? item.briefSnapshot,
+            resumeReceiptId: response.status === "partial_success" ? response.brief_receipt?.request_id : undefined,
+            partialSuccess: response.status === "partial_success", sending: false,
+            error: response.status === "partial_success"
+              ? "Your trip details were updated, but the answer did not finish." : undefined }
+        : item));
+    } catch (error) {
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      const partial = error instanceof ApiError ? error.partialResult : undefined;
+      if (partial) acceptBrief(partial.guest_brief, currentGeneration);
+      const failure = classifyFailure(error instanceof ApiError ? error : { outcome: "unknown" });
+      const errorCode = error instanceof ApiError ? error.code : undefined;
+      setTurns((current) => current.map((item) => item.id === turn.id
+        ? { ...item, sending: false,
+            error: partial ? "Your trip details were updated, but the answer did not finish." : failure.message,
+            receipt: partial?.brief_receipt ?? item.receipt,
+            briefSnapshot: partial?.guest_brief ?? item.briefSnapshot,
+            appliedDelta: partial?.applied_delta ?? item.appliedDelta,
+            resumeReceiptId: partial?.brief_receipt.request_id ?? item.resumeReceiptId,
+            partialSuccess: Boolean(partial), briefConfirmation: partial ? undefined : item.briefConfirmation,
+            confirmationRequestId: partial || errorCode === "brief_apply_no_effect" ? undefined : confirmRequestId,
+            retryMode: partial ? undefined : failure.retryMode }
+        : item));
+    } finally {
+      if (isCurrentGeneration(currentGeneration, generation.current)) setBusy(false);
+      releaseRequest(currentGeneration, activeRequest);
+    }
+  }
+
+  function cancelBriefUpdate(turnId: string) {
+    setTurns((current) => current.map((item) => item.id === turnId
+      ? { ...item, briefConfirmation: undefined, confirmationDismissed: true }
+      : item));
+  }
+
   async function selectTurnResultOption(turnId: string, result: unknown, optionId: string) {
     if (!session || !turnResultActions || roomAdvicePending || busy) return;
     setRoomAdvicePending(optionId);
@@ -407,6 +531,17 @@ export function GuestChat({
           {turns.map((turn) => (
             <article className="turn" key={`${turn.id}-${turn.question}`}>
               <div className="message message-guest" lang={turn.languageTag ?? "en"} dir="auto"><p>{turn.question}</p></div>
+              {turn.briefConfirmation && !turn.confirmationDismissed && <BriefConfirmationReview
+                confirmation={turn.briefConfirmation}
+                languageTag={turn.languageTag ?? activeLanguageTag}
+                formatChanges={formatBriefConfirmationChanges}
+                disabled={busy}
+                onConfirm={() => void confirmBriefUpdate(turn)}
+                onCancel={() => cancelBriefUpdate(turn.id)}
+              />}
+              {turn.confirmationDismissed && <p className="status-note" role="status">
+                {confirmationText(turn.languageTag ?? activeLanguageTag).canceled}
+              </p>}
               {turn.sending && <p className="status-note">{activeLabels.sending}</p>}
               {turn.recovered && <p className="status-note" role="status">
                 This saved answer was completed by a later continuation.
@@ -422,7 +557,8 @@ export function GuestChat({
                     </button>
                   )}
                   {turn.retryMode && turn.retryMode !== "none" && (
-                    <button className="text-button" type="button" onClick={() => retry(turn)} disabled={busy || !session}>
+                    <button className="text-button" type="button"
+                      onClick={() => turn.briefConfirmation ? void confirmBriefUpdate(turn) : retry(turn)} disabled={busy || !session}>
                       {activeLabels.retry_answer}
                     </button>
                   )}

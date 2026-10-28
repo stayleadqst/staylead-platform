@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ApiError, checkGuestFreshness, createGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
+import { ApiError, checkGuestFreshness, confirmGuestBriefEdit, createGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
 
 const target = {
   domain: "hospitality",
-  guestContractVersion: "1",
+  guestContractVersion: "2",
   apiBasePath: "/api/guest",
 };
 
@@ -14,7 +14,7 @@ test("session creation verifies real target metadata before sending hotel data",
   const calls = [];
   globalThis.fetch = async (url, init) => {
     calls.push({ url, init });
-    return Response.json({ status: "ok", domain: "another-domain", guest_contract_version: "1" });
+    return Response.json({ status: "ok", domain: "hospitality", guest_contract_version: "1" });
   };
 
   try {
@@ -36,13 +36,34 @@ test("direct hotel lookup is data-driven and unknown hotels surface the backend 
   globalThis.fetch = async (url, init) => {
     calls.push({ url, init });
     return Response.json({ hotel_id: "HTL-FOUR", hotel_slug: "new-hotel", public_config: {},
-      config_version: "1", guest_contract_version: "1" });
+      config_version: "1", guest_contract_version: "2" });
   };
   try {
     assert.equal((await getGuestHotel({ hotelSlug: "new-hotel", target })).hotel_id, "HTL-FOUR");
     assert.equal(calls[0].url, "/api/guest/hotels/new-hotel");
     globalThis.fetch = async () => Response.json({ error: { code: "hotel_unavailable", message: "This hotel is not available." } }, { status: 404 });
     await assert.rejects(getGuestHotel({ hotelSlug: "unknown", target }), (error) => error instanceof ApiError && error.status === 404);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("brief confirmation uses a separate scoped action request", async () => {
+  const originalFetch = globalThis.fetch;
+  let call;
+  const response = { request_id: "confirm-1", status: "completed", answer: "Updated." };
+  globalThis.fetch = async (url, init) => {
+    call = { url, init };
+    return Response.json(response);
+  };
+  try {
+    assert.deepEqual(await confirmGuestBriefEdit({
+      sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token",
+      requestId: "confirm-1", confirmationToken: "signed-challenge", target,
+    }), response);
+    assert.equal(call.url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc/brief-confirmations");
+    assert.equal(call.init.headers.authorization, "Bearer guest-token");
+    assert.deepEqual(JSON.parse(call.init.body), { request_id: "confirm-1", confirmation_token: "signed-challenge" });
   } finally {
     globalThis.fetch = originalFetch;
   }

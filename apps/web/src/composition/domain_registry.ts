@@ -13,6 +13,18 @@ export type GuestBriefRendererProps = Readonly<{
   delta?: unknown;
   labels?: Readonly<Record<string, string>>;
 }>;
+export type GuestBriefConfirmationChange = Readonly<{
+  field: string;
+  before_present?: boolean;
+  before?: unknown;
+  after_present?: boolean;
+  after?: unknown;
+}>;
+export type GuestBriefConfirmationLine = Readonly<{
+  field: string;
+  before: string;
+  after: string;
+}>;
 export type GuestTurnResultRendererProps = Readonly<{
   response: unknown | null;
   bookingChannel: unknown;
@@ -41,6 +53,7 @@ export type DomainRegistration = Readonly<{
   landing: ComponentType;
   answerRenderer: ComponentType<AnswerRendererProps>;
   guestBriefRenderer: ComponentType<GuestBriefRendererProps>;
+  formatBriefConfirmationChanges?: (changes: readonly GuestBriefConfirmationChange[]) => readonly GuestBriefConfirmationLine[];
   turnResultRenderer: ComponentType<GuestTurnResultRendererProps>;
   turnResultActions?: TurnResultActions;
   themeClass: string;

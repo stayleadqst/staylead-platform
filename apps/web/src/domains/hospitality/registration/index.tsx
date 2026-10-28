@@ -1,6 +1,6 @@
 import type { DomainRegistration, GuestBriefRendererProps } from "@/composition/domain_registry";
 import { HospitalityLanding } from "@/domains/hospitality/landing/HospitalityLanding";
-import { formatHospitalityBriefDelta } from "@/domains/hospitality/registration/brief-format";
+import { formatHospitalityBriefConfirmationChanges, formatHospitalityBriefDelta } from "@/domains/hospitality/registration/brief-format";
 import { HospitalityTurnResultRenderer } from "@/domains/hospitality/registration/turn-result-renderer";
 import { ENGLISH_LABELS } from "@/shared/chat/presentation";
 import { selectGuestRoomAdviceOption } from "@/shared/api/client";
@@ -82,7 +82,7 @@ function HospitalityGuestBriefRenderer({ brief, receipt, delta, labels: supplied
 
 export const hospitalityTarget = {
   domain: "hospitality",
-  guestContractVersion: "1",
+  guestContractVersion: "2",
   apiBasePath: "/api/guest",
 } as const;
 
@@ -91,6 +91,7 @@ export const hospitalityRegistration: DomainRegistration = {
   landing: HospitalityLanding,
   answerRenderer: HospitalityAnswerRenderer,
   guestBriefRenderer: HospitalityGuestBriefRenderer,
+  formatBriefConfirmationChanges: formatHospitalityBriefConfirmationChanges,
   turnResultRenderer: HospitalityTurnResultRenderer,
   turnResultActions: {
     selectOption: async ({ sessionId, accessToken, result, optionId, target }) => {

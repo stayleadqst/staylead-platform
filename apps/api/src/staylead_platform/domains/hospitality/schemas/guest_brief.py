@@ -258,6 +258,13 @@ def validate_committed_turn_channels(
     payload: Any, intents: tuple[str, ...], pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
 ) -> None:
     """Enforce prepared turn scope even when a provider ignores native JSON schema hints."""
+    if getattr(payload, "guest_patch", None) is not None:
+        raise ValueError("A committed answer cannot propose guest brief mutations.")
+    if getattr(payload, "guest_patch_authorizations", ()):
+        raise ValueError("A committed answer cannot grant guest brief mutation authority.")
+    answer_intents = tuple(getattr(payload, "turn_intents", ()))
+    if answer_intents and answer_intents != intents:
+        raise ValueError("A committed answer cannot change the prepared turn intents.")
     valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("The committed answer has no persisted current-turn intent.")

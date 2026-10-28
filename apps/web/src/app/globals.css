@@ -70,6 +70,12 @@ body {
 .brief-receipt, .brief-delta { max-width: min(100%, 680px); border: 1px solid #dce6dd; border-radius: 12px; padding: 10px 13px; background: #fbfcfa; color: #34473b; font-size: 13px; }
 .brief-receipt summary, .brief-delta summary { color: #315f4d; font-weight: 700; cursor: pointer; }
 .brief-receipt p { margin: 8px 0 0; }
+.brief-confirmation { max-width: min(100%, 680px); box-sizing: border-box; border: 1px solid #b8cdbd; border-radius: 12px; padding: 14px; background: #f7faf6; color: #263b30; overflow-wrap: anywhere; }
+.brief-confirmation h2 { margin: 0 0 10px; font-size: 16px; }
+.brief-confirmation ul { display: grid; gap: 10px; margin: 0 0 14px; padding-inline-start: 22px; }
+.brief-confirmation li { display: grid; gap: 4px; }
+.brief-confirmation li span { white-space: pre-wrap; }
+.brief-confirmation button { margin-inline-end: 8px; }
 .brief-delta-text { margin: 8px 0 0; color: #39473e; }
 .brief-delta pre { overflow: auto; max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message-error p, .session-error p { margin: 0; }

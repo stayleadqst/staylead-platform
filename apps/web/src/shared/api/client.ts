@@ -71,7 +71,9 @@ export type GuestHotel = Readonly<{
 
 export type GuestMessageResponse = Readonly<{
   request_id: string;
-  status: "completed" | "partial_success";
+  status: "completed" | "partial_success" | "confirmation_required";
+  confirmation_required?: boolean;
+  brief_confirmation?: GuestBriefConfirmation;
   answer?: string;
   evidence?: readonly GuestEvidence[];
   media?: readonly GuestMediaDescriptor[];
@@ -95,6 +97,19 @@ export type GuestMessageResponse = Readonly<{
   answer_eligibility?: "current" | "pending" | "stale";
   room_advice?: unknown;
   booking_request?: unknown;
+}>;
+
+export type GuestBriefConfirmation = Readonly<{
+  token: string;
+  expected_brief_version: number;
+  changes: readonly Readonly<{
+    field: string;
+    before_present?: boolean;
+    before?: unknown;
+    after_present?: boolean;
+    after?: unknown;
+  }>[];
+  expires_at: string;
 }>;
 
 export type GuestBriefMember = Readonly<{ member_id: string; age: number | null }>;
@@ -307,6 +322,21 @@ export async function sendGuestMessage(args: {
     },
     body: JSON.stringify({ request_id: args.requestId, ...(args.question ? { question: args.question } : {}),
       ...(args.answerOnlyReceiptId ? { answer_only_receipt_id: args.answerOnlyReceiptId } : {}) }),
+  });
+}
+
+export async function confirmGuestBriefEdit(args: {
+  sessionId: string;
+  accessToken: string;
+  requestId: string;
+  confirmationToken: string;
+  target: DomainTarget;
+}): Promise<GuestMessageResponse> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  return request<GuestMessageResponse>(endpoint(args.target, `/sessions/${sessionId}/brief-confirmations`), {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
+    body: JSON.stringify({ request_id: args.requestId, confirmation_token: args.confirmationToken }),
   });
 }
 
