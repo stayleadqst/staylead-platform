@@ -1,0 +1,10 @@
+{
+  "verdict": "PASS scoped offline localization fix; historical actual8 remainsFAIL",
+  "person_night_question_shape": "French checkedratebasis survives withrawroom_advicequestion; unrelatedquestion/missingneeded/numeric labels reject",
+  "actual_four_to_two": "actualcapturecandidate4labels projectchecked2; Frenchwithoutfallback, math/assignmentsunchanged",
+  "hashes": {
+    "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py": "671dda0b10e157d4270eaba955f10c23099f119c7b1d4c2666cbee7319555e47",
+    "tests/contracts/test_room_advice.py": "5c30989cdfc15941465a2844817f3d1c3e272945949a42c343ac69fb9f72169e"
+  },
+  "effects": "No calls/DBwrites; await cont6harnessfreeze+pin"
+}

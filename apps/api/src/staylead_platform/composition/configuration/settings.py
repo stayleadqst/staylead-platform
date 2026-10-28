@@ -20,6 +20,14 @@ class Settings(BaseSettings):
     codex_cli_executable: str = "codex"
     codex_cli_model: str = "gpt-6-luna"
     codex_cli_reasoning_effort: str = "low"
+    # Server-owned destinations keyed by the trusted hotel slug. These defaults
+    # use the reserved .example domain and are explicitly demonstration-only.
+    booking_destination_by_hotel: dict[str, str] = Field(default_factory=lambda: {
+        "harbor-city-demo": "https://booking.example/hotels/harbor-city-demo",
+        "lagoon-family-demo": "https://booking.example/hotels/lagoon-family-demo",
+        "pine-ridge-demo": "https://booking.example/hotels/pine-ridge-demo",
+    })
+    booking_contact_by_hotel: dict[str, str] = Field(default_factory=dict)
     azure_openai_base_url: str | None = Field(default=None, validation_alias="AZURE_OPENAI_BASE_URL")
     azure_openai_api_key: SecretStr | None = Field(default=None, validation_alias="AZURE_OPENAI_API_KEY")
     azure_openai_model_deployment: str = Field(

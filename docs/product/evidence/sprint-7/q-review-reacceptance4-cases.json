@@ -1,0 +1,41 @@
+{
+  "verdict": "APPROVED_SCOPE_AND_INPUTS_PASS; final control readiness awaits freeze/pin/gates",
+  "run_id": "s7-room-advice-20261027-reacceptance4",
+  "cases_sha256": "dd7119bd77b717d22a15b1a3d381ee3351ae4e00678944bfcaa526577222832a",
+  "authority_sha256": "0c28591bcede1157dcdf02c2687028bfc8d051f5c283d653376be1a8e4cf1b2f",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "scope": "Exactly two original Pine turns, fresh one session; known hard access at age7 then same-child age8/current explicit clear both/French/current UI selection. City/Family/B07 accepted evidence reused.",
+  "approved_limits": {
+    "max_guest_turns": 2,
+    "max_codex_requests": 4,
+    "max_calls_per_turn": 2,
+    "model": "gpt-6-luna",
+    "effort": "low",
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "output_cap": 700
+  },
+  "private_inputs_regular_0600": true,
+  "utterances_and_case_objects_equal_published_proposal": true,
+  "prior_allocation": {
+    "status": "halted",
+    "counts": [
+      4,
+      8
+    ],
+    "state_sha256": "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b",
+    "lifetime_requests": 44,
+    "unused_slots": [
+      0,
+      0
+    ]
+  },
+  "fresh_namespace_not_continuation": true,
+  "must_observe_before_root_marker": [
+    "Pine1 exact current quoted facts→stable child UUID,guardian/sharing/dates and BOTH hardneeds saved; no false access fit or guest-restatement question; current source/version/hash/generation; useful VI hotel-verification question",
+    "Pine2 same child age8; clear only hard_accessibility_needs with current explicit quote, preserve other saved values; M2 before dependent call2; no unrelated clear",
+    "Pine2 checked French option/rationale/questions without EN fallback, source correct; known LOFT4.4m/GARDEN5m/CABIN8.2m two-night base if proposed, childfees unknown and totalnull; no fit/price/availability fabrication",
+    "Real UI current result selection exactresultID/version, persisted GETlatest; root-only regular0600 semantic review receipt with actual API body hash before next guest request"
+  ],
+  "no_Q_live_or_DB_write": true
+}

@@ -42,6 +42,12 @@ class FreshnessRequest(BaseModel):
     request_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
 
 
+class SelectRoomAdviceOptionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    result_version: int = Field(ge=1)
+    option_id: str = Field(min_length=1, max_length=120, pattern=r"^[A-Za-z0-9._:-]+$")
+
+
 def create_app(
     settings: Settings | None = None,
     *,
@@ -121,6 +127,29 @@ def create_app(
             raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
         return guest_chat.check_freshness(
             session_id=session_id, token=authorization[7:], request_id=body.request_id,
+        )
+
+    @app.get("/v1/guest/sessions/{session_id}/room-advice", tags=["guest room advice"])
+    def read_room_advice(
+        session_id: str,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, Any]:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        return guest_chat.read_room_advice(session_id=session_id, token=authorization[7:])
+
+    @app.post("/v1/guest/sessions/{session_id}/room-advice/{result_id}/selection", tags=["guest room advice"])
+    def choose_room_advice_option(
+        session_id: str,
+        result_id: str,
+        body: SelectRoomAdviceOptionRequest,
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, Any]:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        return guest_chat.choose_room_advice_option(
+            session_id=session_id, token=authorization[7:], result_id=result_id,
+            result_version=body.result_version, option_id=body.option_id,
         )
 
     @app.get("/v1/guest/sessions/{session_id}/media/{media_id}", tags=["guest media"])

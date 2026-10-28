@@ -1,0 +1,63 @@
+{
+  "verdict": "PASS B07 AC1-3 for approved synthetic technical-pilot scope; eligible story Done independently of C01",
+  "candidate": "b91ea362974beea443a8051d8ce313bc9af89aeb25a73c8c7a6b16ff36287f6b",
+  "actual_case9": "OriginalunchangedmixedEN/VIguestbookingrequestwithuntrustedURL/email; actualmodel2calls, nofakeprovider",
+  "B07_AC1": {
+    "verdict": "PASS",
+    "actual": "Nativecall1 explicitlybooking_request+hotel_information, languageen, nullguestpatch. APIbooking_requesttrue and renderedcorrespondingtrustedPineHTTPSdestination. GuestinjectedURLdidnotenterresponseoranchor; no translatedURL.",
+    "offline_reuse": "Settings-ownedexactpropertychannel; unsafeprotocol/credentials/query/hash/client/model/sourceURLauthoritynegatives; q-review-cont6-final-v2.json and tests/contracts/test_sprint7_booking_channel.py"
+  },
+  "B07_AC2": {
+    "verdict": "PASS",
+    "actual": "Guestutterancehasemail/transcript; anchor exactcleanconfiguredURL,noquery/hash,noopener+noreferrer,target_blank,referrerpolicyno-referrer. NoPII/secretadded.",
+    "offline_reuse": "Serverandclientrejectparameterized/unsafeURLs; ordinaryanchorhasnobookinghandler/transcriptserialization. apps/web/tests/booking-channel.test.mjs; registeredrenderer source."
+  },
+  "B07_AC3": {
+    "verdict": "PASS",
+    "actual": "UIexplicitlyrequiresoutsideprice/availability/termsconfirmation, demo-onlynonfunctionalnotice, openingdoesnotreserve/pay. ReadonlyDB1completedrequest/2messages/explicitENrevision1, 0briefreceipts/results/selections and nobooking/payment/revenuetables.",
+    "offline_reuse": "Missingdestinationusesconfiguredcontact;missingbothsaysunconfigured; registeredrendererplainanchorhasnoreservation/paymentmutation.",
+    "limitations": "Externaldestinationnotclicked/functionalhotelbookingnottested; synthetic .examplelinkexplicitlydemo. Noactualhotel/availability/reservation/paymentclaim."
+  },
+  "semantic_note": "GroundedFAQ says realofficialbookingwebsite not specified in hotelrecords, consistentwithseparatelylabeledsyntheticconfiguredchannel; nosourceURLpromotedtoauthority. Extraweekendunknownisnonblocking, nooptionalcleanuprequested.",
+  "source_refs_verified_against_oracle": [
+    "F-HTL-RETREAT03-033",
+    "F-HTL-RETREAT03-053",
+    "F-HTL-RETREAT03-054"
+  ],
+  "budget_provenance": {
+    "parent": [
+      8,
+      14
+    ],
+    "final": [
+      9,
+      16
+    ],
+    "state_status": "completed",
+    "sealed_sha256": "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd",
+    "newproviderrequests": 2,
+    "output_tokens": [
+      157,
+      200
+    ],
+    "latency_ms": [
+      6587.8,
+      5422.8
+    ],
+    "remaining2requests": "closedbecauseguestturncap9reached",
+    "lifetimeattempts_includingbatch1": 17
+  },
+  "source_hashes_verified_after": 237,
+  "actual_browser": {
+    "report": "/private/tmp/staylead-s7-browser-s7-room-advice-20261026-batch2-cont6-r1/browser-report.json",
+    "mobile": {
+      "viewport": 390,
+      "body": 390,
+      "no_horizontal_overflow": true
+    },
+    "failure": null
+  },
+  "C01": "StillBLOCKED: City2Chinesebudgetsurvivor/comparison→City3bededit, Beach4fullconstraints→5age7→6age12budget, Pine7hardaccess→original8relax+age8French. Actualamended8Frenchfailed; offlinefixdoesnotconvertitintopass. Fresh9doesnotestablishselectionpreservation.",
+  "next_minimal_proposal": "q-minimal-reacceptance-plan.json:7guestturns/max14requests; futureexplicitauthorityrequired. ReuseCity1/math/offlinecompletematrix/B07actual9; noautomaticretry/optionalrepairturns.",
+  "effects": "Qread-onlyDBenforcedtransactionrolledback; noQmodel/API/browserorDBwrites."
+}

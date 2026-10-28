@@ -1,0 +1,63 @@
+{
+  "stage": "APPROVED_CASE_INPUT_SCOPE_ONLY; final harness readiness pending freeze",
+  "verdict": "PASS_EXACT4_MATRIX_AND_CLOSED_PRIOR_SCOPE",
+  "run_id": "s7-room-advice-20261027-reacceptance3",
+  "matrix_sha256": "9a8d77345f34b0a1b3b77c560b676995883d5ca22781db5ad50fc5b13e4656e6",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "authority_sha256": "e7db311fdd35d9c2a2076b752bbcab240a970d3d0572c389f557f97ebee96136",
+  "exact_published_case_objects_unchanged": true,
+  "original_prior_case_mapping": [
+    1,
+    2,
+    6,
+    7
+  ],
+  "new_allocation": {
+    "fresh_counters": [
+      0,
+      0
+    ],
+    "caps": [
+      4,
+      8
+    ],
+    "continuation": null,
+    "model": "gpt-6-luna/low",
+    "max_calls_per_turn": 2,
+    "provider_seconds": 25,
+    "turn_seconds": 45,
+    "output_cap": 700,
+    "no_automatic_retry": true,
+    "stop_at_first_blocking_failure": true
+  },
+  "closed_prior": {
+    "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+    "status": "halted",
+    "guest_turns": 6,
+    "codex_requests": 11,
+    "sha256": "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5",
+    "lifetime_requests": 36,
+    "unused_slots_closed": [
+      1,
+      3
+    ],
+    "no_transfer": true
+  },
+  "assertion_priorities": {
+    "1": "Exact Chinese couple/dates3n/hard6mVND/consent/no inventedmaxrooms/exacttype; checked sourcefit+base5.4mSTD/5.85mTWN ifproposed; actual current UIselection at0provider. No forcedoptioncount/ranking.",
+    "2": "Samecouple/dates,6.5m,explicit separate sleeping surfaces without invented physicaltype; distinct checked surfaces, old selectedresult stale/disabled, stalePOST409, new currentexactresultselection/GETlatest at0provider; Chinese retained.",
+    "3": "FreshPineadult1+child7 guardian/share via serverUUID inlinefield; exact2n dates+bothhardaccessneeds retained; knownrequirements vs unconfirmedhotelcapability hotel-verification step, not generic guestrestatement; no age7LOFT/GARDEN/accessfalsefit/soldout.",
+    "4": "SamechildUUIDage8,explicit onlyaccessclear; guardian/share/dates preserved; checkedpositivecandidate and correct4.4m/5m/8.2m known2nbase ifproposed, unknownfamilyfees/nulltotal; French checkedrationale/questions noENfallback; current UIselection/exactlatestversions at0provider."
+  },
+  "reuse": [
+    "Family3–5 actual unknownage→7→12/budget chain accepted; new native enum still admits actual IDs, canonical/M4 unchanged.",
+    "B07 prioractual technicalpilot AC1–3 accepted; no repeatedbooking turn.",
+    "Productd7 offline mechanism/code review,277backend15PG40frontend53pins validunchanged; no redundantproductaudit."
+  ],
+  "semantic_review_control": "Rootsolewriter regular0600 exactrun/candidate/turn/verdictpass/APIresponsebodySHA receipt only after Q actual perturnsemantics/source/math/DB/UI review; no nextturn/providerreservation whilewaiting.",
+  "limitations": [
+    "No config/state/service/provider initiation or DBwrites byQ.",
+    "Exactfour-case matrix authorized by newhumanreply/authority; historicalpublishedproposal remainsfalse.",
+    "Readiness pending frozencontrols/sourcepin/actualproducer-shape positive+negative proofs; no actualPASS inferred."
+  ]
+}

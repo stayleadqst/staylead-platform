@@ -1,0 +1,41 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol",
+  "authorized_for_live_calls": true,
+  "authority": "Hieu explicitly approved NEW manual batch: Cho phép batch mới Sol/low 2/4, on reviewed published productdd0cc688/PR99commita63bdfb. Exact two original Pine utterances in one fresh session, gpt-6.1-sol/low,2calls/turn25s/provider45s/turn700output,noautoretry/nofallback,stopfirstblockingfailure. PriorR6halted1/2/lifetime52immutable,unused1/2closed,no reuse/reset/transfer/historyrepair. Reuse CityFamilyB07PASS.",
+  "max_guest_turns": 2,
+  "max_codex_requests": 4,
+  "max_calls_per_turn": 2,
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+    "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "state_sha256": "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27",
+    "lifetime_requests": 52,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 2,
+    "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+    "actual_outcome": {
+      "pine1": "FAIL AC2 unnecessary generic room_advice question despite all relevant saved nonpending requirements",
+      "pine2": "Blocked dependency/notattempted"
+    },
+    "runners": "API62558 SIGTERM exit143; browser35519 SIGTERM then exact ownedPID13138 SIGKILL exit137; no marker01/turn2/retry"
+  },
+  "case_matrix_sha256": "c684ea8fe0675aaa820597f3ebdb800273f6c64f8c378ade2e70264770ed4088",
+  "continuation": null,
+  "human_reply": "Cho phép batch mới Sol/low 2/4",
+  "approval_date": "2026-10-28",
+  "published_product_commit": "a63bdfbf8b83c871ff3a61f04ac40e73a3e0d55e",
+  "reviewed_product_candidate": "dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab",
+  "runtime_candidate": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "no_automatic_retry": true,
+  "no_fallback": true,
+  "stop_at_first_blocking_failure": true,
+  "authority_source": "Direct human reply; guides/backlog do not grant allowance"
+}

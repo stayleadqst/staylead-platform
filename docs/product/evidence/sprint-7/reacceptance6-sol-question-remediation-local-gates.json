@@ -1,0 +1,16 @@
+{
+  "candidate_sha256": "96a40f58e74a5773ef5bcbf7b094bf82cc7d7a287b95b8b79bfe298010085f6b",
+  "source_pins": 237,
+  "root_gate": {
+    "contracts_architecture_api": "289 PASS",
+    "warnings": "3 known deprecations",
+    "isolated_pg": "16 PASS,1 known deprecation",
+    "ruff": "PASS full src/tests/runtime",
+    "compile": "PASS src/runtime",
+    "diff": "PASS",
+    "final_independent_missing_child_fixture": "3 relevant parametrized cases PASS; actual childageNone/pending field"
+  },
+  "builder": "85 room-advice tests/Ruff/compile/NodeSyntax/diff PASS",
+  "frontend_reused": "53pins unchanged,40tests/lint/typecheck/buildPASS",
+  "actual_after_consumer_fix": "NOT RUN; R6sealed1/2/lifetime52 unused1/2closed"
+}

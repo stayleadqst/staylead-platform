@@ -1,0 +1,18 @@
+{
+  "candidate_sha256": "c9829ff3c8ea2a9f5aee3e6b8ab3f4b4d21f74dc95134cd10966ad7c4b58ec86",
+  "product_candidate_sha256": "3df06f98b30cf46043d6ea742375d4e82cd7a14fa3f97553b40b672f7b6b45a5",
+  "current_focused_harness_and_api_tests": 27,
+  "warnings": 3,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "node_syntax": "PASS",
+  "offline_smoke": "PASS",
+  "diff_check": "PASS",
+  "reused_prior_backend_run": 274,
+  "reused_relevant_postgres": 14,
+  "reused_frontend_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "reuse_note": "Product source unchanged. Reuse unaffected prior backend checks only; changed harness rerun. Counts overlap and must not be added as unique tests.",
+  "new_live_calls": 0,
+  "initial_control_finding": "City2 no longer AND-requires affirmative sharing after valid separate-bed resolution; exactactualproducercheckrerun byQ"
+}

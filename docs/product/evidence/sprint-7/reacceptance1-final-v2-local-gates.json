@@ -1,0 +1,21 @@
+{
+  "candidate_sha256": "3df06f98b30cf46043d6ea742375d4e82cd7a14fa3f97553b40b672f7b6b45a5",
+  "backend_tests": 274,
+  "backend_warnings": 3,
+  "postgres_tests_rerun_for_final_consumer_delta": 14,
+  "postgres_scope": [
+    "test_sprint7_room_advice_postgres.py",
+    "test_sprint6_language_consumer_postgres.py"
+  ],
+  "prior_postgres_tests": 31,
+  "other_postgres_tests_reused_unchanged": 18,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "node_syntax": "PASS reused unchanged controls",
+  "offline_smoke": "PASS reused unchanged controls",
+  "diff_check": "PASS",
+  "frontend_tests_reused": 40,
+  "unchanged_frontend_pins": 53,
+  "live_on_this_final_candidate": false,
+  "actual_prior_candidate_outcome": "FAIL preserved; finalremediation not actual acceptance"
+}

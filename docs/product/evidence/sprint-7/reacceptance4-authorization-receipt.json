@@ -1,0 +1,27 @@
+{
+  "human_reply": "Cho phép batch mới Pine2/4",
+  "run_id": "s7-room-advice-20261027-reacceptance4",
+  "published_commit": "4548c181448a07a8788755af1a170f97579bd382",
+  "product_candidate": "0eb86e8c747e5674c45867fd358c007e767f91586ac1dc51761dd90c30d1c6cd",
+  "case_matrix_sha256": "dd7119bd77b717d22a15b1a3d381ee3351ae4e00678944bfcaa526577222832a",
+  "max_guest_turns": 2,
+  "max_requests": 4,
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance3",
+    "status": "halted",
+    "guest_turns": 4,
+    "codex_requests": 8,
+    "state_sha256": "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b",
+    "lifetime_requests": 44,
+    "unused_guest_slots": 0,
+    "unused_request_slots": 0,
+    "actual_outcome": {
+      "city1": "PASS",
+      "city2": "PASS",
+      "pine3": "PASS",
+      "pine4": "FAIL failed explicit access relaxation; no semantic receipt4"
+    },
+    "runners": "API46945/browser9109 stopped; no retry"
+  },
+  "status": "Approvedcases/authority0600 prepared; no new config/state/API/modelcall"
+}

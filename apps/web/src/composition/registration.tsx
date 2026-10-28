@@ -6,7 +6,7 @@ import {
   type DomainTarget,
 } from "@/composition/domain_registry";
 
-export type { AnswerRendererProps, GuestBriefRendererProps, DomainRegistration, DomainTarget } from "@/composition/domain_registry";
+export type { AnswerRendererProps, GuestBriefRendererProps, GuestTurnResultRendererProps, TurnResultActions, DomainRegistration, DomainTarget } from "@/composition/domain_registry";
 export { DomainRegistrationError } from "@/composition/domain_registry";
 
 export function resolveDomainRegistration(

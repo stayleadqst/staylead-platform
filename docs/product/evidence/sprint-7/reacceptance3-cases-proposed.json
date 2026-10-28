@@ -1,0 +1,96 @@
+{
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "no_automatic_retry": true,
+  "stop_at_first_blocking_failure": true,
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "run_id": "s7-room-advice-20261027-reacceptance3-proposed",
+  "status": "PROPOSED ONLY; explicit new manual allowance required",
+  "authorized_for_live_calls": false,
+  "proposed_max_guest_turns": 4,
+  "proposed_max_requests": 8,
+  "candidate_sha256": "d7ca88db6c1251a7dc9ff64acdf9d6624731b5865a46d322f28f55dde3b5e35a",
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+    "status": "halted",
+    "guest_turns": 6,
+    "codex_requests": 11,
+    "state_sha256": "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5",
+    "lifetime_requests": 36,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 3,
+    "unused_slots": "closed; no replay/reset/reallocation",
+    "actual_outcome": {
+      "city1": "PASS",
+      "city2": "FAIL invented hard twin",
+      "family3_5": "PASS",
+      "pine6": "FAIL invented child-1; HTTP500",
+      "pine7": "Blocked dependency; not attempted"
+    },
+    "no_further_calls": true
+  },
+  "cases": [
+    {
+      "turn": 1,
+      "source_case": 2,
+      "session": "fresh-city",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "我们是两位成年人，是情侣，可以同住并共用一张大床。入住日期为2026-11-10，退房日期为2026-11-13。整个住宿的客房总预算上限为6000000 VND。请用中文比较合适的房型和参考费用。",
+      "amendment": {
+        "original_utterance": "改成我们两位成年人，情侣，可以同住并共用一张大床。日期和总预算不变。请用中文比较合适的房型和参考费用。",
+        "reason": "Fresh session cannot resolve previous dates/total budget. Restates actual explicit City1 values as current guest input; old invalid City session untouched. No room-count limit invented."
+      },
+      "expected": [
+        "M2 adults2/dates2026-11-10..13/nights3/hardstayroomtotal6mVND/explicitcouplesharing; no inferredmaxrooms",
+        "Chinese comparison/rationale only for surviving checked options; STD5.4m/TWN5.85m ifproposed; FAM8.7m may be rejected, but rejectedoverbudget must not contaminate withinbudget survivor wording",
+        "Select one current option through UI at0provider; persist exactresultID/version/option"
+      ],
+      "approved_previous_turn": 1
+    },
+    {
+      "turn": 2,
+      "source_case": 3,
+      "session": "fresh-city",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "Keep Chinese. We now require two separate beds; increase the total room budget to 6500000 VND. Keep our dates and two adults. Please update the advice.",
+      "expected": [
+        "KeepChinese/twoadults/dates; commithardseparatebeds+budget6.5m, retaincorrectfields and currentquoteprovenance",
+        "TWN3n5.85m ifproposed; two separatelyassignedsleepingsurfaces, no sharedbed falselysatisfiesrequest",
+        "Old selected card becomesstale/disabled; no oldresultrebind; newcurrentresult selectable, exactversiontracked"
+      ],
+      "approved_previous_turn": 2
+    },
+    {
+      "turn": 3,
+      "source_case": 7,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đi cùng con 7 tuổi và là người giám hộ của bé. Chúng tôi có thể ở chung phòng và chung giường lớn. Ở 2026-11-10 đến 2026-11-12; bắt buộc không có bậc và phòng tắm phù hợp xe lăn. Tư vấn phần có căn cứ, đừng tự bỏ điều kiện.",
+      "expected": [
+        "M2 adult1/child7/explicitguardian/sharetrue/dates2n/hardstepfree+wheelchairbathroom",
+        "LOFT/GARDENminimumage8 rejected at7; CABINaccesssupportunknown =>no certifiedhardaccessfit",
+        "Keeprequirements, explainunknown/incompatible ratherthansoldout, no relaxationwithoutconsent; no forcedoptions"
+      ],
+      "approved_previous_turn": 6
+    },
+    {
+      "turn": 4,
+      "source_case": 8,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đồng ý bỏ yêu cầu không bậc và yêu cầu phòng tắm xe lăn. Sửa tuổi con thành 8; tôi vẫn là người giám hộ và chúng tôi đồng ý chung giường lớn. Giữ ngày ở. Hãy tư vấn lại. Répondez en français.",
+      "expected": [
+        "SamechildID age7→8, preserveguardian/sharing/dates; clearonlytwohardaccessrequirements authorizedbycurrentquote; M2commitbeforedependentresult",
+        "LOFT4.4m/GARDEN5m/CABIN8.2m known2nbase ifproposed; familychargesunknown/nulltotal; age8eligibilityverified",
+        "French checkedrationale/questions withoutENfallback afterM4filtersclaims; actualcardlanguagefr; source/brief/resultversions traceable",
+        "Current UIselection0provider; previousresultstale ifany; no reservation/payment"
+      ],
+      "approved_previous_turn": 7
+    }
+  ],
+  "purpose": "Only missing City bed edit/stale selection and Pine hard-access→explicit relaxation/age8/French/current selection. Family3–5 and B07 acceptance reused. Fresh two sessions; exact original utterances. No automatic retry, amended input or history repair."
+}

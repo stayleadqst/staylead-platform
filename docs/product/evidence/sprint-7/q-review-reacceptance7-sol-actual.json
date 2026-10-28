@@ -1,0 +1,183 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol",
+  "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "turns": {
+    "1": {
+      "verdict": "PASS",
+      "api_body_sha256": "24cb10f9b66d6859ff1502501da4155522227ae2ee1e2821c374e7ec55790897",
+      "brief_version": 1,
+      "child_id": "d245f734-e5a0-461d-8028-809beac8ed9f",
+      "semantics": "One adult/child7/exact guardian/sharetrue/dates2n/both hardneeds; no invented hardtype/budget/maxrooms/pending. One useful VI hotel-verification question, no extra generic restatement; no certified access fit or availability claim.",
+      "UI": "Actual visible checked question matches API; no selection/options claimed",
+      "sources": "10 refs match approved owner/version/hash/generation; readonly DB synthetic current config/generation checked",
+      "persistence": "enforced read_only on + rollback; brief/state/result1, one completed request,2messages, no selection",
+      "protocol": "Two native calls Sol/low; explicit per-op current quotes; no new member-ID invention"
+    },
+    "2": {
+      "verdict": "PASS",
+      "api_body_sha256": "ea30fbee2cb5d292f3b44e528e9755753bebc41c143a3d2ee0e6708265c1e2a7",
+      "brief_version": 2,
+      "same_child": true,
+      "authorized_edit": "Age8; clearbothhardaccess needs only; preserve dates2n/guardian/sharetrue; pending[]; no invented budget/maxrooms/hardtype",
+      "checked_option": "Gardenroom0/queenbed0; both members once; occupancy/bed/consent/age/guardian pass; cost incomplete",
+      "independent_math": "2500000 VND/night ×2n ×1room =5000000 knownbase; childchargesunknown/nulltotal; partial/availabilityunknown",
+      "language": "Three checked French rationales nonfallback visible in actual UI; no additional question was needed. Generic static UI phrases disclosed Englishfallback; domain response satisfies open-language requirement.",
+      "persistence": "Readonlybrief/state/result2; priorresult1 historical; bothrequestscompleted/4messages; exactselectedresult2/option-1 persisted and GETlatest matches",
+      "sources": "BothGardenroom+rate approved/current refs owner/version/hash/generation verified against independent oracle and DB",
+      "selection_provider_calls": 0
+    }
+  },
+  "status": "COMPLETED; scoped syntheticSprint7 acceptance PASS",
+  "no_Q_provider_API_DBwrites": true,
+  "source_pins_after": {
+    "repo": [],
+    "snapshot": []
+  },
+  "usage": {
+    "guest_turns": 2,
+    "provider_requests": 4,
+    "no_retry": true,
+    "per_call": [
+      {
+        "turn": 1,
+        "call": 1,
+        "input_tokens": 12974,
+        "output_tokens": 449,
+        "latency_ms": 11155.9
+      },
+      {
+        "turn": 1,
+        "call": 2,
+        "input_tokens": 12084,
+        "output_tokens": 34,
+        "latency_ms": 5754.1
+      },
+      {
+        "turn": 2,
+        "call": 1,
+        "input_tokens": 13372,
+        "output_tokens": 533,
+        "latency_ms": 13586.6
+      },
+      {
+        "turn": 2,
+        "call": 2,
+        "input_tokens": 12619,
+        "output_tokens": 336,
+        "latency_ms": 10712.4
+      }
+    ],
+    "http": [
+      {
+        "turn": 1,
+        "status": 200,
+        "latency_ms": 17611.3
+      },
+      {
+        "turn": 2,
+        "status": 200,
+        "latency_ms": 24513.7
+      }
+    ]
+  },
+  "browser_final": {
+    "failure": null,
+    "mobile": {
+      "viewport": 390,
+      "body": 390,
+      "no_horizontal_overflow": true
+    },
+    "counters": {
+      "guest_turns": 2,
+      "codex_requests": 4,
+      "new_guest_turns": 2,
+      "new_requests": 4,
+      "max_guest_turns": 2,
+      "max_codex_requests": 4
+    },
+    "selection_calls": 0,
+    "semantic_receipts": [
+      {
+        "turn": 1,
+        "verdict": "pass",
+        "response_sha256": "24cb10f9b66d6859ff1502501da4155522227ae2ee1e2821c374e7ec55790897"
+      },
+      {
+        "turn": 2,
+        "verdict": "pass",
+        "response_sha256": "ea30fbee2cb5d292f3b44e528e9755753bebc41c143a3d2ee0e6708265c1e2a7"
+      }
+    ]
+  },
+  "accepted_evidence_reuse": {
+    "City": "q-review-reacceptance3-actual.json turn1/2 PASS Chinese couplecomparison/sharedqueen5.4m→Englishedit/Chineseanswer/distinctbeds5.85m; oldselection409+newversionselected",
+    "Family": "q-review-reacceptance2-cont1-actual.json turn3/4/5 PASS unknownage→7→12; guardian/separatechildbed/adultconsent/currentfields; knownbases5.2m/7.6m unknownfees and6mbudgetstrengthquestion",
+    "B07": "q-review-cont6-actual.json originalbooking9 PASS modelintent/trustedURL/noPII/noreservation/payment/mobile; no selectedroomclaim required"
+  },
+  "C01_AC_matrix": {
+    "AC1": {
+      "verdict": "PASS",
+      "evidence": "Accepted City/Family + R7 explicitguardian/share/access/age/negation/clear sameUUID M2provenance; offlinehard-v-preference/noinference guard proofs reused"
+    },
+    "AC2": {
+      "verdict": "PASS",
+      "evidence": "R7oneconsequentialhotelverificationonly; approvedowner/version/hash/gen refs+readonlyDB; prior missingage/budgetquestion and offlineexpired/revoked/conflict/unknown guards reused"
+    },
+    "AC3": {
+      "verdict": "PASS",
+      "evidence": "Citydistinctbeds,Familyownchildsurface/guardian/billingminor boundaries,R7sharedqueenconsent/allmembersonce/age8; offlinecot/extrabed/bunk/duplicates/unusedrooms/group-limit proofs reused"
+    },
+    "AC4": {
+      "verdict": "PASS",
+      "evidence": "IndependentCity5.4/5.85m,Family5.2/7.6m,R7Garden5m; unknownmandatoryfees/nulltotal/nofalseinbudget; offlinebasis/currency/chargednightvalidity/hardbudget proofs reused"
+    },
+    "AC5": {
+      "verdict": "PASS",
+      "evidence": "ActualCityChinesecomparison+tradeoffs/comparableprices/currentselection; R7Gardenusefulfit/bed/unknownfeesFrenchrationale/exactversionselection0calls; noforcedoptioncount/globaloptimum claim"
+    },
+    "AC6": {
+      "verdict": "PASS",
+      "evidence": "R7knownaccesssupportunverified→hotelconfirmation,notneedsrestatement/soldout; explicitguestclear beforepositivecheckedoption; availabilityunknown; offlineconflict/processinglimitproofs reused"
+    },
+    "AC7": {
+      "verdict": "PASS",
+      "evidence": "M2commitbeforecall2; Citystaleoldcard409/newcurrentselection; Familyfieldpreservation; R7samechildageedit/clear/currentGET+DB; unchangedofflineidempotency/languageCAS/sourcecurrentness/failurepartialguards reused"
+    },
+    "AC8": {
+      "verdict": "PASS",
+      "evidence": "Actualweb/API/SolcheckedPineVI→Frenchlinkedchain+UIselection/mobile; acceptedChinese/mixedCity,FamilymixedFAQ,B07approvedconfigbookingboundary; explicitsyntheticpilot scope"
+    }
+  },
+  "review_verdict": "PASS fullC01AC1–8 for scoped synthetic technicalpilot, combining valid accepted actuals and unchanged independent offline boundary proofs; B07AC1–3 remainsPASS",
+  "limitations": [
+    "Historical failures remain immutable and were not relabeledPASS.",
+    "Synthetic authored3hotel dataset; does not establish realinventory/quote/booking, allhotelpolicies/alllanguages, or a reliabilityrate for either model.",
+    "Sharedparents/catalog/pricing epics not automaticallyDone; publication/status/merge/deploy owned byroot."
+  ],
+  "sealed_run": {
+    "status": "completed",
+    "guest_turns": 2,
+    "provider_requests": 4,
+    "state_sha256": "4665e22612dc04d3532c60cfec98fc280d06fa81b1805008025e9221a36f8da6",
+    "lifetime_requests": 56,
+    "browser_exit": 0,
+    "api_exit": 143,
+    "all_runners_stopped": true,
+    "no_retry_fallback_or_budget_transfer": true
+  },
+  "C_coordination_DoD": {
+    "verdict": "PASS review completion; no remaining Q blocker to39/98/97 closure/publication/authorizedPR99merge",
+    "accepted_coverage": "C01AC1–8PASS+independentlyacceptedB07AC1–3; validCity/Family/Pineactualchains combined, nothistoricalfailedrun relabeling",
+    "source_bound": "237repo+snapshothashes before/after actualmatch finalcandidate2bf9fd82; domainproductdd0unchanged",
+    "gates_reused": "292contracts/architecture/API+16isolatedPG/fullRuff/compile/diff; unchanged53frontendpins40tests/lint/typecheck/build; R7controls23harness/APIandNodegates; overlappingcountsnotadded",
+    "closure_conditions": "Root publish curated no-secret evidence and truthful finalstatus; GitHubpermits authorizedmerge. No additional Q functional gate or manualCIrun required."
+  },
+  "evidence_paths": [
+    "q-review-reacceptance7-sol-turn-01-db-readonly.json",
+    "q-review-reacceptance7-sol-turn-02-db-readonly.json",
+    "q-review-reacceptance7-sol-final.json",
+    "q-review-reacceptance7-sol-pins.json",
+    "reacceptance7-sol-stop-receipt.json",
+    "/private/tmp/staylead-s7-browser-s7-room-advice-20261028-reacceptance7-sol-r1/browser-report.json"
+  ]
+}

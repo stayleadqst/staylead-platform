@@ -1,0 +1,19 @@
+{
+  "candidate_sha256": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+  "backend_tests": 280,
+  "backend_warnings": 3,
+  "postgres_tests": 16,
+  "postgres_warnings": 1,
+  "builder_focused_tests": 194,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "diff_check": "PASS",
+  "node_syntax_smoke": "PASS builder, changeddriverguardofflineonly",
+  "frontend_tests_reused": 40,
+  "frontend_pins_unchanged": 53,
+  "frontend_lint_typecheck_build": "PASS reused, unchanged all53pins",
+  "no_inference_after_fix": true,
+  "primary_limit": "Promptadherencehypothesis: originalbadclarifycaptureSTILLpassesstaticparser/currentquote/canonicalM2; no serversemanticrejectionclaim",
+  "deterministic_fix": "Knownnonpendingaccesshotelverification preservedthroughunrelatedpending; absent/itselforwholeobjectpendingnegative",
+  "future_profile": "Sol/low2/4 proposedonly, no profile/modelchange orcall"
+}

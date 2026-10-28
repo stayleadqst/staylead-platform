@@ -1,0 +1,111 @@
+{
+  "verdict": "FAIL actual continuation; product blockers, not harness false failure",
+  "candidate_fingerprint": "de8afd9126c6a3971d62d964db24bbc1fe80a3325912886292a2b64ee53850f8",
+  "source_hash_recheck": {
+    "count": 236,
+    "mismatches": []
+  },
+  "actual_provenance": {
+    "replay": {
+      "exact_request_replayed": true,
+      "persisted_result_id_sha256": "8eab80b1728efc82503bacb266a2fee0f4542215d80b23796dac6b1d4a955c4f",
+      "provider_calls": 0,
+      "counters_unchanged": true,
+      "session_handshake": "recovered from authoritative existing DB receipt"
+    },
+    "turn2_http": 200,
+    "turn3_http": 200,
+    "browser_failure": {
+      "name": "Error",
+      "message": "turn 3 did not produce useful advice despite supported catalog data"
+    },
+    "linked_counters_observed": {
+      "status": "halted",
+      "guest_turns": 3,
+      "codex_requests": 6,
+      "max_guest_turns": 9,
+      "max_codex_requests": 18
+    },
+    "new_provider_calls": 4,
+    "new_calls_by_turn": [
+      {
+        "turn": 2,
+        "call": 1,
+        "output_tokens": 466,
+        "latency_ms": 8206.5
+      },
+      {
+        "turn": 2,
+        "call": 2,
+        "output_tokens": 412,
+        "latency_ms": 6207.1
+      },
+      {
+        "turn": 3,
+        "call": 1,
+        "output_tokens": 626,
+        "latency_ms": 11712.4
+      },
+      {
+        "turn": 3,
+        "call": 2,
+        "output_tokens": 212,
+        "latency_ms": 4657.3
+      }
+    ],
+    "prior_physical_calls": 3,
+    "physical_total_so_far": 7,
+    "note": "Per-turn output_tokens in response trace sum two calls; native individual calls all<=700. No call after turn3 recorded in reviewed event log."
+  },
+  "findings": [
+    {
+      "id": "Q-C1",
+      "severity": "P1",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "line": 1115,
+      "title": "Rejected candidate budget conflict is presented as a false claim about retained within-budget arrangement",
+      "trigger": "City2 proposes STD5.4m and FAM8.7m against hard stay budget6m. Server correctly removes FAM but publishes global hard_budget_exceeded and Chinese question 此方案超出已确认的预算 under remaining STD5.4m.",
+      "reproducer": "Exact captured City2 draft + actual readonly current facts => partial, retainedtotal5400000, false over-budget question.",
+      "impact": "C01 AC6/AC8 reason/comparison misstates displayed arrangement and asks unnecessary budget adjustment; source IDs do not entail rendered claim.",
+      "smallest_fix": "Keep rejection reason tied to rejected candidate/option and price or render an explicit discarded-alternative explanation; never attach unqualified over-budget claim to remaining compliant arrangement. No generalized semantic engine needed."
+    },
+    {
+      "id": "Q-C2",
+      "severity": "P1",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "line": 690,
+      "title": "Free-form separate-beds requirement fails literal M4 bed-type check on valid two-single arrangement",
+      "trigger": "City3 M2 stores hard_bed_types=['separate beds']; call2 selects CITY-TWN, adults on two distinct single beds0/1. M4 compares {'single'} <= {'separate beds'} and rejects alloptions.",
+      "reproducer": "Exact captured draft and actualreadonly facts =>0options/conflict. Sole in-memory counterfactual canonical hard_bed_types=['single']=>1option CITY-TWN total5850000 under6.5m budget.",
+      "impact": "C01 hard-bed requirement and useful updated advice fail despite supported data; actual browser positive advice assertion correctly halts.",
+      "smallest_fix": "Make the M2→M4 bed requirement protocol express required separate sleeping places and canonical bed types clearly; validate explicit two distinct beds without weakening other hard constraints. Include saved multilingual quotes/drafts regressions."
+    }
+  ],
+  "readonly_db": {
+    "evidence": "q-review-cont1-actual-db-readonly.json",
+    "transaction_read_only": "on",
+    "completed_requests": 3,
+    "session_state_version": 3,
+    "brief_receipts": 3,
+    "result_versions": [
+      1,
+      2,
+      3
+    ],
+    "messages": 6,
+    "stored_selection": "City2 resultversion2 remains historical",
+    "effective_currentness": "City1/City2 stale, selectionnull; City3current selectionnull"
+  },
+  "independent_offline_replay": "q-review-cont1-offline-diagnosis.json",
+  "observed_passes": [
+    "Exact completed City1 realAPI replay confirmed0provider/countersunchanged1/2; authoritative session recovery truthfully labeled.",
+    "City2 preserves dates3n and hard6mVND budget/adults2, explicit sharedqueen consent; no inferredmax_rooms. Chinese checked rationale present; arithmetic STD5.4m correct.",
+    "City3 preserves dates/adults, Chinese explicit preference, increases budget6.5m, removes previous softlarge-bed preference. Request commit precedes output; stale oldselection safely ineffective.",
+    "All four new individual calls within2call/700/25s, both turns under45s."
+  ],
+  "not_observed": [
+    "Cases4–9 notexecuted: childstableID/age/guardian/accessibilityrelaxation/French8/trustedbooking9 remain actualpending.",
+    "No fullC01/B07/#97 actualPASS or Done justified."
+  ],
+  "reviewer_effects": "No provider calls, no DBwrites, no product/source mutations. Own q-review evidence only."
+}

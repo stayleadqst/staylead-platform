@@ -1,0 +1,142 @@
+{
+  "verdict": "FAIL actualPine6cause/clarification; Pine7tokenlimitfailure. FullC01/SprintDoD remainsBLOCKED; B07priorPASSunchanged",
+  "candidate": "5c7f04dd27aa0dcb2a0c479aa1dc5fa84cd225f3985cc21a43ea67abb32e83df",
+  "immutable_snapshot_all237_verified": true,
+  "Pine6": {
+    "approved_case": 6,
+    "budget_turn": 4,
+    "HTTP": 200,
+    "calls": 2,
+    "verified_positive": [
+      "M2adult1/child7/stableUUID/guardianadult1/explicitsharingtrue/dates2n/bothhardaccessneeds/noinventedbudgetorroomlimit",
+      "Currentpersistedbrief/resultversion1,knowledgegeneration1; sourceowner/version/hash/generation/factsverified",
+      "No certifiedaccessfit/soldout/availability/quoteclaim; no options"
+    ],
+    "AC2_AC6_failure": "Bothguesthardneeds alreadyknownexplicitandsaved. Nativecall2onlyasksfieldhard_accessibility_needs; serverrenders “Tôi nên áp dụng yêu cầu phòng nào?” instead of explainingunverifiedhotelcapability/usefulhotelconfirmationstep. APIunknowns empty; resultunknowns onlyno checkedroomcandidate. UI doesnotexplainminage8roomrestrictionoraccessunknown.",
+    "cause": "No-candidate earlyrecommend branch +genericroomquestion template loseknown-vs-unknowncause; questionfieldpresence driverguardpassesbutsemanticsfail.",
+    "actual_question": [
+      {
+        "field": "room_requirements.hard_accessibility_needs",
+        "reason": "Tôi nên áp dụng yêu cầu phòng nào?",
+        "locale": "vi",
+        "locale_fallback": false,
+        "presentation_key": "question.room"
+      }
+    ],
+    "source_fact_ids_verified": [
+      "F-HTL-RETREAT03-016",
+      "F-HTL-RETREAT03-017",
+      "F-HTL-RETREAT03-067",
+      "F-HTL-RETREAT03-112",
+      "F-HTL-RETREAT03-ROOM_TYPE-PINE-LOFT",
+      "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN",
+      "F-HTL-RETREAT03-ROOM_TYPE-PINE-CABIN",
+      "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-LOFT-REF",
+      "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF",
+      "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-CABIN-REF"
+    ]
+  },
+  "Pine7": {
+    "approved_case": 7,
+    "budget_turn": 5,
+    "HTTP": 502,
+    "calls": 1,
+    "error": {
+      "code": "provider_invalid_response",
+      "message": "The local model response exceeded the requested token limit.",
+      "retryable": false
+    },
+    "cause": "Provider completed enough for adapter to inspect output usage, then rejected because usage.output_tokens exceeded request.max_output_tokens (configured700).",
+    "no_commit_verified": "EnforcedreadonlyDB: samebrief1/child7/bothhardneeds/guardian+sharetrue/languagevi rev1; case7requesterror,onlycase6receipt/result/sourceutterance;0selections. No age8/relaxation/Frenchcommit.",
+    "unverified": "Frenchcheckedexplanation,relaxation/samechildage8result/math/selection notobserved."
+  },
+  "readonly_proof": "q-review-reacceptance1-cont2-actual-db-readonly.json",
+  "provider_proof": "q-review-reacceptance1-cont2-provider-diagnosis.json",
+  "chronology": [
+    {
+      "stage": "provider_reserved",
+      "turn": 4,
+      "case_turn": 6,
+      "call": 1,
+      "unix_time": 1793084596.212466
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 4,
+      "case_turn": 6,
+      "call": 1,
+      "unix_time": 1793084603.634144,
+      "latency_ms": 7421.5,
+      "output_tokens": 402
+    },
+    {
+      "stage": "provider_reserved",
+      "turn": 4,
+      "case_turn": 6,
+      "call": 2,
+      "unix_time": 1793084603.692395
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 4,
+      "case_turn": 6,
+      "call": 2,
+      "unix_time": 1793084607.4417899,
+      "latency_ms": 3749.3,
+      "output_tokens": 33
+    },
+    {
+      "stage": "http_completed",
+      "turn": 4,
+      "case_turn": 6,
+      "status": 200,
+      "unix_time": 1793084607.5106812,
+      "latency_ms": 11367.1
+    },
+    {
+      "stage": "provider_reserved",
+      "turn": 5,
+      "case_turn": 7,
+      "call": 1,
+      "unix_time": 1793084607.718549
+    },
+    {
+      "stage": "provider_failed",
+      "turn": 5,
+      "case_turn": 7,
+      "call": 1,
+      "unix_time": 1793084618.264277,
+      "latency_ms": 10545.5,
+      "exception_class": "ProviderError"
+    },
+    {
+      "stage": "http_completed",
+      "turn": 5,
+      "case_turn": 7,
+      "status": 502,
+      "unix_time": 1793084618.277306,
+      "latency_ms": 10606.5
+    }
+  ],
+  "final_budget": {
+    "parentseed": [
+      3,
+      5
+    ],
+    "globalhalted": [
+      5,
+      8
+    ],
+    "state_sha256": "3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843",
+    "lifetime_provider_attempts": 25,
+    "unused_originalcap": "2guest/6requestslots remainunspentbutclosed; originalcases2,5Blockeddependencies; allotherapprovedcasesattempted. No newindependentcallavailable."
+  },
+  "remaining_C01_gaps": [
+    "CitycoupleChinesecomparison/budget→bededit/staleselectionfullactualchain failed/unverified",
+    "Familymissingageexplicitadultconsent→7→12budgetfullactualchain failed;age7didcommitbeforeanswerfailed,case5skipped",
+    "Pinehardaccesscauseexplanation failed;age8relaxation/French/selectionfailedtokencap beforeM2"
+  ],
+  "valid_reuse": "PriorCity1math/partialBeach&Pineknownbaseevidence, independentofflinefullconstraint/source/quote/currentness/CAS tests andactualB07pilotPASS remainvalidcomponentproof; do notupgradefailedjourneys tofullPASS.",
+  "next_scope": "OnlyboundedofflinePine6explanationfix currentlyassignedB; preserveallquote/ID/source/numericguards and2call/25s45s/700caps. No furthermodelcallsorretriesauthorizedbythiscompleted/skippedmatrix.",
+  "effects": "NoQprovider/API/modelcalls orDBwrites; readonlytransactionrolledback; no unrelatedhistory/credentialscan."
+}

@@ -1,0 +1,120 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance2",
+  "status": "PROPOSED; requires new explicit manual reacceptance allowance; no state/config/API/provider initialization",
+  "authorized_for_live_calls": false,
+  "proposed_max_guest_turns": 7,
+  "proposed_max_requests": 14,
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "no_automatic_retry": true,
+  "stop_at_first_blocking_failure": true,
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "cases": [
+    {
+      "turn": 1,
+      "source_case": 2,
+      "session": "fresh-city",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "我们是两位成年人，是情侣，可以同住并共用一张大床。入住日期为2026-11-10，退房日期为2026-11-13。整个住宿的客房总预算上限为6000000 VND。请用中文比较合适的房型和参考费用。",
+      "amendment": {
+        "original_utterance": "改成我们两位成年人，情侣，可以同住并共用一张大床。日期和总预算不变。请用中文比较合适的房型和参考费用。",
+        "reason": "Fresh session cannot resolve previous dates/total budget. Restates actual explicit City1 values as current guest input; old invalid City session untouched. No room-count limit invented."
+      },
+      "expected": [
+        "M2 adults2/dates2026-11-10..13/nights3/hardstayroomtotal6mVND/explicitcouplesharing; no inferredmaxrooms",
+        "Chinese comparison/rationale only for surviving checked options; STD5.4m/TWN5.85m ifproposed; FAM8.7m may be rejected, but rejectedoverbudget must not contaminate withinbudget survivor wording",
+        "Select one current option through UI at0provider; persist exactresultID/version/option"
+      ]
+    },
+    {
+      "turn": 2,
+      "source_case": 3,
+      "session": "fresh-city",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "Keep Chinese. We now require two separate beds; increase the total room budget to 6500000 VND. Keep our dates and two adults. Please update the advice.",
+      "expected": [
+        "KeepChinese/twoadults/dates; commithardseparatebeds+budget6.5m, retaincorrectfields and currentquoteprovenance",
+        "TWN3n5.85m ifproposed; two separatelyassignedsleepingsurfaces, no sharedbed falselysatisfiesrequest",
+        "Old selected card becomesstale/disabled; no oldresultrebind; newcurrentresult selectable, exactversiontracked"
+      ]
+    },
+    {
+      "turn": 3,
+      "source_case": 4,
+      "session": "fresh-beach",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "We are two adults and our one child. I am the child’s parent and guardian. We can share one room; the adults can share a queen bed, but the child needs a separate sleeping place. Stay 2026-11-10 to 2026-11-12. Please advise and estimate; what else do you need?",
+      "expected": [
+        "M2 twoadults+oneageunknownstablechild; explicitspeakerparentguardianboundopaqueadult1; adultsqueensharingtrue; childrequiresseparatebedtrue; roomsharingconsent/dates2n",
+        "Ask consequentialchildage; preserveallotherexplicitconstraints; no assumedage/guardian/sharedchildbed",
+        "Usefulpartial/sourcepricedbaseifavailable; unknownfees andavailability stayunknown; do not forceoptions/selection onneedsclarification"
+      ]
+    },
+    {
+      "turn": 4,
+      "source_case": 5,
+      "session": "fresh-beach",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "Our child is 7 years old. Please continue with the same requirements and dates, and explain the known room cost versus charges you cannot confirm.",
+      "expected": [
+        "Update samechildID age7; preserveguardian/adultconsent/childseparatebed/dates/adults",
+        "GDN5.2m,FAM7.6m,POOL9m known2nroomsubtotals ifproposed; exactassignments no duplicates/unusedrooms/extra guests",
+        "Guardian/occupancy/beds/agechecks verified where sourced; childorothermandatoryfees unknown =>incomplete/nulltotal; no inbudgetcertification"
+      ]
+    },
+    {
+      "turn": 5,
+      "source_case": 6,
+      "session": "fresh-beach",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "Correction: our child is 12, not 7. We still need one room and a separate bed for the child; I remain the parent and guardian. Budget is 6000000 VND for the whole stay, including all mandatory room charges.",
+      "expected": [
+        "SamechildID corrected12; remainsminor withguardian; separatelycheckadult-ratebillingthreshold; preserveexplicitseparatebed,one-room,date/adultcount",
+        "Budgetamount6mVND whole-staymandatorycharges; originalwording doesnotexplicitlyclassify hardvs target: preserveunknownstrength/askboundedstrengthquestion ratherthanfabricate",
+        "Retain useful knownroomcost; adult-rate/mandatorychildorbedfees unsupported =>unknown/incomplete/nulltotal, never claimwithin6m"
+      ]
+    },
+    {
+      "turn": 6,
+      "source_case": 7,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đi cùng con 7 tuổi và là người giám hộ của bé. Chúng tôi có thể ở chung phòng và chung giường lớn. Ở 2026-11-10 đến 2026-11-12; bắt buộc không có bậc và phòng tắm phù hợp xe lăn. Tư vấn phần có căn cứ, đừng tự bỏ điều kiện.",
+      "expected": [
+        "M2 adult1/child7/explicitguardian/sharetrue/dates2n/hardstepfree+wheelchairbathroom",
+        "LOFT/GARDENminimumage8 rejected at7; CABINaccesssupportunknown =>no certifiedhardaccessfit",
+        "Keeprequirements, explainunknown/incompatible ratherthansoldout, no relaxationwithoutconsent; no forcedoptions"
+      ]
+    },
+    {
+      "turn": 7,
+      "source_case": 8,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đồng ý bỏ yêu cầu không bậc và yêu cầu phòng tắm xe lăn. Sửa tuổi con thành 8; tôi vẫn là người giám hộ và chúng tôi đồng ý chung giường lớn. Giữ ngày ở. Hãy tư vấn lại. Répondez en français.",
+      "expected": [
+        "SamechildID age7→8, preserveguardian/sharing/dates; clearonlytwohardaccessrequirements authorizedbycurrentquote; M2commitbeforedependentresult",
+        "LOFT4.4m/GARDEN5m/CABIN8.2m known2nbase ifproposed; familychargesunknown/nulltotal; age8eligibilityverified",
+        "French checkedrationale/questions withoutENfallback afterM4filtersclaims; actualcardlanguagefr; source/brief/resultversions traceable",
+        "Current UIselection0provider; previousresultstale ifany; no reservation/payment"
+      ]
+    }
+  ],
+  "prior_attempts": "All prior states/counters/failures immutable. New manual proposal, not reset/transfer of unused slots. B07 is already independently accepted; do not repeat booking.",
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261026-reacceptance1-cont2",
+    "guest_turns": 5,
+    "codex_requests": 8,
+    "state_sha256": "3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843",
+    "lifetime_requests": 25,
+    "unused_guest_slots": 2,
+    "unused_request_slots": 6,
+    "unused_slots": "closed; no transfer/reset/reuse"
+  },
+  "purpose": "Fresh manual reacceptance of full remaining City/Family/Pine chains after offline remediation. Same original seven utterances, fresh three sessions, max7guest14requests, same2calls25s45s700Luna/low,no automaticretry, firstblockingfailurestop. B07priorPASSreused.",
+  "candidate_sha256": "3df06f98b30cf46043d6ea742375d4e82cd7a14fa3f97553b40b672f7b6b45a5"
+}

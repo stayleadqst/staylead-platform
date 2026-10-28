@@ -23,4 +23,6 @@ def test_fixture_projection_contains_only_guest_approved_current_facts() -> None
                for hotel in hotels for fact in hotel.facts for ref in fact["source_refs"])
     assert all(fact["approved"] and fact["visibility"] == "guest" for hotel in hotels for fact in hotel.facts)
     assert not any(fact["fact_id"] == "F-HTL-CITY01-004" for hotel in hotels for fact in hotel.facts)
-    assert sum(len(hotel.facts) for hotel in hotels) == 327
+    assert sum(len(hotel.facts) for hotel in hotels) == 345
+    assert all(sum(fact["field"] == "room_type" for fact in hotel.facts) == 3 for hotel in hotels)
+    assert all(sum(fact["field"] == "reference_rate" for fact in hotel.facts) == 3 for hotel in hotels)

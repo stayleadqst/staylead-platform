@@ -5,7 +5,7 @@ export type GuestSession = Readonly<{
   access_token: string;
   token_type: "Bearer";
   expires_at: string;
-  hotel: Record<string, unknown>;
+  hotel: Readonly<Record<string, unknown>>;
   config_version: string;
   language_preference?: GuestLanguagePreference;
 }>;
@@ -65,6 +65,7 @@ export type GuestHotel = Readonly<{
   public_config: Record<string, unknown>;
   config_version: string;
   guest_contract_version: string;
+  booking_channel?: unknown;
 }>;
 
 export type GuestMessageResponse = Readonly<{
@@ -91,6 +92,8 @@ export type GuestMessageResponse = Readonly<{
   language_preference?: GuestLanguagePreference;
   presentation?: GuestPresentation;
   answer_eligibility?: "current" | "pending" | "stale";
+  room_advice?: unknown;
+  booking_request?: unknown;
 }>;
 
 export type GuestBriefMember = Readonly<{ member_id: string; age: number | null }>;
@@ -121,7 +124,10 @@ export type GuestPartialResult = Readonly<{
   error: Readonly<{ code: string; message: string }>;
 }>;
 
-export type GuestFreshnessResponse = Readonly<{ status: "current" | "stale" }>;
+export type GuestFreshnessResponse = Readonly<{
+  status: "current" | "stale";
+  room_advice_currentness?: "current" | "stale";
+}>;
 
 export type GuestContractMetadata = Readonly<{
   status: "ok";
@@ -357,5 +363,22 @@ export async function checkGuestFreshness(args: {
       authorization: `Bearer ${args.accessToken}`,
     },
     body: JSON.stringify({ request_id: args.requestId }),
+  });
+}
+
+export async function selectGuestRoomAdviceOption(args: {
+  sessionId: string;
+  accessToken: string;
+  resultId: string;
+  resultVersion: number;
+  optionId: string;
+  target: DomainTarget;
+}): Promise<Readonly<{ result_id: string; result_version: number; option_id: string; updated_at: string }>> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  const resultId = encodeURIComponent(args.resultId);
+  return request(endpoint(args.target, `/sessions/${sessionId}/room-advice/${resultId}/selection`), {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
+    body: JSON.stringify({ result_version: args.resultVersion, option_id: args.optionId }),
   });
 }

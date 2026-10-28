@@ -16,6 +16,7 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy import select, text
 from sqlalchemy.exc import StatementError
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies.guest_chat import GuestChatError
 from staylead_platform.entrypoints.app import create_app
@@ -70,7 +71,9 @@ class FakeProvider:
         if "Select only fact IDs" in request.instructions:
             index = json.loads(request.input_text)["candidate_index"]
             eligible = [item["fact_id"] for item in index]
-            result = {"fact_ids": eligible[:4]}
+            result = {
+                "fact_ids": eligible[:4], "turn_intents": ["hotel_information"],
+            }
         else:
             facts = json.loads(request.input_text)["facts"]
             if facts:
@@ -81,6 +84,7 @@ class FakeProvider:
                 }
             else:
                 result = {"supported_claims": [], "unknowns": ["This detail is not in the available records."], "conflicts": []}
+            result["turn_intents"] = ["hotel_information"]
         return GenerationResult(
             text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
             request_id=f"fake-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),
@@ -98,11 +102,13 @@ def settings_for(database_url: str, *, ai_turn_timeout_seconds: float = 45.0) ->
 
 
 def test_explicit_migration_fixture_bootstrap_and_hotel_scoped_provenance(engine) -> None:
-    assert schema_version(engine) == 6
+    assert schema_version(engine) == 7
     cities = facts_for_hotel(engine, "HTL-CITY01")
     beach = facts_for_hotel(engine, "HTL-BEACH02")
-    assert len(cities) == 109
-    assert len(beach) == 108
+    assert len(cities) == 115
+    assert len(beach) == 114
+    assert sum(item["field"] in {"room_type", "reference_rate"} for item in cities) == 6
+    assert sum(item["field"] in {"room_type", "reference_rate"} for item in beach) == 6
     assert all(item["hotel_id"] == "HTL-CITY01" for item in cities)
     assert all(item["provenance"]["source_id"].startswith("SRC-HTL-CITY01") for item in cities)
     assert all(item["fact_id"] != "F-HTL-CITY01-004" for item in cities)
@@ -259,7 +265,10 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                 await asyncio.to_thread(allow_model.wait)
             if "Select only fact IDs" in request.instructions:
                 candidate_index = json.loads(request.input_text)["candidate_index"]
-                result = {"fact_ids": [candidate_index[0]["fact_id"]]}
+                result = {
+                    "fact_ids": [candidate_index[0]["fact_id"]],
+                    "turn_intents": ["hotel_information"],
+                    }
             else:
                 facts = json.loads(request.input_text)["facts"]
                 fact_id = facts[0]["fact_id"]
@@ -267,6 +276,7 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                     "supported_claims": [{"text": "The available record covers breakfast.", "fact_ids": [fact_id]}],
                     "unknowns": [], "conflicts": [],
                 }
+            result["turn_intents"] = ["hotel_information"]
             return GenerationResult(
                 text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
                 request_id=f"gated-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),

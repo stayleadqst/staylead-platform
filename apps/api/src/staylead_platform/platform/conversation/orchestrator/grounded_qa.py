@@ -7,7 +7,8 @@ import json
 import re
 import unicodedata
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from types import SimpleNamespace
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel, ValidationError
@@ -23,6 +24,13 @@ from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
     GuestBriefSnapshot,
     PreparedGuestTurn,
+)
+from staylead_platform.platform.contracts.room_advice import (
+    RoomAdviceContext,
+    RoomAdviceHotelAnswer,
+    RoomAdviceHotelClaim,
+    RoomAdviceResult,
+    RoomAdviceUseCase,
 )
 from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
 
@@ -278,14 +286,17 @@ class GroundedQAOrchestrator:
         committed_output_schema_factory: Callable[
             [tuple[str, ...], tuple[str, ...], tuple[str, ...], str, tuple[str, ...], tuple[str, ...]], dict[str, Any]
         ] | None = None,
-        preparation_selection_schema_factory: Callable[[], dict[str, Any]] | None = None,
-        preparation_answer_schema_factory: Callable[[tuple[str, ...], tuple[str, ...]], dict[str, Any]] | None = None,
+        preparation_selection_schema_factory: Callable[[GuestBriefSnapshot | None], dict[str, Any]] | None = None,
+        preparation_answer_schema_factory: Callable[
+            [tuple[str, ...], tuple[str, ...], GuestBriefSnapshot | None], dict[str, Any]
+        ] | None = None,
         preparation_metadata_validator: Callable[
             [Any, GuestBriefProposal | None, str], tuple[tuple[str, ...], tuple[dict[str, Any], ...]]
         ] | None = None,
         committed_answer_validator: Callable[[Any, tuple[str, ...], tuple[str, ...], tuple[str, ...]], None] | None = None,
         response_envelope_key: str | None = None,
         max_output_tokens: int = 700,
+        room_advice: RoomAdviceUseCase | None = None,
     ) -> None:
         self._provider = provider
         self._retriever = retriever
@@ -304,6 +315,7 @@ class GroundedQAOrchestrator:
         self._committed_answer_validator = committed_answer_validator
         self._response_envelope_key = response_envelope_key
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
+        self._room_advice = room_advice
 
     async def answer(
         self, *, hotel_id: str, question: str, history: list[dict[str, str]],
@@ -345,7 +357,7 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selection_schema = (
-                    self._preparation_selection_schema_factory()
+                    self._preparation_selection_schema_factory(brief)
                     if extract_guest_patch and self._preparation_selection_schema_factory is not None else None
                 )
                 selected = await self._provider.generate(GenerationRequest(
@@ -440,7 +452,7 @@ class GroundedQAOrchestrator:
         try:
             allowed_brief_refs = _known_nonpending_brief_refs(brief)
             response_schema = (
-                self._preparation_answer_schema_factory(missing_label_keys, label_bundle_keys)
+                self._preparation_answer_schema_factory(missing_label_keys, label_bundle_keys, brief)
                 if extract_guest_patch and self._preparation_answer_schema_factory is not None
                 else self._committed_output_schema_factory(
                     missing_label_keys,
@@ -670,7 +682,7 @@ class GroundedQAOrchestrator:
             }, ensure_ascii=False, separators=(",", ":"))
             try:
                 selection_schema = (
-                    self._preparation_selection_schema_factory()
+                    self._preparation_selection_schema_factory(brief)
                     if self._preparation_selection_schema_factory is not None else None
                 )
                 selected = await self._provider.generate(GenerationRequest(
@@ -689,9 +701,14 @@ class GroundedQAOrchestrator:
                     *_question_url_fact_ids(question, hotel_id, tuple(retrieved.facts), allowed_ids),
                 )))
                 patch = _proposal(getattr(payload, "guest_patch", None))
-                turn_intents, patch_authorizations = self._validated_preparation_metadata(
-                    payload, patch, question,
-                )
+                try:
+                    turn_intents, patch_authorizations = self._validated_preparation_metadata(
+                        payload, patch, question,
+                    )
+                except ValueError as exc:
+                    raise ConversationFailure(
+                        "invalid_model_output", "The model returned invalid preparation data.",
+                    ) from exc
                 return PreparedGuestTurn(
                     provisional_answer=None, guest_patch=patch,
                     selected_fact_ids=selected_ids, source_utterance_id=source_utterance_id,
@@ -757,6 +774,235 @@ class GroundedQAOrchestrator:
             authorized_targets=authorized_targets,
             label_source_texts=label_source_texts,
         )
+
+    async def recommend_committed_room_advice(
+        self, *, context: RoomAdviceContext, deadline: float | None = None,
+    ) -> tuple[RoomAdviceResult, GenerationResult]:
+        """Generate call-two candidates from committed state, then validate in code."""
+        remaining = self._remaining(deadline)
+        if self._room_advice is None:
+            raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
+        mixed_hotel_request = {"hotel_information", "room_advice"} <= set(context.turn_intents)
+        include_presentation_labels = self._room_advice.needs_presentation_labels(context.locale)
+        requested_hotel_fact_ids = set(context.hotel_information_fact_ids) if mixed_hotel_request else set()
+        eligible_facts = self._room_advice.eligible_facts(context)
+        eligible_by_id = {fact.get("fact_id"): fact for fact in eligible_facts}
+        if requested_hotel_fact_ids:
+            current_hotel_facts = await self._current_facts_by_ids(
+                context.hotel_id, requested_hotel_fact_ids, deadline=deadline,
+            )
+            eligible_current_by_id = {
+                fact.get("fact_id"): fact for fact in self._room_advice.eligible_facts(
+                    replace(context, facts=current_hotel_facts),
+                )
+            }
+            for fact_id in requested_hotel_fact_ids:
+                eligible_by_id.pop(fact_id, None)
+            eligible_by_id.update(eligible_current_by_id)
+        if any(fact_id not in eligible_by_id for fact_id in requested_hotel_fact_ids):
+            raise ConversationFailure(
+                "invalid_room_advice", "A selected hotel-information fact is no longer current and eligible.",
+            )
+        room_facts = self._room_advice.select_facts(
+            eligible_facts, question=context.question, brief_data=context.brief_data,
+        )
+        hotel_information_facts = tuple(
+            eligible_by_id[fact_id] for fact_id in context.hotel_information_fact_ids
+            if mixed_hotel_request
+        )
+        combined_facts = tuple({fact["fact_id"]: fact for fact in (*room_facts, *hotel_information_facts)}.values())
+        selected_context = replace(context, facts=combined_facts)
+        preparation_input = {
+            "hotel_id": context.hotel_id,
+            "brief_version": context.brief_version,
+            "committed_guest_brief": context.brief_data,
+            "pending_fields": list(context.pending_fields),
+            "source_generation": context.source_generation,
+            "current_question": context.question,
+            "guest_facts": list(room_facts),
+        }
+        if mixed_hotel_request:
+            preparation_input["turn_intents"] = list(context.turn_intents)
+            preparation_input["hotel_information_facts"] = list(hotel_information_facts)
+        if include_presentation_labels:
+            preparation_input["presentation_templates"] = self._room_advice.presentation_templates()
+        generated = await self._provider.generate(GenerationRequest(
+            instructions=self._room_advice.preparation_instructions(
+                context.locale, include_hotel_answer=mixed_hotel_request,
+                include_presentation_labels=include_presentation_labels,
+            ),
+            input_text=json.dumps(preparation_input, ensure_ascii=False, separators=(",", ":")),
+            max_output_tokens=self._max_output_tokens,
+            response_schema=self._room_advice.preparation_output_schema(
+                include_hotel_answer=mixed_hotel_request,
+                include_presentation_labels=include_presentation_labels,
+            ),
+            response_envelope_key="response",
+        ))
+        if mixed_hotel_request:
+            current_hotel_facts_after = await self._current_facts_by_ids(
+                context.hotel_id, requested_hotel_fact_ids, deadline=deadline,
+            ) if requested_hotel_fact_ids else ()
+            eligible_after = {
+                fact.get("fact_id"): fact for fact in self._room_advice.eligible_facts(
+                    replace(context, facts=current_hotel_facts_after),
+                )
+            }
+            if any(
+                fact_id not in eligible_after
+                or json.dumps(eligible_after[fact_id], ensure_ascii=False, sort_keys=True)
+                != json.dumps(eligible_by_id[fact_id], ensure_ascii=False, sort_keys=True)
+                for fact_id in requested_hotel_fact_ids
+            ):
+                raise ConversationFailure(
+                    "invalid_room_advice", "A selected hotel-information fact changed during generation.",
+                )
+        try:
+            draft = self._room_advice.parse_draft(generated.text)
+        except (ValidationError, ValueError) as exc:
+            diagnostics = _validation_diagnostics(exc) if isinstance(exc, ValidationError) else None
+            raise ConversationFailure(
+                "invalid_room_advice", "The model returned an invalid room-advice candidate.",
+                validation_diagnostics=diagnostics,
+            ) from exc
+        hotel_answer = self._validate_room_advice_hotel_answer(
+            draft.hotel_answer, context=context,
+            hotel_information_facts=tuple(eligible_after[fact_id] for fact_id in context.hotel_information_fact_ids)
+            if mixed_hotel_request else (),
+            mixed_hotel_request=mixed_hotel_request,
+        )
+        draft = replace(draft, hotel_answer=hotel_answer)
+        return await self._room_advice.recommend(context=selected_context, draft=draft, deadline=remaining), generated
+
+    def _validate_room_advice_hotel_answer(
+        self, answer: RoomAdviceHotelAnswer | None, *, context: RoomAdviceContext,
+        hotel_information_facts: tuple[dict[str, Any], ...], mixed_hotel_request: bool,
+    ) -> RoomAdviceHotelAnswer | None:
+        if not mixed_hotel_request:
+            if answer is not None:
+                raise ConversationFailure(
+                    "invalid_room_advice", "The model returned an FAQ answer outside a mixed hotel-information turn.",
+                )
+            return None
+        if answer is None:
+            raise ConversationFailure(
+                "invalid_room_advice", "The mixed hotel-information answer is missing from call two.",
+            )
+        allowed_ids = set(context.hotel_information_fact_ids)
+        facts_by_id = {
+            fact["fact_id"]: fact for fact in hotel_information_facts
+            if isinstance(fact.get("fact_id"), str) and fact.get("hotel_id") == context.hotel_id
+        }
+        if any(fact_id not in facts_by_id for fact_id in allowed_ids):
+            raise ConversationFailure(
+                "invalid_room_advice", "A selected hotel-information fact is unavailable in the current hotel context.",
+            )
+        validator_payload = SimpleNamespace(
+            supported_claims=[SimpleNamespace(text=claim.text, fact_ids=list(claim.fact_ids))
+                              for claim in answer.supported_claims],
+            unknowns=list(answer.unknowns), conflicts=list(answer.conflicts),
+        )
+        if self._committed_answer_validator is not None:
+            try:
+                self._committed_answer_validator(
+                    validator_payload, context.turn_intents, (), (),
+                )
+            except ValueError as exc:
+                raise ConversationFailure(
+                    "invalid_room_advice", "The mixed FAQ answer is outside the prepared turn scope.",
+                ) from exc
+        checked_claims = []
+        for claim in answer.supported_claims:
+            claim_ids = tuple(dict.fromkeys(claim.fact_ids))
+            if not claim_ids or any(fact_id not in allowed_ids or fact_id not in facts_by_id for fact_id in claim_ids):
+                raise ConversationFailure(
+                    "invalid_room_advice", "The mixed FAQ answer cited a fact outside M1 selection.",
+                )
+            references = _FACT_REFERENCE.findall(claim.text)
+            tokens = _FACT_TOKEN.findall(claim.text)
+            if tokens != references or (references and set(references) != set(claim_ids)):
+                raise ConversationFailure(
+                    "invalid_room_advice", "The mixed FAQ answer contains invalid evidence references.",
+                )
+            cited_facts = [facts_by_id[fact_id] for fact_id in claim_ids]
+            _validate_supported_literals(claim.text, cited_facts)
+            formatted = self._claim_formatter(claim.text, cited_facts) if self._claim_formatter else claim.text
+            if not isinstance(formatted, str):
+                raise ConversationFailure("invalid_room_advice", "The FAQ claim formatter returned invalid text.")
+            formatted_refs = _FACT_REFERENCE.findall(formatted)
+            formatted_tokens = _FACT_TOKEN.findall(formatted)
+            if formatted_tokens != formatted_refs or formatted_refs != references:
+                raise ConversationFailure("invalid_room_advice", "The FAQ claim formatter changed evidence references.")
+            _validate_supported_literals(formatted, cited_facts)
+            checked_claims.append(RoomAdviceHotelClaim(text=formatted, fact_ids=claim_ids))
+        for text in (*answer.unknowns, *answer.conflicts):
+            _validate_untrusted_field(text, facts_by_id)
+        if not checked_claims and not answer.unknowns and not answer.conflicts:
+            raise ConversationFailure("invalid_room_advice", "The mixed FAQ answer has no substantive response.")
+        return RoomAdviceHotelAnswer(
+            supported_claims=tuple(checked_claims), unknowns=answer.unknowns, conflicts=answer.conflicts,
+        )
+
+    async def _current_facts_by_ids(
+        self, hotel_id: str, fact_ids: set[str], *, deadline: float | None,
+    ) -> tuple[dict[str, Any], ...]:
+        """Reload current guest-eligible facts through the generic M1 retrieval port."""
+        getter = getattr(self._retriever, "get_by_ids", None)
+        if not callable(getter):
+            raise ConversationFailure(
+                "room_advice_unavailable", "Current hotel facts cannot be revalidated for mixed advice.",
+            )
+        try:
+            current = await asyncio.to_thread(
+                getter, hotel_id, fact_ids, timeout_seconds=self._remaining(deadline),
+            )
+        except (TimeoutError, OSError) as exc:
+            raise ConversationFailure(
+                "room_advice_unavailable", "Current hotel facts could not be revalidated.",
+            ) from exc
+        return tuple(current)
+
+    def relocalize_room_advice(
+        self, result: RoomAdviceResult, locale: str | None,
+        presentation_labels: dict[str, str] | None = None,
+    ) -> RoomAdviceResult:
+        """Forward presentation-only localization to the registered domain port."""
+        if self._room_advice is None:
+            raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
+        return self._room_advice.relocalize(result, locale, presentation_labels)
+
+    async def translate_room_advice(
+        self, result: RoomAdviceResult, locale: str | None, *, deadline: float | None = None,
+    ) -> tuple[RoomAdviceResult, GenerationResult | None]:
+        """Use the existing second slot for presentation-only localization of checked advice."""
+        if self._room_advice is None:
+            raise ConversationFailure("room_advice_unavailable", "Room advice is not configured.")
+        request = self._room_advice.localization_request(result, locale)
+        if request is None:
+            return self._room_advice.relocalize(result, locale), None
+        try:
+            generated = await self._provider.generate(GenerationRequest(
+                instructions=request["instructions"],
+                input_text=json.dumps(request["input"], ensure_ascii=False, separators=(",", ":")),
+                max_output_tokens=self._max_output_tokens,
+                response_schema=request["response_schema"],
+                response_envelope_key="response",
+            ))
+            labels = self._room_advice.parse_localization(
+                generated.text, expected_keys=tuple(request["keys"]), locale=locale,
+            )
+        except (ProviderError, TimeoutError):
+            raise
+        except (ValidationError, ValueError) as exc:
+            diagnostics = _validation_diagnostics(exc) if isinstance(exc, ValidationError) else None
+            raise ConversationFailure(
+                "invalid_room_advice_localization", "The model returned invalid room-advice labels.",
+                validation_diagnostics=diagnostics,
+            ) from exc
+        remaining = self._remaining(deadline)
+        if remaining is not None and remaining <= 0:
+            raise TimeoutError("The request deadline expired during room-advice localization.")
+        return self._room_advice.relocalize(result, locale, labels), generated
 
     def _validated_preparation_metadata(
         self, payload: Any, patch: GuestBriefProposal | None, question: str,

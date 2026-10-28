@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
+
 from staylead_platform.entrypoints.app import MessageRequest
 
 

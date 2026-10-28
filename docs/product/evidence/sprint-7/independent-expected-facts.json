@@ -1,0 +1,133 @@
+{
+  "kind": "independent source-derived expectations; not executed product evidence",
+  "baseline": "a46a63eb4b589b8518f9477ebd66e81d89a0f054",
+  "synthetic": true,
+  "source_files": {
+    "properties.json": "627dd25e733d7ec59be02619eeb813d8c2b037e02d51fd11680eb9a6e88a868e",
+    "sources.json": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f",
+    "facts.json": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0",
+    "manifest.json": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2"
+  },
+  "source_versions": "CATALOG 1.0 per hotel; 2026-10-01..2027-09-30",
+  "room_rates": {
+    "CITY-STD": 1800000,
+    "CITY-TWN": 1950000,
+    "CITY-FAM": 2900000,
+    "BEACH-GDN": 2600000,
+    "BEACH-FAM": 3800000,
+    "BEACH-POOL": 4500000,
+    "PINE-LOFT": 2200000,
+    "PINE-GARDEN": 2500000,
+    "PINE-CABIN": 4100000
+  },
+  "cases": [
+    {
+      "id": "city-solo-3n",
+      "members": 1,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "nights": 3,
+      "known_room_subtotal_vnd": 5400000,
+      "expected": "Reference only; no live availability; one queen accommodates one consenting guest."
+    },
+    {
+      "id": "city-couple-3n",
+      "members": 2,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "nights": 3,
+      "known_room_subtotal_vnd": 5400000,
+      "expected": "Two adults may share queen only if sharing authorized; bed count is not guest count."
+    },
+    {
+      "id": "city-colleagues-separate-beds-2n",
+      "members": 2,
+      "room": "CITY-TWN",
+      "rooms": 1,
+      "nights": 2,
+      "known_room_subtotal_vnd": 3900000,
+      "expected": "Two single beds; no invented discount; no double counted included breakfast."
+    },
+    {
+      "id": "city-three-adults-2n",
+      "members": 3,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "expected": "Reject occupancy 3>2, never fit or sold out."
+    },
+    {
+      "id": "city-two-twin-2n",
+      "members": 3,
+      "room": "CITY-TWN",
+      "rooms": 2,
+      "nights": 2,
+      "known_room_subtotal_vnd": 7800000,
+      "expected": "Exactly-once assignment; per-room capacity≤2; no unused fictional adult fees for room with one guest."
+    },
+    {
+      "id": "beach-family-2n",
+      "adults": 2,
+      "children_ages": [
+        7
+      ],
+      "room": "BEACH-GDN",
+      "rooms": 1,
+      "nights": 2,
+      "known_room_subtotal_vnd": 5200000,
+      "expected": "3 occupants counts child; queen+sofa capacity3; explicit guardian/sharing needed; child fee unknown makes full total incomplete, budget certification forbidden."
+    },
+    {
+      "id": "retreat-child-age7-loft",
+      "adults": 1,
+      "children_ages": [
+        7
+      ],
+      "room": "PINE-LOFT",
+      "expected": "Reject below typed minimum8 even though7 absent from boundary samples."
+    },
+    {
+      "id": "retreat-child-age8-loft",
+      "adults": 1,
+      "children_ages": [
+        8
+      ],
+      "room": "PINE-LOFT",
+      "expected": "Age eligible by typed minimum8; explicit guardian/bed sharing still checked; do not require sample-age whitelist."
+    },
+    {
+      "id": "retreat-cabin-bunk-age6",
+      "children_ages": [
+        6
+      ],
+      "room": "PINE-CABIN",
+      "expected": "Conflict: boundary sample prohibits upper bunk for6 vs prose prohibits under6; do not silently certify."
+    },
+    {
+      "id": "nonprice-without-dates",
+      "room": "CITY-TWN",
+      "expected": "Useful room-fit and 1950000VND/room-night reference possible without full dates; total unknown."
+    },
+    {
+      "id": "access-unverified",
+      "room": "BEACH-GDN",
+      "hard_requirements": [
+        "wheelchair bathroom"
+      ],
+      "expected": "Not certified fit; bathroom unverified. Explain unknown/next confirmation, no diagnosis."
+    },
+    {
+      "id": "unknown-cot-conflict",
+      "room": "BEACH-GDN",
+      "expected": "Cot prose free1 vs typed allowedfalse must remain conflict/needs confirmation, not free available."
+    }
+  ],
+  "global_invariants": [
+    "Unknown child/extra-adult/extra-bed charges are not zero.",
+    "Rate includes2 adults and0 children; costs checked per room assignment, not global party headcount.",
+    "Age12/17 adult-rate child remains minor requiring guardian.",
+    "No total/in-budget when required fees unknown; no implicit currency conversion.",
+    "Correct hotel/source/version/expiry/revoke controls all derived claims.",
+    "Language-only edit preserves mathematics and assignment; need change invalidates affected result.",
+    "Booking destination from trusted server config only, no model/source/guest authority; no PII or query params."
+  ]
+}

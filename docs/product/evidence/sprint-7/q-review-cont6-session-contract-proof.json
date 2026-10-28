@@ -1,0 +1,27 @@
+{
+  "producer": "Actual GuestChatApplication.open_session executed with pure fixture_pack parser output; repository get/create mocked in process only",
+  "session_hotel": {
+    "hotel_id": "HTL-RETREAT03",
+    "name": "Pine Ridge Demo",
+    "address": "42 Suong Thong Road, fictional Pine Ridge Commune, fictional Lam Son Province, Vietnam",
+    "description": "Nơi nghỉ dưỡng núi hư cấu, ưu tiên không gian yên tĩnh; địa chỉ và tọa độ chỉ là dữ liệu minh họa.",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "currency": "VND",
+    "synthetic": true,
+    "source_pack": "staylead-hospitality-knowledge-v1",
+    "booking_channel": {
+      "destination_url": "https://booking.example/hotels/pine-ridge-demo",
+      "contact": null,
+      "destination_kind": "synthetic_demo"
+    }
+  },
+  "no_DB_or_provider": true,
+  "omitted_fields": [
+    "access_token",
+    "session_id",
+    "token_type",
+    "expires_at"
+  ],
+  "original_guard_result": false,
+  "minimal_hotel_id_guard_result": true
+}

@@ -1,0 +1,55 @@
+{
+  "verdict": "PASS focused readiness for the explicitly approved freshR7 two-turn/four-request run",
+  "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "scope": "Exact three controls-only delta; unchanged productdd0 offline review reused, no live acceptance claim",
+  "independent_checks": {
+    "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+    "source_count": 237,
+    "before": {
+      "repo": [],
+      "snapshot": []
+    },
+    "after": {
+      "repo": [],
+      "snapshot": []
+    },
+    "delta": [
+      "tests/contracts/test_sprint7_acceptance_harness.py",
+      "tools/evals/sprint7_browser.mjs",
+      "tools/evals/sprint7_runtime.py"
+    ],
+    "candidate_digest": "PASS",
+    "runtime_actual_parent_guard": "PASS exact sealedR6 path/hash/receipt",
+    "approved_inputs": "PASS exact private cases/authority/oracle",
+    "fresh_budget": "0/0→2/4; Sol/low; no continuation",
+    "semantic_and_actual_producer_branches": "byte-identical from const expectedBrief onwards; helper unchanged; reuse prior actual producer/negative/semantic gate proofs"
+  },
+  "targeted_tests": "3PASS/18deselected: actual private approvedmatrix+authority+sealed parent guard, freshcaps+wrongstate negatives, unique browser namespace",
+  "root_reported_gates": {
+    "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+    "source_pins": 237,
+    "controls_delta_files": 3,
+    "root_gate": "23harness/APItests,Rufffullsrc/tests/runtime,compilePASS;3existingwarnings",
+    "builder_gate": "21harnesstests,Ruff,NodeSyntax,diffPASS",
+    "reused_product": "dd0cc688:292contracts/architecture/API,16isolatedPG,RuffcompileDiff,QscopedPASS",
+    "reused_frontend": "53pinsunchanged;40tests/lint/typecheck/buildPASS",
+    "live_requests": 0
+  },
+  "reused_proofs": [
+    "q-review-reacceptance6-sol-question-remediation-final.json",
+    "q-review-reacceptance6-sol-question-final-driver-probe-results.json",
+    "real Sol constructor/CLI args reviewed bootstrap2; unchanged provider",
+    "CityR3/FamilyR2/B07 accepted actual evidence; no repeat"
+  ],
+  "semantic_gate": "Unchanged root-only regular0600 exact run/candidate/turn/pass/API body_text SHA marker after captured machine/UI checks; waits before next request without provider use. Q actual semantic PASS required.",
+  "prior_actual": "R6HALTED1/2,lifetime52,unused1/2closed; no transfer/reset/retry. New explicit2/4 is separate fresh0/0.",
+  "limitations": [
+    "Q performed no model/API/DBcalls or activation/state mutation",
+    "Future actual extraction/French rationale/current selection not proven by readiness",
+    "First blocking actual failure stops; no automatic retry/fallback; root sole activator and marker writer"
+  ],
+  "evidence": [
+    "q-review-reacceptance7-sol-cases.json",
+    "q-review-reacceptance7-sol-pins.json"
+  ]
+}

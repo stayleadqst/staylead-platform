@@ -1,0 +1,28 @@
+{
+  "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+  "changed_controls": 3,
+  "root_gate": {
+    "tests": "35 PASS: provider real construction/security/wire + harness + API skeleton",
+    "ruff": "PASS full src/tests + runtime",
+    "compile": "PASS src/runtime",
+    "warnings": "3 existing FastAPI/Starlette deprecations"
+  },
+  "builder_gate": {
+    "focused_tests": "21 PASS",
+    "node_syntax": "PASS",
+    "offline_smoke": "PASS no_api_or_model:true",
+    "diff_check": "PASS",
+    "provider_contract_tests": "12 PASS"
+  },
+  "reused_product_evidence": {
+    "candidate": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+    "backend_tests": 280,
+    "isolated_pg_tests": 16,
+    "frontend_tests": 40,
+    "frontend_pins_unchanged": 53,
+    "frontend_lint_typecheck_build": "PASS reused"
+  },
+  "live_requests": 0,
+  "limitations": "Offline gates do not establish Pine actual model semantic success.",
+  "provider_delta_files": 2
+}

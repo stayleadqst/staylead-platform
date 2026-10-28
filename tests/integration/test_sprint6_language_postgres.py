@@ -7,6 +7,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
+
 from staylead_platform.infrastructure.database import create_database_engine
 from staylead_platform.infrastructure.persistence.store import (
     apply_migrations,
@@ -23,7 +24,7 @@ def engine():
     if not TEST_DSN:
         pytest.skip("Set STAYLEAD_TEST_DATABASE_URL to an isolated Sprint 6 PostgreSQL database.")
     database = create_database_engine(TEST_DSN)
-    assert apply_migrations(database) == 6
+    assert apply_migrations(database) == 7
     yield database
     database.dispose()
 

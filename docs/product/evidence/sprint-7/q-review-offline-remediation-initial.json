@@ -1,0 +1,55 @@
+{
+  "candidate_sha256": "b77ca99cc36872d760353758863259ff53d0f59a3d44b17d4edb0f004ec4b561",
+  "verdict": "Offlinefixmostlycorrect; one P2 regression requires correction before code-reviewPASS. This is not actualmodelPASS.",
+  "scope": "Exact5filedelta frompreserved9a;235hashesbeforeaftermatch/digestverified; no platformsource/config/fixture/harness/cap changes",
+  "passing": [
+    "Originalactualcapture rejectsbeforeanymutation undernative/Pydanticcanonicaltargetpattern",
+    "Correctcounterfactual fourbudgetpaths+guest_edit+max_roomsnull validates",
+    "Missingguest_edit stillrejects",
+    "11requirementfields and clears computedcanonicalorder; nullplaceholders not targets",
+    "Packed/inventedtargetstrings reject; currentquote/op/targetcomparison unchanged",
+    "Prompt explicitly requiresguest_edit forinitialtripdetails and forbidsinferredmax_rooms",
+    "4focusedtestsPASS117deselected"
+  ],
+  "findings": [
+    {
+      "id": "Q-A8",
+      "priority": "P2",
+      "files": [
+        "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+        "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py"
+      ],
+      "line": 115,
+      "summary": "Targetwhitelist accidentallyremovesvalidclarifyroom_requirements authorization",
+      "reproducer": {
+        "operation": {
+          "op": "clarify",
+          "field": "room_requirements"
+        },
+        "authorization": {
+          "operation_index": 0,
+          "op": "clarify",
+          "target_fields": [
+            "room_requirements"
+          ],
+          "intent": "clarification",
+          "current_turn_quote": "Please clarify my room requirements."
+        }
+      },
+      "observed": "Authorizationrejects; samebusinessoperationstillvalidandproducespendingroom_requirements",
+      "impact": "Existingconsequentialrequirementclarification cannotpasscurrentnative/Pydanticauthorizationgrammar; delta regressionAC1/2",
+      "smallest_fix": "Allow room_requirements aggregate forclarify inbothnative/Pydantic; exactoperation-targetmatchingcontinues torequiregranularpaths for set_room_requirements. Addroundtripregression."
+    }
+  ],
+  "evidence": [
+    "q-review-offline-remediation-probe-results.json",
+    "q-review-offline-remediation-hashes-before.json",
+    "q-review-offline-remediation-hashes-after.json"
+  ],
+  "limitations": [
+    "Noactualprovider/DBcalls",
+    "Originalq-review-actualevidenceunchanged",
+    "Promptimprovementdoesnotprovefuturemodelwillobey;39/28/97actualACremainblocked",
+    "Rootrunningbroaderoffline/PGchecks notrepeatedbyQ"
+  ]
+}

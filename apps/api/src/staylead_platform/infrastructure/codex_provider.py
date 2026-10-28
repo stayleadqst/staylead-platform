@@ -73,8 +73,11 @@ class CodexCLIProvider:
         model: str = "gpt-6-luna",
         reasoning_effort: str = "low",
     ) -> None:
-        if not executable.strip() or model != "gpt-6-luna" or reasoning_effort != "low":
-            raise ValueError("The local Codex provider uses the approved gpt-6-luna/low profile.")
+        if not executable.strip() or (model, reasoning_effort) not in {
+            ("gpt-6-luna", "low"),
+            ("gpt-6.1-sol", "low"),
+        }:
+            raise ValueError("The local Codex provider uses an approved Luna/low or Sol/low profile.")
         self._executable = executable
         self._timeout_seconds = min(max(timeout_seconds, 1.0), 60.0)
         self._model = model

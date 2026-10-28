@@ -1,0 +1,16 @@
+{
+  "candidate_sha256": "5c7f04dd27aa0dcb2a0c479aa1dc5fa84cd225f3985cc21a43ea67abb32e83df",
+  "backend_tests": 263,
+  "backend_warnings": 3,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "node_syntax": "PASS reused unchanged v1 controls",
+  "offline_smoke": "PASS reused unchanged v1 controls",
+  "diff_check": "PASS",
+  "reused_postgres_tests": 31,
+  "reused_frontend_contract_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "new_live_calls": 0,
+  "v1_gate_failure": "Old prompt-literal assertion corrected; no product acceptance weakening",
+  "Q_initial_review_fix": "Exact numeric spelling rule added to actual mixed-room producer path, not only committed standalone FAQ"
+}

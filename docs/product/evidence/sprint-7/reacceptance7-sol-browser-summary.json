@@ -1,0 +1,86 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol",
+  "started_at": "2026-10-28T01:52:39.538Z",
+  "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "live_cases_sha256": "c684ea8fe0675aaa820597f3ebdb800273f6c64f8c378ade2e70264770ed4088",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "browser": "chromium",
+  "live": true,
+  "mock_api": false,
+  "prior_allocation_closed": true,
+  "fresh_namespace": {
+    "guest_turns": 0,
+    "codex_requests": 0
+  },
+  "turns": [
+    {
+      "turn": 1,
+      "session": "fresh-pine",
+      "hotel_id": "HTL-RETREAT03",
+      "http_status": 200,
+      "request_id_sha256": "645490dfa2517d82f35744fbd2398d0d26b743d3a5badc90582a89afeaffd9bc",
+      "result_id_sha256": "93b77d35fb8cf0236b60c926ecd6d48508e4b6566cd448bc1086c87fee62194f",
+      "result_version": 1,
+      "brief_version": 1,
+      "source_generation": 1,
+      "source_ref_count": 10,
+      "option_count": 0,
+      "status": "needs_clarification",
+      "provider_calls": 2,
+      "answer_language": "vi",
+      "capture": "turn-01-api.json"
+    },
+    {
+      "turn": 2,
+      "session": "fresh-pine",
+      "hotel_id": "HTL-RETREAT03",
+      "http_status": 200,
+      "request_id_sha256": "83db3a1f941e00317d6b935c60cccd048b87fb28aea2989e069bcd3d3f33f48a",
+      "result_id_sha256": "f506b01dabb06036da255f7a9cf7d15a65f077b420703f15eddf4810186e0b9a",
+      "result_version": 2,
+      "brief_version": 2,
+      "source_generation": 1,
+      "source_ref_count": 2,
+      "option_count": 1,
+      "status": "partial",
+      "provider_calls": 2,
+      "answer_language": "fr",
+      "capture": "turn-02-api.json"
+    }
+  ],
+  "selections": [
+    {
+      "turn": 2,
+      "result_version": 2,
+      "option_id_sha256": "76dedb3969a81f49f3cc77a1ed680b0095a0957446255bf749fe33c2ab37399b",
+      "model_calls": 0
+    }
+  ],
+  "semantic_reviews": [
+    {
+      "turn": 1,
+      "verdict": "pass",
+      "response_sha256": "24cb10f9b66d6859ff1502501da4155522227ae2ee1e2821c374e7ec55790897"
+    },
+    {
+      "turn": 2,
+      "verdict": "pass",
+      "response_sha256": "ea30fbee2cb5d292f3b44e528e9755753bebc41c143a3d2ee0e6708265c1e2a7"
+    }
+  ],
+  "failure": null,
+  "mobile_layout": {
+    "viewport": 390,
+    "body": 390,
+    "no_horizontal_overflow": true
+  },
+  "counters": {
+    "guest_turns": 2,
+    "codex_requests": 4,
+    "new_guest_turns": 2,
+    "new_requests": 4,
+    "max_guest_turns": 2,
+    "max_codex_requests": 4
+  },
+  "completed_at": "2026-10-28T01:54:59.773Z"
+}

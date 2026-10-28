@@ -1,0 +1,80 @@
+{
+  "candidate_sha256": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+  "verdict": "OFFLINE_SCOPED_CODE_REVIEW_PASS; no remaining intervention in six-file delta",
+  "actual_acceptance": "C01/Sprint7 NOT Done. R4 Pine1 FAIL, dependent Pine2 not attempted; historical failure/counters remain unchanged. Primary extraction improvement is prompt-only hypothesis, not model-verified.",
+  "source_pins": {
+    "count": 237,
+    "digest": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+    "before_after_repo_snapshot_match": true,
+    "exact_six_file_delta": [
+      "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+      "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "tests/contracts/test_grounded_qa.py",
+      "tests/contracts/test_room_advice.py",
+      "tests/contracts/test_sprint7_acceptance_harness.py",
+      "tools/evals/sprint7_browser.mjs"
+    ],
+    "evidence": "q-review-reacceptance4-remediation-pins.json"
+  },
+  "independent_checks": [
+    {
+      "evidence": "q-review-reacceptance4-remediation-causal-probe-results.json",
+      "outcome": "Exact failed native call1 STILL statically parses, passes quote/canonical M2 and creates hardbedpending (no semantic rejection claim). New M4 early-pending branch now preserves known/nonpending access hotel-verification key; French projection passes with required exact labels. Absent needs, access pending and whole-requirements pending do not falsely receive known marker. Explicit unsupported physical hardtype clarification still creates pending field and is not dropped."
+    },
+    {
+      "evidence": "q-review-reacceptance4-remediation-driver-probe-results.json",
+      "outcome": "Actual canonicalM2/M4→driver positives pass; unrequested hardtype value/pending reject on current actual checkBrief; no invention of budget/child/source/completefee/ENfallback accepts. Legit generic source-driven unknowns/partial remain allowed."
+    },
+    {
+      "command": "Six focused pytest instances (known-access unrelated pending; three absent/pending negatives; prompt distinction; actual drivercheckBrief negative test)",
+      "outcome": "6 passed; no model/API/actualDB writes"
+    }
+  ],
+  "guards_unchanged": [
+    "Canonical M2/quote authorization/ID guards remain unchanged; noNLparser/aliases/automatic pending clearing",
+    "Native clear-only and canonical question-field fixes from0eb retained; no new source authority/price/availability rule",
+    "Runtime model remains gpt-6-luna/low; timeout/output/turn/request caps unchanged and old state untouched"
+  ],
+  "root_gates_observed": {
+    "backend_log": "/private/tmp/staylead-s7-r4-final-remediation-backend.log",
+    "backend": "280 passed,3 known deprecation warnings",
+    "postgres_log": "/private/tmp/staylead-s7-r4-final-remediation-postgres.log",
+    "postgres": "16 passed,1 known deprecation warning",
+    "reported_static": "WholecanonicalRuff/compilePASS; NodeSyntaxSmoke/diffPASS; unchanged53frontendpins/40tests+lint/typecheck/build reused. Do not sum overlaps."
+  },
+  "future_proposal": {
+    "file": "reacceptance5-sol-cases-proposed.json",
+    "scope_verdict": "PASS as an unapproved proposal only",
+    "authorized_for_live_calls": false,
+    "profile_change_approved": false,
+    "model": "gpt-6.1-sol",
+    "effort": "low",
+    "maxima": [
+      2,
+      4
+    ],
+    "exact_two_original_case_objects_preserved": true,
+    "same_fresh_one_Pine_session": true,
+    "unchanged_limits": {
+      "max_calls_per_turn": 2,
+      "provider_seconds": 25,
+      "turn_seconds": 45,
+      "output_tokens": 700,
+      "automatic_retry": false
+    },
+    "prior_allocation": "R4 sealedhalted1/2 SHA16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c/lifetime46; unused1guest2requestsclosed",
+    "reuse": "Accepted City/Family/B07 remains valid; do not repeat unrelated actual cases",
+    "judgment": "A distinct stronger inference-profile proposal is reasonable after repeated semantic errors. Not a controlled comparison or guaranteed improvement; timeout700/25/45 feasibility remains untested. Noautomaticfallback/profilechange/call."
+  },
+  "official_profile_support": {
+    "source": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "method": "Independent official-domain search then fetched official model page using OpenAI Docs skill",
+    "verified": "Official page lists reasoning.effort low and structured outputs supported.",
+    "not_verified": "CodexCLI endpoint/account access, realquality/latency/outputcap success. Local modelslug/effortlisting reported byroot only; no inference/access test byQ."
+  },
+  "limitations": [
+    "No actual-state repair, new config/state activation or provider call byQ",
+    "Original R4 rawcapture/current badbrief1/pendinghardtype preserved; final screenshot/French/currentselection acceptance still missing",
+    "Publication before new manual/profile-approval request belongs to root"
+  ]
+}

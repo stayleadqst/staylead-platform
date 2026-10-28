@@ -50,7 +50,8 @@ from staylead_platform.platform.contracts.knowledge import (
 )
 
 metadata = MetaData()
-CURRENT_SCHEMA_VERSION = 6
+CURRENT_SCHEMA_VERSION = 7
+ROOM_ADVICE_ALGORITHM_VERSION = "s7-room-advice-v1"
 schema_versions = Table(
     "schema_versions", metadata,
     Column("version", Integer, primary_key=True),
@@ -215,6 +216,37 @@ guest_brief_receipts = Table(
     Column("brief_dependent", Boolean, nullable=False, server_default="true"),
     Column("answer_payload", JSON),
     Column("created_at", DateTime(timezone=True), nullable=False),
+)
+room_advice_results = Table(
+    "guest_room_advice_results", metadata,
+    Column("result_id", String(36), primary_key=True),
+    Column("session_id", String(36), nullable=False, index=True),
+    Column("hotel_id", String(80), nullable=False, index=True),
+    Column("request_id", String(128), nullable=False),
+    Column("result_version", Integer, nullable=False),
+    Column("session_state_version", Integer, nullable=False),
+    Column("brief_version", Integer, nullable=False),
+    Column("source_generation", Integer, nullable=False),
+    Column("config_version", String(80), nullable=False),
+    Column("policy_version", String(120)),
+    Column("price_version", String(120)),
+    Column("algorithm_version", String(80), nullable=False),
+    Column("dependency_fingerprint", String(64), nullable=False),
+    Column("source_refs", JSON, nullable=False),
+    Column("payload", JSON, nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    UniqueConstraint("session_id", "request_id", name="uq_room_advice_session_request"),
+    UniqueConstraint("session_id", "result_version", name="uq_room_advice_session_version"),
+    UniqueConstraint("session_id", "session_state_version", name="uq_room_advice_session_state"),
+)
+room_advice_selections = Table(
+    "guest_room_advice_selections", metadata,
+    Column("session_id", String(36), primary_key=True),
+    Column("hotel_id", String(80), nullable=False),
+    Column("result_id", String(36), nullable=False),
+    Column("result_version", Integer, nullable=False),
+    Column("option_id", String(120), nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
 )
 
 
@@ -527,6 +559,10 @@ def apply_migrations(engine: Engine) -> int:
         if existing < 6:
             # metadata.create_all above creates the session-scoped presentation preference table.
             connection.execute(insert(schema_versions).values(version=6, applied_at=utcnow()))
+            existing = 6
+        if existing < 7:
+            # metadata.create_all above creates immutable room advice snapshots and their selection pointer.
+            connection.execute(insert(schema_versions).values(version=7, applied_at=utcnow()))
     return CURRENT_SCHEMA_VERSION
 
 
@@ -771,6 +807,12 @@ def save_bootstrap(
 def get_hotel_by_slug(engine: Engine, slug: str) -> dict[str, Any] | None:
     with engine.connect() as connection:
         row = connection.execute(select(hotels).where(hotels.c.slug == slug)).mappings().first()
+    return dict(row) if row else None
+
+
+def get_hotel_by_id(engine: Engine, hotel_id: str) -> dict[str, Any] | None:
+    with engine.connect() as connection:
+        row = connection.execute(select(hotels).where(hotels.c.hotel_id == hotel_id)).mappings().first()
     return dict(row) if row else None
 
 
@@ -1147,6 +1189,321 @@ def get_guest_brief(
             guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
         ))).mappings().first()
         return _brief_snapshot(row)
+
+
+def _room_advice_currentness(connection: Any, row: Any, now: datetime) -> str:
+    hotel = connection.execute(select(hotels).where(hotels.c.hotel_id == row["hotel_id"])).mappings().first()
+    session = connection.execute(select(sessions).where(and_(
+        sessions.c.session_id == row["session_id"], sessions.c.hotel_id == row["hotel_id"],
+        sessions.c.expires_at > now,
+    ))).first()
+    if hotel is None or session is None:
+        return "stale"
+    brief_version = connection.scalar(select(guest_briefs.c.brief_version).where(and_(
+        guest_briefs.c.session_id == row["session_id"], guest_briefs.c.hotel_id == row["hotel_id"],
+    ))) or 0
+    if (brief_version != row["brief_version"]
+            or hotel["knowledge_generation"] != row["source_generation"]
+            or hotel["config_version"] != row["config_version"]
+            or row["algorithm_version"] != ROOM_ADVICE_ALGORITHM_VERSION):
+        return "stale"
+    latest_result_version = connection.scalar(select(room_advice_results.c.result_version).where(
+        room_advice_results.c.session_id == row["session_id"],
+    ).order_by(room_advice_results.c.result_version.desc()).limit(1))
+    if latest_result_version != row["result_version"]:
+        return "stale"
+    refs = row["source_refs"] or []
+    if refs and not _validate_evidence_on_connection(connection, row["hotel_id"], refs, now).eligible:
+        return "stale"
+    return "current"
+
+
+def save_room_advice_result(
+    engine: Engine, *, session_id: str, hotel_id: str, request_id: str,
+    payload: dict[str, Any], brief_version: int, source_generation: int,
+    config_version: str, source_refs: list[dict[str, Any]],
+    expected_state_version: int,
+    policy_version: str | None = None, price_version: str | None = None,
+    algorithm_version: str = ROOM_ADVICE_ALGORITHM_VERSION,
+    timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Atomically persist a checked result only while its input dependencies are still current."""
+    now = utcnow()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > now,
+        )).with_for_update()).mappings().first()
+        hotel = connection.execute(select(hotels).where(
+            hotels.c.hotel_id == hotel_id,
+        ).with_for_update()).mappings().first()
+        if session is None or hotel is None:
+            raise ScopeError("room advice scope is invalid")
+        existing = connection.execute(select(room_advice_results).where(and_(
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.request_id == request_id,
+        ))).mappings().first()
+        dependency = {
+            "brief_version": brief_version, "source_generation": source_generation,
+            "config_version": config_version, "policy_version": policy_version,
+            "price_version": price_version, "algorithm_version": algorithm_version,
+            "source_refs": source_refs,
+        }
+        fingerprint = _canonical_hash(dependency)
+        if existing is not None:
+            if existing["dependency_fingerprint"] != fingerprint or existing["payload"] != payload:
+                raise IdempotencyConflict("room advice request id was reused with different result content")
+            result = dict(existing)
+            result["currentness"] = _room_advice_currentness(connection, existing, now)
+            selection = connection.execute(select(room_advice_selections).where(and_(
+                room_advice_selections.c.session_id == session_id,
+                room_advice_selections.c.hotel_id == hotel_id,
+            ))).mappings().first()
+            result["selection"] = _selection_payload(selection, existing)
+            return result
+        if session["state_version"] != expected_state_version:
+            raise VersionConflict("guest session advanced before the room advice result was committed")
+        prior_for_turn = connection.execute(select(room_advice_results.c.result_id).where(and_(
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.session_state_version == expected_state_version,
+        ))).first()
+        if prior_for_turn is not None:
+            raise VersionConflict("a room advice result already exists for this guest turn")
+        brief_row = connection.execute(select(guest_briefs.c.brief_version).where(and_(
+            guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+        ))).scalar_one_or_none()
+        current_brief_version = int(brief_row or 0)
+        if (current_brief_version != brief_version
+                or hotel["knowledge_generation"] != source_generation
+                or hotel["config_version"] != config_version):
+            raise StaleSource("room advice dependencies changed before result commit")
+        decision = _validate_evidence_on_connection(connection, hotel_id, source_refs, now)
+        if source_refs and not decision.eligible:
+            raise StaleSource("room advice source evidence is no longer eligible")
+        result_version = int(connection.scalar(select(room_advice_results.c.result_version).where(
+            room_advice_results.c.session_id == session_id,
+        ).order_by(room_advice_results.c.result_version.desc()).limit(1)) or 0) + 1
+        result_id = str(uuid.uuid4())
+        connection.execute(insert(room_advice_results).values(
+            result_id=result_id, session_id=session_id, hotel_id=hotel_id,
+            request_id=request_id, result_version=result_version,
+            session_state_version=expected_state_version,
+            brief_version=brief_version, source_generation=source_generation,
+            config_version=config_version, policy_version=policy_version,
+            price_version=price_version, algorithm_version=algorithm_version,
+            dependency_fingerprint=fingerprint,
+            source_refs=source_refs, payload=payload, created_at=now,
+        ))
+        saved = connection.execute(select(room_advice_results).where(
+            room_advice_results.c.result_id == result_id,
+        )).mappings().one()
+        result = dict(saved)
+        result["currentness"] = "current"
+        result["selection"] = None
+        return result
+
+
+def _selection_payload(selection: Any | None, result: Any) -> dict[str, Any] | None:
+    if selection is None or selection["result_id"] != result["result_id"]:
+        return None
+    return {"result_id": selection["result_id"], "result_version": selection["result_version"],
+            "option_id": selection["option_id"], "updated_at": selection["updated_at"].isoformat()}
+
+
+def get_room_advice_result(
+    engine: Engine, *, session_id: str, hotel_id: str,
+    result_id: str | None = None, timeout_seconds: float | None = None,
+) -> dict[str, Any] | None:
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        query = select(room_advice_results).where(and_(
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.hotel_id == hotel_id,
+        ))
+        if result_id is not None:
+            query = query.where(room_advice_results.c.result_id == result_id)
+        else:
+            query = query.order_by(room_advice_results.c.result_version.desc()).limit(1)
+        row = connection.execute(query).mappings().first()
+        if row is None:
+            return None
+        result = dict(row)
+        result["currentness"] = _room_advice_currentness(connection, row, utcnow())
+        selection = connection.execute(select(room_advice_selections).where(and_(
+            room_advice_selections.c.session_id == session_id,
+            room_advice_selections.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        result["selection"] = _selection_payload(selection, row) if result["currentness"] == "current" else None
+        return result
+
+
+def update_room_advice_presentation(
+    engine: Engine, *, session_id: str, hotel_id: str, result_id: str,
+    expected_result_version: int, expected_payload: dict[str, Any],
+    payload: dict[str, Any], expected_language_revision: int,
+    timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    """Persist localized display text without changing the checked advice decision.
+
+    The stored result version and dependency fingerprint remain stable. The caller
+    supplies the payload it read; this compare-and-set accepts only changes to
+    presentation labels and rendered rationale/question text and metadata.
+    """
+    def decision_content(value: dict[str, Any]) -> dict[str, Any]:
+        content = json.loads(json.dumps(value, ensure_ascii=False))
+        content.pop("presentation_labels", None)
+        content.pop("presentation_locale", None)
+        claim_codes = {
+            "party_fit", "bed_setup", "reference_price", "policy_confirmation",
+            "accessibility_confirmation", "preference_tradeoff", "charges_confirmation",
+        }
+        def checked_key(actual: Any, expected: str) -> str:
+            if actual is not None and actual != expected:
+                raise ValueError("localized room advice contains an invalid presentation key")
+            return expected
+
+        def question_key(question: dict[str, Any]) -> str:
+            field = question.get("field")
+            if (field == "room_requirements.hard_accessibility_needs"
+                    and question.get("presentation_key") == "question.accessibility_confirmation"):
+                # The checked producer stores this marker only for a saved,
+                # non-pending hard need; preserve it through language-only CAS.
+                return "question.accessibility_confirmation"
+            if field == "room_requirements.budget_strength":
+                return "question.budget_strength"
+            unknowns = set(content.get("explanation_inputs", {}).get("unknowns", ()))
+            conflicts = set(content.get("explanation_inputs", {}).get("conflicts", ()))
+            if "rate_basis" in unknowns:
+                return "question.rate_basis"
+            if "rate_validity_window" in unknowns:
+                return "question.rate_validity_window"
+            if field == "room_advice" and conflicts:
+                conflict = min(conflicts)
+                return {
+                    "hard_budget_exceeded": "question.hard_budget_exceeded",
+                    "source_fact_conflict": "question.source_fact_conflict",
+                }.get(conflict, "question.room_rule_conflict")
+            if field in {"dates.check_in", "dates.check_out"}:
+                return "question.dates"
+            if field == "party.adults":
+                return "question.party"
+            if field == "party.children.age" or (
+                isinstance(field, str) and field.startswith("party.children.") and field.endswith(".age")
+            ):
+                return "question.age"
+            if field == "room_advice" or isinstance(field, str) and field.startswith("room_requirements."):
+                return "question.room"
+            return "question.generic"
+
+        for option in content.get("options", ()):
+            if not isinstance(option, dict):
+                continue
+            for item in option.get("rationale", ()):
+                if isinstance(item, dict):
+                    claim_code = item.get("claim_code")
+                    if claim_code not in claim_codes:
+                        raise ValueError("localized room advice contains an invalid rationale code")
+                    item["presentation_key"] = checked_key(
+                        item.get("presentation_key"), f"claim.{claim_code}",
+                    )
+                    for key in ("text", "locale", "locale_fallback"):
+                        item.pop(key, None)
+        for question in content.get("questions", ()):
+            if isinstance(question, dict):
+                question["presentation_key"] = checked_key(
+                    question.get("presentation_key"), question_key(question),
+                )
+                for key in ("reason", "locale", "locale_fallback"):
+                    question.pop(key, None)
+        return content
+
+    if decision_content(expected_payload) != decision_content(payload):
+        raise ValueError("localized room advice changed checked decision content")
+    now = utcnow()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions.c.session_id).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > now,
+        )).with_for_update()).first()
+        if session is None:
+            raise ScopeError("room advice presentation session is no longer current")
+        row = connection.execute(select(room_advice_results).where(and_(
+            room_advice_results.c.result_id == result_id,
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.hotel_id == hotel_id,
+        )).with_for_update()).mappings().first()
+        if (row is None or row["result_version"] != expected_result_version
+                or decision_content(row["payload"]) != decision_content(expected_payload)):
+            raise VersionConflict("room advice changed before its presentation was updated")
+        if _room_advice_currentness(connection, row, now) != "current":
+            raise StaleSource("room advice dependencies changed before presentation update")
+        preference = connection.execute(select(guest_language_preferences.c.revision).where(and_(
+            guest_language_preferences.c.session_id == session_id,
+            guest_language_preferences.c.hotel_id == hotel_id,
+        )).with_for_update()).scalar_one_or_none()
+        if int(preference or 0) != expected_language_revision:
+            raise VersionConflict("guest language preference changed before presentation update")
+        connection.execute(update(room_advice_results).where(
+            room_advice_results.c.result_id == result_id,
+        ).values(payload=payload))
+        updated = connection.execute(select(room_advice_results).where(
+            room_advice_results.c.result_id == result_id,
+        )).mappings().one()
+        result = dict(updated)
+        result["currentness"] = "current"
+        selection = connection.execute(select(room_advice_selections).where(and_(
+            room_advice_selections.c.session_id == session_id,
+            room_advice_selections.c.hotel_id == hotel_id,
+        ))).mappings().first()
+        result["selection"] = _selection_payload(selection, updated)
+        return result
+
+
+def select_room_advice_option(
+    engine: Engine, *, session_id: str, hotel_id: str, result_id: str,
+    expected_result_version: int, option_id: str, timeout_seconds: float | None = None,
+) -> dict[str, Any]:
+    now = utcnow()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > now,
+        )).with_for_update()).first()
+        # Match source lifecycle's hotel-row lock so revocation/refresh cannot race a selection.
+        hotel_lock = connection.execute(select(hotels.c.hotel_id).where(
+            hotels.c.hotel_id == hotel_id,
+        ).with_for_update()).first()
+        result = connection.execute(select(room_advice_results).where(and_(
+            room_advice_results.c.result_id == result_id,
+            room_advice_results.c.session_id == session_id,
+            room_advice_results.c.hotel_id == hotel_id,
+        )).with_for_update()).mappings().first()
+        if session is None or hotel_lock is None or result is None:
+            raise ScopeError("room advice result scope is invalid")
+        if result["result_version"] != expected_result_version:
+            raise VersionConflict("room advice result version changed")
+        if _room_advice_currentness(connection, result, now) != "current":
+            raise StaleSource("room advice result is stale")
+        options = result["payload"].get("options", [])
+        if not any(isinstance(option, dict) and option.get("option_id") == option_id for option in options):
+            raise ScopeError("room advice option is not part of this result")
+        values = {"hotel_id": hotel_id, "result_id": result_id,
+                  "result_version": expected_result_version, "option_id": option_id, "updated_at": now}
+        existing = connection.execute(select(room_advice_selections.c.session_id).where(and_(
+            room_advice_selections.c.session_id == session_id,
+            room_advice_selections.c.hotel_id == hotel_id,
+        )).with_for_update()).first()
+        if existing:
+            connection.execute(update(room_advice_selections).where(
+                room_advice_selections.c.session_id == session_id,
+            ).values(**values))
+        else:
+            connection.execute(insert(room_advice_selections).values(session_id=session_id, **values))
+        return {"result_id": result_id, "result_version": expected_result_version,
+                "option_id": option_id, "updated_at": now.isoformat()}
 
 
 def _brief_receipt(row: Any) -> GuestBriefReceipt:

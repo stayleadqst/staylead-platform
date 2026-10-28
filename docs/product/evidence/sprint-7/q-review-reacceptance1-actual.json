@@ -1,0 +1,46 @@
+{
+  "verdict": "FAIL firstactualreacceptancecase1; fullC01AC1-8/Sprint7DoD remainBLOCKED",
+  "candidate_sha256": "fcdd4a2f2ea0247deb873db638879ce579c74b23d703037190a0487e4f1d877c",
+  "snapshot_all237verified": true,
+  "current_source_mismatches_at_report": [],
+  "case_matrix_sha256": "d48d28c04b23f0ea7151a3e24c6f5556169bdfdd2a7a0caca0ed7d01e338ec50",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "actual_outcome": {
+    "turn": 1,
+    "HTTP": 502,
+    "code": "invalid_model_output",
+    "provider_requests": 1,
+    "call2": false,
+    "input_tokens": 12066,
+    "output_tokens": 346,
+    "latency_ms": 7934.5,
+    "failure_stage": "preparationcurrentturnauthorization"
+  },
+  "verified_cause": "OriginalnativeJSONpassesFactSelection. set_room_requirements quotejoins2nonadjacentcurrentphrases, so exactcurrent-substring guardcorrectlyrejects beforeM2.",
+  "additional_observed_semantic_defects": [
+    "hard_bed_types king isnotlicensedby permissive shareone 大床 wording",
+    "Onlysharing allowpreference emitted; missingexplicitparty.bed_sharing consent op. Quote-onlyrepairisnotsemanticPASS."
+  ],
+  "no_commit_proof": "q-review-reacceptance1-actual-db-readonly.json: readonly=on, requesterror invalid_model_output, state0,0messages/briefs/receipts/sourceutterances/results/selections/languageprefs",
+  "protocol_proof": "q-review-reacceptance1-actual-protocol.json; originalfailurepreserved; wholecontiguousquotecounterfactualpassesmetadataonly",
+  "actual_remaining_cases": "Cases2-7 unattempted; no Citybededit/family/Pine/French/selectionactualPASS. Missingcoupledcasesremainunresolved.",
+  "budget_and_provenance": {
+    "fresh_allocation": "7turn/14request",
+    "halted_consumption": [
+      1,
+      1
+    ],
+    "state_sha256": "16ead6f78ee2687e3a2e490886930b04b87b8938186b393a5f5c2004805d191a",
+    "prior_closed_consumption": [
+      9,
+      16
+    ],
+    "prior_lifetime_requests": 17,
+    "new_lifetime_requests": 18,
+    "unusedslots": "Noautomaticretry/resume/continuation; haltednamespace preserved."
+  },
+  "B07": "PrioractualB07AC1-3syntheticpilotPASS remainsvalid, no bookingrepeatneeded.",
+  "local_vs_actual": "Localcode/harnessreadinessPASS ispreserved asofflineevidence; itdoesnotestablishmodelsemanticreliability oractualC01acceptance. No fullSprintDone verdict.",
+  "next_action_scope": "Coordinatorcananalyzeboundedofflineprompt/protocol/semanticfixes. Keepcurrentquote/ID/sourceguards and2call/25s45s/700bounds. Anyactualfollowup mustrespecthumanallocation/noautoretry/exactcaseauthority; Qmakesnone.",
+  "effects": "Qread-onlyDBtransactionrolledback; no Qprovider/API/modelcalls,DBwrites,productmutations."
+}

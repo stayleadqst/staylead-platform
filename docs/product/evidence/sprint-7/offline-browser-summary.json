@@ -1,0 +1,71 @@
+{
+  "kind": "offline real-API/PostgreSQL browser preflight",
+  "mock_provider": true,
+  "live_model": false,
+  "actual_s7_namespace": false,
+  "browser": "Chromium",
+  "turns": [
+    {
+      "turn": 1,
+      "http_status": 200,
+      "request_id_sha256": "0b06ce20abb91c5d679099a4f5ad9e968cdcd343b5972063fc8c431c01b831e2",
+      "result_id_sha256": "e931fb87da771bb27f7b0ee6da118adace2630457986676b5ca90058c9aab523",
+      "result_version": 1,
+      "brief_version": 1,
+      "currentness": "current",
+      "option_count": 1,
+      "selected_option": null,
+      "answer_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "turn": 2,
+      "http_status": 200,
+      "request_id_sha256": "48b5e306da007d622b966d4176d8a8061218adda6b5d9adead0a8790e14e4b2c",
+      "result_id_sha256": "9f9488dfb763a1f139b7cfc1169428321160bd6510ecb98cb2a8b140d8863f30",
+      "result_version": 2,
+      "brief_version": 2,
+      "currentness": "current",
+      "option_count": 1,
+      "selected_option": null,
+      "answer_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "selection": {
+    "result_version": 1,
+    "selected": true,
+    "api_status": 200,
+    "persisted": true
+  },
+  "replay": {
+    "stale_old_result_rejected": true,
+    "http_status": 409,
+    "old_version": 1,
+    "latest_version": 2
+  },
+  "failure": null,
+  "booking_anchor": {
+    "href": "https://booking.example/hotels/harbor-city-demo",
+    "target": "_blank",
+    "rel": "noopener noreferrer",
+    "referrerPolicy": "no-referrer",
+    "verified": true
+  },
+  "exact_result_freshness": {
+    "old": "stale",
+    "current": "current"
+  },
+  "ui_freshness": {
+    "old_result_stale_banner": true,
+    "old_option_disabled": true,
+    "new_result_current": true,
+    "new_option_enabled": true
+  },
+  "mobile_layout": {
+    "viewport": 390,
+    "body": 390,
+    "no_horizontal_overflow": true
+  },
+  "status": "passed",
+  "completed_at": "2026-10-27T01:54:19.460Z",
+  "captures_and_screenshots": "Retained locally only, not included in Git"
+}

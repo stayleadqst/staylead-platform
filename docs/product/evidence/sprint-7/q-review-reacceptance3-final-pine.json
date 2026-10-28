@@ -1,0 +1,65 @@
+{
+  "candidate_sha256": "0eb86e8c747e5674c45867fd358c007e767f91586ac1dc51761dd90c30d1c6cd",
+  "verdict": "OFFLINE_SCOPED_CODE_REVIEW_PASS; no remaining intervention in reviewed delta",
+  "actual_acceptance": "NOT PASS: original R3 Pine4 failure remains immutable; C01/Sprint7 still blocked pending separately authorized actual linked Pine reacceptance",
+  "scope": [
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/room_advice.py",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/room_advice.py",
+    "tests/contracts/test_hospitality_preparation_output.py",
+    "tests/contracts/test_room_advice.py",
+    "tests/integration/test_sprint7_room_advice_postgres.py"
+  ],
+  "pins": {
+    "count": 237,
+    "digest_match": true,
+    "before_after_repo_snapshot_match": true,
+    "evidence": "q-review-reacceptance3-final-pine-pins.json"
+  },
+  "independent_checks": [
+    {
+      "command": "PYTHONPATH=apps/api/src apps/api/.venv/bin/python /Users/ccvn/Documents/project/Staylead/validation/sprint-7-execution-20261026/q-review-reacceptance3-offline-clear-probe.py",
+      "outcome": "PASS: original bad clear op excluded by both contextual native paths; corrected clear, partial remaining needs, distinct set/clear operations accepted; absent/null fields excluded, zero budget remains clearable; no empty enum; canonical UUID question accepted, uppercase/malformed/alias rejected; original exact call2 alias rejected; exact quote authorizes correct derived clear target, forged quote and canonical set/clear collision reject; corrected actual quote preserves childID/guardian/dates and gives French LOFT known2night base4.4m, child charges unknown/nulltotal",
+      "evidence": "q-review-reacceptance3-offline-clear-probe-results.json"
+    },
+    {
+      "command": "Two focused tests: test_room_requirement_clear_schema_is_limited_to_present_non_null_values; test_room_advice_question_fields_are_canonical_and_reject_presentation_aliases",
+      "outcome": "2 passed"
+    }
+  ],
+  "consumer_persistence_proof": {
+    "inspection": "Reviewed actual FastAPI TestClient + fake-provider PostgreSQL test_pine_accessibility_clear_age_update_reaches_french_persisted_advice, including contextual request schema clearenum, same child age8/guardian/dates, cleared field, exact known base/unknowncharges, French payload and persisted current result. Q did not rerun DB mutations.",
+    "executed_root_log": "/private/tmp/staylead-s7-r3-final-pine-postgres.log",
+    "outcome": "Observed log:16 passed,1 known deprecation warning; root reports isolated test database only"
+  },
+  "other_gates": {
+    "observed_backend_log": "/private/tmp/staylead-s7-r3-final-pine-backend.log",
+    "observed_backend_outcome": "275 passed,3 known deprecation warnings",
+    "root_reported": "Whole canonical Ruff/compile PASS; prior frontend53 source pins/40tests+lint/typecheck/build unchanged; controls unchanged",
+    "no_overlap_count_sum": true
+  },
+  "authority_guard_preservation": [
+    "Canonical M2 validator guest_brief.py, composition boundary, provider caps and platform code unchanged from345a7141",
+    "Native set-only and clear-only alternatives intentionally tighten contextual wire possibilities without changing canonical internal semantics",
+    "Pydantic canonical M2 remains broader than contextual wire; the exact original mixed clear capture remains historical evidence, not retroactively accepted",
+    "Question aliases rejected rather than parsed or translated; dynamic canonical child UUID-age keys remain supported",
+    "No third model call/quote guard weakening/ID alias/language parser/global semantic engine introduced"
+  ],
+  "future_proposal": {
+    "path": "reacceptance4-cases-proposed.json",
+    "verdict": "scope PASS, PROPOSAL ONLY",
+    "authorized_for_live_calls": false,
+    "max_guest_turns": 2,
+    "max_requests": 4,
+    "utterances_and_case_objects": "Exact original R3 Pine3/4 except renumbered1/2 and previous_run_turn3/4 metadata; approved_previous_turn6/7 retained",
+    "new_fresh_session_required": true,
+    "reuse": "Accepted City1→2, Family3→5 and B07 need no rerun under unchanged relevant source proofs",
+    "prior_run": "R3 halted4/8, sealed e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b, lifetime44, no unused slots or automatic retry"
+  },
+  "limitations": [
+    "Offline schema and fake-provider proof do not prove future LLM extraction or French actual UI/selection success",
+    "Q made no provider/model/API/actual DB write; own evidence files only",
+    "No new live allowance/config/state initialized by Q; publication and any later human authorization belong to root"
+  ]
+}

@@ -1,4 +1,5 @@
 import pytest
+
 from staylead_platform.platform.contracts.language import (
     language_direction,
     normalize_language_tag,

@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
-import type { AnswerRendererProps, GuestBriefRendererProps, DomainTarget } from "@/composition/registration";
+import type { AnswerRendererProps, GuestBriefRendererProps, GuestTurnResultRendererProps, TurnResultActions, DomainTarget } from "@/composition/registration";
 import { formatMediaTime } from "@/shared/chat/media-format";
 import {
   canStartRequest,
@@ -62,6 +62,8 @@ export function GuestChat({
   syntheticDisclosure,
   AnswerRenderer,
   GuestBriefRenderer,
+  TurnResultRenderer,
+  TurnResultActions: turnResultActions,
   target,
 }: {
   hotelSlug: string;
@@ -69,6 +71,8 @@ export function GuestChat({
   syntheticDisclosure: string;
   AnswerRenderer: ComponentType<AnswerRendererProps>;
   GuestBriefRenderer: ComponentType<GuestBriefRendererProps>;
+  TurnResultRenderer: ComponentType<GuestTurnResultRendererProps>;
+  TurnResultActions?: TurnResultActions;
   target: DomainTarget;
 }) {
   const [session, setSession] = useState<GuestSession | null>(null);
@@ -79,6 +83,8 @@ export function GuestChat({
   const [guestBrief, setGuestBrief] = useState<GuestBriefSnapshot | null>(null);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
+  const [roomAdvicePending, setRoomAdvicePending] = useState<string | null>(null);
+  const [roomAdviceError, setRoomAdviceError] = useState("");
   const turnsRef = useRef<ChatTurn[]>([]);
   const freshnessInFlight = useRef(new Set<string>());
   const generation = useRef(0);
@@ -132,6 +138,27 @@ export function GuestChat({
     const currentGeneration = generation.current;
     const activeSession = session;
     if (!activeSession || !claimRequest(currentGeneration, activeRequest)) return;
+    const refreshPreviousAnswers = async () => {
+      const previousAnswers = turnsRef.current.filter((item) => item.id !== turn.id && item.answer);
+      await Promise.all(previousAnswers.map(async (item) => {
+        try {
+          const freshness = await checkGuestFreshness({
+            sessionId: activeSession.session_id, accessToken: activeSession.access_token,
+            requestId: item.answer!.request_id, target,
+          });
+          if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+          const stale = freshness.status === "stale"
+            || freshness.room_advice_currentness === "stale";
+          setTurns((current) => current.map((existing) => existing.id === item.id
+            ? { ...existing, stale, freshnessError: undefined } : existing));
+        } catch {
+          if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+          setTurns((current) => current.map((existing) => existing.id === item.id
+            ? { ...existing, stale: true, freshnessError: "Could not verify whether this answer is still current." }
+            : existing));
+        }
+      }));
+    };
     setBusy(true);
     setTurns((current) => current.map((item) => item.id === turn.id
       ? { ...item, sending: true, error: undefined, retryMode: undefined }
@@ -170,6 +197,7 @@ export function GuestChat({
               sameIdOnly: false,
               error: "Your trip details were updated, but the answer did not finish.", retryMode: undefined }
           : item));
+        await refreshPreviousAnswers();
         return;
       }
       setTurns((current) => {
@@ -190,6 +218,7 @@ export function GuestChat({
           ? resolveAnswerOnlyReceipt(completed, answerOnlyReceiptId, id)
           : completed;
       });
+      await refreshPreviousAnswers();
     } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       const partial = error instanceof ApiError ? error.partialResult : undefined;
@@ -234,14 +263,14 @@ export function GuestChat({
         target,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
-      const serverStale = response.answer_eligibility === "stale" || response.presentation?.freshness === "stale";
+      const serverStale = result.status === "stale" || result.room_advice_currentness === "stale";
       setTurns((current) => current.map((item) => item.id === turnId
-        ? { ...item, stale: serverStale || result.status === "stale", freshnessError: undefined }
+        ? { ...item, stale: serverStale, freshnessError: undefined }
         : item));
     } catch {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       setTurns((current) => current.map((item) => item.id === turnId
-        ? { ...item, freshnessError: "Could not verify whether this answer is still current." }
+        ? { ...item, stale: true, freshnessError: "Could not verify whether this answer is still current." }
         : item));
     } finally {
       freshnessInFlight.current.delete(response.request_id);
@@ -250,7 +279,7 @@ export function GuestChat({
 
   const recheckVisibleAnswers = useCallback(async () => {
     const current = turnsRef.current;
-    await Promise.all(current.filter((item) => item.answer && !item.stale)
+    await Promise.all(current.filter((item) => item.answer)
       .map((item) => recheckAnswer(item.id, item.answer!)));
   }, [recheckAnswer]);
 
@@ -326,6 +355,25 @@ export function GuestChat({
     void deliver(resumeTurn, resumeTurn.id, turn.resumeReceiptId);
   }
 
+  async function selectTurnResultOption(turnId: string, result: unknown, optionId: string) {
+    if (!session || !turnResultActions || roomAdvicePending || busy) return;
+    setRoomAdvicePending(optionId);
+    setRoomAdviceError("");
+    try {
+      const selection = await turnResultActions.selectOption({
+        sessionId: session.session_id, accessToken: session.access_token, result, optionId, target,
+      });
+      setTurns((current) => current.map((turn) => {
+        if (turn.id !== turnId || !turn.answer) return turn;
+        return { ...turn, answer: turnResultActions.attachSelection(turn.answer, result, selection) as GuestMessageResponse };
+      }));
+    } catch {
+      setRoomAdviceError("room_selection_failed");
+    } finally {
+      setRoomAdvicePending(null);
+    }
+  }
+
   const activeLanguageTag = session?.language_preference?.language_tag ?? "en";
   const activeLabels = labelsForLanguage(activeLanguageTag);
   const showEnglishLabelFallback = normalizeLanguageTag(activeLanguageTag)?.split("-")[0].toLowerCase() !== "en"
@@ -342,6 +390,10 @@ export function GuestChat({
         </p>}
         <h1>{hotelName}</h1>
         <p className="chat-intro">{activeLabels.ai_notice}</p>
+        <TurnResultRenderer response={null} bookingChannel={session?.hotel.booking_channel ?? null}
+          languageTag={activeLanguageTag} stale={false} freshnessError={false}
+          selectionDisabled={busy} pendingOptionId={roomAdvicePending} selectionError=""
+          onSelectOption={selectTurnResultOption} />
         {guestBrief && guestBrief.brief_version > 0 && <div lang={session?.language_preference?.language_tag ?? "en"}
           dir={directionForLanguageTag(session?.language_preference?.language_tag ?? "en")}>
           <GuestBriefRenderer brief={guestBrief} labels={activeLabels} />
@@ -393,7 +445,13 @@ export function GuestChat({
                     delta={turn.appliedDelta} labels={activeLabels} />
                 </details>
               </>}
-              {turn.answer && <AnswerCard
+              {turn.answer && <TurnResultRenderer response={turn.answer} bookingChannel={session?.hotel.booking_channel ?? null}
+                languageTag={turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en"}
+                stale={turn.stale ?? false} freshnessError={Boolean(turn.freshnessError)}
+                selectionDisabled={busy}
+                pendingOptionId={roomAdvicePending} selectionError={roomAdviceError}
+                turnId={turn.id} onSelectOption={selectTurnResultOption} />}
+              {turn.answer && !!turn.answer.answer && <AnswerCard
                 response={turn.answer}
                 session={session}
                 target={target}

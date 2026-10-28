@@ -9,6 +9,7 @@ from typing import Any, ClassVar, Self
 import httpx
 import pytest
 from pydantic import SecretStr
+
 from staylead_platform.domains.hospitality.prompts.grounded_qa import (
     COMMITTED_GROUNDED_QA_INSTRUCTIONS,
 )

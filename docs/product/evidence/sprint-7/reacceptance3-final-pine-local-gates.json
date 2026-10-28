@@ -1,0 +1,19 @@
+{
+  "candidate_sha256": "0eb86e8c747e5674c45867fd358c007e767f91586ac1dc51761dd90c30d1c6cd",
+  "backend_tests": 275,
+  "backend_warnings": 3,
+  "postgres_tests": 16,
+  "postgres_warnings": 1,
+  "builder_focused_contract_tests": 81,
+  "builder_new_fake_provider_api_pg_regression": 1,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "diff_check": "PASS",
+  "node_controls": "Reuse R3 NodeSyntax/Smoke andactual345controls; unchanged sinceactualrun",
+  "frontend_tests_reused": 40,
+  "frontend_pins_unchanged": 53,
+  "frontend_reuse": "All53frontendpinsunchanged; previouslint/typecheck/buildPASS reused",
+  "no_live_model_after_fix": true,
+  "actual_reacceptance3": "halted4/8/lifetime44; acceptedCitychain/Pine3+Family/B07 reused; Pine4 actualFAIL retained",
+  "overlap_note": "Do not sum overlapping suites as unique tests"
+}

@@ -15,6 +15,7 @@ export function GuestChatExperience({ hotelSlug }: { hotelSlug: string }) {
   }, []);
   const AnswerRenderer = registration.answerRenderer;
   const GuestBriefRenderer = registration.guestBriefRenderer;
+  const TurnResultRenderer = registration.turnResultRenderer;
 
   return (
     <div className={registration.themeClass}>
@@ -26,6 +27,8 @@ export function GuestChatExperience({ hotelSlug }: { hotelSlug: string }) {
         syntheticDisclosure={registration.content.syntheticDisclosure}
         AnswerRenderer={AnswerRenderer}
         GuestBriefRenderer={GuestBriefRenderer}
+        TurnResultRenderer={TurnResultRenderer}
+        TurnResultActions={registration.turnResultActions}
       />
     </div>
   );

@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies import guest_chat as guest_chat_module
 from staylead_platform.composition.dependencies.guest_chat import _media_reference
@@ -72,7 +73,12 @@ def test_hotel_lookup_is_data_driven_and_unknown_slug_is_clear(monkeypatch) -> N
     client = make_client(monkeypatch)
     assert client.get("/v1/guest/hotels/fourth-hotel").json() == {
         "hotel_id": "HTL-FOUR", "hotel_slug": "fourth-hotel",
-        "public_config": {"name": "Fourth Hotel"}, "config_version": "1",
+        "public_config": {
+            "name": "Fourth Hotel",
+            "booking_channel": {
+                "destination_url": None, "contact": None, "destination_kind": "configured",
+            },
+        }, "config_version": "1",
         "guest_contract_version": "1",
     }
     unknown = client.get("/v1/guest/hotels/not-imported")

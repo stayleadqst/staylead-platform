@@ -1,0 +1,24 @@
+{
+  "candidate_sha256": "327ea219c0503f66b2ac940ea0b94c228e1d9e7259e86e671ae995097ab0b5cf",
+  "source_pins": 237,
+  "root_gate": {
+    "contracts_architecture_api_tests": "284 PASS",
+    "warnings": "3 known deprecations",
+    "isolated_pg_tests": "16 PASS",
+    "isolated_pg_warnings": "1 known deprecation",
+    "ruff": "PASS full src/tests/runtime",
+    "compile": "PASS src/runtime",
+    "diff": "PASS"
+  },
+  "builder_gate": {
+    "room_advice_contract_tests": "80 PASS",
+    "ruff_compile_diff": "PASS"
+  },
+  "frontend_unchanged": {
+    "source_pins": 53,
+    "reused_tests": 40,
+    "reused_lint_typecheck_build": "PASS"
+  },
+  "actual_model_after_index_fix": "NOT RUN; exhausted allocation2/4/lifetime50",
+  "raw_files": "local0600 only"
+}
