@@ -1,0 +1,38 @@
+{
+  "verdict": "APPROVED_SCOPE_INPUTS_PASS; finalcontrolsreadinesspendingfreeze",
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "cases_sha256": "23e0baa5abdf9372cdafea134b0665b87f161965b571667fa9c9e98453fe0c3e",
+  "authority_sha256": "d1fd022a6126201fc17eb610926f1338f5a987e51483d495c78a6380fc707469",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "exact_published_case_objects": true,
+  "private_regular0600": true,
+  "profile_caps": [
+    "gpt-6.1-sol",
+    "low",
+    2,
+    4,
+    2,
+    25,
+    45,
+    700
+  ],
+  "fresh_expected_counters": [
+    0,
+    0
+  ],
+  "continuation": null,
+  "actual_predecessor_path": "/private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-state.json",
+  "predecessor": {
+    "status": "halted",
+    "counts": [
+      2,
+      4
+    ],
+    "state_sha256": "9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee",
+    "lifetime_requests": 50,
+    "exhausted": true,
+    "bootstrap1_zero_state_not_used": true
+  },
+  "reuse": "Product327indexguidancereview, acceptedCity/Family/B07",
+  "no_Q_provider_API_or_DB_write": true
+}

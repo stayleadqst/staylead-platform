@@ -1,0 +1,10 @@
+{
+  "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+  "root": "23 harness/APItests PASS; Ruff fullsrc/tests/runtime PASS; compilePASS;3existingwarnings",
+  "builder": "21harnesstests/NodeSyntax/offlineSmoke/diffPASS; no API/model",
+  "source_pins": 237,
+  "controls_delta_files": 3,
+  "reused_product": "327ea219:284contracts/architecture/API,16isolatedPG,Ruff/compile/diff,QscopedPASS",
+  "reused_frontend": "53pinsunchanged;40tests/lint/typecheck/buildPASS",
+  "live_requests": 0
+}

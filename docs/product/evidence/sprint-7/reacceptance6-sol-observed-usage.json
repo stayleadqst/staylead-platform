@@ -1,0 +1,32 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "requests": 2,
+  "guest_turns": 1,
+  "lifetime_requests": 52,
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "input_tokens": 25051,
+  "output_tokens": 489,
+  "per_request": [
+    {
+      "turn": 1,
+      "call": 1,
+      "input_tokens": 12976,
+      "output_tokens": 449,
+      "latency_ms": 9251.2
+    },
+    {
+      "turn": 1,
+      "call": 2,
+      "input_tokens": 12075,
+      "output_tokens": 40,
+      "latency_ms": 5096.4
+    }
+  ],
+  "http_turn_latencies_ms": [
+    14533.9
+  ],
+  "automatic_retries": 0,
+  "fallbacks": 0,
+  "agent_tokens_and_billing": "unavailable"
+}

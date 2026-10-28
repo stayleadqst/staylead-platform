@@ -469,7 +469,9 @@ def test_accessibility_confirmation_message_requires_saved_nonpending_needs(save
         "room_requirements": requirements,
     }, (room, rate)), locale="en", pending_fields=pending_fields)
     draft = RoomAdviceDraft(
-        "needs_clarification", questions=({"field": "room_requirements.hard_accessibility_needs"},),
+        "needs_clarification", questions=(
+            {"field": "room_requirements.hard_accessibility_needs"}, {"field": "room_advice"},
+        ),
     )
 
     result = __import__("asyncio").run(
@@ -479,7 +481,137 @@ def test_accessibility_confirmation_message_requires_saved_nonpending_needs(save
     question = result.questions[0]
     assert question["presentation_key"] == "question.room"
     assert question["reason"] == "Which room requirement should I use?"
+    assert any(item["field"] == "room_advice" for item in result.questions)
     assert "known_hard_accessibility_needs" not in result.explanation_inputs
+
+
+@pytest.mark.parametrize("draft_fields,children,pending_fields", [
+    (("room_advice",), [], ()),
+    (("room_advice", "room_requirements.hard_accessibility_needs"), [], ()),
+    (("party.children.age", "room_advice", "room_requirements.hard_accessibility_needs"),
+     [{"age": None}], ("party.children.age",)),
+])
+def test_known_nonpending_access_discards_only_broad_model_hint(draft_fields, children, pending_fields) -> None:
+    room, rate = _catalog(), _rate()
+    context = replace(_context({
+        "party": {"adults": 1, "children": children},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry", "wheelchair bathroom"]},
+    }, (room, rate)), locale="vi", pending_fields=pending_fields)
+    draft = RoomAdviceDraft(
+        "needs_clarification", questions=tuple({"field": field} for field in draft_fields),
+    )
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(context=context, draft=draft))
+
+    fields = [question["field"] for question in result.questions]
+    assert "room_advice" not in fields
+    assert fields.count("room_requirements.hard_accessibility_needs") == 1
+    access_question = next(item for item in result.questions
+                           if item["field"] == "room_requirements.hard_accessibility_needs")
+    assert access_question["presentation_key"] == "question.accessibility_confirmation"
+    assert "nhờ khách sạn xác nhận" in access_question["reason"]
+    if "party.children.age" in draft_fields:
+        assert "party.children.age" in fields
+
+
+@pytest.mark.parametrize("draft_fields", [
+    ("room_advice",),
+    ("room_advice", "room_requirements.hard_accessibility_needs"),
+])
+def test_known_access_preserves_missing_party_question_and_confirmation_context(draft_fields) -> None:
+    room, rate = _catalog(), _rate()
+    context = replace(_context({
+        "party": {"adults": None, "children": []},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry"]},
+    }, (room, rate)), locale="vi")
+    draft = RoomAdviceDraft("needs_clarification", questions=tuple(
+        {"field": field} for field in draft_fields
+    ))
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(context=context, draft=draft))
+
+    assert result.status == "needs_clarification"
+    fields = {question["field"] for question in result.questions}
+    assert "room_advice" not in fields
+    assert "party.adults" in fields
+    assert result.explanation_inputs["known_hard_accessibility_needs"] is True
+    if "room_requirements.hard_accessibility_needs" in draft_fields:
+        question = next(item for item in result.questions
+                        if item["field"] == "room_requirements.hard_accessibility_needs")
+        assert question["presentation_key"] == "question.accessibility_confirmation"
+        assert "Tôi đã ghi nhận yêu cầu tiếp cận" in question["reason"]
+        assert "nhờ khách sạn xác nhận" in question["reason"]
+
+
+def test_known_access_does_not_replace_processing_limit_with_hotel_confirmation() -> None:
+    room, rate = _catalog(), _rate()
+    children = [{"member_id": f"child-{index}", "age": None} for index in range(1, 41)]
+    context = replace(_context({
+        "party": {"adults": 1, "children": children},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry"]},
+    }, (room, rate)), locale="vi")
+    draft = RoomAdviceDraft("needs_clarification", questions=(
+        {"field": "room_advice"},
+        {"field": "room_requirements.hard_accessibility_needs"},
+    ))
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(context=context, draft=draft))
+
+    assert result.status == "processing_limit"
+    assert [question["field"] for question in result.questions] == [
+        "room_requirements.hard_accessibility_needs",
+    ]
+    assert result.questions[0]["presentation_key"] == "question.accessibility_confirmation"
+    assert "nhờ khách sạn xác nhận" in result.questions[0]["reason"]
+    assert result.explanation_inputs["unknowns"] == ["party exceeds checked assignment limit"]
+    assert result.explanation_inputs["known_hard_accessibility_needs"] is True
+
+
+def test_model_room_hint_does_not_hide_m4_hard_conflict_question() -> None:
+    room, rate = _catalog(), _rate()
+    context = replace(_context({
+        "party": {"adults": 1, "children": []},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry"]},
+    }, (room, rate)), locale="en")
+    bad_candidate = RoomAdviceCandidate(
+        option_id="bad-bed", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=({"member_id": "adult-1", "room_index": 0,
+                      "bed_index": 1, "bed_type": "queen"},),
+    )
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=context,
+        draft=RoomAdviceDraft("ready", (bad_candidate,), questions=({"field": "room_advice"},)),
+    ))
+
+    assert result.options == ()
+    assert "candidate_fails_hard_room_check" in result.explanation_inputs["conflicts"]
+    conflict_question = next(item for item in result.questions if item["field"] == "room_advice")
+    assert conflict_question["presentation_key"] == "question.room_rule_conflict"
+
+
+def test_model_room_hint_does_not_hide_m4_rate_basis_question() -> None:
+    room, rate = _catalog(), _rate()
+    rate["value"]["price_basis"]["unit"] = "person_night"
+    context = replace(_context({
+        "dates": {"check_in": "2026-11-10", "check_out": "2026-11-12"},
+        "party": {"adults": 1, "children": []},
+        "room_requirements": {"hard_accessibility_needs": ["step-free entry"]},
+    }, (room, rate)), locale="en")
+    candidate = RoomAdviceCandidate(
+        option_id="rate-unknown", rooms=({"room_index": 0, "room_type_id": "FAM"},),
+        assignments=({"member_id": "adult-1", "room_index": 0,
+                      "bed_index": 0, "bed_type": "queen"},),
+    )
+
+    result = __import__("asyncio").run(HospitalityRoomAdvice().recommend(
+        context=context,
+        draft=RoomAdviceDraft("ready", (candidate,), questions=({"field": "room_advice"},)),
+    ))
+
+    assert len(result.options) == 1
+    assert any(question["presentation_key"] == "question.rate_basis" for question in result.questions)
+    assert any("per room per night" in question["reason"] for question in result.questions)
 
 
 def test_known_accessibility_confirmation_survives_unrelated_bed_type_clarification() -> None:

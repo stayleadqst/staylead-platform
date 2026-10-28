@@ -1,0 +1,24 @@
+{
+  "candidate_sha256": "96a40f58e74a5773ef5bcbf7b094bf82cc7d7a287b95b8b79bfe298010085f6b",
+  "verdict": "CHANGES_REQUIRED P2 within new derivation rule; exactactualcapture otherwise fixed",
+  "passed": [
+    "All237repo/snapshot/digestbefore match exact3filedelta",
+    "ExactR6native draft→M4 nowkeepsonlycorrectVIhotelverification; generic-only hint derivesexistingusefulstep forknownparty",
+    "Currentactualbrowserpositiveconsumerpass; oldextraquestionnegative nowrejects beforeadvance",
+    "SevenfocusedcasesPASS preserving specificage/pending/conflict/rate questions"
+  ],
+  "finding": {
+    "id": "Q-R6-Q1",
+    "severity": "P2",
+    "locus": "recommendations/rooms.py:newgeneric→accessderivation beforeearlypartysize return",
+    "input": "Knownnonpending hardaccess needs, adultsNone/children[], pendingroomrequirementsnone, draftquestionsonlyroom_advice. This is valid partial canonicalbrief advice state.",
+    "observed": "Newrule derives hard_accessibility_needsquestion; earlypartysize result lacks knownmarker andlocalizesit asgeneric Whichroomrequirement? alongsidecorrectadultsquestion. Same unnecessaryknown-requirementrestatement survives under missingparty.",
+    "evidence": "q-review-reacceptance6-sol-question-unknown-party-probe.json",
+    "smallest_direction": "Either defer derivedaccessquestion until branch canpreserveits knownstate semantics or carryknownaccessmarker through party-size result; preserve the actualmissingadultquestion. No newparser/framework."
+  },
+  "proofs": [
+    "q-review-reacceptance6-sol-question-probe-results.json",
+    "q-review-reacceptance6-sol-question-driver-probe-results.json"
+  ],
+  "no_model_API_actualDBwrite": true
+}

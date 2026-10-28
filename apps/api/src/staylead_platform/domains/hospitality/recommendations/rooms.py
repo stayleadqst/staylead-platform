@@ -635,33 +635,60 @@ server validates phrases and inserts checked amount/currency values itself.
         }
         members, ages, adults = _member_ids(context.brief_data)
         pending = set(context.pending_fields)
-        questions = []
-        for item in draft.questions:
-            field = item.get("field")
-            if isinstance(field, str):
-                questions.append({"field": field})
+        requirements = context.brief_data.get("room_requirements") or {}
+        has_known_nonpending_access_needs = (
+            bool(requirements.get("hard_accessibility_needs"))
+            and "room_requirements.hard_accessibility_needs" not in pending
+            and "room_requirements" not in pending
+        )
+        has_pending_room_requirement = "room_requirements" in pending or any(
+            field.startswith("room_requirements.") for field in pending
+        )
+        draft_question_fields = [
+            item.get("field") for item in draft.questions if isinstance(item.get("field"), str)
+        ]
+        if has_known_nonpending_access_needs and not has_pending_room_requirement:
+            # Discard only the broad hint before any early return. Keep explicit access
+            # questions, whose localization uses the trusted known-needs marker below.
+            draft_question_fields = [field for field in draft_question_fields if field != "room_advice"]
+        questions = [{"field": field} for field in draft_question_fields]
         if adults is None or not members:
             questions.append({"field": "party.adults"})
+            explanation_inputs = {"unknowns": ["party size"]}
+            if has_known_nonpending_access_needs:
+                explanation_inputs["known_hard_accessibility_needs"] = True
             result = RoomAdviceResult(
                 status="needs_clarification", brief_version=context.brief_version,
                 source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
-                questions=tuple(questions), explanation_inputs={"unknowns": ["party size"]},
+                questions=tuple(questions), explanation_inputs=explanation_inputs,
                 hotel_answer=draft.hotel_answer,
             )
             return relocalize_checked(result)
         if len(members) > 40:
+            explanation_inputs = {"unknowns": ["party exceeds checked assignment limit"]}
+            if has_known_nonpending_access_needs:
+                explanation_inputs["known_hard_accessibility_needs"] = True
             result = RoomAdviceResult(
                 status="processing_limit", brief_version=context.brief_version,
                 source_generation=context.source_generation,
                 source_refs=tuple(_source(f, context.source_generation) for f in active),
-                questions=tuple(questions), explanation_inputs={"unknowns": ["party exceeds checked assignment limit"]},
+                questions=tuple(questions), explanation_inputs=explanation_inputs,
                 hotel_answer=draft.hotel_answer,
             )
             return relocalize_checked(result)
+
+        # A broad model hint cannot ask the guest to restate already committed, non-pending
+        # hard access needs. Keep independent specific questions. If the model supplied no
+        # candidate and only used that broad hint, turn the saved needs into the hotel
+        # verification step the guest actually needs; candidate conflicts are added below.
+        if (has_known_nonpending_access_needs and not has_pending_room_requirement and not draft.options
+                and "room_advice" in [item.get("field") for item in draft.questions]
+                and "room_requirements.hard_accessibility_needs" not in draft_question_fields):
+            draft_question_fields.append("room_requirements.hard_accessibility_needs")
+        questions = [{"field": field} for field in draft_question_fields]
         if any(field == "party.children.member" or field.startswith("party.children.") for field in pending):
             questions.append({"field": "party.children.age"})
-        requirements = context.brief_data.get("room_requirements") or {}
         budget_strength_unknown = (
             requirements.get("budget_amount") is not None
             and requirements.get("budget_strength") not in {"hard", "target"}
@@ -670,11 +697,6 @@ server validates phrases and inserts checked amount/currency values itself.
             pending.add("room_requirements.budget_strength")
         if "room_requirements.budget_strength" in pending:
             questions.append({"field": "room_requirements.budget_strength"})
-        has_known_nonpending_access_needs = (
-            bool(requirements.get("hard_accessibility_needs"))
-            and "room_requirements.hard_accessibility_needs" not in pending
-            and "room_requirements" not in pending
-        )
         other_pending_room_requirements = (
             pending - {"room_requirements.budget_strength"}
             if budget_strength_unknown else pending

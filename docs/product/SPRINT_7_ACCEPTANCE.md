@@ -4,57 +4,57 @@
 
 ## Kết quả hiện hành
 
-Batch Sol/low được Hieu duyệt đã đóng **2 lượt / 4 requests**, tổng Sprint7 **50 runtime provider requests**. Pine1 PASS; Pine2 lưu đúng nhu cầu nhưng FAIL phương án/chọn/tiếng Pháp. API/browser đã dừng, không marker02 hoặc retry. Giữ mọi failure/counter; không sửa actualstate thành PASS.
+Batch Sol/low R6 được duyệt max2guest/4requests đã **dừng tại1lượt/2requests** do lỗi AC2 ở lượt đầu; tổng Sprint7 **52runtime provider requests**. Unused1guest/2requests đóng; không marker01/turn2/retry/reset/reallocation/history repair. API đã dừng exit143; browser dừng exit137 sau SIGTERM không kết thúc.
 
 | Work | Owner / model / effort | Stage / candidate | Verification | Blocker / next action |
 |---|---|---|---|---|
-| B07 #28 | Q / gpt-6.1-sol/high | Done/closed | Actual AC1–3 technical synthetic pilot | Giữ Done; không claim endpoint đặt phòng thật hoạt động |
-| City Chinese→sửa giường | Q / gpt-6.1-sol/high | R3 actual PASS | STD5.4m/TWN5.85m; separate singles/budget; stale UI/409/new version selection0extraLLM | Reuse |
-| Family thiếu tuổi→7→12/budget | Q / gpt-6.1-sol/high | R2 actual PASS | Stablechild/guardian/consent/date;5.2m/7.6m base,feesunknown/nulltotal,budgetstrength truthful | Reuse |
-| Pine hardaccess→age8/clearboth/French | Q / gpt-6.1-sol/high | Actual ff917ce6: Pine1 PASS/Pine2 FAIL | Correct M2 samechild7→8,clearboth,guardian/share/dates; turn1 VI hotel verification; turn2 invalid room/bed indices | No useful option/French question/current selection; remains Blocked |
-| Producer index contract | B / gpt-6-luna/high | Offline implemented/frozen327ea219 | Explain both zero-based index conventions; retain strict validators | Local gates/Q scoped PASS; publish concrete candidate |
-| Integration/delivery | Coordinator / exact model-effort unavailable | Own branch/PR99 | Limits/source/usage/state preserved; local relevant gates | Full AC/DoD before Done/merge |
+| B07 #28 | Q / gpt-6.1-sol/high | Done/closed | Actual technical synthetic pilot AC1–3 | Giữ Done; không claim real booking endpoint hoạt động |
+| City Chinese→sửa giường | Q / gpt-6.1-sol/high | R3 actual PASS | Comparison,6.5m budget,separate singles,staleUI/409/newselection0extraLLM | Reuse |
+| Family thiếu tuổi→7→12/budget | Q / gpt-6.1-sol/high | R2 actual PASS | Stablechild/guardian/consent/date,5.2m/7.6m base,feesunknown/nulltotal | Reuse |
+| Pine full chain | Q / gpt-6.1-sol/high | R6 Pine1 AC2FAIL; Pine2 not attempted | Correct M2/known access verification, but extra generic question asks saved requirements again | Actual fullchain/French/options/currentselection still missing |
+| Typed question necessity | B / gpt-6-luna/high | Implemented/frozendd0cc688 | Remove unsupported broad model hint from typed known/nonpending state; preserve real missing/pending/conflict/rate questions | Q scoped PASS; publish concrete bounded actual proposal |
+| Integration/delivery | Coordinator / exact model-effort unavailable | Own branch/PR99 | Local292backend16PG, prior frontend40 reused | Full AC/DoD before Done/merge |
 
-## Actual evidence và nguyên nhân
+## Actual R6 failure và nguyên nhân
 
-Hieu explicitly approved “Cho phép Sol/low 2/4” for exact two original Pine utterances, one fresh session, `gpt-6.1-sol/low`,2calls/turn,25s/provider,45s/turn,700output,noautomaticretry/nofallback/firstblockingfailurestop. Approved cases SHA607a92dcb433bf463150648e9cad548e0b7b47a78932d1d8f5ca1cd38ea625eb; oracle4adda unchanged. PriorR4 sealed1/2/lifetime46 remains unchanged; its unused slots closed.
+Hieu explicitly approved “Cho phép batch mới Sol/low 2/4” on reviewed product327ea219/PR99commit5085de0. Exact original two Pine utterances/one fresh session, Sol/low,2calls/turn,25s/provider,45s/turn,700output,noautomaticretry/nofallback,stopfirstblockingfailure. Source of authority is direct human reply, not attached guides/backlog.
 
-First bootstrap candidate0a741183 failed before any turn/request: adapter constructor only allowed Luna/low. Root and Q reproduced real construction failure. B added explicit Sol/low alongside Luna/low, defaults unchanged and other profiles reject. Tests verify real Settings→build_provider→CLI model argument, no inference. First state retained/sealedHALTED0/0 SHA0c41c6db. Linked bootstrap2 uses separate files under SAME approved allocation; no duplicated allowance. [Recovery receipt](evidence/sprint-7/reacceptance5-sol-bootstrap-recovery.json).
+Actual candidate **a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f**,237pins, only3controls delta from327. [Manifest](evidence/sprint-7/candidate-manifest-reacceptance6-sol.json) · [Readiness](evidence/sprint-7/q-review-reacceptance6-sol-final.json) · [Authorization](evidence/sprint-7/reacceptance6-sol-authorization-receipt.json). Prior actual R5bootstrap2 sealed2/4/lifetime50/stateSHA9441449d remains unchanged; bootstrap1zero was not used as predecessor.
 
-Actual candidate **ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5**,237pins: [manifest](evidence/sprint-7/candidate-manifest-reacceptance5-sol-bootstrap2.json), [readiness](evidence/sprint-7/q-review-reacceptance5-sol-bootstrap2-final.json), [35-test local gate](evidence/sprint-7/reacceptance5-sol-bootstrap2-local-gates.json).
+Pine1 HTTP200/bodySHA **a2b293fe1b610c4c7562f362162a1511d1bdc3df3dde40c4909a0f06e6903d24** saved correctadult1/child7/explicitguardian/sharing/dates2n/bothhardaccess,pending[]. UI correctly asks hotel to verify known accessibility needs, but also asks **“Tôi nên áp dụng yêu cầu phòng nào?”** despite complete relevant saved requirements. Q confirms strict **C01-AC2 FAIL**: the generic question has no missing consequential guest information behind it. No false fit/availability/math claim was released.
 
-Pine1 HTTP200/body450f0fed: child7,explicitguardian/sharing,date2n,bothhardaccess,pending[],noinventedhardtype/budget. Correct useful Vietnamese hotel-verification question, current sources, no certified accessibility/availability claim. Q enforced readonly DB confirms brief/state1,result1/completedrequest1,messages2,noselection. Root marker01 follows independent semanticPASS.
+Cause: M4 copied every canonical model question, then no-option branch forwarded broad `room_advice` without checking typed-state necessity. This differs from the old pending-marker bug; known-access marker and verification now work, but the extra question remains unjustified. Q enforced readonly DB confirms brief/state1,one completedrequest/result,2messages,noselection,all10source owner/version/hash/generation refs current. Actual failure/state/capture remain preserved. [Actual review and AC matrix](evidence/sprint-7/q-review-reacceptance6-sol-actual.json).
 
-Pine2 HTTP200/bodyec570b87: samechild age8,clearONLYtwoaccessneeds,guardian/sharing/dates retained,pending[]. Native candidate has ONE Garden room with room_index1 and queen bed_index1; canonical both start at0. M4 rejects room_count_mismatch; nooption/selection. French claim labels exist, but new derived conflict question lacks translation and falls back English. Actual C01-AC5/8 remains missing. Q readonly DB confirms brief/state2,2completedrequests/results,4messages,noselection; actual data preserved.
+Root withheld marker01 and stopped before original turn2. State sealedHALTED1/2 SHA **4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27**, lifetime52. [Stop receipt](evidence/sprint-7/reacceptance6-sol-stop-receipt.json).
 
-Q causal probe: room-only correction in a COPY exposes invalidbedindex; correcting BOTH yields French partial Garden2.5m/night×2=5m knownbase,unknownchildfees/nulltotal. This is offline evidence only. [Causal results](evidence/sprint-7/q-review-reacceptance5-sol-causal-probe-results.json).
+## Offline consumer fix và quality gates
 
-SealedHALTED2/4 stateSHA **9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee**, lifetime50; [stop receipt](evidence/sprint-7/reacceptance5-sol-stop-receipt.json). API43586 exit143/browser76255 exit1, no marker02/retry.
+Candidate **dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab**,237pins, exact3delta fromactuala7: M4consumer, room-advice tests and browser. With saved nonpending hardaccess and no pending room field, discard only unsupported model broad `room_advice` hints, independent of pair/order. With no options and only that hint, surface the existing known-needs hotel-verification step. Preserve specific questions, actual pending-room questions and server-derived conflict/rate questions. No NLparser/alias/M2repair/output-reindex/constraint-validator weakening or extra model call.
 
-## Offline index fix và kiểm chứng
+Browser original Pine1 now requires only the useful specific verification question. Tests cover broad-only, reordered/pair/additional-specific layouts, actual missingchildageNone/pendingage preservation, absent/pending/wholeobject/otherroompending, conflict/rate paths. Original two-question capture gives the correct single verification question offline; actual R6 remains FAIL.
 
-Candidate **327ea219c0503f66b2ac940ea0b94c228e1d9e7259e86e671ae995097ab0b5cf**,237pins, exact2delta from actualff917ce6: prompt + room-advice contract tests. Hướng dẫn nêu rõ room indexes contiguous0..n-1 và bed indexes theo danh sách expanded source beds,count; ví dụ mộtqueen chỉindex0. M4/parser/schema không đổi, không covert reindex/output repair. Originalbadcapture vẫn bị từ chối; corrected copy và mixedroom0/1 hợp lệ, gap0/2 và bed ngoài phạm vi bị loại. Đây là prompt-contract fix; adherence trên model thật vẫn chưa được kiểm chứng.
+[Manifest](evidence/sprint-7/candidate-manifest-reacceptance6-sol-question-remediation-final.json) · [Gates](evidence/sprint-7/reacceptance6-sol-question-remediation-final-local-gates.json): **292 contracts/architecture/API PASS,16isolatedPG PASS**, Ruff/compile/diffPASS; builder88roomtests/NodeSyntaxPASS. Final corrected missing-child fixture3targeted casesPASS. Existing warnings:3backend/1PG deprecations. Frontend53pins unchanged; reuse40tests/lint/typecheck/build. Suites overlap; no invented unique-test total. [Independent fix review](evidence/sprint-7/q-review-reacceptance6-sol-question-remediation-final.json): **scoped PASS**, including reported early-return edge, all237 pins and emitted-browser positive/negative proofs.
 
-[Manifest](evidence/sprint-7/candidate-manifest-reacceptance5-sol-index-remediation.json) · [Local gates](evidence/sprint-7/reacceptance5-sol-index-remediation-local-gates.json): **284 contracts/architecture/API PASS,16isolatedPG PASS**, Ruff/compile/diffPASS; builder80roomtestsPASS. Frontend53pins không đổi, reuse40tests/lint/typecheck/build. Không cộng các suite chồng nhau thành unique totals. [Independent fix review](evidence/sprint-7/q-review-reacceptance5-sol-index-remediation.json).
+Independent review found an early-return regression in initial96a: known access could be rendered generic when adults were unknown. Final fix defers new verification derivation until after party/cap earlyreturns and carries trusted known-access metadata for existing specific questions through both earlyreturns. Missing-adults question and processing-limit status remain intact; positive/negative regressions pass. [Initial finding](evidence/sprint-7/q-review-reacceptance6-sol-question-remediation-initial.json).
 
-[Concrete next proposal](evidence/sprint-7/reacceptance6-sol-cases-proposed.json): NEW fresh Pine2guest/max4requests, exactsame2originalcases, Sol/low,2calls25s45s700,noautoretry/nofallback,stopfirstblockingfailure. ReuseCity/Family/B07. **Chưa được duyệt allowance mới**, chưa init config/state/run. PriorR5exhausted2/4/lifetime50; không tự dùng lại hoặc tăng quyền.
+Prior explicit zero-based room/bed guidance remains in the candidate. R5 actual one-based room/bed proposal still rejected; corrected COPY gives FrenchGarden5m base/unknownchildfees/nulltotal offline. R6turn2 was not attempted, so actual adherence to the indexing fix remains unverified.
 
-## Backlog và next action
+## Backlog / next action
 
-| Story | Đã hoàn thành | Còn thiếu | State |
+| Story | Đã kiểm chứng | Còn thiếu | State |
 |---|---|---|---|
 | #28 B07 | Actual technical pilot AC1–3 | None in scope | Done/closed |
-| #39 C01 | City/Family/Pine1 and correct actual Pine2 M2 update; offline math/source/state guards | Valid actual Pine2 options/French/current selection; full AC1–8 | Blocked |
-| #98 S7-F1 | Root causes, attempts, evidence; fixes executed in Sprint7 | Producer-index fix validation and bounded actual reacceptance | Blocked / Sprint7 / P0 |
-| #97 coordination | Ownership/gates/limits/evidence | FullAC/DoD/delivery | Blocked |
+| #39 C01 | City/Family; prior Pine correct M2 edits; offline source/math/currentness guards | Fixed actual Pine clarification→age8/clearboth/French/options/currentselection; full AC1–8 | Blocked |
+| #98 S7-F1 | Roots/attempts/evidence and necessary fixes executed in Sprint7 | Actual fixed Pine fullchain acceptance | Blocked / Sprint7 / P0 |
+| #97 coordination | Team/ownership/bounds/gates | Full AC/DoD/verified delivery | Blocked |
 
-Existing#98 covers the related blockers with problem/impact/attempts/evidence/AC/epicE3/P0/affected#39/#97. No duplicate story, broader closure or silent deferral. Offline fix and independent review PASS; publish candidate and smallest concrete actual proposal before requesting any NEW manual allowance. The current2/4 is exhausted; no further inference is authorized.
+Existing#98 covers problem/impact/attempts/evidence/AC/epicE3/P0/affected#39/#97; no duplicate story or broaderparent/epic closure. [Concrete fresh Pine proposal](evidence/sprint-7/reacceptance7-sol-cases-proposed.json): NEW max2guest4requests, exacttwooriginalcases/onefreshsession, sameSol/low2calls25s45s700/noautoretry/nofallback/firstblockingstop, reuseCity/Family/B07. **No NEW allowance approved, no new config/state/init/inference.** R6 unused1/2closed, cannot reuse or transfer.
 
-## Usage và delivery limits
+## Usage / delivery limits
 
-[Observed usage](evidence/sprint-7/reacceptance5-sol-observed-usage.json):4successful adapter responses,50775input/1410outputtokens; each request≤700output/25s, both turns≤45s. No fallback/retry. Agent tokens/billing unavailable. Bootstrap1 consumed0requests.
+[Observed R6 usage](evidence/sprint-7/reacceptance6-sol-observed-usage.json):2successful adapter responses,25051input/489outputtokens(449+40),9.25s/5.10s provider latency,14.53s HTTPturn; no retry/fallback. Lifetime52; agenttokens/billing unavailable.
 
-Own branch `sprint-7-room-advisory`, accepted baseline `a46a63eb4b589b8518f9477ebd66e81d89a0f054`, published HEAD before this recovery `ac951807f5050f6f637fceb0bc14242b30ae04fc`. Raw model/API/config/signingsecret/DB/screenshots local0600; public only source/authoredcases/sanitized summaries/hashes. Synthetic3hotels/9roomtypes/referenceprices do not establish real hotel approval/liveavailability/booking. No manualCI/rerun/waitgate/checkbypass/Grok/deploy/newpaidresources/main/otherPRmerge/broaderclosure. Automatic CI may run after branch update; no CI PASS claimed.
+Ownbranch `sprint-7-room-advisory`, acceptedbaselinea46a63e, publishedHEAD before this recovery5085de0. Raw model/API/config/signingsecret/DB/screenshots local0600; publish source/authoredcases/sanitized summaries/hashes only. Synthetic3hotels/9roomtypes/referenceprices do not prove realhotelapproval/liveavailability/booking. No manualCI/rerun/waitgate/checkbypass/Grok/deploy/newpaidresources/main/otherPRmerge/broaderclosure. Automatic CI may run after push; no CI PASS claimed.
 
 ## Historical actual failures — retained evidence
 
