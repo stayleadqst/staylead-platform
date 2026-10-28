@@ -1,5 +1,11 @@
 # Staylead Platform — mandatory working context
 
+## Sprint 8 final actual acceptance — 2026-10-28
+
+FinalindependentQ PASS fullscopedG1–G4/L1–L4/C1–C3/DoD, noopenactionablecorefinding. Reportdocs/product/evidence/sprint-8/independent-final-review.json. AllservicesincludingisolatedPGstopped; finaldeliverydocs/evidenceonly, sourcepinsunchanged. OwnPR103ready+mergeintoexistingSprint5baseauthorizedwhenGitHubpermits; no newapprovalneededforthatdelivery.
+
+Hieu approvedNEWproposalv2 on4f73e00; actual4turn/max8request Sol/low completed4/8 with all4Q/rootsemanticPASSreceipts, no retry/fallback. SealedCOMPLETEDstateSHA bf05af652f3c796af218b45b804470221e115b0a597ff9bb20271d123478d8b7; no further inference authorized. Product71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855/275 and controls257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0/4 unchanged; oracle25d927... . Chinese/Frenchsamecatalogfits/sponsordisclosure PASS, ArabicmobileRTLhardunknowns PASS, sameC Frenchsocialedit preservespeanut+stepfree+wheelchairPASS. OriginalHALTED1/2/state9919/unused3/6closed unchanged; lifetimeSprint8 5guest/10requests, noS7reuse. API/webstoppedexit143/browserexit0; PGonlyuntilQfinalreadonlydone. Currentbatch95864input/3396output tokens; runtime returnedmodelID/percallusage unavailable. C/Q finalintegratedACclosure and publish/merge ownPR103 intoexistingSprint5base authorized afterfullAC/local/reviewPASS, noCIwait/manualCI/deploy/broaderparentclosure. No activecodinglease/newstory; older pendingauthority statements below historical/consumed.
+
 ## Sprint 8 repaired candidate — fresh live allowance pending
 
 Offline repair/readiness independently QPASS: product71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855/275, controls257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0/4, neworacle25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030. Root121repair+15controls/staticPASS, web/prompt/catalog unchanged/reuse. A/B/Q finished; no active code lease. Fresh namespace s8-local-guide-20261028-reacceptance1 is proposedonly4/8 originalinputs, NOTAUTHORIZED; no newliveconfig/state. OriginalbatchbelowCLOSED1/2/no unused3/6 reuse. Read docs/product/SPRINT_8_ACCEPTANCE.md and live-acceptance-proposal-v2.json.

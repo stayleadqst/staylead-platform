@@ -1,0 +1,8 @@
+{"call": 1, "latency_ms": 12753, "response_sha256": "8e86292a274d8552118e55bbcc01bcb6ea8b9f732377716fa11d7075e4729ea6", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 1}
+{"call": 2, "latency_ms": 8997, "response_sha256": "cea508b840b78bf04d5a540f28bc0666167a6b261083d662de0605bca28d21a4", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 1}
+{"call": 1, "latency_ms": 13911, "response_sha256": "e4407369a7bda150b3664a5dabce0561bf0eebb6af8545f9aa62b924f1e2d46d", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 2}
+{"call": 2, "latency_ms": 8270, "response_sha256": "db2ee15c48040e3e076be3464b53c4a033d03fe994b0e175cb5411cddd3d3ea2", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 2}
+{"call": 1, "latency_ms": 12529, "response_sha256": "55b5433d3116d9eddc8953b1d9669fb987fe2b962b623bed1912373cbb99fda4", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 3}
+{"call": 2, "latency_ms": 9659, "response_sha256": "3735711cabae4fb35ae889baaea3901582a6315aacd35de9019788bd6b570a46", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 3}
+{"call": 1, "latency_ms": 10519, "response_sha256": "135e6c35752f7d2fabd6e9689b134c602d72bb124571cf8eeb60698e0585c906", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 4}
+{"call": 2, "latency_ms": 6482, "response_sha256": "2562615f608649a2f744d4dee72c1f512af81849230951d7f2db9983bdfdef10", "run_id": "s8-local-guide-20261028-reacceptance1", "stage": "provider_completed", "turn": 4}

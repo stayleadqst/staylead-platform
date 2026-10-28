@@ -13,23 +13,27 @@
     "operator": "G1-G4 and actual operator browser evidence unchanged"
   },
   "live": {
-    "original_batch": "HALTED_SEALED",
-    "guest_turns": 1,
-    "requests": 2,
-    "unused_turns_closed": 3,
-    "unused_requests_closed": 6,
-    "new_batch_authorized": false,
-    "new_batch_state_initialized": false,
-    "aggregate_tokens": {
-      "input": 24454,
-      "output": 1015,
+    "latest_batch": "COMPLETED_SEALED4turns/8requests independentlyQ/rootPASS",
+    "state_sha256": "bf05af652f3c796af218b45b804470221e115b0a597ff9bb20271d123478d8b7",
+    "aggregate_tokens_latest_batch": {
+      "input": 95864,
+      "output": 3396,
       "per_call": "unavailable"
     },
     "call_latencies_ms": [
-      12619,
-      11634
+      12753,
+      8997,
+      13911,
+      8270,
+      12529,
+      9659,
+      10519,
+      6482
     ],
-    "retries": 0
+    "original_batch": "HALTED1/2 immutable unused3/6CLOSED; priorfailure preserved",
+    "sprint8_total_actual_requests": 10,
+    "retries": 0,
+    "further_inference_authorized": false
   },
   "usage": {
     "coding_tokens": "unavailable",
