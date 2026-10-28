@@ -1,12 +1,12 @@
 {
   "harness_files": {
-    "tools/evals/sprint8_runtime.py": "f431af1b9f310c49bbbb0f73c35469a1e0cb64496baf470e3d280251925a5b77",
-    "tools/evals/sprint8_browser.mjs": "0e2c01fa83eef73c7dc57a78de27609b8d771482ed468ef242a73e082024b364",
-    "tools/evals/sprint8_browser_helpers.mjs": "e6b522613620482ec96bb37d8cff45bbd3ac65dbb115d130b081fbe56eb39e12",
-    "tests/contracts/test_sprint8_acceptance_harness.py": "768943a4282839ddc91b75ef9d925bec1a38b9a7a0ca87a2cdc95dbe01ee0caf"
+    "tools/evals/sprint8_runtime.py": "b89814ba2955e8d097aa0fbf3a11015cb4f1435b2e41b9f0058560371854f327",
+    "tools/evals/sprint8_browser.mjs": "926b621da376080a3227f76ddf7c8c4f094cdc46247c1962928547fed2e8f3c8",
+    "tools/evals/sprint8_browser_helpers.mjs": "e214b1aa920dba6604e051833bd79b944f0ea3a692f2f302455f29374b572a77",
+    "tests/contracts/test_sprint8_acceptance_harness.py": "cb9dabdaa83d2de2bc8ee378e435e3cc4fa9b5e5c04b417452e92b3cdee242e4"
   },
   "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
-  "classification": "offline-reviewed source pins only; not live authorization/config/state",
-  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182"
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "classification": "offline-reviewed source pins for proposed NEW reacceptance1; not live authorization/config/state",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855"
 }

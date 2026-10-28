@@ -21,8 +21,8 @@ import time
 from pathlib import Path
 from typing import Any
 
-RUN_ID = "s8-local-guide-20261028-acceptance"
-CASE_RUN_ID = "s8-local-guide-20261028-acceptance"
+RUN_ID = "s8-local-guide-20261028-reacceptance1"
+CASE_RUN_ID = "s8-local-guide-20261028-reacceptance1"
 LIVE_ENV = "STAYLEAD_S8_LIVE_EVAL"
 CONFIG_ENV = "STAYLEAD_S8_RUNTIME_CONFIG"
 STATE_ENV = "STAYLEAD_S8_RUN_STATE"

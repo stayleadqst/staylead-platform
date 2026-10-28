@@ -1,0 +1,33 @@
+{
+  "authorized_for_live_calls": false,
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "case_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "oracle_sha256": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+  "source_data_and_prompt_pins": "candidate-manifest.json exact275files map; independent-oracle-v2.json rawsourceversions/hashes/generation3; no prompt/catalog/web source delta",
+  "provider": "codex_cli local/test only",
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "limits": {
+    "guest_turns": 4,
+    "provider_requests": 8,
+    "calls_per_turn": 2,
+    "seconds_per_call": 25,
+    "seconds_per_turn": 45,
+    "output_tokens": 700,
+    "automatic_retry": false,
+    "fallback": false,
+    "stop_first_blocking_failure": true
+  },
+  "native_output_token_limit": false,
+  "output_limit_enforcement": "Inherited Codex CLI adapter post-checks reported output usage and rejects over700; no verified native generation/billing token cap. Stop on first blocking failure. Requested profile and returned usage recorded when available.",
+  "workflow": "Only reviewed browser controller; root/Q semantic receipts before advancing; final turn independently reviewed before completed sealing. On failure stop/seal all remaining slots; no direct extra guest requests/reset/reuse/S7 allowance.",
+  "expected_data": "Fresh baseline primary1.0 + secondary1.0, generation3; exact source hashes in independent oracle. Both fresh priorities use the same catalog.",
+  "cases": "Original four exact authored inputs in acceptance-cases-proposed.json (unchanged case_sha256); new independent-oracle-v2.json, same catalog",
+  "next_action": "NEW explicit human4turn/max8request allowance required AFTER final independent repaired-candidate review and publication. No new live config/state initialized. Original approval consumed/closed.",
+  "run_id": "s8-local-guide-20261028-reacceptance1",
+  "prior_batch": "s8-local-guide-20261028-acceptance: HALTED1turn/2requests, unused3/6CLOSED; no retry/reset/transfer",
+  "reason_full_fresh_matrix": "S8 cold-cache generic label request changed; previous Chinese actual component evidence cannot establish repaired complete multilingual path.",
+  "artifact_protocol": "Sole reviewed browser;0600 per-turn evidence JSON path/hash indexed before assertions; response/render/counters/screenshot retained even for failures; screenshot capture failure blocks advancement; Q/root receipts incl final; root stop/seal first failure.",
+  "independent_review": "independent-repair-review.json: PASS scoped offline repair/readiness; actual repaired model UNVERIFIED"
+}

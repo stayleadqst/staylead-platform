@@ -3,9 +3,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { browserRunDirectory, freshRuntimeHandoffReady, hardNeedsPreserved, latestTurnForQuestion, localGuideAcceptanceCheck, semanticReviewReceiptValid, sha256 } from "./sprint8_browser_helpers.mjs";
+import { browserRunDirectory, freshRuntimeHandoffReady, hardNeedsPreserved, latestTurnForQuestion, localGuideAcceptanceCheck, persistBeforeEvaluation, semanticReviewReceiptValid, sha256 } from "./sprint8_browser_helpers.mjs";
 
-const RUN_ID = "s8-local-guide-20261028-acceptance";
+const RUN_ID = "s8-local-guide-20261028-reacceptance1";
 const MAX_TURNS = 4;
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const privatePath = async (value, name) => {
@@ -21,6 +21,44 @@ function stable(value) {
   if (value && typeof value === "object") return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stable(value[key])}`).join(",")}}`;
   return JSON.stringify(value);
 }
+async function writePrivateJson(target, value, maxBytes) {
+  const content = `${JSON.stringify(value, null, 2)}\n`;
+  assert(Buffer.byteLength(content) <= maxBytes, "Private evidence file exceeds its size cap");
+  const temporary = `${target}.tmp-${process.pid}`;
+  try {
+    const existing = await fs.lstat(target);
+    assert(existing.isFile() && !existing.isSymbolicLink() && (existing.mode & 0o777) === 0o600,
+      "Existing private evidence file is unsafe");
+  } catch (error) { if (error.code !== "ENOENT") throw error; }
+  await fs.writeFile(temporary, content, { flag: "wx", mode: 0o600 });
+  await fs.chmod(temporary, 0o600);
+  await fs.rename(temporary, target);
+  await fs.chmod(target, 0o600);
+  return { content, sha256: sha256(content) };
+}
+async function persistTurnEvidence({ report, record, evidencePath, persistIndex }) {
+  const evidence = { ...record };
+  delete evidence.evidence_path;
+  delete evidence.evidence_sha256;
+  const saved = await writePrivateJson(evidencePath, evidence, 1_048_576);
+  record.evidence_path = evidencePath;
+  record.evidence_sha256 = saved.sha256;
+  const index = Number.isInteger(record.turn) && record.turn > 0 ? record.turn - 1 : report.turns.length;
+  report.turns[index] = {
+    turn: record.turn, case_id: record.case_id, locale: record.locale,
+    input_sha256: record.input_sha256, attempt_status: record.attempt_status,
+    network_response: record.network_response ?? null,
+    response_sha256: record.response_sha256 ?? null,
+    counter_snapshot: record.counter_snapshot ?? null,
+    request_delta: record.request_delta ?? null,
+    provider_requests_after: record.provider_requests_after ?? null,
+    screenshot: record.screenshot ?? null,
+    verdict: record.verdict ?? null,
+    failure: record.failure ?? null,
+    evidence_path: evidencePath, evidence_sha256: saved.sha256,
+  };
+  await persistIndex(report);
+}
 
 if (process.argv.includes("--offline-harness-smoke")) {
   const proposed = JSON.parse(await fs.readFile("docs/product/evidence/sprint-8/acceptance-cases-proposed.json", "utf8"));
@@ -28,6 +66,64 @@ if (process.argv.includes("--offline-harness-smoke")) {
   console.log(JSON.stringify({ status: "offline-harness-smoke-ok", batch_namespace: RUN_ID,
     guest_turn_cap: MAX_TURNS, request_cap: 8, fresh_counters: { guest_turns: 0, requests: 0 },
     no_browser: true, no_api_or_model: true }));
+  process.exit(0);
+}
+if (process.argv[2] === "--offline-oracle-failure-smoke") {
+  const reportPath = process.argv[3];
+  assert(typeof reportPath === "string" && path.isAbsolute(reportPath) && reportPath.startsWith("/private/tmp/"),
+    "Offline failure smoke report must be under /private/tmp");
+  const report = { turns: [] };
+  const screenshotPath = `${reportPath}.png`;
+  const evidencePath = `${reportPath}.turn-01.json`;
+  const response = { presentation: { language_tag: "zh" }, local_guide: {
+    supported_claims: [{ venue_id: "ATT-01", unknown_codes: ["hours_unconfirmed"],
+      localized_unknowns: ["请向场所确认当前营业时间。"] }],
+    source_refs: [{ source_id: "S8-GUIDE-PRIMARY", fact_ids: ["F-HTL-S8-DEMO-001"] }],
+  } };
+  const record = { turn: 1, case_id: "s8-offline-regression", locale: "zh", response,
+    rendered: { lang: "zh", dir: "ltr", text: "待核实事项\n请向场所确认当前营业时间。" } };
+  const verdict = await persistBeforeEvaluation({
+    report, record,
+    counterSnapshot: async () => ({ guest_turns: 1, approved_case_turn: 1, requests: 2 }),
+    captureScreenshot: async () => {
+      await fs.writeFile(screenshotPath, "synthetic offline screenshot evidence", { mode: 0o600 });
+      await fs.chmod(screenshotPath, 0o600);
+      return screenshotPath;
+    },
+    persist: async () => persistTurnEvidence({ report, record, evidencePath,
+      persistIndex: (value) => writePrivateJson(reportPath, value, 128 * 1024) }),
+    evaluate: async () => {
+      const saved = JSON.parse(await fs.readFile(reportPath, "utf8"));
+      const evidence = JSON.parse(await fs.readFile(saved.turns[0].evidence_path, "utf8"));
+      assert(evidence.response?.local_guide, "Attempt response was not persisted before oracle evaluation");
+      assert(evidence.rendered?.text && evidence.counter_snapshot?.requests === 2
+        && evidence.screenshot === screenshotPath && saved.turns[0].evidence_sha256,
+      "Rendered text, counters, screenshot, or evidence hash were not persisted before oracle evaluation");
+      const accepted = localGuideAcceptanceCheck({
+        response, rendered: record.rendered, language: "zh",
+        expected: { required_localized_unknowns_rendered: true },
+      });
+      assert(accepted.ok, `Localized unknown evidence should pass its semantic check: ${accepted.reason}`);
+      const missingRenderedUnknown = localGuideAcceptanceCheck({
+        response, rendered: { ...record.rendered, text: "待核实事项" }, language: "zh",
+        expected: { required_localized_unknowns_rendered: true },
+      });
+      assert(!missingRenderedUnknown.ok && missingRenderedUnknown.reason === "localized_unknown_not_rendered:ATT-01",
+        "A known unknown missing from the rendered card must fail");
+      return localGuideAcceptanceCheck({
+        response, rendered: record.rendered, language: "zh",
+        expected: { required_rendered_phrases: ["需要确认"] },
+      });
+    },
+  });
+  record.verdict = verdict;
+  await persistTurnEvidence({ report, record, evidencePath,
+    persistIndex: (value) => writePrivateJson(reportPath, value, 128 * 1024) });
+  assert(verdict.ok === false && verdict.reason === "required_localized_phrase_missing",
+    "Regression must retain a realistic strict-phrase oracle failure");
+  console.log(JSON.stringify({ status: "offline-oracle-failure-evidence-ok", report_path: reportPath,
+    verdict, requests: record.counter_snapshot.requests,
+    localized_unknown_rendered: true, missing_localized_unknown_rejected: true }));
   process.exit(0);
 }
 assert(process.env.STAYLEAD_S8_LIVE_EVAL === "1", "STAYLEAD_S8_LIVE_EVAL=1 is required; no browser/API/model request was sent");
@@ -126,6 +222,30 @@ const replacePrivateReport = async (value) => {
   await fs.chmod(target, 0o600);
   return target;
 };
+async function persistAttemptBeforeOracle(record, evaluate) {
+  return persistBeforeEvaluation({
+    report, record, persist: () => persistTurnEvidence({
+      report, record,
+      evidencePath: path.join(runDir, `turn-${String(record.turn).padStart(2, "0")}-evidence.json`),
+      persistIndex: replacePrivateReport,
+    }),
+    counterSnapshot: async () => {
+      const current = JSON.parse(await fs.readFile(statePath, "utf8"));
+      return {
+        guest_turns: current.guest_turns,
+        approved_case_turn: current.approved_case_turn,
+        requests: current.requests,
+      };
+    },
+    captureScreenshot: async () => {
+      const file = path.join(runDir, `turn-${String(record.turn).padStart(2, "0")}.png`);
+      await page.screenshot({ path: file, fullPage: true });
+      await fs.chmod(file, 0o600);
+      return file;
+    },
+    evaluate,
+  });
+}
 const receiptPath = (turn) => path.join(runDir, `semantic-review-turn-${String(turn).padStart(2, "0")}.json`);
 async function waitForReceipt(turn, responseHash) {
   const deadline = Date.now() + 600_000;
@@ -147,12 +267,24 @@ async function waitForReceipt(turn, responseHash) {
 
 let page;
 let previousRequests = 0;
+let activeItem = null;
+let activeRecord = null;
+const completedResponses = [];
 try {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   page = await context.newPage();
   const base = (process.env.STAYLEAD_S8_WEB_URL ?? "http://127.0.0.1:13000").replace(/\/$/u, "");
   for (let index = 0; index < cases.cases.length; index += 1) {
     const item = cases.cases[index];
+    activeItem = item;
+    const record = {
+      turn: index + 1, case_id: item.id, locale: item.language,
+      input_sha256: sha256(item.input), attempt_status: "prepared",
+      network_response: null, response: null, rendered: null, rendered_text: null,
+    };
+    activeRecord = record;
+    report.turns.push(record);
+    await replacePrivateReport(report);
     if (index < 3) {
       if (index > 0) await page.goto(`${base}/hotels/${cases.property.slug}/chat`, { waitUntil: "domcontentloaded" });
       else await page.goto(`${base}/hotels/${cases.property.slug}/chat`, { waitUntil: "domcontentloaded" });
@@ -161,47 +293,115 @@ try {
     const editor = page.locator("#guest-question");
     await editor.waitFor({ state: "visible", timeout: 15_000 });
     await editor.fill(item.input);
-    const responseWait = page.waitForResponse((response) => response.request().method() === "POST" && /\/sessions\/[^/]+\/messages$/u.test(new URL(response.url()).pathname), { timeout: 50_000 });
+    const isMessagePost = (request) => request.method() === "POST"
+      && /\/sessions\/[^/]+\/messages$/u.test(new URL(request.url()).pathname);
+    const requestFailures = [];
+    const onRequestFailed = (request) => {
+      if (isMessagePost(request)) requestFailures.push({ method: request.method(), failure: request.failure()?.errorText ?? null });
+    };
+    page.on("requestfailed", onRequestFailed);
+    const responseWait = page.waitForResponse((response) => isMessagePost(response.request()), { timeout: 50_000 });
+    record.attempt_status = "submitting";
+    await replacePrivateReport(report);
     await page.locator("form.chat-composer button[type=submit]").click();
-    const networkResponse = await responseWait;
-    const payload = await networkResponse.json();
-    assert(networkResponse.ok(), `Turn ${index + 1} API response failed: ${networkResponse.status()}`);
-    const afterState = JSON.parse(await fs.readFile(statePath, "utf8"));
-    const requestDelta = afterState.requests - previousRequests;
-    assert(afterState.guest_turns === index + 1 && afterState.approved_case_turn === index + 1
-      && requestDelta >= 1 && requestDelta <= 2 && afterState.requests <= 8,
-    `Turn ${index + 1} counters diverged or exceeded the request allowance`);
-    previousRequests = afterState.requests;
+    record.attempt_status = "submitted";
+    await replacePrivateReport(report);
+    let networkResponse;
+    try {
+      networkResponse = await responseWait;
+    } catch (error) {
+      page.off("requestfailed", onRequestFailed);
+      record.request_failures = requestFailures;
+      record.failure = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+      try {
+        record.rendered_text = await page.locator(".turn").filter({
+          has: page.locator(".message-guest p").getByText(item.input, { exact: true }),
+        }).last().innerText();
+      } catch (renderError) {
+        record.render_capture_failure = { name: renderError?.name ?? "Error", message: renderError?.message ?? String(renderError) };
+      }
+      await persistAttemptBeforeOracle(record, () => { throw error; });
+    }
+    page.off("requestfailed", onRequestFailed);
+    record.network_response = { status: networkResponse.status(), ok: networkResponse.ok() };
+    const bodyText = await networkResponse.text();
+    try {
+      record.response = JSON.parse(bodyText);
+      record.response_sha256 = sha256(JSON.stringify(record.response));
+    } catch (error) {
+      record.response_body_text = bodyText.slice(0, 16_000);
+      record.response_body_truncated = bodyText.length > 16_000;
+      record.response_parse_failure = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+    }
+    record.request_failures = requestFailures;
     const currentTurn = page.locator(".turn").filter({
       has: page.locator(".message-guest p").getByText(item.input, { exact: true }),
     }).last();
-    await currentTurn.getByTestId("local-guide-result").waitFor({ state: "visible", timeout: 10_000 });
+    if (networkResponse.ok()) {
+      try {
+        await currentTurn.getByTestId("local-guide-result").waitFor({ state: "visible", timeout: 10_000 });
+      } catch (error) {
+        record.render_wait_failure = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+      }
+    }
     const turnSnapshots = await page.locator(".turn").evaluateAll((turns) => turns.map((turn) => {
       const question = turn.querySelector(".message-guest p")?.textContent ?? "";
       const guide = turn.querySelector('[data-testid="local-guide-result"]');
       return { question, guide: guide ? {
         lang: guide.getAttribute("lang"), dir: guide.getAttribute("dir"), text: guide.innerText,
-      } : null };
+      } : null, turn_text: turn.innerText };
     }));
     const currentSnapshot = latestTurnForQuestion(turnSnapshots, item.input);
-    assert(currentSnapshot?.guide, `Turn ${index + 1} did not render a card for its exact question`);
-    const rendered = currentSnapshot.guide;
+    record.rendered = currentSnapshot?.guide ?? null;
+    record.rendered_text = currentSnapshot?.turn_text ?? null;
     const oracleCase = checks.get(item.id);
-    const verdict = localGuideAcceptanceCheck({ response: payload, rendered, expected: oracleCase, language: item.language });
+    const verdict = await persistAttemptBeforeOracle(record, () => {
+      if (!networkResponse.ok()) return { ok: false, reason: `api_http_failure:${networkResponse.status()}` };
+      if (!record.response || typeof record.response !== "object") return { ok: false, reason: "api_response_json_missing" };
+      if (record.screenshot_error) return { ok: false, reason: "screenshot_capture_failed" };
+      const counters = record.counter_snapshot;
+      if (!counters) return { ok: false, reason: "counter_snapshot_missing" };
+      const requestDelta = counters.requests - previousRequests;
+      record.request_delta = requestDelta;
+      if (counters.guest_turns !== index + 1 || counters.approved_case_turn !== index + 1
+          || requestDelta < 1 || requestDelta > 2 || counters.requests > 8) {
+        return { ok: false, reason: "acceptance_counters_diverged" };
+      }
+      if (!record.rendered) return { ok: false, reason: "current_turn_card_missing" };
+      const result = localGuideAcceptanceCheck({
+        response: record.response, rendered: record.rendered, expected: oracleCase, language: item.language,
+      });
+      if (!result.ok) return result;
+      if (index === 3 && oracleCase.preserved_hard_needs
+          && !hardNeedsPreserved(completedResponses[2]?.guest_brief, record.response.guest_brief)) {
+        return { ok: false, reason: "hard_needs_not_preserved" };
+      }
+      return result;
+    });
+    record.verdict = verdict;
+    record.provider_requests_after = record.counter_snapshot?.requests ?? null;
+    completedResponses[index] = record.response;
+    await persistTurnEvidence({ report, record,
+      evidencePath: path.join(runDir, `turn-${String(record.turn).padStart(2, "0")}-evidence.json`),
+      persistIndex: replacePrivateReport,
+    });
     assert(verdict.ok, `Turn ${index + 1} failed independent oracle: ${verdict.reason}`);
-    if (index === 3) {
-      const original = report.turns[2]?.response?.guest_brief;
-      if (oracleCase.preserved_hard_needs) assert(hardNeedsPreserved(original, payload.guest_brief), "Turn 4 did not preserve exact M2 hard needs");
-    }
-    const screenshot = path.join(runDir, `turn-${String(index + 1).padStart(2, "0")}.png`);
-    await page.screenshot({ path: screenshot, fullPage: true }); await fs.chmod(screenshot, 0o600);
-    const responseHash = sha256(JSON.stringify(payload));
-    report.turns.push({ turn: index + 1, case_id: item.id, locale: item.language, response_sha256: responseHash,
-      provider_requests_after: afterState.requests, verdict, screenshot, response: payload, rendered });
-    await replacePrivateReport(report);
+    previousRequests = record.counter_snapshot.requests;
+    const responseHash = record.response_sha256;
     if (index < cases.cases.length - 1) await waitForReceipt(index + 1, responseHash);
   }
 } catch (error) {
+  if (["submitting", "submitted"].includes(activeRecord?.attempt_status) && !activeRecord.evidence_persisted) {
+    activeRecord.failure ??= { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+    try {
+      activeRecord.rendered_text = await page.locator(".turn").filter({
+        has: page.locator(".message-guest p").getByText(activeItem.input, { exact: true }),
+      }).last().innerText();
+    } catch (renderError) {
+      activeRecord.render_capture_failure = { name: renderError?.name ?? "Error", message: renderError?.message ?? String(renderError) };
+    }
+    await persistAttemptBeforeOracle(activeRecord, () => null).catch(() => {});
+  }
   report.failure = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
   await replacePrivateReport(report).catch(() => {});
   console.error(`Sprint 8 browser acceptance halted: ${report.failure.name}: ${report.failure.message}`);

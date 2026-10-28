@@ -28,6 +28,7 @@ from staylead_platform.domains.hospitality.recommendations.rooms import Hospital
 from staylead_platform.domains.hospitality.registration.local_guide import HospitalityLocalGuide
 from staylead_platform.domains.hospitality.registration.local_guide_labels import (
     LOCAL_GUIDE_LABEL_KEYS,
+    has_reviewed_local_guide_labels,
     local_guide_label_source_texts,
     local_guide_source_status_label,
     local_guide_unknown_label,
@@ -150,8 +151,8 @@ def _booking_channel(settings: Settings, hotel_slug: str) -> dict[str, Any]:
 
 
 def _answer_label_request(language_tag: str, turn_intents: tuple[str, ...]) -> tuple[tuple[str, ...], tuple[str, ...], dict[str, str]]:
-    """Keep local-guide labels capability-scoped to its committed second call."""
-    if "local_guide" in turn_intents:
+    """Keep bounded answer labels localized without repeating reviewed domain copy."""
+    if "local_guide" in turn_intents and not has_reviewed_local_guide_labels(language_tag):
         language = language_tag.split("-", 1)[0].lower()
         keys = LOCAL_GUIDE_LABEL_KEYS
         missing = () if language == "en" else keys

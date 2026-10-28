@@ -1,0 +1,12 @@
+{
+  "harness_files": {
+    "tools/evals/sprint8_runtime.py": "f431af1b9f310c49bbbb0f73c35469a1e0cb64496baf470e3d280251925a5b77",
+    "tools/evals/sprint8_browser.mjs": "0e2c01fa83eef73c7dc57a78de27609b8d771482ed468ef242a73e082024b364",
+    "tools/evals/sprint8_browser_helpers.mjs": "e6b522613620482ec96bb37d8cff45bbd3ac65dbb115d130b081fbe56eb39e12",
+    "tests/contracts/test_sprint8_acceptance_harness.py": "768943a4282839ddc91b75ef9d925bec1a38b9a7a0ca87a2cdc95dbe01ee0caf"
+  },
+  "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+  "classification": "offline-reviewed source pins only; not live authorization/config/state",
+  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182"
+}

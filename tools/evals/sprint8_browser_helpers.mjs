@@ -16,6 +16,25 @@ export function latestTurnForQuestion(turns, question) {
   return [...turns].reverse().find((turn) => turn?.question === question) ?? null;
 }
 
+/** Save exact turn evidence before applying any semantic oracle to it. */
+export async function persistBeforeEvaluation({ report, record, persist, counterSnapshot, captureScreenshot, evaluate }) {
+  try {
+    record.counter_snapshot = await counterSnapshot();
+  } catch (error) {
+    record.counter_snapshot_error = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+  }
+  try {
+    record.screenshot = await captureScreenshot();
+  } catch (error) {
+    record.screenshot_error = { name: error?.name ?? "Error", message: error?.message ?? String(error) };
+  }
+  const index = Number.isInteger(record.turn) && record.turn > 0 ? record.turn - 1 : report.turns.length;
+  report.turns[index] = record;
+  await persist(report);
+  record.evidence_persisted = true;
+  return evaluate();
+}
+
 export function browserRunDirectory(runId, attempt) {
   if (!/^[a-z0-9][a-z0-9-]{0,63}$/u.test(runId) || !/^[a-z0-9][a-z0-9-]{0,15}$/u.test(attempt)) {
     throw new Error("Invalid Sprint 8 private run identity");
@@ -55,6 +74,19 @@ export function localGuideAcceptanceCheck({ response, rendered, expected, langua
     if (facts.fit_status !== undefined && claim.fit_status !== facts.fit_status) return { ok: false, reason: `fit_status_mismatch:${venueId}` };
     if (facts.conflict_fields && facts.conflict_fields.some((field) => !claim.conflict_fields.includes(field))) return { ok: false, reason: `conflict_missing:${venueId}` };
     if (facts.unknown_codes && facts.unknown_codes.some((code) => !(claim.unknown_codes ?? []).includes(code))) return { ok: false, reason: `unknown_code_missing:${venueId}` };
+  }
+  if (expected.required_localized_unknowns_rendered) {
+    const claimsWithUnknowns = guide.supported_claims.filter((claim) =>
+      Array.isArray(claim.unknown_codes) && claim.unknown_codes.length > 0,
+    );
+    if (!claimsWithUnknowns.length) return { ok: false, reason: "localized_unknown_codes_missing" };
+    for (const claim of claimsWithUnknowns) {
+      const labels = claim.localized_unknowns;
+      if (!Array.isArray(labels) || labels.length < claim.unknown_codes.length
+          || labels.some((label) => typeof label !== "string" || !label.trim() || !rendered?.text?.includes(label))) {
+        return { ok: false, reason: `localized_unknown_not_rendered:${claim.venue_id}` };
+      }
+    }
   }
   if (expected.no_certified_dining_fit_without_positive_evidence
       && guide.supported_claims.some((claim) => claim.kind === "dining" && claim.fit_status === "fit")) return { ok: false, reason: "hard_need_certified_without_proof" };

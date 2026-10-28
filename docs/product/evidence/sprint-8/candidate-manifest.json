@@ -2,8 +2,8 @@
   "schema_version": 1,
   "baseline": "12122f7d012c0617670438de5419efdc3d7729ab",
   "branch": "sprint-8-guide-shortlist",
-  "sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
-  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
   "hash_method": "sha256(canonical JSON files map: sort_keys=True,separators=(comma,colon))",
   "scope": "apps, fixtures, product tests; new acceptance harness excluded and separately pinned",
   "files": {
@@ -13,7 +13,7 @@
     "apps/api/src/staylead_platform/composition/configuration/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "apps/api/src/staylead_platform/composition/configuration/settings.py": "d9950ddf88f08581e5e9b93c5d49bc18a8e6e179f7ea0bcdc21b7786c35c2c01",
     "apps/api/src/staylead_platform/composition/dependencies/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py": "1c4f64be44cb3c6a82f85b411549d6c426dc821b872c1f4a4920c2379a7f0073",
+    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py": "6b26415137d3b919a6ed56cc17dbc1809af8323646a4b5f0ce47c366b9845103",
     "apps/api/src/staylead_platform/composition/dependencies/operator_guide.py": "15a3b7a71a97169c915009aed552c4911356c66b41b2c87598fd590f26103354",
     "apps/api/src/staylead_platform/composition/domain_registry/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "apps/api/src/staylead_platform/composition/startup/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -28,7 +28,7 @@
     "apps/api/src/staylead_platform/domains/hospitality/registration/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "apps/api/src/staylead_platform/domains/hospitality/registration/fixture_pack.py": "b510485a4b92e585eecdafa261039101c87247c3c60205b70371921dd59eb4e5",
     "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide.py": "0a8c2d1cfaf5525f9e4e71206832527d1ee8657a76fbb924f054fe1f5a3cc246",
-    "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide_labels.py": "9bc9caf3ebbd73e27da658a9894e8f13a196bd7f9ce1ed549cfbb2fc7c034c2e",
+    "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide_labels.py": "426a5a194e94a7d50ca1b984159b2b502adec5a9742d83086dcabeaea429fc43",
     "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide_pack.py": "95966de8fe27a2ba7c51a715b2627fdca6853342011faf657e7da56c8e73042e",
     "apps/api/src/staylead_platform/domains/hospitality/registration/pack_schema.py": "240d7dca00017211311cb2d93966283ccc72e2b6583f9aab5efc7cf41fc49e50",
     "apps/api/src/staylead_platform/domains/hospitality/rooms/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -279,20 +279,19 @@
     "tests/sprint8_local_guide/test_local_guide_labels.py": "496fc2f38bb59f5fea0f8842f39ceaa249c171ae2380426091050c81f8341e52",
     "tests/sprint8_local_guide/test_local_guide_orchestration.py": "6104e8b1f08c9d3c546382ae795465ae9738c39cb16869fc250217640db816ff",
     "tests/sprint8_local_guide/test_local_guide_pack.py": "69eee8be83caadfd55796bbb3689c66e587dcce2890aec2d037f753d6d8afe9d",
-    "tests/sprint8_local_guide/test_local_guide_policy.py": "cd7d94e7a958ae2171998a07bc1ffc86a8fa2a44398df76de3201cd8d0a0158a"
+    "tests/sprint8_local_guide/test_local_guide_policy.py": "cd7d94e7a958ae2171998a07bc1ffc86a8fa2a44398df76de3201cd8d0a0158a",
+    "tests/contracts/test_sprint8_core_labels.py": "8efae9385bfeaa6ff83da4b24a4d3062256f7d82b7fdb0fd4ad6efa9bd5b4548",
+    "tests/integration/test_sprint8_core_labels_api.py": "d80ab98f7492e5bd12eb5a80525b0f23dbea6e56dd9dddc70278f7a4860fc6c5"
   },
   "browser_executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "supersedes": {
-    "candidate_sha256": "a8fb9f38afd27daf48dce986f787b95078950634e90cab95682c64b79eadc6ce",
-    "reason": "Q mixed-channel native guard regression corrected; canonical import-only test formatting (AST unchanged)",
+    "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+    "reason": "Evidenced S8 cold-cache generic label omission fixed without extra model calls; new focused contract/PG tests",
     "changed_files": [
-      "apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py",
-      "tests/contracts/test_grounded_qa.py",
-      "tests/contracts/test_sprint8_operator_identity.py",
-      "tests/contracts/test_sprint8_operator_transport.py",
-      "tests/integration/test_sprint8_operator_api.py",
-      "tests/sprint8_local_guide/test_local_guide_brief.py",
-      "tests/sprint8_local_guide/test_local_guide_pack.py"
+      "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+      "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide_labels.py",
+      "tests/contracts/test_sprint8_core_labels.py",
+      "tests/integration/test_sprint8_core_labels_api.py"
     ]
   }
 }

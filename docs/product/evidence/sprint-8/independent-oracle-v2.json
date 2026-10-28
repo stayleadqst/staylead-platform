@@ -1,0 +1,602 @@
+{
+  "actual_model_status": "UNVERIFIED for repaired label contract; no new allowance/config/state initialized by this oracle",
+  "authorized_for_live_calls": false,
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "case_checks": [
+    {
+      "case_id": "s8-01",
+      "claims": {
+        "ATT-01": {
+          "conflict_fields": [],
+          "duration_minutes": 90,
+          "fit_status": "fit",
+          "hours_status": "confirmed",
+          "price_amount": 120000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": []
+        },
+        "ATT-02": {
+          "conflict_fields": [],
+          "duration_minutes": 45,
+          "fit_status": "fit",
+          "hours_status": "unknown",
+          "price_amount": 0,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ]
+        },
+        "DIN-01": {
+          "conflict_fields": [],
+          "duration_minutes": 45,
+          "fit_status": "fit",
+          "hours_status": "confirmed",
+          "price_amount": 100000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": []
+        }
+      },
+      "excluded": [
+        "DIN-02",
+        "DIN-03",
+        "ATT-03"
+      ],
+      "forbidden_answer_phrases": [
+        "https://maps.google.com",
+        "100% safe",
+        "guaranteed safe",
+        "fully wheelchair accessible"
+      ],
+      "m2": {
+        "budget_amount": 150000,
+        "budget_basis": "per_person",
+        "budget_currency": "VND",
+        "budget_strength": "hard",
+        "pace": "relaxed"
+      },
+      "no_booking": true,
+      "preferred_venue_ids": [
+        "DIN-01",
+        "ATT-02"
+      ],
+      "required_localized_unknowns_rendered": true,
+      "required_rendered_phrases": [
+        "Craft Museum",
+        "Riverside Garden",
+        "Lotus Noodle"
+      ],
+      "required_source_ids": [
+        "S8-GUIDE-PRIMARY"
+      ],
+      "semantic_review": {
+        "core_label_check": "For the approved zh/fr/ar pilot languages, inspect complete localized core20 labels plus reviewed domain labels in actual UI. Generic labels_fallback=true fails the repaired-path review; inherited literal receipt/status copy is assessed within applicable existing consumer scope, not inferred to be translated from this flag.",
+        "expected_top_fits": [
+          "ATT-02",
+          "DIN-01"
+        ],
+        "language_verification": "Independent Q assesses actual requested-language meaning. Valid synonymous labels must pass; do not whitelist translated words. Machine checks bind localized_unknowns to rendered text and preserve exact typed facts/unknown codes.",
+        "m2_interests_as_set": [
+          "quiet",
+          "nature"
+        ],
+        "m2_venue_kinds_as_set": [
+          "dining",
+          "attraction"
+        ],
+        "no_new_hard_needs": true,
+        "reason": "Garden matches quiet+nature+short relaxed duration; Lotus matches quiet+short relaxed duration; Museum is a weaker optional alternative.",
+        "required_core_labels_fallback": false,
+        "route_rules": "Only hotel→DIN-01 walk10 and DIN-01→hotel walk12; hotel→ATT-01 taxi15 and ATT-02→hotel taxi20 exist. Never infer hotel→ATT-02 or ATT-01→hotel. Missing route need not be volunteered when no travel claim is made.",
+        "unknown_codes_exact": {
+          "ATT-01": [],
+          "ATT-02": [
+            "hours_unconfirmed"
+          ],
+          "DIN-01": []
+        }
+      },
+      "sources": [
+        {
+          "generation": 3,
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "status": "approved",
+          "version": "1.0"
+        }
+      ]
+    },
+    {
+      "case_id": "s8-02",
+      "claims": {
+        "ATT-01": {
+          "conflict_fields": [],
+          "duration_minutes": 90,
+          "fit_status": "fit",
+          "hours_status": "confirmed",
+          "price_amount": 120000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": []
+        },
+        "ATT-02": {
+          "conflict_fields": [],
+          "duration_minutes": 45,
+          "fit_status": "fit",
+          "hours_status": "unknown",
+          "price_amount": 0,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ]
+        },
+        "DIN-02": {
+          "conflict_fields": [
+            "hours"
+          ],
+          "duration_minutes": 75,
+          "fit_status": "fit",
+          "hours_status": "conflict",
+          "price_amount": 300000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": true,
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "excluded": [
+        "DIN-03",
+        "ATT-03"
+      ],
+      "forbidden_answer_phrases": [
+        "https://maps.google.com",
+        "100% safe",
+        "guaranteed safe",
+        "fully wheelchair accessible"
+      ],
+      "m2": {
+        "budget_amount": 300000,
+        "budget_basis": "per_person",
+        "budget_currency": "VND"
+      },
+      "no_booking": true,
+      "preferred_venue_ids": [
+        "DIN-02",
+        "ATT-01"
+      ],
+      "required_localized_unknowns_rendered": true,
+      "required_rendered_phrases": [
+        "Craft Museum",
+        "Riverside Garden",
+        "River Table"
+      ],
+      "required_source_ids": [
+        "S8-GUIDE-PRIMARY",
+        "S8-GUIDE-SECONDARY"
+      ],
+      "semantic_review": {
+        "budget_strength": "Original phrase can pay300000 does not unambiguously demand a hard ceiling; preserve confirmed amount/basis, do not invent hard strength solely to satisfy oracle.",
+        "core_label_check": "For the approved zh/fr/ar pilot languages, inspect complete localized core20 labels plus reviewed domain labels in actual UI. Generic labels_fallback=true fails the repaired-path review; inherited literal receipt/status copy is assessed within applicable existing consumer scope, not inferred to be translated from this flag.",
+        "expected_top_fits": [
+          "ATT-01",
+          "DIN-02"
+        ],
+        "language_verification": "Independent Q assesses actual requested-language meaning. Valid synonymous labels must pass; do not whitelist translated words. Machine checks bind localized_unknowns to rendered text and preserve exact typed facts/unknown codes.",
+        "m2_interests_as_set": [
+          "culture",
+          "social",
+          "indoor"
+        ],
+        "m2_venue_kinds_as_set": [
+          "dining",
+          "attraction"
+        ],
+        "no_source_memory_facts": true,
+        "reason": "Museum matches culture+indoor; River Table matches culture+social. Sponsorship adds zero fit priority and must be disclosed; hours remain conflicting.",
+        "required_core_labels_fallback": false,
+        "unknown_codes_exact": {
+          "ATT-01": [],
+          "ATT-02": [
+            "hours_unconfirmed"
+          ],
+          "DIN-02": [
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "generation": 3,
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "status": "approved",
+          "version": "1.0"
+        },
+        {
+          "generation": 3,
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "status": "approved",
+          "version": "1.0"
+        }
+      ]
+    },
+    {
+      "case_id": "s8-03",
+      "claims": {
+        "DIN-01": {
+          "conflict_fields": [],
+          "duration_minutes": 45,
+          "fit_status": "unknown",
+          "hours_status": "confirmed",
+          "price_amount": 100000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ]
+        },
+        "DIN-02": {
+          "conflict_fields": [
+            "hours"
+          ],
+          "duration_minutes": 75,
+          "fit_status": "unknown",
+          "hours_status": "conflict",
+          "price_amount": 300000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": true,
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "excluded": [
+        "DIN-03",
+        "ATT-03"
+      ],
+      "forbidden_answer_phrases": [
+        "https://maps.google.com",
+        "100% safe",
+        "guaranteed safe",
+        "fully wheelchair accessible"
+      ],
+      "m2": {
+        "allergy_requirements": [
+          "peanut"
+        ],
+        "venue_kinds": [
+          "dining"
+        ]
+      },
+      "no_booking": true,
+      "no_certified_dining_fit_without_positive_evidence": true,
+      "preferred_venue_ids": [
+        "DIN-01",
+        "DIN-02"
+      ],
+      "required_localized_unknowns_rendered": true,
+      "required_rendered_phrases": [
+        "Lotus Noodle",
+        "River Table"
+      ],
+      "required_source_ids": [
+        "S8-GUIDE-PRIMARY",
+        "S8-GUIDE-SECONDARY"
+      ],
+      "semantic_review": {
+        "allergy_requirements_as_set": [
+          "peanut"
+        ],
+        "core_label_check": "For the approved zh/fr/ar pilot languages, inspect complete localized core20 labels plus reviewed domain labels in actual UI. Generic labels_fallback=true fails the repaired-path review; inherited literal receipt/status copy is assessed within applicable existing consumer scope, not inferred to be translated from this flag.",
+        "exact_verification": "Ask venue/hotel for peanut ingredients/cross-contact controls and requested wheelchair capability. No medical safety inference.",
+        "hard_accessibility_needs_as_set": [
+          "step_free",
+          "wheelchair_access"
+        ],
+        "language_verification": "Independent Q assesses actual requested-language meaning. Valid synonymous labels must pass; do not whitelist translated words. Machine checks bind localized_unknowns to rendered text and preserve exact typed facts/unknown codes.",
+        "m2_interests_as_set": [
+          "quiet"
+        ],
+        "no_dates_party_room_prerequisite": true,
+        "required_core_labels_fallback": false,
+        "specific_requirement": "Peanut cross-contact safety AND step-free wheelchair access are hard. Catalog step_free_entry_supported only proves entry step-free; it cannot certify full wheelchair access, doorway width, interior circulation or toilets.",
+        "unknown_codes_exact": {
+          "DIN-01": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ],
+          "DIN-02": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "generation": 3,
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "status": "approved",
+          "version": "1.0"
+        },
+        {
+          "generation": 3,
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "status": "approved",
+          "version": "1.0"
+        }
+      ]
+    },
+    {
+      "case_id": "s8-04",
+      "claims": {
+        "DIN-01": {
+          "conflict_fields": [],
+          "duration_minutes": 45,
+          "fit_status": "unknown",
+          "hours_status": "confirmed",
+          "price_amount": 100000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": false,
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ]
+        },
+        "DIN-02": {
+          "conflict_fields": [
+            "hours"
+          ],
+          "duration_minutes": 75,
+          "fit_status": "unknown",
+          "hours_status": "conflict",
+          "price_amount": 300000,
+          "price_basis": "per_person",
+          "price_currency": "VND",
+          "sponsored": true,
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "excluded": [
+        "DIN-03",
+        "ATT-03"
+      ],
+      "forbidden_answer_phrases": [
+        "https://maps.google.com",
+        "100% safe",
+        "guaranteed safe",
+        "fully wheelchair accessible"
+      ],
+      "m2": {
+        "allergy_requirements": [
+          "peanut"
+        ],
+        "venue_kinds": [
+          "dining"
+        ]
+      },
+      "no_booking": true,
+      "no_certified_dining_fit_without_positive_evidence": true,
+      "preferred_venue_ids": [
+        "DIN-01",
+        "DIN-02"
+      ],
+      "preserved_hard_needs": true,
+      "required_localized_unknowns_rendered": true,
+      "required_rendered_phrases": [
+        "Lotus Noodle",
+        "River Table"
+      ],
+      "required_source_ids": [
+        "S8-GUIDE-PRIMARY",
+        "S8-GUIDE-SECONDARY"
+      ],
+      "semantic_review": {
+        "allergy_requirements_as_set": [
+          "peanut"
+        ],
+        "core_label_check": "For the approved zh/fr/ar pilot languages, inspect complete localized core20 labels plus reviewed domain labels in actual UI. Generic labels_fallback=true fails the repaired-path review; inherited literal receipt/status copy is assessed within applicable existing consumer scope, not inferred to be translated from this flag.",
+        "exact_edit": "Only ambiance quiet→social and language ar→fr change; M2 hard need sets, property and source snapshot retained. Same session ID.",
+        "exact_verification": "Ask venue/hotel for peanut ingredients/cross-contact controls and requested wheelchair capability. No medical safety inference.",
+        "expected_top_fits": [
+          "DIN-02",
+          "DIN-01"
+        ],
+        "hard_accessibility_needs_as_set": [
+          "step_free",
+          "wheelchair_access"
+        ],
+        "language_verification": "Independent Q assesses actual requested-language meaning. Valid synonymous labels must pass; do not whitelist translated words. Machine checks bind localized_unknowns to rendered text and preserve exact typed facts/unknown codes.",
+        "m2_interests_as_set": [
+          "social"
+        ],
+        "no_dates_party_room_prerequisite": true,
+        "no_history_or_database_repair": true,
+        "required_core_labels_fallback": false,
+        "specific_requirement": "Peanut cross-contact safety AND step-free wheelchair access are hard. Catalog step_free_entry_supported only proves entry step-free; it cannot certify full wheelchair access, doorway width, interior circulation or toilets.",
+        "unknown_codes_exact": {
+          "DIN-01": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ],
+          "DIN-02": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "generation": 3,
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "status": "approved",
+          "version": "1.0"
+        },
+        {
+          "generation": 3,
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "status": "approved",
+          "version": "1.0"
+        }
+      ]
+    }
+  ],
+  "derivation": {
+    "new_live_authority": "None. Fresh4turn/max8requests proposal only after generic-label product fix, offline review/pins and explicit new human approval.",
+    "original_oracle_path": "/private/tmp/staylead-s8-q-oracle.json",
+    "original_oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+    "original_run_id": "s8-local-guide-20261028-acceptance",
+    "original_run_status": "HALTED after first blocking harness failure,1guest/2requests; unused3/6closed; never reclassified/resumed",
+    "original_sealed_state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+    "reason": "Remove overly exact translated literal assertions while preserving source/factual/hard-need semantics; require actual localized unknown text to render."
+  },
+  "directional_routes": [
+    {
+      "duration_minutes": 10,
+      "from": "HTL-S8-DEMO",
+      "mode": "walk",
+      "provider_id": "TR-01",
+      "route_id": "LEG-01",
+      "section": "transport/routes/LEG-01",
+      "source_id": "S8-GUIDE-PRIMARY",
+      "time_source": "synthetic checked 2026-10-28",
+      "to": "DIN-01"
+    },
+    {
+      "duration_minutes": 12,
+      "from": "DIN-01",
+      "mode": "walk",
+      "provider_id": "TR-01",
+      "route_id": "LEG-02",
+      "section": "transport/routes/LEG-02",
+      "source_id": "S8-GUIDE-PRIMARY",
+      "time_source": "synthetic checked 2026-10-28",
+      "to": "HTL-S8-DEMO"
+    },
+    {
+      "duration_minutes": 15,
+      "from": "HTL-S8-DEMO",
+      "mode": "taxi",
+      "provider_id": "TR-02",
+      "route_id": "LEG-03",
+      "section": "transport/routes/LEG-03",
+      "source_id": "S8-GUIDE-PRIMARY",
+      "time_source": "synthetic checked 2026-10-28",
+      "to": "ATT-01"
+    },
+    {
+      "duration_minutes": 20,
+      "from": "ATT-02",
+      "mode": "taxi",
+      "provider_id": "TR-02",
+      "route_id": "LEG-04",
+      "section": "transport/routes/LEG-04",
+      "source_id": "S8-GUIDE-PRIMARY",
+      "time_source": "synthetic checked 2026-10-28",
+      "to": "HTL-S8-DEMO"
+    }
+  ],
+  "fixture_files": {
+    "fixtures/hospitality/sprint8-local-guide-v1/README.md": "6abcef885884093c0ed025c6919793435e2ce1ddf31cbe05927dfe2c1d0c741e",
+    "fixtures/hospitality/sprint8-local-guide-v1/manifest.json": "6e13987b8aee9a77764eaa907f00e434a4e0ac34ae6f38383f60d8dbc9ca5956",
+    "fixtures/hospitality/sprint8-local-guide-v1/providers.json": "392911d52be34b4345850ba92d46bd5e22c05f81b26ddbfee171cf5c0872a8c5",
+    "fixtures/hospitality/sprint8-local-guide-v1/routes.json": "094ac55fac7edbb371084a248d591aac05dc4a9ed9a7fb16022d9016b1032572",
+    "fixtures/hospitality/sprint8-local-guide-v1/sources.json": "24d595e5345832a377c873e0c730e44c9fd0e84b78db5a64236375517e5842ce",
+    "fixtures/hospitality/sprint8-local-guide-v1/venues.json": "6850836d1341d5bc64e2192cabf6b78050ba38c58ce1269132195a1c79ab125c"
+  },
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "independent_reviewer": "Q gpt-6.1-sol/high",
+  "manual_receipt_requirements": [
+    "Verify actual M2 quoted capture/validated state before dependent result; check hard-needs as semantic sets, not JSON array order.",
+    "Inspect explanation language, price/basis/duration/sponsor and exact unknowns in real UI; source refs approved/current and factual claims trace to appropriate IDs.",
+    "Fail immediately on invented venue fact, dropped hard need, closed/expired final recommendation, incorrect price, stale source, unasked room/profile prerequisite, source instruction leakage or contradictory suitability.",
+    "Receipt must bind candidate, response hash, run and turn before any later turn; sole browser controller.",
+    "Fourth turn requires final independent semantic verdict before root seals completed state; prior failures remain preserved.",
+    "Assess generic shell and domain card labels in the requested language after the repaired call2 label contract; localized synonyms must not fail lexical assertions.",
+    "Original halted batch and original oracle remain immutable evidence; a corrected oracle does not change their verdict or grant remaining slots."
+  ],
+  "proposed_case_inputs_sha256": {
+    "s8-01": "96468df4b75c8e92f2818ee3f4b23507487b1acefc893abd155ff05c1f00eda6",
+    "s8-02": "6619acd22f90df77fdf0d7798eca9b5ca6086feeeeddaf7eb6353d36c7f5652a",
+    "s8-03": "ede9f474ef946b32c70f543787292a44a499a48f8bf94fde72e71bc47375fa08",
+    "s8-04": "94f9bad0f8cffe2c771f06a86e10d48a1fef75e23fd6abe55bca333124b636dd"
+  },
+  "proposed_case_matrix_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "proposed_limits": {
+    "automatic_retry": false,
+    "calls_per_turn": 2,
+    "effort": "low",
+    "fallback": false,
+    "guest_turns": 4,
+    "max_output_tokens": 700,
+    "model": "gpt-6.1-sol",
+    "provider_timeout_seconds": 25,
+    "requests": 8,
+    "stop_at_first_blocking_failure": true,
+    "turn_timeout_seconds": 45
+  },
+  "proposed_run_id": "s8-local-guide-20261028-reacceptance1",
+  "providers": [
+    {
+      "access": "unknown",
+      "availability": "unknown",
+      "child_seat": "unknown",
+      "conditions": [
+        "Synthetic record only"
+      ],
+      "luggage_capacity": 2,
+      "name": "Lotus Shuttle",
+      "provider_id": "TR-01",
+      "seats_excluding_driver": 3,
+      "section": "transport/providers/TR-01",
+      "source_id": "S8-GUIDE-PRIMARY"
+    },
+    {
+      "access": "unsupported",
+      "availability": "unknown",
+      "child_seat": "supported",
+      "conditions": [
+        "Synthetic record only"
+      ],
+      "luggage_capacity": "unknown",
+      "name": "River Taxi",
+      "provider_id": "TR-02",
+      "seats_excluding_driver": 6,
+      "section": "transport/providers/TR-02",
+      "source_id": "S8-GUIDE-PRIMARY"
+    }
+  ],
+  "raw_source_versions": {
+    "S8-GUIDE-PRIMARY": "1.0",
+    "S8-GUIDE-SECONDARY": "1.0"
+  },
+  "schema_version": 2,
+  "scope": "Synthetic technical pilot only; private independent acceptance oracle, never serving/model input.",
+  "source_snapshot_precondition": "Fresh v1 approved technical snapshot; both sources1.0 approved at generation3 and exact hashes below, no refresh during four turns. Root must independently verify actual demo source pins before any call. This oracle does not authorize or initialize that snapshot."
+}

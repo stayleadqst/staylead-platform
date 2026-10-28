@@ -1,0 +1,85 @@
+{
+  "batch": "s8-local-guide-20261028-acceptance",
+  "classification": "actual approved synthetic technical pilot; first blocking failure stopped; not full UI/batch PASS",
+  "candidate_commit": "b1744bf114edc0851f1cc8565dbead4b69d50273",
+  "product_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+  "approved_proposed_case_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "derived_live_case_sha256": "825b4ef6074b29bb78999737fd3ba7219d78ef08321dea42a324a31d2fb8b73a",
+  "derived_case_delta": "Only authorized_for_live_calls false→true and run_id proposed→acceptance, independently verified by Q",
+  "oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+  "authority": "Hieu direct approval2026-10-28 including CLI700 postcheck/no verified native generation/billing hardcap",
+  "status": "HALTED_SEALED",
+  "guest_turns": 1,
+  "provider_requests": 2,
+  "retries": 0,
+  "unused_guest_turns_closed": 3,
+  "unused_requests_closed": 6,
+  "remaining_live_authority": false,
+  "sealed_state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+  "browser_failure": "Turn 1 failed independent oracle: required_localized_phrase_missing",
+  "original_browser_report_sha256": "c7452431b12bff3f1b1bbe32450fff03ea6b79450312aa368d75440ff3d54992",
+  "actual_provider": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "low",
+    "reported_provider": "codex_cli",
+    "reported_deployment": "gpt-6.1-sol",
+    "returned_model_identifier": null,
+    "usage_aggregate_two_calls": {
+      "input_tokens": 24454,
+      "output_tokens": 1015,
+      "total_tokens": null
+    },
+    "per_call_usage": "unavailable",
+    "latencies_ms": [
+      12619,
+      11634
+    ],
+    "native_output_token_limit": false
+  },
+  "observed": {
+    "m2": {
+      "interests": [
+        "quiet",
+        "nature"
+      ],
+      "budget_amount": 150000,
+      "budget_basis": "per_person",
+      "budget_currency": "VND",
+      "budget_strength": "hard",
+      "pace": "relaxed",
+      "venue_kinds": [
+        "dining",
+        "attraction"
+      ]
+    },
+    "m2_pending": [],
+    "selected_venue_ids": [
+      "ATT-02",
+      "DIN-01",
+      "ATT-01"
+    ],
+    "source_generation": 3,
+    "local_guide_language": "zh",
+    "specific_unknown_text": [
+      "请向场所确认当前营业时间。"
+    ],
+    "domain_unknown_label": "待核实事项",
+    "generic_labels_fallback": true,
+    "db_records": {
+      "guest_requests": 1,
+      "guest_messages": 2,
+      "guest_briefs": 1,
+      "guest_brief_source_utterances": 1,
+      "guest_brief_receipts": 1
+    }
+  },
+  "independent_diagnosis": {
+    "oracle": "Q confirmed false negative from literal需要确认; actual待核实事项/请向场所确认当前营业时间。 valid Chinese unknown/verification. Original oracle preserved byte-identical.",
+    "product": "B identified new S8 label request only asks domain keys and systematically omits generic UI translations on cold cache; needs composed regression and bounded fix.",
+    "artifact_loss": "Browser asserted oracle before saving attempted response/rendered/screenshot; repair controls offline, preserve original failure.",
+    "acceptance": "Persisted actual model/M2/domain/source semantics verified; original full UI/second brief/mixedRTL/edit remain unaccepted."
+  },
+  "private_database_capture_sha256": "d319f3f99cad71240d74fdd7a9b6f24e02635613e998da043edf70b1cc51869f",
+  "next_action": "Offline repair/review and publish new pins; fresh human live allowance required; no reuse of closed slots"
+}

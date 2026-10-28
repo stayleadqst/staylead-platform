@@ -1,5 +1,13 @@
 # Staylead Platform — mandatory working context
 
+## Sprint 8 repaired candidate — fresh live allowance pending
+
+Offline repair/readiness independently QPASS: product71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855/275, controls257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0/4, neworacle25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030. Root121repair+15controls/staticPASS, web/prompt/catalog unchanged/reuse. A/B/Q finished; no active code lease. Fresh namespace s8-local-guide-20261028-reacceptance1 is proposedonly4/8 originalinputs, NOTAUTHORIZED; no newliveconfig/state. OriginalbatchbelowCLOSED1/2/no unused3/6 reuse. Read docs/product/SPRINT_8_ACCEPTANCE.md and live-acceptance-proposal-v2.json.
+
+## Sprint 8 actual batch stopped — 2026-10-28
+
+Hieu explicitly approved original4turn/max8request Sol/low including CLI700-token postcheck/no verified native generation-billing cap. That allowance is now CLOSED: first blocking failure at1turn/2requests; unused3turns/6requests closed, no retry/reset/transfer. Sealed stateSHA9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4. Original b1744bf/f4af97b product/66c7f6 controls/f2a1 oracle preserved; browser failed exact translatedphrase assertion before capture. Q verified persisted Chinese M2/domain/source semantics; no original fullUI/batchPASS. B also traced a real local-guide-only cold-cache Englishgenericlabel omission; offline fix authorized under core scope. A owns4acceptancecontrolsfiles (artifactcapture, structuralunknownrendering,new proposed reacceptance1 namespace); B ownscompositionguest_chat/domainlabelavailabilityhelper andnewcorelabeltests. Q independentread-only review; C evidence/integration. No more live inference authorized; future reviewed/published candidate needs fresh explicit allowance. See actual-batch-1-summary.json and latest execution/acceptance checkpoint; all older pending/execution/live statements below are historical.
+
 ## Sprint 8 current checkpoint — 2026-10-28
 
 Hieu explicitly authorized core #100–#102 implementation, local checks and GitHub commit/push/PR/merge after applicable review. Owner branch `sprint-8-guide-shortlist`, base `sprint-5-canonical-brief@12122f7`; never substitute main or merge other PRs. Historical Sprint7 allowances remain closed. **No Sprint8 live inference is authorized.**

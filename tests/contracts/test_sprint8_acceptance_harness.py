@@ -106,6 +106,37 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual((report["guest_turn_cap"], report["request_cap"]), (4, 8))
         self.assertTrue(report["no_browser"] and report["no_api_or_model"])
 
+    def test_failed_semantic_oracle_retains_attempt_response_render_counters_and_screenshot(self):
+        report_path = self.root / "failed-oracle-evidence.json"
+        result = subprocess.run(
+            ["node", "tools/evals/sprint8_browser.mjs", "--offline-oracle-failure-smoke", str(report_path)],
+            cwd=ROOT, capture_output=True, text=True, timeout=15, check=False,
+            env={key: value for key, value in os.environ.items() if not key.startswith("STAYLEAD_S8_")},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        summary = json.loads(result.stdout)
+        self.assertEqual(summary["status"], "offline-oracle-failure-evidence-ok")
+        self.assertEqual(summary["verdict"]["reason"], "required_localized_phrase_missing")
+        self.assertTrue(summary["localized_unknown_rendered"])
+        self.assertTrue(summary["missing_localized_unknown_rejected"])
+        self.assertEqual(report_path.stat().st_mode & 0o777, 0o600)
+        report = json.loads(report_path.read_text())
+        self.assertLess(report_path.stat().st_size, 128 * 1024)
+        self.assertEqual(len(report["turns"]), 1)
+        turn = report["turns"][0]
+        evidence_path = Path(turn["evidence_path"])
+        self.assertEqual(evidence_path.stat().st_mode & 0o777, 0o600)
+        import hashlib
+        self.assertEqual(turn["evidence_sha256"], hashlib.sha256(evidence_path.read_bytes()).hexdigest())
+        evidence = json.loads(evidence_path.read_text())
+        self.assertEqual(evidence["response"]["local_guide"]["supported_claims"][0]["venue_id"], "ATT-01")
+        self.assertIn("请向场所确认当前营业时间。", evidence["rendered"]["text"])
+        self.assertEqual(evidence["counter_snapshot"], {"guest_turns": 1, "approved_case_turn": 1, "requests": 2})
+        screenshot = Path(evidence["screenshot"])
+        self.assertTrue(screenshot.is_file())
+        self.assertEqual(screenshot.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(turn["verdict"], summary["verdict"])
+
     def test_fresh_api_startup_handoff_and_current_turn_dom_selection_are_exact(self):
         self.assertTrue(runtime._valid_state(self.state, self.config, fresh=True))
         runtime._update(lambda state: state.update(status="running"))
@@ -138,6 +169,13 @@ assert.equal(hardNeedsPreserved(before, {...reordered, local_guide_preferences: 
         proposed = json.loads((ROOT / runtime.PROPOSED_CASES).read_text())
         self.assertIs(proposed["authorized_for_live_calls"], False)
         self.assertFalse(runtime._valid_state({**self.state, "authorized_for_live_calls": False}, self.config, fresh=True))
+
+    def test_closed_acceptance_namespace_cannot_be_reused_by_reacceptance_controls(self):
+        closed_run_id = "s8-local-guide-20261028-acceptance"
+        self.assertEqual(runtime.RUN_ID, "s8-local-guide-20261028-reacceptance1")
+        self.assertEqual(runtime.CASE_RUN_ID, runtime.RUN_ID)
+        self.assertFalse(runtime._valid_state({**self.state, "run_id": closed_run_id}, self.config, fresh=True))
+        self.assertFalse(runtime._valid_state(self.state, {**self.config, "run_id": closed_run_id}, fresh=True))
 
     def test_exact_case_order_and_same_session_are_persisted(self):
         with self.assertRaises(runtime.UnapprovedTurn):

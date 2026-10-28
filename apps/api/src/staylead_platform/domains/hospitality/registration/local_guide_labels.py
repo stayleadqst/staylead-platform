@@ -154,6 +154,12 @@ def local_guide_label_source_texts() -> dict[str, str]:
     return dict(LOCAL_GUIDE_LABELS_EN)
 
 
+def has_reviewed_local_guide_labels(locale: str | None) -> bool:
+    """Whether this locale has domain-reviewed copy and needs no model labels."""
+    language = (locale or "en").split("-", 1)[0].lower()
+    return language == "en" or language in _TRANSLATIONS
+
+
 def resolve_local_guide_label_bundle(locale: str | None, proposed: object) -> dict[str, str]:
     """Resolve a complete safe bundle, falling back to reviewed localizations when available."""
     language = (locale or "en").split("-")[0].lower()
