@@ -447,6 +447,11 @@ export function GuestChat({
               </>}
               {turn.answer && <TurnResultRenderer response={turn.answer} bookingChannel={session?.hotel.booking_channel ?? null}
                 languageTag={turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en"}
+                localGuideLabels={turn.answer.presentation?.local_guide_labels}
+                staleMessage={labelsForLanguage(
+                  turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en",
+                  turn.answer.presentation?.labels,
+                ).stale_answer}
                 stale={turn.stale ?? false} freshnessError={Boolean(turn.freshnessError)}
                 selectionDisabled={busy}
                 pendingOptionId={roomAdvicePending} selectionError={roomAdviceError}

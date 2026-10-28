@@ -1,0 +1,21 @@
+{
+  "classification": "offline actual fixture projection, no inference",
+  "result": "PASS",
+  "claims": [
+    {
+      "id": "DIN-01",
+      "fit": "unknown",
+      "unknowns": [
+        "child_safety_unconfirmed"
+      ]
+    },
+    {
+      "id": "DIN-02",
+      "fit": "unknown",
+      "unknowns": [
+        "child_safety_unconfirmed",
+        "hours_unconfirmed"
+      ]
+    }
+  ]
+}

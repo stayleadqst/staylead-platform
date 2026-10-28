@@ -1,7 +1,9 @@
 import asyncio
 import json
+import subprocess
 from collections.abc import Callable
 from dataclasses import asdict, replace
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -59,6 +61,23 @@ from staylead_platform.platform.knowledge.retrieval.retriever import (
     KnowledgeRetriever,
     RetrievalResult,
 )
+
+
+def _assert_native_json_schema(schema: dict[str, Any], payload: dict[str, Any]) -> bool:
+    """Validate with the repository's installed Ajv runtime, not a schema-shaped assertion."""
+    script = """
+const Ajv = require('./apps/web/node_modules/ajv');
+const [schema, payload] = JSON.parse(process.argv[1]);
+const validate = new Ajv({allErrors: true}).compile(schema);
+const valid = validate(payload);
+if (!valid) process.stderr.write(JSON.stringify(validate.errors));
+process.exit(valid ? 0 : 1);
+"""
+    result = subprocess.run(
+        ["node", "-e", script, json.dumps([schema, payload], ensure_ascii=False)],
+        cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True, check=False,
+    )
+    return result.returncode == 0
 
 
 class MemoryFacts:
@@ -1479,6 +1498,54 @@ def test_guest_state_without_resolvable_refs_has_bounded_missing_state_question_
         ("send",), turn_intents=("hotel_information",),
     )
     assert faq_schema["properties"]["response"]["anyOf"]
+
+
+def test_local_guide_native_schema_accepts_capability_only_and_label_only_responses() -> None:
+    empty_content = {
+        "supported_claims": [], "unknowns": [], "conflicts": [], "guest_claims": [],
+        "guest_brief_refs": [], "guest_clarification": None,
+        "conversational_acknowledgement": None, "label_bundle": {},
+    }
+    for refs in ((), ("party.children.count",)):
+        schema = committed_answer_output_schema(
+            (), refs, turn_intents=("local_guide", "guest_edit"),
+        )
+        assert _assert_native_json_schema(schema, {"response": empty_content})
+
+        invalid_claim = {
+            "response": {
+                **empty_content,
+                "supported_claims": [{"text": "The hotel provides breakfast.", "fact_ids": ["F-1"]}],
+            },
+        }
+        assert not _assert_native_json_schema(schema, invalid_claim)
+
+    for intents, allowed_refs in (
+        (("guest_edit",), ()),
+        (("local_guide", "guest_state"), ("party.adults",)),
+        (("local_guide", "courtesy"), ()),
+        (("local_guide", "room_advice"), ()),
+        (("local_guide", "booking_request"), ()),
+    ):
+        mixed_schema = committed_answer_output_schema(
+            (), allowed_refs, turn_intents=intents,
+        )
+        assert not _assert_native_json_schema(mixed_schema, {"response": empty_content})
+
+
+def test_local_guide_native_schema_allows_exact_label_only_bundle() -> None:
+    schema = committed_answer_output_schema(
+        ("local_guide_title",), turn_intents=("local_guide", "guest_edit"),
+    )
+    payload = {
+        "response": {
+            "supported_claims": [], "unknowns": [], "conflicts": [], "guest_claims": [],
+            "guest_brief_refs": [], "guest_clarification": None,
+            "conversational_acknowledgement": None,
+            "label_bundle": {"local_guide_title": "附近建议"},
+        },
+    }
+    assert _assert_native_json_schema(schema, payload)
 
 
 def test_committed_output_schema_rejects_dynamic_label_keys() -> None:

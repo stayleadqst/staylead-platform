@@ -1,0 +1,34 @@
+{
+  "classification": "Offline validation of corrected oracle/helper against saved actual response + separately labeled M6 replay; not repaired-candidate actual acceptance",
+  "base": {
+    "ok": true,
+    "venue_ids": [
+      "ATT-02",
+      "DIN-01",
+      "ATT-01"
+    ],
+    "source_ids": [
+      "S8-GUIDE-PRIMARY"
+    ]
+  },
+  "synonym": {
+    "ok": true,
+    "venue_ids": [
+      "ATT-02",
+      "DIN-01",
+      "ATT-01"
+    ],
+    "source_ids": [
+      "S8-GUIDE-PRIMARY"
+    ]
+  },
+  "missing": {
+    "ok": false,
+    "reason": "localized_unknown_not_rendered:ATT-02"
+  },
+  "wrongPrice": {
+    "ok": false,
+    "reason": "price_mismatch:DIN-01"
+  },
+  "original_generic_labels_fallback": true
+}

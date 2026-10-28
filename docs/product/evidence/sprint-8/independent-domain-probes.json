@@ -1,0 +1,1135 @@
+{
+  "classification": "offline typed domain→real M1→consumer binding; no inference and no M2 capture claim",
+  "snapshot": {
+    "hotel_id": "HTL-S8-DEMO",
+    "generation": 3,
+    "sources": [
+      {
+        "hotel_id": "HTL-S8-DEMO",
+        "source_id": "S8-GUIDE-PRIMARY",
+        "hotel_generation": 3,
+        "source_version": "1.0",
+        "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+        "status": "approved",
+        "guest_approved": true,
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-03-31",
+        "last_failure": null,
+        "last_success_at": "2026-10-28T11:10:14.417253+07:00"
+      },
+      {
+        "hotel_id": "HTL-S8-DEMO",
+        "source_id": "S8-GUIDE-SECONDARY",
+        "hotel_generation": 3,
+        "source_version": "1.0",
+        "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+        "status": "approved",
+        "guest_approved": true,
+        "valid_from": "2026-01-01",
+        "valid_to": "2027-03-31",
+        "last_failure": null,
+        "last_success_at": "2026-10-28T11:14:11.562037+07:00"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "s8-01",
+      "typed_preferences": {
+        "venue_kinds": [
+          "dining",
+          "attraction"
+        ],
+        "interests": [
+          "quiet",
+          "nature"
+        ],
+        "pace": "relaxed",
+        "budget_amount": 150000,
+        "budget_currency": "VND",
+        "budget_basis": "per_person",
+        "budget_strength": "hard"
+      },
+      "result": {
+        "hotel_id": "HTL-S8-DEMO",
+        "generation": 3,
+        "selected_venue_ids": [
+          "ATT-02",
+          "DIN-01",
+          "ATT-01"
+        ],
+        "fact_ids": [
+          "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY"
+        ],
+        "supported_claims": [
+          {
+            "venue_id": "ATT-02",
+            "name": "Riverside Garden",
+            "kind": "attraction",
+            "fit_status": "fit",
+            "reason_codes": [
+              "interest:nature",
+              "interest:quiet"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 0,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 45,
+            "hours_status": "unknown",
+            "conflict_fields": [],
+            "unknowns": [
+              "Hours are unknown or conflicted; confirm current hours before visiting."
+            ],
+            "unknown_codes": [
+              "hours_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "请向场所确认当前营业时间。"
+            ]
+          },
+          {
+            "venue_id": "DIN-01",
+            "name": "Lotus Noodle",
+            "kind": "dining",
+            "fit_status": "fit",
+            "reason_codes": [
+              "interest:quiet"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 100000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 45,
+            "hours_status": "confirmed",
+            "conflict_fields": [],
+            "unknowns": [],
+            "unknown_codes": [],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": []
+          },
+          {
+            "venue_id": "ATT-01",
+            "name": "Craft Museum",
+            "kind": "attraction",
+            "fit_status": "fit",
+            "reason_codes": [
+              "available_catalog_match"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 120000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 90,
+            "hours_status": "confirmed",
+            "conflict_fields": [],
+            "unknowns": [],
+            "unknown_codes": [],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": []
+          }
+        ],
+        "unknowns": [
+          "Hours are unknown or conflicted; confirm current hours before visiting."
+        ],
+        "conflicts": [],
+        "source_refs": [
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-PRIMARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "已批准"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY"
+            ]
+          }
+        ],
+        "metadata": {
+          "synthetic": true,
+          "locale": "zh",
+          "brief_version": 1
+        },
+        "localized_unknowns": [
+          "请向场所确认当前营业时间。"
+        ],
+        "localized_conflicts": []
+      }
+    },
+    {
+      "case_id": "s8-02",
+      "typed_preferences": {
+        "venue_kinds": [
+          "dining",
+          "attraction"
+        ],
+        "interests": [
+          "culture",
+          "social",
+          "indoor"
+        ],
+        "budget_amount": 300000,
+        "budget_currency": "VND",
+        "budget_basis": "per_person",
+        "budget_strength": "target"
+      },
+      "result": {
+        "hotel_id": "HTL-S8-DEMO",
+        "generation": 3,
+        "selected_venue_ids": [
+          "ATT-01",
+          "DIN-02",
+          "ATT-02"
+        ],
+        "fact_ids": [
+          "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY"
+        ],
+        "supported_claims": [
+          {
+            "venue_id": "ATT-01",
+            "name": "Craft Museum",
+            "kind": "attraction",
+            "fit_status": "fit",
+            "reason_codes": [
+              "interest:culture",
+              "interest:indoor"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 120000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 90,
+            "hours_status": "confirmed",
+            "conflict_fields": [],
+            "unknowns": [],
+            "unknown_codes": [],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": []
+          },
+          {
+            "venue_id": "DIN-02",
+            "name": "River Table",
+            "kind": "dining",
+            "fit_status": "fit",
+            "reason_codes": [
+              "interest:culture",
+              "interest:social"
+            ],
+            "tradeoff_codes": [
+              "sponsored_disclosed"
+            ],
+            "sponsored": true,
+            "sponsor_label": "Sponsored listing",
+            "price": {
+              "amount": 300000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 75,
+            "hours_status": "conflict",
+            "conflict_fields": [
+              "hours"
+            ],
+            "unknowns": [
+              "Hours are unknown or conflicted; confirm current hours before visiting."
+            ],
+            "unknown_codes": [
+              "hours_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "Confirmez les horaires d'ouverture actuels auprès du lieu."
+            ]
+          },
+          {
+            "venue_id": "ATT-02",
+            "name": "Riverside Garden",
+            "kind": "attraction",
+            "fit_status": "fit",
+            "reason_codes": [
+              "available_catalog_match"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 0,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 45,
+            "hours_status": "unknown",
+            "conflict_fields": [],
+            "unknowns": [
+              "Hours are unknown or conflicted; confirm current hours before visiting."
+            ],
+            "unknown_codes": [
+              "hours_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "Confirmez les horaires d'ouverture actuels auprès du lieu."
+            ]
+          }
+        ],
+        "unknowns": [
+          "Hours are unknown or conflicted; confirm current hours before visiting."
+        ],
+        "conflicts": [
+          "DIN-02 hours conflict must be resolved before relying on it."
+        ],
+        "source_refs": [
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-PRIMARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "Approuvé"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-ATT-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-ATT-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY"
+            ]
+          },
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-SECONDARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "Approuvé"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY"
+            ]
+          }
+        ],
+        "metadata": {
+          "synthetic": true,
+          "locale": "fr",
+          "brief_version": 1
+        },
+        "localized_unknowns": [
+          "Confirmez les horaires d'ouverture actuels auprès du lieu."
+        ],
+        "localized_conflicts": [
+          "Les valeurs des sources sont contradictoires et doivent être confirmées."
+        ]
+      }
+    },
+    {
+      "case_id": "s8-03",
+      "typed_preferences": {
+        "venue_kinds": [
+          "dining"
+        ],
+        "interests": [
+          "quiet"
+        ],
+        "hard_accessibility_needs": [
+          "step_free",
+          "wheelchair_access"
+        ],
+        "allergy_requirements": [
+          "peanut"
+        ]
+      },
+      "result": {
+        "hotel_id": "HTL-S8-DEMO",
+        "generation": 3,
+        "selected_venue_ids": [
+          "DIN-01",
+          "DIN-02"
+        ],
+        "fact_ids": [
+          "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY"
+        ],
+        "supported_claims": [
+          {
+            "venue_id": "DIN-01",
+            "name": "Lotus Noodle",
+            "kind": "dining",
+            "fit_status": "unknown",
+            "reason_codes": [
+              "interest:quiet"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 100000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 45,
+            "hours_status": "confirmed",
+            "conflict_fields": [],
+            "unknowns": [
+              "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+              "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue."
+            ],
+            "unknown_codes": [
+              "accessibility_unconfirmed",
+              "allergy_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "يرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.",
+              "يرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان."
+            ]
+          },
+          {
+            "venue_id": "DIN-02",
+            "name": "River Table",
+            "kind": "dining",
+            "fit_status": "unknown",
+            "reason_codes": [
+              "available_catalog_match"
+            ],
+            "tradeoff_codes": [
+              "sponsored_disclosed"
+            ],
+            "sponsored": true,
+            "sponsor_label": "Sponsored listing",
+            "price": {
+              "amount": 300000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 75,
+            "hours_status": "conflict",
+            "conflict_fields": [
+              "hours"
+            ],
+            "unknowns": [
+              "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+              "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+              "Hours are unknown or conflicted; confirm current hours before visiting."
+            ],
+            "unknown_codes": [
+              "accessibility_unconfirmed",
+              "allergy_unconfirmed",
+              "hours_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "يرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.",
+              "يرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان.",
+              "يرجى تأكيد ساعات العمل الحالية مع المكان."
+            ]
+          }
+        ],
+        "unknowns": [
+          "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+          "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+          "Hours are unknown or conflicted; confirm current hours before visiting."
+        ],
+        "conflicts": [
+          "DIN-02 hours conflict must be resolved before relying on it."
+        ],
+        "source_refs": [
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-PRIMARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "معتمد"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY"
+            ]
+          },
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-SECONDARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "معتمد"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY"
+            ]
+          }
+        ],
+        "metadata": {
+          "synthetic": true,
+          "locale": "ar",
+          "brief_version": 1
+        },
+        "localized_unknowns": [
+          "يرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.",
+          "يرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان.",
+          "يرجى تأكيد ساعات العمل الحالية مع المكان."
+        ],
+        "localized_conflicts": [
+          "تتعارض قيم المصادر ويجب تأكيدها."
+        ]
+      }
+    },
+    {
+      "case_id": "s8-04",
+      "typed_preferences": {
+        "venue_kinds": [
+          "dining"
+        ],
+        "interests": [
+          "social"
+        ],
+        "hard_accessibility_needs": [
+          "step_free",
+          "wheelchair_access"
+        ],
+        "allergy_requirements": [
+          "peanut"
+        ]
+      },
+      "result": {
+        "hotel_id": "HTL-S8-DEMO",
+        "generation": 3,
+        "selected_venue_ids": [
+          "DIN-02",
+          "DIN-01"
+        ],
+        "fact_ids": [
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+          "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+          "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY"
+        ],
+        "supported_claims": [
+          {
+            "venue_id": "DIN-02",
+            "name": "River Table",
+            "kind": "dining",
+            "fit_status": "unknown",
+            "reason_codes": [
+              "interest:social"
+            ],
+            "tradeoff_codes": [
+              "sponsored_disclosed"
+            ],
+            "sponsored": true,
+            "sponsor_label": "Sponsored listing",
+            "price": {
+              "amount": 300000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 75,
+            "hours_status": "conflict",
+            "conflict_fields": [
+              "hours"
+            ],
+            "unknowns": [
+              "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+              "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+              "Hours are unknown or conflicted; confirm current hours before visiting."
+            ],
+            "unknown_codes": [
+              "accessibility_unconfirmed",
+              "allergy_unconfirmed",
+              "hours_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "Confirmez l'aménagement d'accessibilité précis auprès du lieu.",
+              "Confirmez les ingrédients et les risques de contamination croisée auprès du lieu.",
+              "Confirmez les horaires d'ouverture actuels auprès du lieu."
+            ]
+          },
+          {
+            "venue_id": "DIN-01",
+            "name": "Lotus Noodle",
+            "kind": "dining",
+            "fit_status": "unknown",
+            "reason_codes": [
+              "available_catalog_match"
+            ],
+            "tradeoff_codes": [],
+            "sponsored": false,
+            "sponsor_label": null,
+            "price": {
+              "amount": 100000,
+              "currency": "VND",
+              "basis": "per_person"
+            },
+            "duration_minutes": 45,
+            "hours_status": "confirmed",
+            "conflict_fields": [],
+            "unknowns": [
+              "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+              "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue."
+            ],
+            "unknown_codes": [
+              "accessibility_unconfirmed",
+              "allergy_unconfirmed"
+            ],
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY"
+            ],
+            "localized_unknowns": [
+              "Confirmez l'aménagement d'accessibilité précis auprès du lieu.",
+              "Confirmez les ingrédients et les risques de contamination croisée auprès du lieu."
+            ]
+          }
+        ],
+        "unknowns": [
+          "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+          "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+          "Hours are unknown or conflicted; confirm current hours before visiting."
+        ],
+        "conflicts": [
+          "DIN-02 hours conflict must be resolved before relying on it."
+        ],
+        "source_refs": [
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-PRIMARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "Approuvé"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-01-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-01-timezone-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-accessibility-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-allergy_suitability-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-child_safety-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-closed_reason-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-duration_minutes-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-kind-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsor_label-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-sponsored-S8-GUIDE-PRIMARY",
+              "F-HTL-S8-DEMO-DIN-02-timezone-S8-GUIDE-PRIMARY"
+            ]
+          },
+          {
+            "source": {
+              "hotel_id": "HTL-S8-DEMO",
+              "source_id": "S8-GUIDE-SECONDARY",
+              "source_generation": 3,
+              "source_version": "1.0",
+              "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+              "status": "approved",
+              "guest_approved": true,
+              "valid_from": "2026-01-01",
+              "valid_to": "2027-03-31",
+              "localized_status": "Approuvé"
+            },
+            "fact_ids": [
+              "F-HTL-S8-DEMO-DIN-02-hours-S8-GUIDE-SECONDARY"
+            ]
+          }
+        ],
+        "metadata": {
+          "synthetic": true,
+          "locale": "fr",
+          "brief_version": 1
+        },
+        "localized_unknowns": [
+          "Confirmez l'aménagement d'accessibilité précis auprès du lieu.",
+          "Confirmez les ingrédients et les risques de contamination croisée auprès du lieu.",
+          "Confirmez les horaires d'ouverture actuels auprès du lieu."
+        ],
+        "localized_conflicts": [
+          "Les valeurs des sources sont contradictoires et doivent être confirmées."
+        ]
+      }
+    }
+  ]
+}

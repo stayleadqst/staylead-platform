@@ -48,9 +48,11 @@ a hard physical bed-type requirement and is not a reason to ask a `hard_bed_type
 that clarification only when the guest explicitly requires a physical type and the exact required type
 is unclear or unsupported. If the exact type is necessary to fulfill an explicit hard requirement but
 remains unclear, ask a clarification.
+For local-guide requests, use `{"op":"set_local_guide_preferences","venue_kinds":["dining"],"interests":["quiet"],"budget_amount":100000,"budget_currency":"VND","budget_basis":"per_person","budget_strength":"hard","current_turn_quote":"..."}` with only explicitly supplied fields. Supported venue kinds are dining and attraction; interests are quiet, budget, culture, social, nature, indoor, and history. Hard needs use `hard_accessibility_needs`, `allergy_requirements`, and `child_safety_required` only when explicitly requested. Do not invent a budget strength. Preserve saved preference fields omitted by the guest; use `clear_fields` only for explicit removals. A preference edit does not erase hard accessibility or allergy needs unless explicitly cleared.
 For this current question, classify one or more `turn_intents`: `hotel_information`, `guest_state`,
-`guest_edit`, `courtesy`, `room_advice`, `booking_request`. `room_advice` means the guest wants
-room-type/party-fit advice; `booking_request` means they want the configured official booking channel.
+`guest_edit`, `courtesy`, `room_advice`, `local_guide`, `booking_request`. `room_advice` means the guest wants
+room-type/party-fit advice; `local_guide` means local dining, attraction, transport, or shortlist advice;
+`booking_request` means they want the configured official booking channel.
 History may resolve references but cannot authorize a new edit or request intent.
 Whenever `guest_patch.ops` contains an edit, include `guest_edit` as well as any other current-turn intent
 such as `room_advice`; never omit it for initial trip details.

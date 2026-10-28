@@ -97,6 +97,34 @@ class SetRoomRequirements(_PatchOperation):
     ]] = Field(default_factory=list, max_length=11)
 
 
+class SetLocalGuidePreferences(_PatchOperation):
+    """Typed trip preferences; hard needs require an exact current-turn quote."""
+
+    op: Literal["set_local_guide_preferences"]
+    venue_kinds: list[Literal["dining", "attraction"]] | None = Field(default=None, min_length=1, max_length=2)
+    interests: list[Literal["quiet", "budget", "culture", "social", "nature", "indoor", "history"]] | None = Field(
+        default=None, max_length=7,
+    )
+    pace: Literal["relaxed", "moderate", "active"] | None = None
+    budget_amount: int | None = Field(default=None, ge=0, le=10_000_000)
+    budget_currency: Literal["VND"] | None = None
+    budget_basis: Literal["per_person"] | None = None
+    budget_strength: Literal["hard", "target"] | None = None
+    hard_accessibility_needs: list[Literal["step_free", "wheelchair_access"]] | None = Field(default=None, max_length=2)
+    allergy_requirements: list[Literal["peanut", "shellfish", "dairy", "gluten"]] | None = Field(default=None, max_length=4)
+    child_safety_required: bool | None = None
+    clear_fields: list[Literal[
+        "venue_kinds", "interests", "pace", "budget_amount", "budget_currency", "budget_basis",
+        "budget_strength", "hard_accessibility_needs", "allergy_requirements", "child_safety_required",
+    ]] = Field(default_factory=list, max_length=10)
+
+    @model_validator(mode="after")
+    def coherent_budget(self) -> SetLocalGuidePreferences:
+        if self.budget_amount is not None and (self.budget_currency != "VND" or self.budget_basis != "per_person"):
+            raise ValueError("Local-guide budgets require VND and a per-person basis.")
+        return self
+
+
 class SetChildGuardian(_PatchOperation):
     op: Literal["set_child_guardian"]
     child_id: str = Field(min_length=1, max_length=64)
@@ -117,6 +145,7 @@ class ClarifyField(_PatchOperation):
 
 GuestBriefOperation = Annotated[
     SetDates | SetAdults | AddChild | SetChildAge | SetChildSeparateBed | RemoveChild | SetRoomRequirements
+    | SetLocalGuidePreferences
     | SetChildGuardian | SetBedSharing | ClarifyField,
     Field(discriminator="op"),
 ]
@@ -133,19 +162,19 @@ class GuestPatchAuthorization(BaseModel):
     model_config = ConfigDict(extra="forbid")
     operation_index: int = Field(ge=0, le=11)
     op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "set_child_separate_bed", "remove_child",
-                "set_room_requirements", "set_child_guardian", "set_bed_sharing", "clarify"]
+                "set_room_requirements", "set_local_guide_preferences", "set_child_guardian", "set_bed_sharing", "clarify"]
     target_fields: list[Annotated[str, Field(max_length=128, pattern=(
         r"^(?:dates\.(?:check_in|check_out)|party\.(?:adults|children|guardians|bed_sharing)|room_requirements|"
         r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.(?:age|requires_separate_bed))?|room_requirements\."
         r"(?:budget_amount|budget_currency|budget_basis|budget_strength|sharing|"
         r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
-        r"preferred_bed_types|avoided_bed_types|max_rooms))$"
+        r"preferred_bed_types|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?)$"
     ))]] = Field(min_length=1, max_length=11)
     intent: Literal["explicit_request", "clarification"]
     current_turn_quote: str = Field(min_length=1, max_length=500)
 
 
-GuestTurnIntent = Literal["hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"]
+GuestTurnIntent = Literal["hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request"]
 
 
 def validate_guest_patch_authorization(
@@ -209,7 +238,7 @@ def validate_preparation_metadata(
     payload: Any, patch: GuestBriefProposal | None, question: str,
 ) -> tuple[tuple[str, ...], tuple[dict[str, Any], ...]]:
     intents = tuple(dict.fromkeys(getattr(payload, "turn_intents", ())))
-    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"}
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("Preparation must classify at least one current-turn intent.")
     operations = patch.operations if patch is not None else ()
@@ -229,7 +258,7 @@ def validate_committed_turn_channels(
     payload: Any, intents: tuple[str, ...], pending_fields: tuple[str, ...], authorized_targets: tuple[str, ...],
 ) -> None:
     """Enforce prepared turn scope even when a provider ignores native JSON schema hints."""
-    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "booking_request"}
+    valid_intents = {"hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request"}
     if not intents or any(intent not in valid_intents for intent in intents):
         raise ValueError("The committed answer has no persisted current-turn intent.")
     acknowledgement = getattr(payload, "conversational_acknowledgement", None)
@@ -312,6 +341,16 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
             f"room_requirements.{field}" for field in requirement_fields
             if field in cleared or operation.get(field) is not None
         ]
+    if op == "set_local_guide_preferences":
+        preference_fields = (
+            "venue_kinds", "interests", "pace", "budget_amount", "budget_currency", "budget_basis",
+            "budget_strength", "hard_accessibility_needs", "allergy_requirements", "child_safety_required",
+        )
+        cleared = set(operation.get("clear_fields") or ())
+        return [
+            f"local_guide_preferences.{field}" for field in preference_fields
+            if field in cleared or operation.get(field) is not None
+        ]
     if op == "clarify" and isinstance(operation.get("field"), str):
         return [operation["field"]]
     return []
@@ -343,6 +382,8 @@ def validate_guest_brief_proposal(
     }
     if "room_requirements" in current.data:
         data["room_requirements"] = dict(current.data.get("room_requirements") or {})
+    if "local_guide_preferences" in current.data:
+        data["local_guide_preferences"] = dict(current.data.get("local_guide_preferences") or {})
     data["dates"].setdefault("check_in", None)
     data["dates"].setdefault("check_out", None)
     data["dates"].setdefault("nights", None)
@@ -352,7 +393,7 @@ def validate_guest_brief_proposal(
         data["party"]["guardians"] = dict(data["party"].get("guardians") or {})
     pending = set(current.pending_fields)
     fields: set[str] = set()
-    delta: dict[str, object] = {"dates": {}, "party": {}, "room_requirements": {}}
+    delta: dict[str, object] = {"dates": {}, "party": {}, "room_requirements": {}, "local_guide_preferences": {}}
     clarification = False
     changed = False
     for operation in patch.ops:
@@ -541,6 +582,35 @@ def validate_guest_brief_proposal(
                     changed = True
                 if value is not None:
                     pending.discard(f"room_requirements.{key}")
+        elif isinstance(operation, SetLocalGuidePreferences):
+            if set(operation.clear_fields) & {
+                key for key in operation.model_fields_set - {"op", "clear_fields", "current_turn_quote"}
+                if getattr(operation, key) is not None
+            }:
+                raise ValueError("A local-guide preference cannot be set and cleared in one operation.")
+            preferences = data.setdefault("local_guide_preferences", {})
+            preference_fields = (
+                "venue_kinds", "interests", "pace", "budget_amount", "budget_currency", "budget_basis",
+                "budget_strength", "hard_accessibility_needs", "allergy_requirements", "child_safety_required",
+            )
+            for key in operation.clear_fields:
+                if key in preferences:
+                    preferences.pop(key)
+                    delta["local_guide_preferences"][key] = None
+                    changed = True
+            for key in operation.model_fields_set - {"op", "clear_fields", "current_turn_quote"}:
+                value = getattr(operation, key)
+                if value is not None and preferences.get(key) != value:
+                    preferences[key] = value
+                    delta["local_guide_preferences"][key] = value
+                    changed = True
+            if preferences.get("budget_amount") is not None and preferences.get("budget_strength") not in {"hard", "target"}:
+                pending.add("local_guide_preferences.budget_strength")
+                clarification = True
+            else:
+                pending.discard("local_guide_preferences.budget_strength")
+            fields.update(f"local_guide_preferences.{key}" for key in preference_fields
+                          if key in operation.clear_fields or getattr(operation, key) is not None)
         elif isinstance(operation, SetBedSharing):
             fields.add("party.bed_sharing")
             all_members = {f"adult-{index}" for index in range(1, (data["party"].get("adults") or 0) + 1)}
@@ -575,8 +645,12 @@ def validate_guest_brief_proposal(
         delta.pop("party")
     if not delta["room_requirements"]:
         delta.pop("room_requirements")
+    if not delta["local_guide_preferences"]:
+        delta.pop("local_guide_preferences")
     if data.get("room_requirements") == {}:
         data.pop("room_requirements")
+    if data.get("local_guide_preferences") == {}:
+        data.pop("local_guide_preferences")
     requirements = data.get("room_requirements") or {}
     if requirements.get("budget_amount") is not None and requirements.get("budget_strength") not in {"hard", "target"}:
         pending.add("room_requirements.budget_strength")

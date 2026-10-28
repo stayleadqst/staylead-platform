@@ -17,6 +17,8 @@ export type GuestTurnResultRendererProps = Readonly<{
   response: unknown | null;
   bookingChannel: unknown;
   languageTag: string;
+  localGuideLabels?: Readonly<Record<string, string>>;
+  staleMessage?: string;
   stale: boolean;
   freshnessError: boolean;
   selectionDisabled: boolean;

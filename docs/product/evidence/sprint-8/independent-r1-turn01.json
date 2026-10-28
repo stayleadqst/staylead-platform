@@ -1,0 +1,102 @@
+{
+  "turn": 1,
+  "verdict": "PASS",
+  "response_sha256": "db785b9551c31a4fe2b6dc98097c73b6b75ffe02ba9a0edd7f91e0bc451f6a10",
+  "evidence_sha256": "9bc084591687b4a2e2ef52ad604ea7798032ceda1523d77c93d0d783eba15806",
+  "counters": {
+    "guest_turns": 1,
+    "approved_case_turn": 1,
+    "requests": 2
+  },
+  "scope": "Actual fixed candidate Chinese M2→M3/domain→M6",
+  "checks": [
+    "Exact quiet/nature/relaxed hard150k VND/person and both venue kinds saved, no pending or invented hard needs",
+    "Three expected current source-backed cards; Garden hours unknown verified in Chinese; prices/bases/durations/names/IDs correct",
+    "Generic core20 localized Chinese, labels_fallback=false; reviewed domain labels and observed DOM correct",
+    "Known closed/expired/hard-budget DIN02 excluded; no room prerequisite/booking action/route inference",
+    "Screenshot viewed; baseline optional booking cards unconfigured, no action or new requirement; inherited receipt literals are outside changed label keys"
+  ],
+  "trace": {
+    "provider": "codex_cli",
+    "deployment": "gpt-6.1-sol",
+    "model": null,
+    "provider_request_id": "01a180d9-188f-7c42-88fb-9411114fa23d",
+    "provider_request_ids": [
+      "01a180d8-e82d-7683-93ea-36334a73269f",
+      "01a180d9-188f-7c42-88fb-9411114fa23d"
+    ],
+    "calls": 2,
+    "guest_claims_rejected": 0,
+    "answer_validation": "fully_validated",
+    "usage": {
+      "input_tokens": 24134,
+      "output_tokens": 894,
+      "total_tokens": null
+    },
+    "retrieved_fact_ids": [
+      "F-HTL-S8-DEMO-DIN-01-name-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-01-categories-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-01-location-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-01-price-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-02-name-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-02-categories-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-02-location-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-02-price-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-03-name-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-03-categories-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-03-location-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-DIN-03-price-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-01-name-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-01-categories-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-01-location-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-01-price-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-02-name-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-02-categories-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-02-location-S8-GUIDE-PRIMARY",
+      "F-HTL-S8-DEMO-ATT-02-price-S8-GUIDE-PRIMARY"
+    ],
+    "failure_stage": null,
+    "preparation_calls": 1
+  },
+  "brief_receipt": {
+    "request_id": "e853f631-16e0-48f9-8227-415e2a7b3e64",
+    "status": "applied",
+    "brief_version_before": 0,
+    "brief_version_after": 1,
+    "applied_delta": {
+      "local_guide_preferences": {
+        "interests": [
+          "quiet",
+          "nature"
+        ],
+        "budget_currency": "VND",
+        "budget_amount": 150000,
+        "budget_basis": "per_person",
+        "venue_kinds": [
+          "dining",
+          "attraction"
+        ],
+        "budget_strength": "hard",
+        "pace": "relaxed"
+      }
+    },
+    "source_refs": [
+      {
+        "source_utterance_id": "bbad98a7-afa8-4f4a-8c7d-3a4635a938ee",
+        "request_id": "e853f631-16e0-48f9-8227-415e2a7b3e64",
+        "fields": [
+          "local_guide_preferences.budget_amount",
+          "local_guide_preferences.budget_basis",
+          "local_guide_preferences.budget_currency",
+          "local_guide_preferences.budget_strength",
+          "local_guide_preferences.interests",
+          "local_guide_preferences.pace",
+          "local_guide_preferences.venue_kinds"
+        ]
+      }
+    ],
+    "answer_status": "completed",
+    "brief_version_used": 1
+  },
+  "root_agreement": "Explicit parent agreement received before receipt"
+}

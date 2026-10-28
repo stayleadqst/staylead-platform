@@ -1,0 +1,7 @@
+{
+  "run_id": "s8-local-guide-20261028-reacceptance1",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "approved_case_turn": 3,
+  "verdict": "pass",
+  "response_sha256": "b5b201c43378c9b0eb177d5b6e4ebe6d832e029732377606d090413d6019f2fa"
+}

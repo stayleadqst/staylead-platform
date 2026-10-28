@@ -1,0 +1,67 @@
+{
+  "run_id": "s8-local-guide-20261028-acceptance",
+  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+  "original_oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+  "run_verdict": "HALTED1guest/2requests, unused3guest/6requests CLOSED; no semantic PASS receipt issued; not resumed/reclassified",
+  "sealed_state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+  "observed_browser_failure": "required_localized_phrase_missing; report.turns=[] because assertion preceded artifact append/screenshot",
+  "independent_read": "Explicit PostgreSQL SET TRANSACTION READ ONLY, HTL-S8-DEMO only; no API/model calls or DB writes",
+  "counts": {
+    "requests": 1,
+    "briefs": 1,
+    "receipts": 1,
+    "source_utterances": 1,
+    "messages": 2
+  },
+  "request_id": "86d4ccd5-5103-4753-b466-05e6a4d5648b",
+  "session_id": "8e2530cf-3ca2-4ea7-ac2c-5b7c692275c4",
+  "observed_M2": {
+    "brief_version": 1,
+    "dates": {
+      "check_in": null,
+      "check_out": null,
+      "nights": null
+    },
+    "party": {
+      "adults": null,
+      "children": []
+    },
+    "local_guide_preferences": {
+      "interests": [
+        "quiet",
+        "nature"
+      ],
+      "budget_amount": 150000,
+      "budget_basis": "per_person",
+      "budget_currency": "VND",
+      "budget_strength": "hard",
+      "pace": "relaxed",
+      "venue_kinds": [
+        "dining",
+        "attraction"
+      ]
+    },
+    "pending_fields": []
+  },
+  "actual_data_semantics": "PASS for exact quiet/nature/relaxed hard150000VND/person preferences, no pending/room prerequisite; correct ATT02/DIN01/ATT01 facts and primary1.0 approved gen3/hash; missing Garden hours explicit. This is component evidence, not full current/future candidate actual acceptance.",
+  "harness_false_negative": {
+    "responsibility": "Q authored overly exact translated literal expectation; corrected via separate v2 oracle, original preserved",
+    "required_literal": "需要确认",
+    "observed_valid_label": "待核实事项",
+    "observed_valid_verification": "请向场所确认当前营业时间。",
+    "conclusion": "No semantic failure follows from this lexical mismatch; locale synonyms must be reviewed semantically and machine-rendering bound to actual localized values."
+  },
+  "separate_product_regression": {
+    "observed": "presentation.labels_fallback=true with generic shell labels English while requested language zh; domain labels and needed unknowns Chinese",
+    "root_cause": "S8 local-guide _answer_label_request requests domain20 only, omitting missing generic core20 from committed call; traced by B and consistent with inspected old path",
+    "status": "B narrow repair in progress; changes call2 model-output label contract and invalidates complete Chinese fixed-path actual language evidence"
+  },
+  "artifact_limitation": "Original browser closed before screenshot/response append. Preserve this absence; posthoc exact saved-response M6 replay is additional zero-provider evidence, not original screenshot or new model success.",
+  "next_matrix": "After final bounded B/A repairs and independent review, propose fresh4turn/max8requests with original four inputs under NEW explicit human allowance; no transfer of closed unused3/6. Prior actual M2/domain/source facts reusable only as component evidence after output-label contract changes.",
+  "read_only_capture": {
+    "path": "/private/tmp/staylead-s8-q-actual-turn1-db.json",
+    "sha256": "9535a4067675bda1f5cf12e55a77a07d96249af677504a16d72b4453d387b3a8"
+  },
+  "future_oracle": "/private/tmp/staylead-s8-q-oracle-v2.json; pending final candidate/control pins; not live authority"
+}

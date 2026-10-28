@@ -5,6 +5,7 @@ import { safeBookingDestination } from "@/domains/hospitality/registration/booki
 import { roomAdviceCostView } from "@/domains/hospitality/registration/room-advice-cost";
 import { roomAdviceStatusLabel } from "@/domains/hospitality/registration/room-advice-status";
 import { directionForLanguageTag, normalizeLanguageTag } from "@/shared/chat/presentation";
+import { formatLocalGuidePrice, localGuideSourceLine, localGuideVerificationText, visibleLocalGuideClaims } from "@/domains/hospitality/registration/local-guide-presentation";
 
 type BookingChannelData = {
   destination_url: string | null;
@@ -25,6 +26,93 @@ type RoomAdvice = {
   }>;
   questions: Array<{ field: string; reason: string; locale: string; locale_fallback: boolean }>;
 };
+type LocalGuide = {
+  hotel_id: string;
+  generation: number;
+  selected_venue_ids: readonly string[];
+  supported_claims: readonly {
+    venue_id: string; name: string; kind?: string; fit_status?: string; reason_codes: readonly string[];
+    tradeoff_codes: readonly string[]; sponsored: boolean; sponsor_label?: string | null;
+    price?: unknown; duration_minutes?: number | null; hours_status?: string;
+    conflict_fields: readonly string[]; unknowns: readonly string[];
+    unknown_codes?: readonly string[]; localized_unknowns?: readonly string[]; fact_ids: readonly string[];
+  }[];
+  unknowns: readonly string[];
+  localized_unknowns?: readonly string[];
+  conflicts: readonly string[];
+  localized_conflicts?: readonly string[];
+  source_refs: readonly { source?: Record<string, unknown>; fact_ids?: readonly string[] }[];
+  metadata?: { synthetic?: boolean; locale?: string | null };
+};
+
+const LOCAL_GUIDE_LABELS = {
+  en: { title: "Local suggestions", records: "Source records", sponsored: "Sponsored", unknown: "Needs confirmation", fit: "Why it may fit", duration: "Visit duration", hours: "Hours status", conflicts: "Source conflicts", synthetic: "Synthetic technical-pilot information." },
+  vi: { title: "Gợi ý địa phương", records: "Nguồn thông tin", sponsored: "Được tài trợ", unknown: "Cần xác nhận", fit: "Lý do phù hợp", duration: "Thời lượng tham quan", hours: "Trạng thái giờ mở cửa", conflicts: "Nguồn có thông tin khác nhau", synthetic: "Thông tin tổng hợp cho thử nghiệm kỹ thuật." },
+  zh: { title: "当地推荐", records: "信息来源", sponsored: "赞助内容", unknown: "需要确认", fit: "推荐原因", duration: "游览时长", hours: "营业时间状态", conflicts: "来源信息冲突", synthetic: "技术试点的合成信息。" },
+  ja: { title: "周辺のおすすめ", records: "情報源", sponsored: "スポンサー情報", unknown: "要確認", fit: "おすすめの理由", duration: "所要時間", hours: "営業時間の状態", conflicts: "情報源の不一致", synthetic: "技術パイロット用の合成情報です。" },
+} as const;
+
+function localGuideLabels(languageTag: string, supplied: Readonly<Record<string, string>> = {}) {
+  const language = normalizeLanguageTag(languageTag)?.split("-")[0].toLowerCase() as keyof typeof LOCAL_GUIDE_LABELS | undefined;
+  const fallback = LOCAL_GUIDE_LABELS[language ?? "en"] ?? LOCAL_GUIDE_LABELS.en;
+  const fromBundle = (key: string, value: string) => supplied[`local_guide_${key}`] ?? value;
+  return {
+    title: fromBundle("title", fallback.title), records: fromBundle("sources", fallback.records),
+    sponsored: fromBundle("sponsored", fallback.sponsored), unknown: fromBundle("unknown", fallback.unknown),
+    fit: fromBundle("fit", fallback.fit), duration: fromBundle("duration", fallback.duration),
+    hours: fromBundle("hours", fallback.hours), conflicts: fromBundle("conflicts", fallback.conflicts),
+    synthetic: fromBundle("synthetic", fallback.synthetic),
+    perPerson: supplied.local_guide_per_person ?? "per person",
+    fitStatus: fromBundle("fit_status", fallback.fit), unknownStatus: fromBundle("unknown_status", fallback.unknown),
+    interest(code: string) {
+      const key = `local_guide_interest_${code}`;
+      return supplied[key] ?? code.replaceAll("_", " ");
+    },
+  };
+}
+
+function LocalGuidePanel({ result, languageTag, suppliedLabels, stale, freshnessError, staleMessage }: {
+  result: LocalGuide; languageTag: string; suppliedLabels?: Readonly<Record<string, string>>;
+  stale: boolean; freshnessError: boolean; staleMessage: string;
+}) {
+  const labels = localGuideLabels(languageTag, suppliedLabels);
+  const localizedReason = (code: string) => code.startsWith("interest:")
+    ? labels.interest(code.slice("interest:".length))
+    : code === "available_catalog_match" ? labels.fitStatus : code.replaceAll("_", " ");
+  return <section className="local-guide-result" data-testid="local-guide-result" lang={languageTag}
+    dir={directionForLanguageTag(languageTag)} aria-label={labels.title}>
+    <h2>{labels.title}</h2>
+    {(stale || freshnessError) && <p className="status-note" role="alert">{staleMessage}</p>}
+    {visibleLocalGuideClaims(result.supported_claims, stale, freshnessError).map((claim) => <article className="local-guide-venue" key={claim.venue_id}>
+      <h3>{claim.name}</h3>
+      <p>{claim.kind ?? claim.venue_id} · {claim.venue_id}</p>
+      {claim.fit_status && <p>{claim.fit_status === "unknown" ? labels.unknownStatus : labels.fitStatus}</p>}
+      {!!claim.reason_codes.length && <p><strong>{labels.fit}:</strong> {claim.reason_codes.map(localizedReason).join(", ")}</p>}
+      {claim.sponsored && <p className="status-note">{labels.sponsored}{claim.sponsor_label ? ` · ${claim.sponsor_label}` : ""}</p>}
+      {claim.duration_minutes !== null && claim.duration_minutes !== undefined && <p>{labels.duration}: {claim.duration_minutes}</p>}
+      {claim.hours_status && claim.hours_status !== "confirmed" && <p className="status-note">{labels.hours}: {claim.hours_status === "conflict" ? labels.conflicts : labels.unknown}</p>}
+      {claim.conflict_fields.length > 0 && <p className="status-note">{labels.conflicts}</p>}
+      {localGuideVerificationText(claim, labels.unknown).length > 0 && <ul className="status-note" aria-label={labels.unknown}>
+        {localGuideVerificationText(claim, labels.unknown).map((unknown, index) => <li key={`${claim.venue_id}-unknown-${index}`}>{unknown}</li>)}
+      </ul>}
+      {claim.price !== undefined && <p>{formatLocalGuidePrice(claim.price, languageTag, labels.unknown, labels.perPerson)}</p>}
+    </article>)}
+    {!(stale || freshnessError) && !!result.unknowns.length && <details><summary>{labels.unknown} ({result.unknowns.length})</summary><ul>
+      {(result.localized_unknowns?.length ? result.localized_unknowns : [labels.unknown]).map((unknown, index) => <li key={`unknown-${index}`}>{unknown}</li>)}
+    </ul></details>}
+    {!(stale || freshnessError) && !!result.conflicts.length && <details><summary>{labels.conflicts} ({result.conflicts.length})</summary><ul>
+      {(result.localized_conflicts?.length ? result.localized_conflicts : [labels.conflicts]).map((conflict, index) => <li key={`conflict-${index}`}>{conflict}</li>)}
+    </ul></details>}
+    {!!result.source_refs.length && <details><summary>{labels.records} ({result.source_refs.length})</summary><ul>
+      {result.source_refs.map((ref, index) => {
+        return <li key={`${String(ref.source?.source_id ?? "source")}-${index}`}>
+          {localGuideSourceLine(ref)}
+        </li>;
+      })}
+    </ul></details>}
+    {result.metadata?.synthetic && <p className="status-note" role="note">{labels.synthetic}</p>}
+  </section>;
+}
 
 const LABELS = {
   en: {
@@ -160,14 +248,27 @@ function BookingChannel({ channel, languageTag, requested }: { channel?: Booking
 
 export function HospitalityTurnResultRenderer(props: GuestTurnResultRendererProps) {
   const bookingChannel = props.bookingChannel as BookingChannelData | undefined;
-  const response = props.response as { booking_request?: unknown; room_advice?: unknown } | null;
+  const response = props.response as {
+    booking_request?: unknown; room_advice?: unknown; local_guide?: unknown; answer_eligibility?: string;
+  } | null;
   const result = response?.room_advice as RoomAdvice | undefined;
+  const localGuide = response?.local_guide as LocalGuide | undefined;
+  const guideStale = response?.answer_eligibility === "stale" || props.stale;
+  const guideStaleMessage = props.staleMessage ?? labelsFor(props.languageTag).roomStale;
   if (!response && !bookingChannel) return null;
-  if (!result) return <BookingChannel channel={bookingChannel} languageTag={props.languageTag} requested={Boolean(response?.booking_request)} />;
+  if (!result) return <>
+    {bookingChannel && <BookingChannel channel={bookingChannel} languageTag={props.languageTag} requested={Boolean(response?.booking_request)} />}
+    {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
+      suppliedLabels={props.localGuideLabels} stale={guideStale} freshnessError={props.freshnessError}
+      staleMessage={guideStaleMessage} />}
+  </>;
   const labels = labelsFor(props.languageTag);
   const stale = result.currentness !== "current" || props.stale || props.freshnessError;
   return <>
     {Boolean(response?.booking_request) && <BookingChannel channel={bookingChannel} languageTag={props.languageTag} requested />}
+    {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
+      suppliedLabels={props.localGuideLabels} stale={guideStale || result.currentness !== "current"}
+      freshnessError={props.freshnessError} staleMessage={guideStaleMessage} />}
     <section className="room-advice" data-testid="room-advice" data-room-advice="true"
       lang={props.languageTag} dir={directionForLanguageTag(props.languageTag)} aria-label={labels.roomOptions}>
       <h2>{labels.roomOptions}</h2>

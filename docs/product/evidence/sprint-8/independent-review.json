@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "reviewer": "Q gpt-6.1-sol/high",
+  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "status": "PASS - independent offline engineering and actual-acceptance readiness; actual model UNVERIFIED",
+  "scope": "Core100-102 synthetic technical pilot; no actual model, deployment, OIDC/F03 or broader parent closure",
+  "candidate_manifest_verified": {
+    "files": 273,
+    "initial": "d608bf2f91cec28338095c19bad5264ee3901dff33e9239b8ad683a46d081965",
+    "after_two_fixes": "68dc0b6dc0216dcb268248cbfffef528921026cc444f75f8eb73152150a067db",
+    "mismatches": []
+  },
+  "independent_checks": [
+    {
+      "check": "Actual application pre-read security denial with SQL observer",
+      "result": "PASS",
+      "evidence": "/private/tmp/staylead-s8-q-preread.json",
+      "details": "Missing/guest/invalid401, wrong-property403, read-only import403; every request zero SQL, AI disabled"
+    },
+    {
+      "check": "Three actual PostgreSQL operator/guest lifecycle integration tests",
+      "result": "PASS 3 tests",
+      "evidence": "/private/tmp/staylead-s8-q-pg-escalated.log",
+      "details": "Own isolated Q DB; fake provider only. Original sandbox TCP permission failure preserved in staylead-s8-q-pg.log"
+    },
+    {
+      "check": "Four raw-fixture-derived typed preference probes through real M1 and actual consumer source binding",
+      "result": "PASS",
+      "evidence": "/private/tmp/staylead-s8-q-domain-probes.json",
+      "details": "Both1.0 sources approved, generation3; priorities differ, closed/expired excluded, sponsor disclosed and hours conflict, exact wheelchair+peanut unknowns, edit reorders fits without dropping hard needs"
+    },
+    {
+      "check": "Pinned840110 controls existing offline tests",
+      "result": "PASS 12 tests but producer→consumer defects below remain",
+      "evidence": "/private/tmp/staylead-s8-q-controls.log"
+    },
+    {
+      "check": "Final native output JSON schema positive/negative semantics",
+      "result": "PASS 7 actual Ajv cases",
+      "evidence": "/private/tmp/staylead-s8-q-native-schema.json",
+      "details": "Pure guide / guide+edit valid without unrelated profile claim; guest-state/hotel/courtesy/room mixed empty outputs rejected"
+    },
+    {
+      "check": "Final Chinese orchestration and offline acceptance controls tests",
+      "result": "PASS 14 tests",
+      "evidence": "/private/tmp/staylead-s8-q-final-focused.log",
+      "details": "After new guide-only branch; Q7 additionally verified by direct Ajv probe; final runtime delta only canonical import blank line per coordinator"
+    },
+    {
+      "check": "Exact fourth-turn browser locator on real Chromium synthetic HTML",
+      "result": "PASS",
+      "evidence": "/private/tmp/staylead-s8-q-dom.json",
+      "details": "Two same-session .turns, old Arabic card cannot satisfy current French wait; no API navigation/model"
+    },
+    {
+      "check": "Child-safety evidence remains unknown",
+      "result": "PASS",
+      "evidence": "/private/tmp/staylead-s8-q-child-safety.json",
+      "details": "Actual fixture projection returns unknown on both dining cards when child_safety_required=true"
+    },
+    {
+      "check": "Protected operator production-browser demo",
+      "result": "PASS evidence review",
+      "evidence": "docs/product/evidence/sprint-8/operator-browser-summary.json",
+      "details": "Coordinator executed actual browser→Next proxy→API→PostgreSQL, disabled provider, linked offline segments. Q viewed mobile390 and final desktop screenshots. Valid positive operator path reused across guest-policy/native-schema and negative-validator fixes; final CSS hash matches screenshot. Import/activate both/primary price refresh/secondary conflict resolve/revoke/delete, signed guest401/wrong property403; guest facts0 final. This is not a guest actual-model run."
+    }
+  ],
+  "findings": [
+    {
+      "id": "Q1",
+      "priority": "P2",
+      "owner": "A",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide.py",
+      "issue": "unknown_codes leaked from last venue into every emitted claim",
+      "reproducer": "Quiet/nature relaxed hard150k actual fixture; DIN-01/ATT-01 had no unknowns but inherited hours_unconfirmed",
+      "status": "CLOSED by per-record code ownership; independent direct repro PASS at68dc"
+    },
+    {
+      "id": "Q2",
+      "priority": "P2",
+      "owner": "A",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/registration/local_guide_pack.py",
+      "issue": "Secondary hours value validation unreachable below raise",
+      "reproducer": "Private fixture copy DIN-02 secondary value={'status':'confirmed','text':None} was accepted as129 facts",
+      "status": "CLOSED by dedenting validation; independent rejection repro PASS at68dc"
+    },
+    {
+      "id": "Q3",
+      "priority": "P1 readiness",
+      "owner": "A",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py",
+      "lines": "217-263",
+      "issue": "Native committed schema lacks local_guide response branch",
+      "reproducer": "committed_answer_output_schema(keys,refs=(),turn_intents=('local_guide','guest_edit')) yields anyOf=[]; initial party.children.count ref forces unrelated nonempty guest_claims; Chinese orchestration fake ignores native schema",
+      "expected": "A satisfiable native response for trusted local-guide domain cards without invented hotel_information or unrelated profile claim",
+      "status": "CLOSED - actual Ajv accepts pure guide/guide+edit domain-card-only output with/without guest refs; rejects empty unrelated channels. See native-schema evidence."
+    },
+    {
+      "id": "Q4",
+      "priority": "P1 readiness",
+      "owner": "A controls",
+      "file": "tools/evals/sprint8_browser.mjs",
+      "lines": "41",
+      "issue": "Browser requires authorized0/0 while runtime startup persists running0/0",
+      "expected": "Accept precise startup handoff while refusing consumed/reloaded/halting namespaces",
+      "status": "CLOSED - fresh running0/0 startup handoff accepted; consumed/invalid states rejected by focused controls tests"
+    },
+    {
+      "id": "Q5",
+      "priority": "P1 readiness",
+      "owner": "A controls",
+      "file": "tools/evals/sprint8_browser.mjs",
+      "issue": "Fourth same-session turn uses unscoped local-guide-result locator with two transcript results",
+      "expected": "Bind current fourth-turn result, not previous card; no strict-mode failure",
+      "status": "CLOSED - exact current-question .turn locator; independent actual Chromium two-turn synthetic DOM probe confirms old card cannot satisfy current wait"
+    },
+    {
+      "id": "Q6",
+      "priority": "P2 acceptance",
+      "owner": "A controls",
+      "file": "tools/evals/sprint8_browser_helpers.mjs",
+      "issue": "hardNeedsPreserved rejects reordering identical hard-need sets",
+      "reproducer": "['step_free','wheelchair_access']→['wheelchair_access','step_free'] returnsfalse",
+      "expected": "Semantic set preservation; missing/cleared need still rejected",
+      "status": "CLOSED - hard-need arrays compared without order, dropped allergy need still rejected"
+    },
+    {
+      "id": "Q7",
+      "priority": "P2 regression",
+      "owner": "A",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py",
+      "issue": "Initial guide-only native branch also allowed mixed guide+guest_state empty response",
+      "reproducer": "Actual Ajv accepted empty guest-state response only after adding local_guide intent",
+      "status": "CLOSED - branch restricted to local_guide plus optional guest_edit; independent seven-case Ajv positive/negative probe PASS"
+    }
+  ],
+  "ac_readiness": {
+    "G1": "PASS scoped synthetic typed catalog and protected preview; actual operator browser evidence reviewed, exact IDs/prices/bases/durations/source/checked/expiry/sponsor preserved",
+    "G2": "PASS 2 providers/4 directional legs with seats excluding driver, explicit unknown capacities/availability/suitability; no reverse route inference",
+    "G3": "PASS independent isolated-PG staged/activate/refresh/revoke/delete/current retrieval/replay stale409; actual operator browser lifecycle evidence reviewed",
+    "G4": "PASS independent real app composition, five deny cases with zero SQL before read; coordinator also demonstrated actual signed guest401 and wrong-property403; dev-only, no OIDC/F03 claim",
+    "L1": "PASS offline fit/source/closure/expiry/domain checks; actual model interpretation and explanation UNVERIFIED",
+    "L2": "PASS offline exact wheelchair/peanut/child-safety unknowns and verification; actual quoted model capture/specific language UNVERIFIED",
+    "L3": "PASS independent same-catalog preference outcomes and sponsored tradeoffs/prices/durations/provenance offline; actual multilingual paraphrases UNVERIFIED",
+    "L4": "PASS fake-provider M2 commit/edit→M3→domain→actual response/M6 bindings; native JSON schema and current-result DOM fixes independently verified. Actual web→model four-turn path UNVERIFIED",
+    "C1": "PASS checkpoint contracts/data/leases/synthetic scope/identity mapping/limits and inherited evidence; current authority supersedes historical issue planning-only text",
+    "C2": "PASS independent offline review/readiness, final candidate/control pins, seven findings repaired and reprobed, private oracle pinned; actual model portion pending explicit new authority",
+    "C3": "PASS local engineering/demo/readiness evidence and truthful scoped handoff; full Sprint8 Done/actual-model acceptance pending separately authorized4/8 batch. Broader parents45/46 remain open; no deployment claim"
+  },
+  "actual_model": "UNVERIFIED; no inference performed by Q, no live config/state initialized; fresh4turn8request Sol/low proposal remains unauthorized",
+  "reuse": "Coordinator reported final263 backend including3PG+2selected API/room regressions and A99 native/orchestration after Q7; prior A117/domain, C111 affected, B19/API,43web/lint/typecheck/build reused only across unchanged paths; Q independently executed checks identified above. Token usage unavailable; Q inference calls0.",
+  "operational_controls": "Sole browser controls semantic receipts. On any browser semantic failure C stops and seals runtime; no direct/manual next-turn posts, retry, reset, allowance transfer or S7 reuse. Last turn also needs Q semantic verdict before completed sealing.",
+  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+  "open_actionable_findings": [],
+  "oracle": {
+    "path": "/private/tmp/staylead-s8-q-oracle.json",
+    "sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+    "authorized_for_live_calls": false,
+    "outside_serving_context": true
+  },
+  "final_manifest_verification": {
+    "product": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+    "product_files": 273,
+    "controls": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+    "control_files": 4,
+    "product_mismatches": [],
+    "control_mismatches": [],
+    "operator_css_matches_final": true
+  },
+  "feasibility": {
+    "two_call_path": "Verified offline Chinese preparation commits typed preferences before domain call and produces committed native-schema-conforming response in second call; no extra agent/model call added",
+    "max_output_tokens": 700,
+    "compactness": "Preparation uses typed preference operations, call2 carries bounded selected IDs/facts and labels; detailed cards/source facts resolve server-side. Satisfiable native schema checked with actual Ajv.",
+    "actual_provider_adherence_latency_language": "UNVERIFIED; no output-cap increase or retry/fallback authorized; actual700-token/25s45s success must be observed in approved run."
+  },
+  "remaining_authority": "No engineering blocker remains in reviewed scope. Actual guest acceptance requires fresh explicit human4turn/max8request Sol/low approval with exact final product/control/case/oracle/data/prompt pins. Do not reuse S7, initialize state before authority, infer approval from silence, deploy, run manual CI or close broader parents.",
+  "publication_whitespace_recheck": {
+    "result": "PASS",
+    "previous_controls": "4edc84d198959b417743a41c608e4d85fa686c77b883d2131e2818c40e0bb766",
+    "final_controls": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+    "delta": "Only one extra EOF newline removed from sprint8_browser_helpers.mjs. Reconstructed prior full four-file controls digest by appending exactly that newline; matches previous pin.",
+    "product_files": 273,
+    "product_mismatches": [],
+    "control_files": 4,
+    "control_mismatches": [],
+    "semantic_retests": "Not repeated; whitespace-only proven cryptographically; no model calls."
+  }
+}

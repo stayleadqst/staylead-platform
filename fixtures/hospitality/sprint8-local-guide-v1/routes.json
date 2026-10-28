@@ -1,0 +1,6 @@
+[
+  {"route_id":"LEG-01","provider_id":"TR-01","mode":"walk","from":"HTL-S8-DEMO","to":"DIN-01","duration_minutes":10,"time_source":"synthetic checked 2026-10-28","source_id":"S8-GUIDE-PRIMARY","section":"transport/routes/LEG-01"},
+  {"route_id":"LEG-02","provider_id":"TR-01","mode":"walk","from":"DIN-01","to":"HTL-S8-DEMO","duration_minutes":12,"time_source":"synthetic checked 2026-10-28","source_id":"S8-GUIDE-PRIMARY","section":"transport/routes/LEG-02"},
+  {"route_id":"LEG-03","provider_id":"TR-02","mode":"taxi","from":"HTL-S8-DEMO","to":"ATT-01","duration_minutes":15,"time_source":"synthetic checked 2026-10-28","source_id":"S8-GUIDE-PRIMARY","section":"transport/routes/LEG-03"},
+  {"route_id":"LEG-04","provider_id":"TR-02","mode":"taxi","from":"ATT-02","to":"HTL-S8-DEMO","duration_minutes":20,"time_source":"synthetic checked 2026-10-28","source_id":"S8-GUIDE-PRIMARY","section":"transport/routes/LEG-04"}
+]

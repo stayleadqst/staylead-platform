@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "reviewer": "Q gpt-6.1-sol/high",
+  "verdict": "PASS full scoped G1–G4/L1–L4/C1–C3 technical-pilot acceptance and DoD; no open actionable core finding",
+  "candidate_commit_reported_by_coordinator": "4f73e00",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "product_files": 275,
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "harness_files": 4,
+  "oracle_sha256": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+  "case_sha256": "ce03aca2afb5313aef71c25bd8986a66c915233a950f1a9859022b363fe73ce1",
+  "original_input_matrix_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "run_id": "s8-local-guide-20261028-reacceptance1",
+  "actual_batch": {
+    "status": "COMPLETED",
+    "guest_turns": 4,
+    "requests": 8,
+    "state_sha256": "bf05af652f3c796af218b45b804470221e115b0a597ff9bb20271d123478d8b7",
+    "browser_failure": null,
+    "browser_exit": 0,
+    "API_web_stop": "Coordinator SIGTERM exit143 after all4 attempts; no further inference authorized",
+    "configured_model": "gpt-6.1-sol",
+    "configured_effort": "low",
+    "returned_model_id": "unavailable/null in actual provider traces",
+    "usage_current_batch_aggregate": {
+      "input_tokens": 95864,
+      "output_tokens": 3396
+    },
+    "per_call_usage": "unavailable; usage fields above aggregate both calls perturn",
+    "provider_latencies_ms_reported_by_coordinator": [
+      12753,
+      8997,
+      13911,
+      8270,
+      12529,
+      9659,
+      10519,
+      6482
+    ],
+    "limits": "2calls/turn,25s/call,45s wholeturn,700 configured/postcheck; native output-token guarantee unavailable/acknowledged; no retry/fallback",
+    "lifetime_Sprint8_model_requests": 10,
+    "lifetime_scope": "Original halted2 + separately authorized completed8; no additional requests byQ"
+  },
+  "turns": [
+    {
+      "case_id": "s8-01",
+      "turn": 1,
+      "verdict": "PASS independent Q + explicit root agreement",
+      "language": "zh",
+      "response_sha256": "db785b9551c31a4fe2b6dc98097c73b6b75ffe02ba9a0edd7f91e0bc451f6a10",
+      "evidence_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-01-evidence.json",
+      "evidence_sha256": "9bc084591687b4a2e2ef52ad604ea7798032ceda1523d77c93d0d783eba15806",
+      "screenshot_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-01.png",
+      "screenshot_sha256": "a5c65cfcb25aa51fa82d51aa570c3c5f4c71690015ee1020bf95cf9d7fdc90e3",
+      "Q_review": "/private/tmp/staylead-s8-q-r1-turn01-review.json",
+      "receipt_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/semantic-review-turn-01.json",
+      "receipt_sha256": "f803b574d871518a94d721c05a1380fb478138c31535d096e0b3908878b937c0",
+      "counters": {
+        "guest_turns": 1,
+        "approved_case_turn": 1,
+        "requests": 2
+      }
+    },
+    {
+      "case_id": "s8-02",
+      "turn": 2,
+      "verdict": "PASS independent Q + explicit root agreement",
+      "language": "fr",
+      "response_sha256": "224f523495c9fdbd28b470f6c77d9d0a51226adfce0eaf2c4febb263ab2c119b",
+      "evidence_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-02-evidence.json",
+      "evidence_sha256": "d0c4f99afd445698adc44aae6e4653b26d92986037c5f72f27cd51bbe6d50c69",
+      "screenshot_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-02.png",
+      "screenshot_sha256": "dc3296b6a54cb05ef2c143a91ecefa77871f9c017b0fb45a77ce8401637a3a02",
+      "Q_review": "/private/tmp/staylead-s8-q-r1-turn02-review.json",
+      "receipt_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/semantic-review-turn-02.json",
+      "receipt_sha256": "8d924d9a733da3678d3c526b66d5a8394a8ed50c9d11b2e1ae5b7ba87b2a6808",
+      "counters": {
+        "guest_turns": 2,
+        "approved_case_turn": 2,
+        "requests": 4
+      }
+    },
+    {
+      "case_id": "s8-03",
+      "turn": 3,
+      "verdict": "PASS independent Q + explicit root agreement",
+      "language": "ar",
+      "response_sha256": "b5b201c43378c9b0eb177d5b6e4ebe6d832e029732377606d090413d6019f2fa",
+      "evidence_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-03-evidence.json",
+      "evidence_sha256": "33b4687432de916382addebd7e20a94e7cfd8532f2dea47a08e0c71ecdcfa471",
+      "screenshot_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-03.png",
+      "screenshot_sha256": "38771b11b159fc9da6c64c1e12fbba7dce37fa254f78db946605f34b861d3568",
+      "Q_review": "/private/tmp/staylead-s8-q-r1-turn03-review.json",
+      "receipt_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/semantic-review-turn-03.json",
+      "receipt_sha256": "36416c514571c55a73738bcd66c7dcec10d7a83db1e1d5473651f91551a41c88",
+      "counters": {
+        "guest_turns": 3,
+        "approved_case_turn": 3,
+        "requests": 6
+      }
+    },
+    {
+      "case_id": "s8-04",
+      "turn": 4,
+      "verdict": "PASS independent Q + explicit root agreement",
+      "language": "fr",
+      "response_sha256": "56b7d131a6618da895ce0676ff2ee1f496d3eb24baf1027c0ac4301a11fbc6a3",
+      "evidence_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-04-evidence.json",
+      "evidence_sha256": "8e657ebb1176a4c45fdf006856bea3f015564f1b37a74b76551999289c4dfbf9",
+      "screenshot_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/turn-04.png",
+      "screenshot_sha256": "1b06aae7c7732a0d539cf9c971002fe3d5e9ec91c3e6354e022869f89fb250f2",
+      "Q_review": "/private/tmp/staylead-s8-q-r1-turn04-review.json",
+      "receipt_path": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/semantic-review-turn-04.json",
+      "receipt_sha256": "8c628b8790237edfc27b856f2b443d90c6735328e11c114b4740b7cf331c4b3b",
+      "counters": {
+        "guest_turns": 4,
+        "approved_case_turn": 4,
+        "requests": 8
+      }
+    }
+  ],
+  "acceptance_criteria": {
+    "G1": {
+      "verdict": "PASS synthetic technical scope",
+      "evidence": [
+        "Independent raw v1 fixture/oracle review:6 venues stable IDs/location/timezone/hours/closure/duration/price VND perperson/sponsor/source/checked/expiry and unknowns",
+        "Protected operator browser demo and actual PostgreSQL preview/import; final positive operator path unchanged across guest-label/harness-only repair"
+      ],
+      "limits": "Synthetic technical approval only; no real hotel/source approval claim"
+    },
+    "G2": {
+      "verdict": "PASS",
+      "evidence": [
+        "Exactly2 providers and4 directional route legs independently checked through typed pack/operator preview",
+        "TR01 seats3 excludingdriver/luggage2, child-seat/access/availability unknown; TR02 seats6 excludingdriver/luggageunknown/child-seat supported/accessunsupported/availabilityunknown",
+        "Directions and durations10/12/15/20 remain distinct; missing reverse directions not invented"
+      ],
+      "scope": "Guide records/preview only; no D02 transport advisory completion"
+    },
+    "G3": {
+      "verdict": "PASS",
+      "evidence": [
+        "Independent isolated-Q-DB3 PostgreSQL integration cases verify staged zero guest facts, activation, primary price100000→110000 refresh, revoke/delete visibility, saved old response retains100000, replay409 stale_source/freshnessstale with0additional provider calls",
+        "Actual protected operator browser demo:both activation, primary refresh, secondary conflict resolution, primary revoke/secondary delete; final guestfacts0",
+        "ExpiredATT03 absent current guest projection; closedDIN03 absent final actual recommendations; approved v1 current source hashes/generation3 unchanged throughout actualr1"
+      ]
+    },
+    "G4": {
+      "verdict": "PASS development-only",
+      "evidence": [
+        "Q actual app composition with SQL observer:missing/guest/invalid401, wrong-property403, read-only import403, every denial zeroSQL before service/read",
+        "C actual signed-guest401/wrongproperty403 browser/direct API evidence; operator mapping server-derived; credentials unavailable outside dev/test by existing checked settings"
+      ],
+      "limits": "No productionOIDC/F03 claim"
+    },
+    "L1": {
+      "verdict": "PASS actual + offline",
+      "evidence": [
+        "Actual A Chinese commits quiet/nature/relaxed hard150000VND/person before dependent domain result; Garden/Lotus lead, Museum optional, sponsoredDIN02 hardbudgetexcluded",
+        "Actual B French culture/social/indoor300000VND/person uses exact same catalog; Museum/RiverTable lead, actual fits and tradeoffs follow preferences",
+        "All4 real outputs carry approved exact source hashes/IDs/version1.0/gen3; closedDIN03 and expiredATT03 never finalavailable recommendations; no model-memory venue facts or invented routes/availability"
+      ]
+    },
+    "L2": {
+      "verdict": "PASS actual + offline child safety",
+      "evidence": [
+        "Actual mixedArabic C saves exact peanut allergy + step_free + wheelchair_access hard needs without room/dates/age/profile prerequisite; both diningUNKNOWN despite DIN01 entry-only evidence",
+        "Access feature, ingredients/allergen cross-contact, and applicable hours verification rendered; no safe/suitable certification or sponsor override",
+        "Independent offline actual-fixture child_safety_required probe givesUNKNOWN for both dining with child_safety_unconfirmed; specific unsupported-capability and knownunsupported exclusion tests retained"
+      ]
+    },
+    "L3": {
+      "verdict": "PASS actual",
+      "evidence": [
+        "Actual different priorities A/B on same v1 catalog produce independently expected different top fits; exact prices/bases/durations/names/IDs preserved",
+        "Sponsored RiverTable clearly disclosed with unresolved hours/source conflict and concrete verification in French/Arabic",
+        "Chinese/French/Arabic core20 labels have labels_fallback=false; reviewed domain labels rendered; dynamic synonymous language judged semantically rather than rigid translation literals"
+      ]
+    },
+    "L4": {
+      "verdict": "PASS actual M6→API→M3/M2→M5/domain→M6",
+      "evidence": [
+        "Four actual browser turns, each2provider calls, three fresh sessions; actual READ ONLY DB confirms4completedrequests/3briefs/4receipts/4exactcurrent sourceutterances/8messages/0roomresults",
+        "Cases3/4 actual sameCsession aad02bde-897e-4b4b-a34d-98351b533122; M2version1→2 deltaONLY interests quiet→social, exactpeanut/step_free/wheelchair_access/dining retained; Frenchpreference revision2",
+        "Final RiverTable becomes top social candidate while both remainUNKNOWN with exactverification/prices/sponsor/source evidence unchanged; no room selection/booking action",
+        "Mobile390 screenshot + current guide DOM langar/dirrtl thenfr/ltr observed; current exact-question card binding verified; generic inherited booking/receipt copy not a new prerequisite or action",
+        "Unchanged stale-source/replay invalidation and stale-card renderer tests reused from current candidate-bound offline checks"
+      ],
+      "observation_limit": "Screenshots show viewport/scroll-container top, not every scrolled card; complete current guide DOM/lang/dir/unknowns is captured. No full-scrolled-guide screenshot claim"
+    },
+    "C1": {
+      "verdict": "PASS",
+      "evidence": [
+        "Execution checkpoint records pre-dependent typed contracts, data/fixture/identity mapping, source limits, file leases/owners, inherited dependency evidence and synthetic scope",
+        "No R0/R1/R2 gates restored; core100–102 only, no stretch47/48/53/infra/deploy scope expansion"
+      ]
+    },
+    "C2": {
+      "verdict": "PASS",
+      "evidence": [
+        "Independent candidate/control/oracle pins verified before and after actual run; all275+4 hashes stable",
+        "Initial7Q findings repaired/reprobed; later lexical oracle false-negative and distinct cold-cache core-label omission diagnosed/repaired offline with original failure preserved",
+        "New exact facts/M2/source oracle25d927... pinned before fresh explicit human4/8 authority; every turn evidencehash/screenshot examined, independent Q verdict + root agreement before receipt includingfinal4"
+      ]
+    },
+    "C3": {
+      "verdict": "PASS scoped engineering/acceptance handoff",
+      "evidence": [
+        "Actual protected operator lifecycle demo plus new actual4turn guest acceptance completed; all4 semantic receipts; CsealedCOMPLETED4/8 statebf05... after finalQPASS",
+        "Truthful separation:original batch remainsHALTED1/2 sealed9919..., unused3/6CLOSED; newbatch separately authorized/completed, no retry/reset/allowance transfer",
+        "Local relevant tests/lint/compile/build reviewed/reused; no manually triggeredCI or CIwaitgate; ownPR publication/merge remain C delivery actions"
+      ],
+      "delivery_state": "Reviewed actual acceptance complete on candidate71db.../commit4f73e00 as identified by coordinator. Final evidence publication and ownPR103 merge not claimed executed byQ; no deployment or broader parent completion"
+    }
+  },
+  "definition_of_done": {
+    "candidate_bound_expected_observed": "PASS retained independent original-fixture oraclev2 + per-turn actual body/render/source/counter/screenshot hashes",
+    "producer_consumer_and_negatives": "PASS operator→M1→guest and real M2 commit→M3→domain→M6; auth/source/scope/closure/expiry/sponsor/specific need/edits and affected regressions",
+    "local_quality_gates": "Creported121repair-relevant+15controls/canonicalRuff/compile/JSsyntax/diffPASS; unchanged web43contracts/lint/typecheck/build and other relevant earlier passed suites reused. Q independently executed ownDB source3PG, repaired label6contracts/PG, native schema probes, focused controls/DOM/unknown probes and every actual semantic review. No unrelated reruns.",
+    "independent_review_and_demo": "PASS",
+    "permissions_scope": "PASS no secrets publication, no deploy/manualCI/protection bypass/new paidresources/S7reuse/broader parent close",
+    "remaining_engineering_blocker": "None evidenced in reviewed core scope"
+  },
+  "preserved_original_failure": {
+    "run_id": "s8-local-guide-20261028-acceptance",
+    "status": "HALTED1guest/2requests, unused3/6CLOSED",
+    "state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+    "oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+    "diagnosis": "Overly exact Q Chinese literal false-negative plus separately traced cold-cache generic-label product regression; no retroactive PASS/resume"
+  },
+  "evidence_refs": {
+    "operator_public_summary": "/Users/ccvn/Documents/project/Staylead/github/staylead-platform/docs/product/evidence/sprint-8/operator-browser-summary.json",
+    "prior_offline_Q_report": "/private/tmp/staylead-s8-q-review.json",
+    "repair_readiness_report": "/private/tmp/staylead-s8-q-reacceptance1-readiness.json",
+    "r1_preflight": "/private/tmp/staylead-s8-q-r1-preflight.json",
+    "actual_readonly_DB": "/private/tmp/staylead-s8-q-r1-final-db.json",
+    "actual_readonly_DB_summary": "/private/tmp/staylead-s8-q-r1-final-db-summary.json",
+    "browser_index": "/private/tmp/staylead-s8-browser-s8-local-guide-20261028-reacceptance1-r1/browser-report.json"
+  },
+  "scope_limits": [
+    "Synthetic technical pilot, oneproperty6venues2providers4directionallegs; no real hotel approval",
+    "No productionOIDC/F03, transportadvisoryD02/fullitineraryD03/D08/booking/payment/liveinventory/maps/weather/deployment claim",
+    "Reviewed pilot zh/fr/ar path accepted; unreviewed locale dynamic-domain/corefallback unchanged, no all-language shell localization/fullparent26 claim",
+    "Baseline optional unconfigured booking card and literal receipt/profile copy observed; no new booking request/action or blocking full-profile prerequisite"
+  ],
+  "Q_actions": "No candidate edits, API/model calls or actual DB writes. Actual DB inspection used explicit READ ONLY transaction; wrote only private Q reports and authorized semantic receipts. C owns sealing/delivery.",
+  "Q_token_usage": "unavailable",
+  "next_authorized_delivery": "C publish sanitized final evidence/status and ready/merge ownPR103 into designated Sprint5 base when GitHub permits; preserve requiredchecks and reportexactblocker if any; do not close broader45/46/parents or deploy."
+}

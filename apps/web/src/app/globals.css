@@ -108,3 +108,51 @@ body {
   .composer-row { align-items: stretch; flex-direction: column; }
   .send-button { min-height: 48px; }
 }
+.operator-page {
+  width: min(100% - 2rem, 58rem);
+  max-width: 100%;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  color: #1c2522;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.operator-page > * { min-width: 0; max-width: 100%; }
+.operator-page h1, .operator-page h2, .operator-page p { margin: 0; }
+.operator-kicker { color: #53645e; font-size: .875rem; }
+.operator-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: .4rem; font-weight: 600; min-width: 0; max-width: 100%; }
+.operator-field input, .operator-field select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid #98aaa2;
+  border-radius: .4rem;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+.operator-actions { display: flex; flex-wrap: wrap; gap: .65rem; }
+.operator-page button {
+  min-height: 2.65rem;
+  padding: .55rem .9rem;
+  border: 1px solid #64776f;
+  border-radius: .4rem;
+  background: #f4f7f5;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.operator-page button:disabled { cursor: not-allowed; opacity: .55; }
+.operator-page section { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; padding: 1rem; border: 1px solid #d3ddd8; border-radius: .6rem; min-width: 0; max-width: 100%; box-sizing: border-box; }
+.operator-page pre { min-width: 0; max-width: 100%; max-height: 28rem; overflow: auto; white-space: pre; }
+.operator-clear { justify-self: start; }
+.local-guide-result { max-width: min(100%, 680px); margin: 12px 0; padding: 16px; border: 1px solid #dce6dd; border-radius: 14px; background: #fbfcfa; color: #26372d; }
+.local-guide-result h2 { margin: 0 0 8px; font-size: 19px; }
+.local-guide-venue { margin-top: 12px; padding: 12px; border: 1px solid #e0e8e1; border-radius: 10px; background: #fff; }
+.local-guide-venue h3 { margin: 0 0 8px; }
+.local-guide-venue p { margin: 6px 0; }

@@ -1,7 +1,11 @@
 """Environment-backed settings; loading configuration does not open external connections."""
 
-from pydantic import Field, SecretStr
+import hmac
+
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from staylead_platform.infrastructure.identity.operator import DevOperatorCredential
 
 
 class Settings(BaseSettings):
@@ -12,6 +16,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://staylead:change-me@localhost:5432/staylead"
     ai_provider: str = "disabled"
     session_signing_secret: SecretStr | None = None
+    # Explicit server-only dev/test credentials. There is deliberately no public default.
+    dev_operator_credentials: list[DevOperatorCredential] = Field(default_factory=list, repr=False)
     fixture_root: str | None = None
     ai_timeout_seconds: float = 25.0
     ai_turn_timeout_seconds: float = 45.0
@@ -34,3 +40,13 @@ class Settings(BaseSettings):
         default="",
         validation_alias="AZURE_OPENAI_MODEL_DEPLOYMENT",
     )
+
+    @model_validator(mode="after")
+    def disable_dev_operator_credentials_outside_dev(self) -> "Settings":
+        if self.dev_operator_credentials and self.environment.lower() not in {"development", "test"}:
+            raise ValueError("Development operator credentials are unavailable outside development and test.")
+        token_values = [item.token.get_secret_value().encode("utf-8") for item in self.dev_operator_credentials]
+        for index, token in enumerate(token_values):
+            if any(hmac.compare_digest(token, other) for other in token_values[index + 1:]):
+                raise ValueError("Development operator credentials must use distinct bearer tokens.")
+        return self

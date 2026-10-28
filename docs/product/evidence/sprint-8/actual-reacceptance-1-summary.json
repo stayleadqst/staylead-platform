@@ -1,0 +1,826 @@
+{
+  "classification": "Actual approved synthetic technical pilot: all4turns independentlyQ/rootPASS; COMPLETED_SEALED4/8",
+  "run_id": "s8-local-guide-20261028-reacceptance1",
+  "candidate_commit": "4f73e00203571a2f6f1eb6fa8059978b9a2def2a",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "approved_proposed_case_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "derived_live_case_sha256": "ce03aca2afb5313aef71c25bd8986a66c915233a950f1a9859022b363fe73ce1",
+  "oracle_sha256": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+  "actual_turns": 4,
+  "actual_provider_requests": 8,
+  "retries": 0,
+  "fallback": false,
+  "usage_aggregate": {
+    "input_tokens": 95864,
+    "output_tokens": 3396
+  },
+  "per_call_usage": "unavailable",
+  "native_output_token_limit": false,
+  "provider_event_latencies_ms": [
+    12753,
+    8997,
+    13911,
+    8270,
+    12529,
+    9659,
+    10519,
+    6482
+  ],
+  "source_baseline": "PRIMARY1.0+SECONDARY1.0 approved generation3 exactoraclehashes throughout",
+  "session_verification": {
+    "fresh_sessions": 3,
+    "same_C_turn3_to_turn4": true,
+    "requests": 4,
+    "messages": 8,
+    "briefs": 3,
+    "receipts": 4,
+    "source_utterances": 4
+  },
+  "private_database_capture_sha256": "d337607bb62323d83c909e52da35a05845d0c2cb4376312299467d82fa07485b",
+  "turns": [
+    {
+      "case_id": "s8-01",
+      "turn": 1,
+      "locale": "zh",
+      "counter_snapshot": {
+        "guest_turns": 1,
+        "approved_case_turn": 1,
+        "requests": 2
+      },
+      "browser_verdict": {
+        "ok": true,
+        "venue_ids": [
+          "ATT-02",
+          "DIN-01",
+          "ATT-01"
+        ],
+        "source_ids": [
+          "S8-GUIDE-PRIMARY"
+        ]
+      },
+      "response_sha256": "db785b9551c31a4fe2b6dc98097c73b6b75ffe02ba9a0edd7f91e0bc451f6a10",
+      "private_evidence_sha256": "9bc084591687b4a2e2ef52ad604ea7798032ceda1523d77c93d0d783eba15806",
+      "private_screenshot_sha256": "a5c65cfcb25aa51fa82d51aa570c3c5f4c71690015ee1020bf95cf9d7fdc90e3",
+      "guest_brief": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": null,
+          "check_out": null,
+          "nights": null
+        },
+        "party": {
+          "adults": null,
+          "children": []
+        },
+        "local_guide_preferences": {
+          "interests": [
+            "quiet",
+            "nature"
+          ],
+          "budget_currency": "VND",
+          "budget_amount": 150000,
+          "budget_basis": "per_person",
+          "venue_kinds": [
+            "dining",
+            "attraction"
+          ],
+          "budget_strength": "hard",
+          "pace": "relaxed"
+        },
+        "pending_fields": []
+      },
+      "applied_delta": {
+        "local_guide_preferences": {
+          "interests": [
+            "quiet",
+            "nature"
+          ],
+          "budget_currency": "VND",
+          "budget_amount": 150000,
+          "budget_basis": "per_person",
+          "venue_kinds": [
+            "dining",
+            "attraction"
+          ],
+          "budget_strength": "hard",
+          "pace": "relaxed"
+        }
+      },
+      "presentation_language": "zh",
+      "presentation_direction": "ltr",
+      "core_labels_fallback": false,
+      "selected_venue_ids": [
+        "ATT-02",
+        "DIN-01",
+        "ATT-01"
+      ],
+      "claims": [
+        {
+          "venue_id": "ATT-02",
+          "name": "Riverside Garden",
+          "kind": "attraction",
+          "fit_status": "fit",
+          "reason_codes": [
+            "interest:nature",
+            "interest:quiet"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 0,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 45,
+          "hours_status": "unknown",
+          "conflict_fields": [],
+          "unknowns": [
+            "Hours are unknown or conflicted; confirm current hours before visiting."
+          ],
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "请向场所确认当前营业时间。"
+          ]
+        },
+        {
+          "venue_id": "DIN-01",
+          "name": "Lotus Noodle",
+          "kind": "dining",
+          "fit_status": "fit",
+          "reason_codes": [
+            "interest:quiet"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 100000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 45,
+          "hours_status": "confirmed",
+          "conflict_fields": [],
+          "unknowns": [],
+          "unknown_codes": [],
+          "localized_unknowns": []
+        },
+        {
+          "venue_id": "ATT-01",
+          "name": "Craft Museum",
+          "kind": "attraction",
+          "fit_status": "fit",
+          "reason_codes": [
+            "available_catalog_match"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 120000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 90,
+          "hours_status": "confirmed",
+          "conflict_fields": [],
+          "unknowns": [],
+          "unknown_codes": [],
+          "localized_unknowns": []
+        }
+      ],
+      "sources": [
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "已批准",
+          "bound_fact_count": 45
+        }
+      ],
+      "rendered_current_guide": {
+        "lang": "zh",
+        "dir": "ltr",
+        "text": "当地推荐\nRiverside Garden\n\nattraction · ATT-02\n\n可能合适\n\n推荐原因: 自然, 安静\n\n游览时长: 45\n\n营业时间状态: 需要确认\n\n请向场所确认当前营业时间。\n\n0 VND / 每人\n\nLotus Noodle\n\ndining · DIN-01\n\n可能合适\n\n推荐原因: 安静\n\n游览时长: 45\n\n100,000 VND / 每人\n\nCraft Museum\n\nattraction · ATT-01\n\n可能合适\n\n推荐原因: 可能合适\n\n游览时长: 90\n\n120,000 VND / 每人\n\n需要确认 (1)\n信息来源 (1)\n\n技术试点的合成信息。"
+      },
+      "provider_calls": 2,
+      "usage_two_calls": {
+        "input_tokens": 24134,
+        "output_tokens": 894,
+        "total_tokens": null
+      },
+      "returned_model_identifier": null,
+      "requested_deployment": "gpt-6.1-sol"
+    },
+    {
+      "case_id": "s8-02",
+      "turn": 2,
+      "locale": "fr",
+      "counter_snapshot": {
+        "guest_turns": 2,
+        "approved_case_turn": 2,
+        "requests": 4
+      },
+      "browser_verdict": {
+        "ok": true,
+        "venue_ids": [
+          "ATT-01",
+          "DIN-02",
+          "ATT-02"
+        ],
+        "source_ids": [
+          "S8-GUIDE-PRIMARY",
+          "S8-GUIDE-SECONDARY"
+        ]
+      },
+      "response_sha256": "224f523495c9fdbd28b470f6c77d9d0a51226adfce0eaf2c4febb263ab2c119b",
+      "private_evidence_sha256": "d0c4f99afd445698adc44aae6e4653b26d92986037c5f72f27cd51bbe6d50c69",
+      "private_screenshot_sha256": "dc3296b6a54cb05ef2c143a91ecefa77871f9c017b0fb45a77ce8401637a3a02",
+      "guest_brief": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": null,
+          "check_out": null,
+          "nights": null
+        },
+        "party": {
+          "adults": null,
+          "children": []
+        },
+        "local_guide_preferences": {
+          "interests": [
+            "culture",
+            "social",
+            "indoor"
+          ],
+          "budget_currency": "VND",
+          "budget_amount": 300000,
+          "budget_basis": "per_person",
+          "venue_kinds": [
+            "dining",
+            "attraction"
+          ]
+        },
+        "pending_fields": [
+          "local_guide_preferences.budget_strength"
+        ]
+      },
+      "applied_delta": {
+        "local_guide_preferences": {
+          "interests": [
+            "culture",
+            "social",
+            "indoor"
+          ],
+          "budget_currency": "VND",
+          "budget_amount": 300000,
+          "budget_basis": "per_person",
+          "venue_kinds": [
+            "dining",
+            "attraction"
+          ]
+        }
+      },
+      "presentation_language": "fr",
+      "presentation_direction": "ltr",
+      "core_labels_fallback": false,
+      "selected_venue_ids": [
+        "ATT-01",
+        "DIN-02",
+        "ATT-02"
+      ],
+      "claims": [
+        {
+          "venue_id": "ATT-01",
+          "name": "Craft Museum",
+          "kind": "attraction",
+          "fit_status": "fit",
+          "reason_codes": [
+            "interest:culture",
+            "interest:indoor"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 120000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 90,
+          "hours_status": "confirmed",
+          "conflict_fields": [],
+          "unknowns": [],
+          "unknown_codes": [],
+          "localized_unknowns": []
+        },
+        {
+          "venue_id": "DIN-02",
+          "name": "River Table",
+          "kind": "dining",
+          "fit_status": "fit",
+          "reason_codes": [
+            "interest:culture",
+            "interest:social"
+          ],
+          "tradeoff_codes": [
+            "sponsored_disclosed"
+          ],
+          "sponsored": true,
+          "sponsor_label": "Sponsored listing",
+          "price": {
+            "amount": 300000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 75,
+          "hours_status": "conflict",
+          "conflict_fields": [
+            "hours"
+          ],
+          "unknowns": [
+            "Hours are unknown or conflicted; confirm current hours before visiting."
+          ],
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "Confirmez les horaires d'ouverture actuels auprès du lieu."
+          ]
+        },
+        {
+          "venue_id": "ATT-02",
+          "name": "Riverside Garden",
+          "kind": "attraction",
+          "fit_status": "fit",
+          "reason_codes": [
+            "available_catalog_match"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 0,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 45,
+          "hours_status": "unknown",
+          "conflict_fields": [],
+          "unknowns": [
+            "Hours are unknown or conflicted; confirm current hours before visiting."
+          ],
+          "unknown_codes": [
+            "hours_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "Confirmez les horaires d'ouverture actuels auprès du lieu."
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "Approuvé",
+          "bound_fact_count": 45
+        },
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "Approuvé",
+          "bound_fact_count": 1
+        }
+      ],
+      "rendered_current_guide": {
+        "lang": "fr",
+        "dir": "ltr",
+        "text": "Suggestions locales\nCraft Museum\n\nattraction · ATT-01\n\nCorrespondance possible\n\nPourquoi cette suggestion: Culture, En intérieur\n\nDurée de visite: 90\n\n120 000 VND / par personne\n\nRiver Table\n\ndining · DIN-02\n\nCorrespondance possible\n\nPourquoi cette suggestion: Culture, Vie sociale\n\nSponsorisé · Sponsored listing\n\nDurée de visite: 75\n\nÉtat des horaires: Conflits entre sources\n\nConflits entre sources\n\nConfirmez les horaires d'ouverture actuels auprès du lieu.\n\n300 000 VND / par personne\n\nRiverside Garden\n\nattraction · ATT-02\n\nCorrespondance possible\n\nPourquoi cette suggestion: Correspondance possible\n\nDurée de visite: 45\n\nÉtat des horaires: À confirmer\n\nConfirmez les horaires d'ouverture actuels auprès du lieu.\n\n0 VND / par personne\n\nÀ confirmer (1)\nConflits entre sources (1)\nSources (2)\n\nInformations synthétiques du pilote technique."
+      },
+      "provider_calls": 2,
+      "usage_two_calls": {
+        "input_tokens": 24227,
+        "output_tokens": 940,
+        "total_tokens": null
+      },
+      "returned_model_identifier": null,
+      "requested_deployment": "gpt-6.1-sol"
+    },
+    {
+      "case_id": "s8-03",
+      "turn": 3,
+      "locale": "ar",
+      "counter_snapshot": {
+        "guest_turns": 3,
+        "approved_case_turn": 3,
+        "requests": 6
+      },
+      "browser_verdict": {
+        "ok": true,
+        "venue_ids": [
+          "DIN-01",
+          "DIN-02"
+        ],
+        "source_ids": [
+          "S8-GUIDE-PRIMARY",
+          "S8-GUIDE-SECONDARY"
+        ]
+      },
+      "response_sha256": "b5b201c43378c9b0eb177d5b6e4ebe6d832e029732377606d090413d6019f2fa",
+      "private_evidence_sha256": "33b4687432de916382addebd7e20a94e7cfd8532f2dea47a08e0c71ecdcfa471",
+      "private_screenshot_sha256": "38771b11b159fc9da6c64c1e12fbba7dce37fa254f78db946605f34b861d3568",
+      "guest_brief": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": null,
+          "check_out": null,
+          "nights": null
+        },
+        "party": {
+          "adults": null,
+          "children": []
+        },
+        "local_guide_preferences": {
+          "interests": [
+            "quiet"
+          ],
+          "allergy_requirements": [
+            "peanut"
+          ],
+          "hard_accessibility_needs": [
+            "step_free",
+            "wheelchair_access"
+          ],
+          "venue_kinds": [
+            "dining"
+          ]
+        },
+        "pending_fields": []
+      },
+      "applied_delta": {
+        "local_guide_preferences": {
+          "interests": [
+            "quiet"
+          ],
+          "allergy_requirements": [
+            "peanut"
+          ],
+          "hard_accessibility_needs": [
+            "step_free",
+            "wheelchair_access"
+          ],
+          "venue_kinds": [
+            "dining"
+          ]
+        }
+      },
+      "presentation_language": "ar",
+      "presentation_direction": "rtl",
+      "core_labels_fallback": false,
+      "selected_venue_ids": [
+        "DIN-01",
+        "DIN-02"
+      ],
+      "claims": [
+        {
+          "venue_id": "DIN-01",
+          "name": "Lotus Noodle",
+          "kind": "dining",
+          "fit_status": "unknown",
+          "reason_codes": [
+            "interest:quiet"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 100000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 45,
+          "hours_status": "confirmed",
+          "conflict_fields": [],
+          "unknowns": [
+            "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+            "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue."
+          ],
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "يرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.",
+            "يرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان."
+          ]
+        },
+        {
+          "venue_id": "DIN-02",
+          "name": "River Table",
+          "kind": "dining",
+          "fit_status": "unknown",
+          "reason_codes": [
+            "available_catalog_match"
+          ],
+          "tradeoff_codes": [
+            "sponsored_disclosed"
+          ],
+          "sponsored": true,
+          "sponsor_label": "Sponsored listing",
+          "price": {
+            "amount": 300000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 75,
+          "hours_status": "conflict",
+          "conflict_fields": [
+            "hours"
+          ],
+          "unknowns": [
+            "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+            "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+            "Hours are unknown or conflicted; confirm current hours before visiting."
+          ],
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "يرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.",
+            "يرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان.",
+            "يرجى تأكيد ساعات العمل الحالية مع المكان."
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "معتمد",
+          "bound_fact_count": 30
+        },
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "معتمد",
+          "bound_fact_count": 1
+        }
+      ],
+      "rendered_current_guide": {
+        "lang": "ar",
+        "dir": "rtl",
+        "text": "اقتراحات محلية\nLotus Noodle\n\ndining · DIN-01\n\nلم يتم التحقق من متطلب أساسي\n\nسبب ملاءمة الاقتراح: هادئ\n\nمدة الزيارة: 45\n\nيرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.\nيرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان.\n\n100,000 VND / للشخص الواحد\n\nRiver Table\n\ndining · DIN-02\n\nلم يتم التحقق من متطلب أساسي\n\nسبب ملاءمة الاقتراح: قد يكون مناسباً\n\nبرعاية · Sponsored listing\n\nمدة الزيارة: 75\n\nحالة ساعات العمل: تعارض المصادر\n\nتعارض المصادر\n\nيرجى تأكيد ميزة سهولة الوصول المطلوبة مع المكان.\nيرجى تأكيد المكونات ومخاطر التلامس التحسسي مع المكان.\nيرجى تأكيد ساعات العمل الحالية مع المكان.\n\n300,000 VND / للشخص الواحد\n\nبحاجة إلى تأكيد (3)\nتعارض المصادر (1)\nسجلات المصادر (2)\n\nمعلومات اصطناعية للتجربة التقنية."
+      },
+      "provider_calls": 2,
+      "usage_two_calls": {
+        "input_tokens": 23875,
+        "output_tokens": 917,
+        "total_tokens": null
+      },
+      "returned_model_identifier": null,
+      "requested_deployment": "gpt-6.1-sol"
+    },
+    {
+      "case_id": "s8-04",
+      "turn": 4,
+      "locale": "fr",
+      "counter_snapshot": {
+        "guest_turns": 4,
+        "approved_case_turn": 4,
+        "requests": 8
+      },
+      "browser_verdict": {
+        "ok": true,
+        "venue_ids": [
+          "DIN-02",
+          "DIN-01"
+        ],
+        "source_ids": [
+          "S8-GUIDE-PRIMARY",
+          "S8-GUIDE-SECONDARY"
+        ]
+      },
+      "response_sha256": "56b7d131a6618da895ce0676ff2ee1f496d3eb24baf1027c0ac4301a11fbc6a3",
+      "private_evidence_sha256": "8e657ebb1176a4c45fdf006856bea3f015564f1b37a74b76551999289c4dfbf9",
+      "private_screenshot_sha256": "1b06aae7c7732a0d539cf9c971002fe3d5e9ec91c3e6354e022869f89fb250f2",
+      "guest_brief": {
+        "brief_version": 2,
+        "dates": {
+          "check_in": null,
+          "check_out": null,
+          "nights": null
+        },
+        "party": {
+          "adults": null,
+          "children": []
+        },
+        "local_guide_preferences": {
+          "interests": [
+            "social"
+          ],
+          "allergy_requirements": [
+            "peanut"
+          ],
+          "hard_accessibility_needs": [
+            "step_free",
+            "wheelchair_access"
+          ],
+          "venue_kinds": [
+            "dining"
+          ]
+        },
+        "pending_fields": []
+      },
+      "applied_delta": {
+        "local_guide_preferences": {
+          "interests": [
+            "social"
+          ]
+        }
+      },
+      "presentation_language": "fr",
+      "presentation_direction": "ltr",
+      "core_labels_fallback": false,
+      "selected_venue_ids": [
+        "DIN-02",
+        "DIN-01"
+      ],
+      "claims": [
+        {
+          "venue_id": "DIN-02",
+          "name": "River Table",
+          "kind": "dining",
+          "fit_status": "unknown",
+          "reason_codes": [
+            "interest:social"
+          ],
+          "tradeoff_codes": [
+            "sponsored_disclosed"
+          ],
+          "sponsored": true,
+          "sponsor_label": "Sponsored listing",
+          "price": {
+            "amount": 300000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 75,
+          "hours_status": "conflict",
+          "conflict_fields": [
+            "hours"
+          ],
+          "unknowns": [
+            "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+            "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue.",
+            "Hours are unknown or conflicted; confirm current hours before visiting."
+          ],
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed",
+            "hours_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "Confirmez l'aménagement d'accessibilité précis auprès du lieu.",
+            "Confirmez les ingrédients et les risques de contamination croisée auprès du lieu.",
+            "Confirmez les horaires d'ouverture actuels auprès du lieu."
+          ]
+        },
+        {
+          "venue_id": "DIN-01",
+          "name": "Lotus Noodle",
+          "kind": "dining",
+          "fit_status": "unknown",
+          "reason_codes": [
+            "available_catalog_match"
+          ],
+          "tradeoff_codes": [],
+          "sponsored": false,
+          "sponsor_label": null,
+          "price": {
+            "amount": 100000,
+            "currency": "VND",
+            "basis": "per_person"
+          },
+          "duration_minutes": 45,
+          "hours_status": "confirmed",
+          "conflict_fields": [],
+          "unknowns": [
+            "The specific accessibility capability is not confirmed; verify the requested access feature before visiting.",
+            "Allergen-specific cross-contact controls are not confirmed; verify ingredients and controls with the venue."
+          ],
+          "unknown_codes": [
+            "accessibility_unconfirmed",
+            "allergy_unconfirmed"
+          ],
+          "localized_unknowns": [
+            "Confirmez l'aménagement d'accessibilité précis auprès du lieu.",
+            "Confirmez les ingrédients et les risques de contamination croisée auprès du lieu."
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-PRIMARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "b3a5f89e7e92acc527a6b8a73d5c1c017228ee8e93c1db0056a7acd2d3f68963",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "Approuvé",
+          "bound_fact_count": 30
+        },
+        {
+          "hotel_id": "HTL-S8-DEMO",
+          "source_id": "S8-GUIDE-SECONDARY",
+          "source_generation": 3,
+          "source_version": "1.0",
+          "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+          "status": "approved",
+          "guest_approved": true,
+          "valid_from": "2026-01-01",
+          "valid_to": "2027-03-31",
+          "localized_status": "Approuvé",
+          "bound_fact_count": 1
+        }
+      ],
+      "rendered_current_guide": {
+        "lang": "fr",
+        "dir": "ltr",
+        "text": "Suggestions locales\nRiver Table\n\ndining · DIN-02\n\nBesoin requis non vérifié\n\nPourquoi cette suggestion: Vie sociale\n\nSponsorisé · Sponsored listing\n\nDurée de visite: 75\n\nÉtat des horaires: Conflits entre sources\n\nConflits entre sources\n\nConfirmez l'aménagement d'accessibilité précis auprès du lieu.\nConfirmez les ingrédients et les risques de contamination croisée auprès du lieu.\nConfirmez les horaires d'ouverture actuels auprès du lieu.\n\n300 000 VND / par personne\n\nLotus Noodle\n\ndining · DIN-01\n\nBesoin requis non vérifié\n\nPourquoi cette suggestion: Correspondance possible\n\nDurée de visite: 45\n\nConfirmez l'aménagement d'accessibilité précis auprès du lieu.\nConfirmez les ingrédients et les risques de contamination croisée auprès du lieu.\n\n100 000 VND / par personne\n\nÀ confirmer (3)\nConflits entre sources (1)\nSources (2)\n\nInformations synthétiques du pilote technique."
+      },
+      "provider_calls": 2,
+      "usage_two_calls": {
+        "input_tokens": 23628,
+        "output_tokens": 645,
+        "total_tokens": null
+      },
+      "returned_model_identifier": null,
+      "requested_deployment": "gpt-6.1-sol"
+    }
+  ],
+  "limits": "Approved4/8; max2calls/turn,25s/call,45s/turn,700output CLIpostcheck; no retry/fallback; stopfirstblockingfailure",
+  "actual_model_identity": "Requested gpt-6.1-sol/low viaCLI; trace deploymentgpt-6.1-sol, returned model identifier unavailable",
+  "mobile_rtl_observation": "Actual390wide screenshots turns3/4; currentguideDOM ar/rtl→fr/ltr; lowerguide lies in scrollabletranscript, no claim of fullscrolledguide screenshot",
+  "prior_batch": "HALTED1/2 unused3/6CLOSED preservedstate991978...; no retrospectivePASS/reuse/S7allowance",
+  "status": "COMPLETED_SEALED",
+  "sealed_state_sha256": "bf05af652f3c796af218b45b804470221e115b0a597ff9bb20271d123478d8b7",
+  "remaining_live_authority": false,
+  "services": {
+    "browser": "exit0",
+    "API": "exit143 stopped",
+    "web": "exit143 stopped",
+    "postgres": "stopped cleanly after Qfinalreadonly"
+  },
+  "scope": "Core#100-102 synthetic technical pilot only; no realhotelapproval/OIDC/deploy/broaderparentclosure",
+  "total_sprint8_actual_usage": {
+    "guest_turns": 5,
+    "provider_requests": 10,
+    "input_tokens": 120318,
+    "output_tokens": 4411,
+    "batches": "originalHALTED1/2 + newlyapprovedCOMPLETED4/8; no reset/transfer/retry/S7reuse"
+  },
+  "independent_integrated_verdict": "PASS full scopedG1-G4/L1-L4/C1-C3 andDoD; independent-final-review.json"
+}
