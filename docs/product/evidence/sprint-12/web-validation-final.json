@@ -1,0 +1,91 @@
+{
+  "handoff_version": 1,
+  "worker": "B / transport_builder",
+  "sprint": 12,
+  "story": "B11 frontend guest session deletion and expiry cache invalidation",
+  "scope": "Frontend only; no backend files changed by B. D02 not selected.",
+  "review_finding": "Expiry previously left visible transcript, brief, result and copy eligibility in the page; focus freshness recheck only marked answers stale, while invalid_session errors left old content present.",
+  "repair_attempt": {
+    "counter_file": "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/builder-b-counters.json",
+    "class": "b11_client_expiry_cache_invalidation",
+    "attempt": 1,
+    "reserved_before_product_code": true,
+    "inherited_sprint11_counters_reset": false
+  },
+  "implementation": [
+    "Use the session expires_at as an exact boundary; malformed timestamps fail closed.",
+    "Schedule client invalidation at expiry and check the boundary again on focus, pageshow, and visible visibilitychange.",
+    "Authoritative invalid_session/session_scope_mismatch from chat, freshness, confirmation, room selection, and media clears session transcript, brief, results, question, token, media components/object URLs, and copy eligibility; aborts session operations and advances the generation to fence late responses.",
+    "Expiry displays a distinct status and requires explicit Start a new chat; it does not create a session or resend a request.",
+    "A failed unconfirmed delete retains only the explicit delete retry reference; expiry invalidation does not restore cached content."
+  ],
+  "validation": {
+    "repository": "/Users/ccvn/Documents/project/Staylead/github/staylead-platform",
+    "branch": "sprint-12-retention-transport",
+    "base_head": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+    "focused_chat_state": {
+      "command": "node --experimental-strip-types --test tests/chat-state.test.mjs",
+      "cwd": "apps/web",
+      "result": "19/19 pass; exit 0",
+      "captured_at": "approximately 2026-10-29 09:48 Asia/Ho_Chi_Minh",
+      "result_included_in": "The final preserved contracts.log reran the full contract suite, including all 19 chat-state tests and the new expiry/fencing cases."
+    },
+    "contracts": {
+      "command": "npm run test:contracts",
+      "cwd": "apps/web",
+      "started_at": "2026-10-29T09:49:22+0700",
+      "finished_at": "2026-10-29T09:49:23+0700",
+      "exit_code": 0,
+      "result": "54 tests passed, 0 failed",
+      "raw_log": "validation/sprint-12-20261029/builder-b-repair/contracts.log"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "cwd": "apps/web",
+      "started_at": "2026-10-29T09:49:32+0700",
+      "finished_at": "2026-10-29T09:49:39+0700",
+      "exit_code": 0,
+      "raw_log": "validation/sprint-12-20261029/builder-b-repair/lint.log"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "cwd": "apps/web",
+      "started_at": "2026-10-29T09:49:43+0700",
+      "finished_at": "2026-10-29T09:49:47+0700",
+      "exit_code": 0,
+      "result": "next typegen and tsc --noEmit passed",
+      "raw_log": "validation/sprint-12-20261029/builder-b-repair/typecheck.log"
+    },
+    "configured_build": {
+      "command": "NEXT_PUBLIC_STAYLEAD_DOMAIN=hospitality NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION=2 npm run build",
+      "cwd": "apps/web",
+      "environment": {
+        "NEXT_PUBLIC_STAYLEAD_DOMAIN": "hospitality",
+        "NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION": "2"
+      },
+      "started_at": "2026-10-29T09:49:53+0700",
+      "finished_at": "2026-10-29T09:50:00+0700",
+      "exit_code": 0,
+      "raw_log": "validation/sprint-12-20261029/builder-b-repair/build.log"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "cwd": "repository root",
+      "exit_code": 0
+    },
+    "initial_environment_failure_preserved": "The earlier first npm run build without NEXT_PUBLIC_STAYLEAD_DOMAIN and NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION failed during prerender with DomainRegistrationError; see validation/sprint-12-20261029/builder-b-handoff.json and builder-b-validation.log. The configured build above passed."
+  },
+  "source_sha256": {
+    "apps/web/src/app/api/guest/[...path]/route.ts": "51d3f931e104cb03fc56e289876f5c9889b15fd6567d46b0ebceebbc80724133",
+    "apps/web/src/composition/domain_registry.ts": "237b8c5d0030340e0762a94b80dc98b0a6c704ce890d5f2ce76aaa7c60044159",
+    "apps/web/src/domains/hospitality/registration/index.tsx": "acaab9a3a521d57db6b74e9ada4a0105daa09223b49bdcf252a05b3e43d27409",
+    "apps/web/src/shared/api/client.ts": "cd148384e040c41673391a0904dc147a071e0e653f696361284a933a0fa532cc",
+    "apps/web/src/shared/chat/GuestChat.tsx": "13749cacf7a9c1c42bad8c5daef6d295912ab62a5c79e8022a5fc078ea4f4674",
+    "apps/web/src/shared/chat/chat-state.ts": "dba88100f911f7832e924b955b8fa4014818f791f02491912feb9ae4902ffaa1",
+    "apps/web/tests/api-client.test.mjs": "43bcfcc48d66bc6306d3cf0be6007f2322b76b922dff1f2f6f0d2067134c9e11",
+    "apps/web/tests/chat-state.test.mjs": "f4319bec387d74ff9f95d5d5fe487d4b2f8fe5b87355116a602e7bee1014b26b"
+  },
+  "independent_browser_review": "Pending C; B did not start a web service.",
+  "no_commit_or_push": true,
+  "worker_status": "Repair implementation and local gates complete; handed back to C for browser verification. Do not write or rerun gates without a precise dispatch."
+}

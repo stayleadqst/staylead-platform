@@ -11,15 +11,19 @@ import {
   classifyFailure,
   classifySessionFailure,
   hasUnresolvedRequest,
+  isSessionExpired,
+  isSessionInvalidationFailure,
   isCurrentGeneration,
   releaseRequest,
   resolveAnswerOnlyReceipt,
   retryModeForFailure,
+  sessionExpiryDelay,
   type RetryMode,
 } from "@/shared/chat/chat-state";
 import {
   ApiError,
   createGuestSession,
+  deleteGuestSession,
   GuestMessageResponse,
   GuestMediaDescriptor,
   GuestSession,
@@ -138,6 +142,10 @@ export function GuestChat({
   const [sessionLoading, setSessionLoading] = useState(true);
   const [sessionError, setSessionError] = useState("");
   const [sessionErrorRetryable, setSessionErrorRetryable] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [deletingSession, setDeletingSession] = useState(false);
+  const [sessionDeleted, setSessionDeleted] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [guestBrief, setGuestBrief] = useState<GuestBriefSnapshot | null>(null);
   const [question, setQuestion] = useState("");
@@ -149,9 +157,46 @@ export function GuestChat({
   const generation = useRef(0);
   const briefVersion = useRef(-1);
   const activeRequest = useRef<number | null>(null);
+  const sessionOperations = useRef(new AbortController());
+  const currentSessionId = useRef<string | undefined>(session?.session_id);
+  currentSessionId.current = session?.session_id;
+  const deleteSession = useRef<GuestSession | null>(null);
+  const deleteRequest = useRef<AbortController | null>(null);
   const hotelName = typeof session?.hotel.name === "string"
     ? session.hotel.name
     : hotelSlug.replaceAll("-", " ");
+
+  const expireSession = useCallback((expectedGeneration: number) => {
+    if (!isCurrentGeneration(expectedGeneration, generation.current)) return;
+    generation.current += 1;
+    sessionOperations.current.abort();
+    sessionOperations.current = new AbortController();
+    activeRequest.current = null;
+    freshnessInFlight.current.clear();
+    setSession(null);
+    setSessionExpired(true);
+    setSessionError("");
+    setSessionErrorRetryable(false);
+    setDeleteError("");
+    setSessionDeleted(false);
+    setTurns([]);
+    setGuestBrief(null);
+    briefVersion.current = -1;
+    setQuestion("");
+    setBusy(false);
+    setRoomAdvicePending(null);
+    setRoomAdviceError("");
+  }, []);
+
+  const expireSessionIfCurrent = useCallback((expectedGeneration: number, error: unknown) => {
+    if (!(error instanceof ApiError) || !isSessionInvalidationFailure(error)) return false;
+    expireSession(expectedGeneration);
+    return true;
+  }, [expireSession]);
+
+  const expireSessionForId = useCallback((sessionId: string) => {
+    if (currentSessionId.current === sessionId) expireSession(generation.current);
+  }, [expireSession]);
 
   useEffect(() => {
     turnsRef.current = turns;
@@ -170,6 +215,7 @@ export function GuestChat({
     setGuestBrief(null);
     setSessionError("");
     setSessionErrorRetryable(false);
+    setSessionExpired(false);
     setSessionLoading(true);
     try {
       const created = await createGuestSession({ hotelSlug, target });
@@ -187,11 +233,46 @@ export function GuestChat({
 
   useEffect(() => {
     const current = ++generation.current;
+    sessionOperations.current.abort();
+    sessionOperations.current = new AbortController();
+    deleteRequest.current?.abort();
+    deleteRequest.current = null;
+    deleteSession.current = null;
+    setDeletingSession(false);
+    setDeleteError("");
+    setSessionDeleted(false);
+    setSessionExpired(false);
     void openSession(current);
     return () => {
       generation.current += 1;
+      sessionOperations.current.abort();
+      deleteRequest.current?.abort();
     };
   }, [hotelSlug, openSession]);
+
+  useEffect(() => {
+    if (!session) return;
+    const expectedGeneration = generation.current;
+    const invalidateIfExpired = () => {
+      if (isSessionExpired(session.expires_at, Date.now())) expireSession(expectedGeneration);
+    };
+    const delay = sessionExpiryDelay(session.expires_at, Date.now());
+    const timer = window.setTimeout(invalidateIfExpired, delay);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") invalidateIfExpired();
+    };
+    const onPageShow = () => invalidateIfExpired();
+    const onFocus = () => invalidateIfExpired();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [expireSession, session]);
 
   const deliver = useCallback(async (turn: ChatTurn, id: string, answerOnlyReceiptId?: string) => {
     const currentGeneration = generation.current;
@@ -203,15 +284,16 @@ export function GuestChat({
         try {
           const freshness = await checkGuestFreshness({
             sessionId: activeSession.session_id, accessToken: activeSession.access_token,
-            requestId: item.answer!.request_id, target,
+            requestId: item.answer!.request_id, target, signal: sessionOperations.current.signal,
           });
           if (!isCurrentGeneration(currentGeneration, generation.current)) return;
           const stale = freshness.status === "stale"
             || freshness.room_advice_currentness === "stale";
           setTurns((current) => current.map((existing) => existing.id === item.id
             ? { ...existing, stale, freshnessError: undefined } : existing));
-        } catch {
+        } catch (error) {
           if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+          if (expireSessionIfCurrent(currentGeneration, error)) return;
           setTurns((current) => current.map((existing) => existing.id === item.id
             ? { ...existing, stale: true, freshnessError: "Could not verify whether this answer is still current." }
             : existing));
@@ -230,6 +312,7 @@ export function GuestChat({
         question: answerOnlyReceiptId ? undefined : turn.question,
         answerOnlyReceiptId,
         target,
+        signal: sessionOperations.current.signal,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       acceptBrief(answer.guest_brief, currentGeneration);
@@ -288,6 +371,7 @@ export function GuestChat({
       await refreshPreviousAnswers();
     } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      if (expireSessionIfCurrent(currentGeneration, error)) return;
       const partial = error instanceof ApiError ? error.partialResult : undefined;
       if (partial) acceptBrief(partial.guest_brief, currentGeneration);
       const display = classifyFailure(error instanceof ApiError
@@ -315,7 +399,7 @@ export function GuestChat({
       if (isCurrentGeneration(currentGeneration, generation.current)) setBusy(false);
       releaseRequest(currentGeneration, activeRequest);
     }
-  }, [acceptBrief, session, target]);
+  }, [acceptBrief, expireSessionIfCurrent, session, target]);
 
   const unresolvedRequest = hasUnresolvedRequest(turns)
     || turns.some((turn) => Boolean(turn.briefConfirmation) && !turn.confirmationDismissed);
@@ -330,21 +414,23 @@ export function GuestChat({
         accessToken: session.access_token,
         requestId: response.request_id,
         target,
+        signal: sessionOperations.current.signal,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       const serverStale = result.status === "stale" || result.room_advice_currentness === "stale";
       setTurns((current) => current.map((item) => item.id === turnId
         ? { ...item, stale: serverStale, freshnessError: undefined }
         : item));
-    } catch {
+    } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      if (expireSessionIfCurrent(currentGeneration, error)) return;
       setTurns((current) => current.map((item) => item.id === turnId
         ? { ...item, stale: true, freshnessError: "Could not verify whether this answer is still current." }
         : item));
     } finally {
       freshnessInFlight.current.delete(response.request_id);
     }
-  }, [session, target]);
+  }, [expireSessionIfCurrent, session, target]);
 
   const recheckVisibleAnswers = useCallback(async () => {
     const current = turnsRef.current;
@@ -369,20 +455,73 @@ export function GuestChat({
   }, [recheckVisibleAnswers]);
 
   function startNewChat() {
-    if (sessionLoading) return;
+    if (sessionLoading || deletingSession || deleteSession.current) return;
+    sessionOperations.current.abort();
+    sessionOperations.current = new AbortController();
     setTurns([]);
     setGuestBrief(null);
     briefVersion.current = -1;
     setQuestion("");
+    setDeleteError("");
+    setSessionExpired(false);
+    setSessionDeleted(false);
     const current = ++generation.current;
+    activeRequest.current = null;
     setBusy(false);
     void openSession(current);
+  }
+
+  async function deleteCurrentChat() {
+    if (deletingSession || deleteRequest.current) return;
+    const activeSession = deleteSession.current ?? session;
+    if (!activeSession) return;
+    deleteSession.current = activeSession;
+    sessionOperations.current.abort();
+    sessionOperations.current = new AbortController();
+    const currentGeneration = ++generation.current;
+    activeRequest.current = null;
+    setBusy(false);
+    setRoomAdvicePending(null);
+    setRoomAdviceError("");
+    setTurns([]);
+    setGuestBrief(null);
+    briefVersion.current = -1;
+    setQuestion("");
+    setSession(null);
+    setSessionDeleted(false);
+    setSessionError("");
+    setDeleteError("");
+    setDeletingSession(true);
+    const controller = new AbortController();
+    deleteRequest.current = controller;
+    try {
+      await deleteGuestSession({
+        sessionId: activeSession.session_id,
+        accessToken: activeSession.access_token,
+        target,
+        signal: controller.signal,
+      });
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      deleteSession.current = null;
+      setSessionDeleted(true);
+    } catch (error) {
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      const message = error instanceof ApiError && error.outcome === "rejected"
+        ? `The server did not delete this chat: ${error.message}`
+        : "The server did not confirm deletion. This session may still exist; retry deletion to verify.";
+      setDeleteError(message);
+    } finally {
+      if (deleteRequest.current === controller) deleteRequest.current = null;
+      if (isCurrentGeneration(currentGeneration, generation.current)) setDeletingSession(false);
+    }
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = question.trim();
     if (!text || !canStartRequest(Boolean(session), activeRequest.current === generation.current, unresolvedRequest)) return;
+    const submittedGeneration = generation.current;
+    const submittedSessionId = session?.session_id;
     const turn: ChatTurn = {
       id: requestId(), question: text, sending: true,
       languageTag: session?.language_preference?.language_tag ?? "en",
@@ -393,6 +532,8 @@ export function GuestChat({
     void (async () => {
       setBusy(true);
       await recheckVisibleAnswers();
+      if (!isCurrentGeneration(submittedGeneration, generation.current)
+        || session?.session_id !== submittedSessionId) return;
       await deliver(turn, turn.id);
     })();
   }
@@ -440,6 +581,7 @@ export function GuestChat({
         requestId: confirmRequestId,
         confirmationToken: challenge.token,
         target,
+        signal: sessionOperations.current.signal,
       });
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       acceptBrief(response.guest_brief, currentGeneration);
@@ -456,6 +598,7 @@ export function GuestChat({
         : item));
     } catch (error) {
       if (!isCurrentGeneration(currentGeneration, generation.current)) return;
+      if (expireSessionIfCurrent(currentGeneration, error)) return;
       const partial = error instanceof ApiError ? error.partialResult : undefined;
       if (partial) acceptBrief(partial.guest_brief, currentGeneration);
       const failure = classifyFailure(error instanceof ApiError ? error : { outcome: "unknown" });
@@ -486,20 +629,24 @@ export function GuestChat({
 
   async function selectTurnResultOption(turnId: string, result: unknown, optionId: string) {
     if (!session || !turnResultActions || roomAdvicePending || busy) return;
+    const currentGeneration = generation.current;
     setRoomAdvicePending(optionId);
     setRoomAdviceError("");
     try {
       const selection = await turnResultActions.selectOption({
         sessionId: session.session_id, accessToken: session.access_token, result, optionId, target,
+        signal: sessionOperations.current.signal,
       });
+      if (!isCurrentGeneration(currentGeneration, generation.current)) return;
       setTurns((current) => current.map((turn) => {
         if (turn.id !== turnId || !turn.answer) return turn;
         return { ...turn, answer: turnResultActions.attachSelection(turn.answer, result, selection) as GuestMessageResponse };
       }));
-    } catch {
-      setRoomAdviceError("room_selection_failed");
+    } catch (error) {
+      if (expireSessionIfCurrent(currentGeneration, error)) return;
+      if (isCurrentGeneration(currentGeneration, generation.current)) setRoomAdviceError("room_selection_failed");
     } finally {
-      setRoomAdvicePending(null);
+      if (isCurrentGeneration(currentGeneration, generation.current)) setRoomAdvicePending(null);
     }
   }
 
@@ -519,6 +666,8 @@ export function GuestChat({
         </p>}
         <h1>{hotelName}</h1>
         <p className="chat-intro">{activeLabels.ai_notice}</p>
+        {session && <button className="text-button" type="button" onClick={() => void deleteCurrentChat()}
+          disabled={sessionLoading || deletingSession}>Delete this chat</button>}
         <TurnResultRenderer response={null} bookingChannel={session?.hotel.booking_channel ?? null}
           languageTag={activeLanguageTag} stale={false} freshnessError={false}
           selectionDisabled={busy} pendingOptionId={roomAdvicePending} selectionError=""
@@ -531,6 +680,24 @@ export function GuestChat({
 
       <section className="chat-panel" aria-label={`Chat with ${hotelName}`}>
         <div className="chat-transcript" aria-live="polite" aria-relevant="additions text">
+          {deletingSession && <p className="status-note" role="status">Deleting this chat…</p>}
+          {deleteError && <div className="session-error" role="alert">
+            <p>{deleteError}</p>
+            <button className="text-button" type="button" onClick={() => void deleteCurrentChat()}
+              disabled={deletingSession}>Retry deletion</button>
+          </div>}
+          {sessionExpired && <div className="session-error" role="status">
+            <p>This chat has expired and its contents were cleared from this browser tab.</p>
+            <button className="text-button" type="button" onClick={startNewChat} disabled={sessionLoading}>
+              Start a new chat
+            </button>
+          </div>}
+          {sessionDeleted && <div className="session-error" role="status">
+            <p>This chat was deleted from the server.</p>
+            <button className="text-button" type="button" onClick={startNewChat} disabled={sessionLoading}>
+              Start a new chat
+            </button>
+          </div>}
           {!turns.length && sessionLoading && <p className="status-note">Starting a new private chat…</p>}
           {!turns.length && session && <p className="status-note">Ask a question about {hotelName} to get started.</p>}
           {turns.map((turn) => (
@@ -616,6 +783,7 @@ export function GuestChat({
                 currentScopeSessionId={session?.session_id}
                 isCurrentTurn={turns.at(-1)?.id === turn.id && !busy}
                 onRecheck={() => void recheckAnswer(turn.id, turn.answer!)}
+                onSessionInvalid={expireSessionForId}
               />}
             </article>
           ))}
@@ -646,11 +814,12 @@ export function GuestChat({
               placeholder="Ask in any language…"
               maxLength={2000}
               rows={2}
-              disabled={!session || busy || unresolvedRequest}
+              disabled={!session || busy || unresolvedRequest || deletingSession || Boolean(deleteError)}
               aria-describedby="question-hint"
               required
             />
-            <button className="send-button" type="submit" disabled={!session || busy || unresolvedRequest || !question.trim()}>
+            <button className="send-button" type="submit"
+              disabled={!session || busy || unresolvedRequest || deletingSession || Boolean(deleteError) || !question.trim()}>
               {activeLabels.send}
             </button>
           </div>
@@ -674,6 +843,7 @@ function AnswerCard({
   currentScopeSessionId,
   isCurrentTurn,
   onRecheck,
+  onSessionInvalid,
 }: {
   response: GuestMessageResponse;
   session: GuestSession | null;
@@ -686,6 +856,7 @@ function AnswerCard({
   currentScopeSessionId?: string;
   isCurrentTurn: boolean;
   onRecheck: () => void;
+  onSessionInvalid: (sessionId: string) => void;
 }) {
   const [copyResult, setCopyResult] = useState<CopyResult | "">("");
   const answerText = response.answer ?? "";
@@ -758,7 +929,8 @@ function AnswerCard({
       {!stale && !freshnessError && !!response.media?.length && session && (
         <div className="answer-media" aria-label="Approved hotel media">
           {response.media.map((media) => (
-          <GuestMedia key={`${session.session_id}-${media.media_id}-${media.source_hash}`} media={media} session={session} target={target} />
+          <GuestMedia key={`${session.session_id}-${media.media_id}-${media.source_hash}`} media={media} session={session} target={target}
+            onSessionInvalid={onSessionInvalid} />
           ))}
         </div>
       )}
@@ -786,10 +958,11 @@ function AnswerCard({
   );
 }
 
-function GuestMedia({ media, session, target }: {
+function GuestMedia({ media, session, target, onSessionInvalid }: {
   media: GuestMediaDescriptor;
   session: GuestSession;
   target: DomainTarget;
+  onSessionInvalid: (sessionId: string) => void;
 }) {
   const [src, setSrc] = useState("");
   const [captionsSrc, setCaptionsSrc] = useState("");
@@ -828,8 +1001,13 @@ function GuestMedia({ media, session, target }: {
           objectUrls.push(captionsUrl);
           setCaptionsSrc(captionsUrl);
         }
-      } catch {
-        if (live && !controller.signal.aborted) setError("Approved media is temporarily unavailable.");
+      } catch (error) {
+        if (!live || controller.signal.aborted) return;
+        if (error instanceof ApiError && isSessionInvalidationFailure(error)) {
+          onSessionInvalid(session.session_id);
+          return;
+        }
+        setError("Approved media is temporarily unavailable.");
       }
     };
     void load();
@@ -838,7 +1016,7 @@ function GuestMedia({ media, session, target }: {
       controller.abort();
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [media, session.session_id, session.access_token, target]);
+  }, [media, onSessionInvalid, session.session_id, session.access_token, target]);
 
   const timeReference = media.start_seconds !== undefined
     ? `${formatMediaTime(media.start_seconds)}${media.end_seconds !== undefined ? `–${formatMediaTime(media.end_seconds)}` : ""}`

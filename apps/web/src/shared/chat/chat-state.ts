@@ -6,6 +6,21 @@ export type FailureInput = Readonly<{
 
 export type RetryMode = "same-request" | "new-request" | "new-session" | "none";
 
+/** Return zero for malformed/expired timestamps so callers fail closed. */
+export function sessionExpiryDelay(expiresAt: string, now = Date.now()): number {
+  const expiry = Date.parse(expiresAt);
+  if (!Number.isFinite(expiry) || !Number.isFinite(now)) return 0;
+  return Math.max(0, expiry - now);
+}
+
+export function isSessionExpired(expiresAt: string, now = Date.now()): boolean {
+  return sessionExpiryDelay(expiresAt, now) === 0;
+}
+
+export function isSessionInvalidationFailure(error: FailureInput): boolean {
+  return error.code === "invalid_session" || error.code === "session_scope_mismatch";
+}
+
 export type AnswerOnlyReceiptTurn = {
   id: string;
   resumeReceiptId?: string;

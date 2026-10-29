@@ -50,6 +50,10 @@ from staylead_platform.platform.contracts.knowledge import (
     FreshnessDecision,
     SourceVersionRef,
 )
+from staylead_platform.platform.guest_context.sessions.retention import (
+    ADMISSION_RESERVATION_WINDOW,
+    SESSION_CONTENT_MAX_AGE,
+)
 
 metadata = MetaData()
 CURRENT_SCHEMA_VERSION = 8
@@ -1191,11 +1195,194 @@ def facts_for_hotel(engine: Engine, hotel_id: str, *, limit: int = 400) -> list[
 
 
 def create_session(engine: Engine, session_id: str, hotel_id: str, expires_at: datetime) -> None:
+    created_at = utcnow()
+    requested_expiry = expires_at.astimezone(UTC)
+    expires_at = min(requested_expiry, created_at + SESSION_CONTENT_MAX_AGE)
     with engine.begin() as connection:
         connection.execute(insert(sessions).values(
             session_id=session_id, hotel_id=hotel_id, state_version=0,
-            created_at=utcnow(), expires_at=expires_at,
+            created_at=created_at, expires_at=expires_at,
         ))
+
+
+def _purge_session_content(connection: Any, session_id: str, hotel_id: str, now: datetime) -> None:
+    """Remove session content while retaining only recent property quota reservations."""
+    reservation_cutoff = now - ADMISSION_RESERVATION_WINDOW
+    recent = connection.execute(select(
+        requests.c.created_at, requests.c.lease_owner, requests.c.lease_expires_at,
+        requests.c.provider_calls,
+        requests.c.status,
+    ).where(and_(
+        requests.c.session_id == session_id,
+        requests.c.hotel_id == hotel_id,
+        requests.c.created_at > reservation_cutoff,
+        requests.c.lease_owner.is_not(None),
+    ))).mappings().all()
+    connection.execute(delete(requests).where(and_(
+        requests.c.session_id == session_id,
+        requests.c.hotel_id == hotel_id,
+    )))
+
+    # Keep recent admission accounting for the B10 property window without retaining
+    # client IDs, content hashes, responses, trace payloads, or session correlation.
+    quota_session_id = str(uuid.uuid4())
+    for row in recent:
+        connection.execute(insert(requests).values(
+            request_id=hashlib.sha256(uuid.uuid4().bytes).hexdigest(),
+            session_id=quota_session_id,
+            hotel_id=hotel_id,
+            expected_version=0,
+            payload_hash=hashlib.sha256(b"redacted").hexdigest(),
+            status=row["status"],
+            provider_calls=row["provider_calls"],
+            lease_owner=str(uuid.uuid4()),
+            lease_expires_at=row["lease_expires_at"],
+            response=None,
+            error_code=None,
+            created_at=row["created_at"],
+        ))
+
+    connection.execute(delete(messages).where(and_(
+        messages.c.session_id == session_id, messages.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(guest_briefs).where(and_(
+        guest_briefs.c.session_id == session_id, guest_briefs.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(guest_language_preferences).where(and_(
+        guest_language_preferences.c.session_id == session_id,
+        guest_language_preferences.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(guest_brief_source_utterances).where(and_(
+        guest_brief_source_utterances.c.session_id == session_id,
+        guest_brief_source_utterances.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(guest_brief_receipts).where(and_(
+        guest_brief_receipts.c.session_id == session_id,
+        guest_brief_receipts.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(room_advice_selections).where(and_(
+        room_advice_selections.c.session_id == session_id,
+        room_advice_selections.c.hotel_id == hotel_id,
+    )))
+    connection.execute(delete(room_advice_results).where(and_(
+        room_advice_results.c.session_id == session_id,
+        room_advice_results.c.hotel_id == hotel_id,
+    )))
+
+
+def _lock_session_requests_for_cleanup(connection: Any, session_id: str, hotel_id: str) -> None:
+    # complete_request locks a request row before the parent session. Cleanup uses
+    # the same order to avoid a request/session deadlock during late commits.
+    connection.execute(select(requests.c.request_id).where(and_(
+        requests.c.session_id == session_id,
+        requests.c.hotel_id == hotel_id,
+    )).order_by(requests.c.request_id).with_for_update()).all()
+
+
+def delete_guest_session(
+    engine: Engine, *, session_id: str, hotel_id: str, now: datetime | None = None,
+) -> bool:
+    """Expire then erase one guest session; return false for an absent/foreign session."""
+    timestamp = (now or utcnow()).astimezone(UTC)
+    with engine.begin() as connection:
+        updated = connection.execute(update(sessions).where(and_(
+            sessions.c.session_id == session_id,
+            sessions.c.hotel_id == hotel_id,
+            sessions.c.expires_at > timestamp,
+        )).values(expires_at=timestamp))
+    # Keep phase one separate so in-flight admission/completion sees expiry before
+    # cleanup. Phase two locks requests before the session, matching completion's
+    # request-then-session order while serializing duplicate cleanup.
+    with engine.begin() as connection:
+        _lock_session_requests_for_cleanup(connection, session_id, hotel_id)
+        session = connection.execute(select(
+            sessions.c.session_id, sessions.c.hotel_id,
+        ).where(and_(sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id))
+         .with_for_update()).mappings().first()
+        if session is None:
+            return False
+        _purge_session_content(connection, session_id, hotel_id, utcnow() if now is None else timestamp)
+        connection.execute(delete(sessions).where(and_(
+            sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
+        )))
+    return updated.rowcount == 1 or session is not None
+
+
+def purge_expired_sessions(
+    engine: Engine, *, now: datetime | None = None, batch_size: int = 100,
+) -> int:
+    """Purge expired sessions and aged orphan quota metadata using a controllable UTC clock."""
+    timestamp = (now or utcnow()).astimezone(UTC)
+    with engine.connect() as connection:
+        expired = connection.execute(select(
+            sessions.c.session_id, sessions.c.hotel_id,
+        ).where(sessions.c.expires_at <= timestamp).order_by(
+            sessions.c.expires_at, sessions.c.session_id,
+        ).limit(max(1, min(batch_size, 1000)))).mappings().all()
+    purged = 0
+    for row in expired:
+        with engine.begin() as connection:
+            _lock_session_requests_for_cleanup(connection, row["session_id"], row["hotel_id"])
+            current = connection.execute(select(
+                sessions.c.session_id,
+            ).where(and_(
+                sessions.c.session_id == row["session_id"],
+                sessions.c.hotel_id == row["hotel_id"],
+                sessions.c.expires_at <= timestamp,
+            )).with_for_update()).first()
+            if current is None:
+                continue
+            cleanup_now = utcnow() if now is None else timestamp
+            _purge_session_content(connection, row["session_id"], row["hotel_id"], cleanup_now)
+            connection.execute(delete(sessions).where(and_(
+                sessions.c.session_id == row["session_id"],
+                sessions.c.hotel_id == row["hotel_id"],
+            )))
+            purged += 1
+    # Session rows are gone after deletion, so reservation rows are safe to remove
+    # once the complete property admission window has elapsed.
+    with engine.begin() as connection:
+        _purge_orphan_session_content(connection)
+        cleanup_timestamp = utcnow() if now is None else timestamp
+        connection.execute(delete(requests).where(and_(
+            requests.c.created_at <= cleanup_timestamp - ADMISSION_RESERVATION_WINDOW,
+            ~select(sessions.c.session_id).where(and_(
+                sessions.c.session_id == requests.c.session_id,
+                sessions.c.hotel_id == requests.c.hotel_id,
+            )).exists(),
+        )))
+    return purged
+
+
+def _purge_orphan_session_content(connection: Any) -> None:
+    """Erase session-derived rows left by older writers after their parent disappeared."""
+    session_content_tables = (
+        messages,
+        guest_briefs,
+        guest_language_preferences,
+        guest_brief_source_utterances,
+        guest_brief_receipts,
+        room_advice_selections,
+        room_advice_results,
+    )
+    for table in session_content_tables:
+        parent_exists = select(sessions.c.session_id).where(and_(
+            sessions.c.session_id == table.c.session_id,
+            sessions.c.hotel_id == table.c.hotel_id,
+        )).correlate(table).exists()
+        connection.execute(delete(table).where(~parent_exists))
+
+
+def next_session_expiry(
+    engine: Engine, *, now: datetime | None = None, hotel_id: str | None = None,
+) -> datetime | None:
+    """Return the nearest due/future expiry for the app lifecycle wait calculation."""
+    query = select(func.min(sessions.c.expires_at))
+    if hotel_id is not None:
+        query = query.where(sessions.c.hotel_id == hotel_id)
+    with engine.connect() as connection:
+        value = connection.scalar(query)
+    return value.astimezone(UTC) if value is not None else None
 
 
 def _brief_snapshot(row: Any | None) -> GuestBriefSnapshot:
@@ -1274,6 +1461,9 @@ def save_room_advice_result(
         ).with_for_update()).mappings().first()
         if session is None or hotel is None:
             raise ScopeError("room advice scope is invalid")
+        now = utcnow()
+        if session["expires_at"] <= now:
+            raise ScopeError("room advice session expired before commit")
         existing = connection.execute(select(room_advice_results).where(and_(
             room_advice_results.c.session_id == session_id,
             room_advice_results.c.request_id == request_id,
@@ -1288,6 +1478,9 @@ def save_room_advice_result(
         if existing is not None:
             if existing["dependency_fingerprint"] != fingerprint or existing["payload"] != payload:
                 raise IdempotencyConflict("room advice request id was reused with different result content")
+            now = utcnow()
+            if session["expires_at"] <= now:
+                raise ScopeError("room advice session expired before result replay")
             result = dict(existing)
             result["currentness"] = _room_advice_currentness(connection, existing, now)
             selection = connection.execute(select(room_advice_selections).where(and_(
@@ -1315,6 +1508,9 @@ def save_room_advice_result(
         decision = _validate_evidence_on_connection(connection, hotel_id, source_refs, now)
         if source_refs and not decision.eligible:
             raise StaleSource("room advice source evidence is no longer eligible")
+        now = utcnow()
+        if session["expires_at"] <= now:
+            raise ScopeError("room advice session expired before commit")
         result_version = int(connection.scalar(select(room_advice_results.c.result_version).where(
             room_advice_results.c.session_id == session_id,
         ).order_by(room_advice_results.c.result_version.desc()).limit(1)) or 0) + 1
@@ -1505,7 +1701,7 @@ def select_room_advice_option(
         session = connection.execute(select(sessions).where(and_(
             sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
             sessions.c.expires_at > now,
-        )).with_for_update()).first()
+        )).with_for_update()).mappings().first()
         # Match source lifecycle's hotel-row lock so revocation/refresh cannot race a selection.
         hotel_lock = connection.execute(select(hotels.c.hotel_id).where(
             hotels.c.hotel_id == hotel_id,
@@ -1517,6 +1713,9 @@ def select_room_advice_option(
         )).with_for_update()).mappings().first()
         if session is None or hotel_lock is None or result is None:
             raise ScopeError("room advice result scope is invalid")
+        now = utcnow()
+        if session["expires_at"] <= now:
+            raise ScopeError("room advice session expired before selection")
         if result["result_version"] != expected_result_version:
             raise VersionConflict("room advice result version changed")
         if _room_advice_currentness(connection, result, now) != "current":
@@ -1530,6 +1729,10 @@ def select_room_advice_option(
             room_advice_selections.c.session_id == session_id,
             room_advice_selections.c.hotel_id == hotel_id,
         )).with_for_update()).first()
+        now = utcnow()
+        if session["expires_at"] <= now:
+            raise ScopeError("room advice session expired before selection")
+        values["updated_at"] = now
         if existing:
             connection.execute(update(room_advice_selections).where(
                 room_advice_selections.c.session_id == session_id,
@@ -1619,6 +1822,9 @@ def apply_guest_brief_patch(
         )).with_for_update()).mappings().first()
         if session is None:
             raise ScopeError("session scope is invalid")
+        checked_at = (now or utcnow()).astimezone(UTC)
+        if session["expires_at"] <= checked_at:
+            raise ScopeError("session expired before brief commit")
         prior_receipt = connection.execute(select(guest_brief_receipts).where(
             guest_brief_receipts.c.request_id == context.request_id,
         )).mappings().first()
@@ -1637,10 +1843,16 @@ def apply_guest_brief_patch(
             guest_briefs.c.session_id == context.session_id,
             guest_briefs.c.hotel_id == context.hotel_id,
         )).with_for_update()).mappings().first()
+        checked_at = (now or utcnow()).astimezone(UTC)
+        if session["expires_at"] <= checked_at:
+            raise ScopeError("session expired before brief commit")
         current = _brief_snapshot(current_row)
         if current.brief_version != context.expected_brief_version:
             raise VersionConflict("guest brief version changed")
         refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        checked_at = (now or utcnow()).astimezone(UTC)
+        if session["expires_at"] <= checked_at:
+            raise ScopeError("session expired before brief commit")
         before = current.brief_version
         changed = (mutation.data != current.data
                    or tuple(mutation.pending_fields) != current.pending_fields)
@@ -1754,6 +1966,14 @@ def commit_language_preference(
         raise ValueError("Invalid language preference provenance.")
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
+        session = connection.execute(select(sessions.c.expires_at).where(and_(
+            sessions.c.session_id == session_id,
+            sessions.c.hotel_id == hotel_id,
+        )).with_for_update()).mappings().first()
+        # Sample the wall clock after acquiring the owning-session lock. A DELETE
+        # or expiry purge that committed while this writer waited must fence it out.
+        if session is None or session["expires_at"] <= utcnow():
+            raise ScopeError("session scope is invalid")
         current = connection.execute(select(guest_language_preferences).where(and_(
             guest_language_preferences.c.session_id == session_id,
             guest_language_preferences.c.hotel_id == hotel_id,
@@ -2020,6 +2240,11 @@ def consume_provider_slot(
             requests.c.lease_owner == lease_owner,
             requests.c.lease_expires_at > timestamp,
             requests.c.provider_calls < selected_limit,
+            select(sessions.c.session_id).where(and_(
+                sessions.c.session_id == session_id,
+                sessions.c.hotel_id == hotel_id,
+                sessions.c.expires_at > timestamp,
+            )).exists(),
         )).values(provider_calls=requests.c.provider_calls + 1).returning(
             requests.c.provider_calls,
         ))

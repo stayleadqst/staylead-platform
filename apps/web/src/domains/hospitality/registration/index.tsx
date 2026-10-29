@@ -94,12 +94,12 @@ export const hospitalityRegistration: DomainRegistration = {
   formatBriefConfirmationChanges: formatHospitalityBriefConfirmationChanges,
   turnResultRenderer: HospitalityTurnResultRenderer,
   turnResultActions: {
-    selectOption: async ({ sessionId, accessToken, result, optionId, target }) => {
+    selectOption: async ({ sessionId, accessToken, result, optionId, target, signal }) => {
       const identity = roomAdviceIdentity(result);
       if (!identity) throw new Error("The selected option is unavailable.");
       return selectGuestRoomAdviceOption({
         sessionId, accessToken, resultId: identity.result_id, resultVersion: identity.result_version,
-        optionId, target,
+        optionId, target, signal,
       });
     },
     attachSelection: attachRoomSelection,

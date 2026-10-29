@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     guest_in_flight_per_session: int = Field(default=1, gt=0)
     guest_in_flight_per_hotel: int = Field(default=4, gt=0)
     guest_provider_calls_per_request: int = Field(default=2, gt=0)
+    session_retention_sweep_interval_seconds: int = Field(default=60, ge=1, le=3600)
     validation_diagnostics: bool = False
     codex_cli_executable: str = "codex"
     codex_cli_model: str = "gpt-6-luna"

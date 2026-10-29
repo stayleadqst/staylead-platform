@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-10-29T03:00:07.327043+00:00",
+  "scope": "B11 actual desktop browser→production localweb13542→API18542→PG55442 using OfflineB10Provider; zero live product inference",
+  "candidate_ref": "candidate-v1.json; web initial repair pins unchanged",
+  "results": [
+    {
+      "id": "desktop_delete_isolation",
+      "status": "PASS",
+      "steps": "two browser tabs same hotel created independent sessions; each sends FAQ; deleteA; tabA confirmed serverdeletion/noCopy/disabledcomposer/explicitnewchat; B sends secondFAQ successfully",
+      "before": {
+        "sessions": 2,
+        "messages": 4,
+        "requests": 2
+      },
+      "afterBsecondFAQ": {
+        "sessions": 1,
+        "messages": 4,
+        "content_responses": 2,
+        "redacted_reservations": 1
+      },
+      "note": "response is JSON; first count using IS NOT NULL alone counted JSONnull as raw. Corrected cast-to-jsonb query distinguishes contentresponses/redactedquota. No productfailure from initial observation query."
+    },
+    {
+      "id": "authoritative_server_expiry",
+      "status": "PASS",
+      "control": "C sets expires_at of sole remaining synthetic browser session to now−1s in privatebrowserDB; signed browser token otherwise unchanged",
+      "observed": "Checkstatus action returned invalidsession; UI clearly expired and contentcleared; explicitnewchat, disabledcomposer, noCopy. CUA click command timedout, reconciled AX state showed completed action; no blind retry."
+    }
+  ],
+  "screenshots": [
+    "browser-deleted.png",
+    "browser-expired-server.png"
+  ],
+  "not_yet_verified": [
+    "mobile delete/expirytimer",
+    "delete transportfailure/lateUI"
+  ],
+  "known_Q_failures": [
+    "Q12-1languageorphan",
+    "Q12-2duplicatequota"
+  ],
+  "overall": "NOT_ACCEPTED; v1 QFAIL retained"
+}
