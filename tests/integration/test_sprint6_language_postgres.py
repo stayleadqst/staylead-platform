@@ -24,7 +24,7 @@ def engine():
     if not TEST_DSN:
         pytest.skip("Set STAYLEAD_TEST_DATABASE_URL to an isolated Sprint 6 PostgreSQL database.")
     database = create_database_engine(TEST_DSN)
-    assert apply_migrations(database) == 7
+    assert apply_migrations(database) == 8
     yield database
     database.dispose()
 

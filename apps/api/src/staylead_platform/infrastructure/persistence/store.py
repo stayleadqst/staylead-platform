@@ -6,7 +6,7 @@ import hashlib
 import json
 import time
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from threading import Event
 from typing import Any
 
@@ -25,6 +25,7 @@ from sqlalchemy import (
     UniqueConstraint,
     and_,
     delete,
+    func,
     insert,
     inspect,
     select,
@@ -34,6 +35,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 
+from staylead_platform.platform.contracts.admission import GuestAdmissionLimits
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefContext,
     GuestBriefMutationResult,
@@ -50,7 +52,7 @@ from staylead_platform.platform.contracts.knowledge import (
 )
 
 metadata = MetaData()
-CURRENT_SCHEMA_VERSION = 7
+CURRENT_SCHEMA_VERSION = 8
 ROOM_ADVICE_ALGORITHM_VERSION = "s7-room-advice-v1"
 schema_versions = Table(
     "schema_versions", metadata,
@@ -97,6 +99,9 @@ requests = Table(
     Column("expected_version", Integer, nullable=False),
     Column("payload_hash", String(64), nullable=False),
     Column("status", String(20), nullable=False),
+    Column("provider_calls", Integer, nullable=False, server_default="0"),
+    Column("lease_owner", String(36)),
+    Column("lease_expires_at", DateTime(timezone=True)),
     Column("response", JSON),
     Column("error_code", String(60)),
     Column("created_at", DateTime(timezone=True), nullable=False),
@@ -264,6 +269,24 @@ class IdempotencyConflict(ValueError):
 
 class RequestInProgress(ValueError):
     pass
+
+
+class QuotaExceeded(ValueError):
+    def __init__(self, scope: str, retry_after: int) -> None:
+        super().__init__(f"Guest admission limit exceeded for {scope}.")
+        self.scope = scope
+        self.retry_after = max(1, int(retry_after))
+
+
+class ProviderCallLimitExceeded(ValueError):
+    def __init__(self, code: str = "provider_call_limit") -> None:
+        super().__init__("The request has no provider calls remaining.")
+        self.code = code
+
+
+def request_payload_hash(question: str) -> str:
+    """Return the durable idempotency digest used for a guest request."""
+    return hashlib.sha256(question.encode("utf-8")).hexdigest()
 
 
 class StaleSource(ValueError):
@@ -563,6 +586,17 @@ def apply_migrations(engine: Engine) -> int:
         if existing < 7:
             # metadata.create_all above creates immutable room advice snapshots and their selection pointer.
             connection.execute(insert(schema_versions).values(version=7, applied_at=utcnow()))
+            existing = 7
+        if existing < 8:
+            columns = {column["name"] for column in inspect(connection).get_columns("guest_requests")}
+            for name, sql in (
+                ("provider_calls", "INTEGER NOT NULL DEFAULT 0"),
+                ("lease_owner", "VARCHAR(36)"),
+                ("lease_expires_at", "TIMESTAMP WITH TIME ZONE"),
+            ):
+                if name not in columns:
+                    connection.execute(text(f"ALTER TABLE guest_requests ADD COLUMN {name} {sql}"))
+            connection.execute(insert(schema_versions).values(version=8, applied_at=utcnow()))
     return CURRENT_SCHEMA_VERSION
 
 
@@ -1782,24 +1816,99 @@ def reserve_request(
     timeout_seconds: float | None = None,
     deadline_monotonic: float | None = None,
     cancellation_event: Event | None = None,
+    limits: GuestAdmissionLimits | None = None,
+    lease_owner: str | None = None,
+    lease_until: datetime | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any] | None:
-    digest = hashlib.sha256(question.encode("utf-8")).hexdigest()
+    digest = request_payload_hash(question)
+    if limits is None:
+        # Internal child reservations keep their existing replay record but do not
+        # consume a guest turn or in-flight slot of their own.
+        lease_owner = None
+        lease_until = None
+    if limits is not None and lease_owner is None:
+        lease_owner = str(uuid.uuid4())
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
-        session_version = connection.scalar(select(sessions.c.state_version).where(and_(
+        connection.execute(text(
+            "SELECT pg_advisory_xact_lock(hashtextextended(:lock_key, 0))",
+        ), {"lock_key": f"staylead:guest-admission:hotel:{hotel_id}"})
+        refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        session = connection.execute(select(sessions).where(and_(
             sessions.c.session_id == session_id, sessions.c.hotel_id == hotel_id,
-            sessions.c.expires_at > utcnow(),
-        )))
-        if session_version is None:
+        )).with_for_update()).mappings().first()
+        refresh_transaction_deadline(connection, deadline_monotonic, cancellation_event)
+        # Admission time must be sampled after both serialization locks. A request
+        # queued behind another reservation must count that reservation even if
+        # it began waiting before the earlier request committed.
+        timestamp = (now or utcnow()).astimezone(UTC)
+        if session is None or session["expires_at"] <= timestamp:
             raise ScopeError("session scope is invalid")
+        if limits is not None and lease_until is None:
+            remaining = limits.lease_seconds
+            if deadline_monotonic is not None:
+                remaining = min(remaining, max(0.0, deadline_monotonic - time.monotonic()))
+            lease_until = timestamp + timedelta(seconds=remaining)
+        if lease_until is not None:
+            lease_until = lease_until.astimezone(UTC)
         inserted = connection.execute(pg_insert(requests).values(
             session_id=session_id, request_id=request_id, hotel_id=hotel_id,
-            expected_version=session_version, payload_hash=digest,
-            status="processing", created_at=utcnow(),
+            expected_version=session["state_version"], payload_hash=digest,
+            status="processing", created_at=timestamp,
+            provider_calls=0, lease_owner=lease_owner, lease_expires_at=lease_until,
         ).on_conflict_do_nothing().returning(requests.c.request_id))
         # psycopg may report rowcount=-1 for INSERT ... RETURNING; use the
         # returned row to distinguish a fresh reservation from a replay.
         if inserted.scalar_one_or_none() is not None:
+            if limits is not None:
+                boundary = timestamp - timedelta(seconds=limits.window_seconds)
+                hotel_turns = connection.scalar(select(func.count()).select_from(requests).where(and_(
+                    requests.c.hotel_id == hotel_id, requests.c.created_at > boundary,
+                    requests.c.created_at <= timestamp,
+                    requests.c.lease_owner.is_not(None),
+                ))) or 0
+                if hotel_turns > limits.turns_per_hotel:
+                    oldest = connection.scalar(select(func.min(requests.c.created_at)).where(and_(
+                        requests.c.hotel_id == hotel_id, requests.c.created_at > boundary,
+                        requests.c.created_at <= timestamp,
+                        requests.c.lease_owner.is_not(None),
+                    )))
+                    raise QuotaExceeded("hotel_turns", int((oldest + timedelta(
+                        seconds=limits.window_seconds) - timestamp).total_seconds() + 0.999))
+                session_turns = connection.scalar(select(func.count()).select_from(requests).where(and_(
+                    requests.c.session_id == session_id, requests.c.created_at > boundary,
+                    requests.c.created_at <= timestamp,
+                    requests.c.lease_owner.is_not(None),
+                ))) or 0
+                if session_turns > limits.turns_per_session:
+                    oldest = connection.scalar(select(func.min(requests.c.created_at)).where(and_(
+                        requests.c.session_id == session_id, requests.c.created_at > boundary,
+                        requests.c.created_at <= timestamp,
+                        requests.c.lease_owner.is_not(None),
+                    )))
+                    raise QuotaExceeded("session_turns", int((oldest + timedelta(
+                        seconds=limits.window_seconds) - timestamp).total_seconds() + 0.999))
+                active_hotel = connection.scalar(select(func.count()).select_from(requests).where(and_(
+                    requests.c.hotel_id == hotel_id, requests.c.status == "processing",
+                    requests.c.lease_expires_at > timestamp,
+                ))) or 0
+                if active_hotel > limits.in_flight_per_hotel:
+                    soonest = connection.scalar(select(func.min(requests.c.lease_expires_at)).where(and_(
+                        requests.c.hotel_id == hotel_id, requests.c.status == "processing",
+                        requests.c.lease_expires_at > timestamp,
+                    )))
+                    raise QuotaExceeded("hotel_in_flight", int((soonest - timestamp).total_seconds() + 0.999))
+                active_session = connection.scalar(select(func.count()).select_from(requests).where(and_(
+                    requests.c.session_id == session_id, requests.c.status == "processing",
+                    requests.c.lease_expires_at > timestamp,
+                ))) or 0
+                if active_session > limits.in_flight_per_session:
+                    soonest = connection.scalar(select(func.min(requests.c.lease_expires_at)).where(and_(
+                        requests.c.session_id == session_id, requests.c.status == "processing",
+                        requests.c.lease_expires_at > timestamp,
+                    )))
+                    raise QuotaExceeded("session_in_flight", int((soonest - timestamp).total_seconds() + 0.999))
             if (deadline_monotonic is not None and time.monotonic() >= deadline_monotonic
                     or cancellation_event is not None and cancellation_event.is_set()):
                 raise TimeoutError("The guest turn expired before its reservation could commit.")
@@ -1890,6 +1999,46 @@ def reserve_request(
                     "pending_fields": current_brief["pending_fields"] or [],
                 }
         return response
+
+
+def consume_provider_slot(
+    engine: Engine, *, session_id: str, hotel_id: str, request_id: str, payload_hash: str,
+    lease_owner: str, limits: GuestAdmissionLimits | None = None, limit: int | None = None,
+    timeout_seconds: float | None = None,
+) -> int:
+    """Durably consume one provider dispatch before the provider is called."""
+    selected_limit = limit or (limits.provider_calls_per_request if limits else 2)
+    timestamp = utcnow()
+    with engine.begin() as connection:
+        set_transaction_timeout(connection, timeout_seconds)
+        updated = connection.execute(update(requests).where(and_(
+            requests.c.session_id == session_id,
+            requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id,
+            requests.c.payload_hash == payload_hash,
+            requests.c.status == "processing",
+            requests.c.lease_owner == lease_owner,
+            requests.c.lease_expires_at > timestamp,
+            requests.c.provider_calls < selected_limit,
+        )).values(provider_calls=requests.c.provider_calls + 1).returning(
+            requests.c.provider_calls,
+        ))
+        consumed = updated.scalar_one_or_none()
+        if consumed is not None:
+            return int(consumed)
+        row = connection.execute(select(requests).where(and_(
+            requests.c.session_id == session_id,
+            requests.c.hotel_id == hotel_id,
+            requests.c.request_id == request_id,
+            requests.c.payload_hash == payload_hash,
+        )).with_for_update()).mappings().first()
+        if (row is None or row["status"] != "processing"
+                or row["lease_owner"] != lease_owner
+                or row["lease_expires_at"] is None or row["lease_expires_at"] <= timestamp):
+            raise ProviderCallLimitExceeded("turn_lease_expired")
+        if row["provider_calls"] >= selected_limit:
+            raise ProviderCallLimitExceeded()
+        raise ProviderCallLimitExceeded("provider_call_unavailable")
 
 
 def complete_request(
@@ -2120,14 +2269,84 @@ def complete_request_with_response_only(
 
 def fail_request(
     engine: Engine, *, session_id: str, request_id: str, code: str,
-    timeout_seconds: float | None = None,
+    timeout_seconds: float | None = None, trace: dict[str, Any] | None = None,
 ) -> None:
+    safe_trace = _safe_turn_trace(trace) if trace is not None else None
     with engine.begin() as connection:
         set_transaction_timeout(connection, timeout_seconds)
+        values: dict[str, Any] = {"status": "error", "error_code": code}
+        if safe_trace is not None:
+            values["response"] = {"trace": safe_trace}
         connection.execute(update(requests).where(and_(
             requests.c.session_id == session_id, requests.c.request_id == request_id,
             requests.c.status == "processing",
-        )).values(status="error", error_code=code))
+        )).values(**values))
+
+
+def _safe_turn_trace(trace: dict[str, Any]) -> dict[str, Any]:
+    """Persist only the bounded execution metadata shape; never raw guest/provider text."""
+    from re import fullmatch
+
+    string_fields = {
+        "request_id", "session_id", "hotel_id", "provider", "deployment", "model",
+        "provider_request_id", "config_version", "prompt_version", "answer_schema_version",
+        "cost_status", "limits_version",
+    }
+    numeric_fields = {
+        "calls", "input_tokens", "output_tokens", "total_tokens", "schema_version",
+        "answer_schema_version", "source_generation", "brief_version", "elapsed_ms",
+        "context_chars", "turn_timeout_ms", "provider_timeout_ms", "max_output_tokens",
+    }
+    outcome = trace.get("outcome")
+    failure_stage = trace.get("failure_stage")
+    elapsed_ms = trace.get("elapsed_ms")
+    safe: dict[str, Any] = {
+        "schema_version": 1,
+        "outcome": outcome if isinstance(outcome, str) and outcome in {
+            "ok", "error", "cancelled", "in_progress",
+        } else "error",
+        "elapsed_ms": max(0, elapsed_ms) if isinstance(elapsed_ms, int) and not isinstance(elapsed_ms, bool) else None,
+        "failure_stage": failure_stage if isinstance(failure_stage, str) and failure_stage in {
+            "admission", "retrieval", "capability", "provider", "response",
+        } else None,
+        "failure_code": trace.get("failure_code") if isinstance(trace.get("failure_code"), str)
+        and fullmatch(r"[A-Za-z0-9_.-]{1,64}", trace["failure_code"]) else None,
+    }
+    for key in string_fields:
+        value = trace.get(key)
+        if isinstance(value, str) and 0 < len(value) <= 128 and not any(ord(char) < 32 for char in value):
+            safe[key] = value
+    for key in numeric_fields - {"elapsed_ms"}:
+        value = trace.get(key)
+        if isinstance(value, int) and not isinstance(value, bool):
+            safe[key] = max(0, value)
+    events: list[dict[str, Any]] = []
+    for event in trace.get("events", [])[:20] if isinstance(trace.get("events"), list) else []:
+        if not isinstance(event, dict) or event.get("stage") not in {
+            "admission", "retrieval", "capability", "provider", "response",
+        } or event.get("status") not in {"started", "ok", "error", "cancelled", "denied"}:
+            continue
+        item: dict[str, Any] = {"stage": event["stage"], "status": event["status"]}
+        duration = event.get("duration_ms")
+        if isinstance(duration, int) and not isinstance(duration, bool):
+            item["duration_ms"] = max(0, duration)
+        event_code = event.get("code")
+        if isinstance(event_code, str) and fullmatch(r"[A-Za-z0-9_.-]{1,64}", event_code):
+            item["code"] = event_code
+        for key in string_fields:
+            value = event.get(key)
+            if isinstance(value, str) and 0 < len(value) <= 128 and not any(ord(char) < 32 for char in value):
+                item[key] = value
+        for key in numeric_fields - {"elapsed_ms"}:
+            value = event.get(key)
+            if isinstance(value, int) and not isinstance(value, bool):
+                item[key] = max(0, value)
+        events.append(item)
+    safe["events"] = events
+    # This allowlist is naturally small, but retain a hard storage ceiling if fields change.
+    while len(json.dumps(safe, separators=(",", ":")).encode("utf-8")) > 8192 and safe["events"]:
+        safe["events"].pop()
+    return safe
 
 
 def complete_partial_request(

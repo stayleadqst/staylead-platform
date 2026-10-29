@@ -5,9 +5,11 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import sys
 import time
 import uuid
-from dataclasses import asdict, replace
+from contextvars import ContextVar
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
 from threading import Event
 from typing import Any
@@ -55,12 +57,15 @@ from staylead_platform.domains.hospitality.validators.guest_clarification import
 from staylead_platform.infrastructure.ai_provider import FoundryGrokConfig, FoundryGrokProvider
 from staylead_platform.infrastructure.codex_provider import CodexCLIProvider
 from staylead_platform.infrastructure.database import create_database_engine
+from staylead_platform.infrastructure.observability.turn_trace import TurnTrace
 from staylead_platform.infrastructure.persistence.knowledge_repository import (
     PostgresKnowledgeFactRepository,
 )
 from staylead_platform.infrastructure.persistence.media_repository import PostgresMediaRepository
 from staylead_platform.infrastructure.persistence.store import (
     IdempotencyConflict,
+    ProviderCallLimitExceeded,
+    QuotaExceeded,
     RequestInProgress,
     ScopeError,
     StaleSource,
@@ -70,6 +75,7 @@ from staylead_platform.infrastructure.persistence.store import (
     complete_partial_request,
     complete_request,
     complete_request_with_response_only,
+    consume_provider_slot,
     create_session,
     fail_request,
     get_active_snapshot,
@@ -84,12 +90,15 @@ from staylead_platform.infrastructure.persistence.store import (
     get_session,
     recent_messages,
     record_guest_brief_answer,
+    request_payload_hash,
     reserve_request,
     save_room_advice_result,
     select_room_advice_option,
     update_room_advice_presentation,
     validate_evidence_current,
 )
+from staylead_platform.platform.ai_runtime.execution import MeteredProvider
+from staylead_platform.platform.contracts.admission import GuestAdmissionLimits
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError, Usage
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefContext,
@@ -252,6 +261,23 @@ class GuestChatError(RuntimeError):
         self.retryable = retryable
         self.partial_result = partial_result
         self.validation_diagnostics = validation_diagnostics
+
+
+@dataclass(frozen=True)
+class ProviderAdmission:
+    session_id: str
+    hotel_id: str
+    request_id: str
+    payload_hash: str
+    lease_owner: str
+    limits: GuestAdmissionLimits
+
+
+def _quota_error(_exc: QuotaExceeded) -> GuestChatError:
+    return GuestChatError(
+        429, "quota_exceeded", "The request limit has been reached. Wait briefly, then try again.",
+        retryable=False,
+    )
 
 
 def build_provider(settings: Settings) -> AIProvider | None:
@@ -552,6 +578,20 @@ class GuestChatApplication:
         self._media_repository = media_repository or PostgresMediaRepository(engine)
         self._knowledge_retriever = knowledge_retriever
         self._knowledge_fact_repository = knowledge_fact_repository
+        self._request_trace: ContextVar[TurnTrace | None] = ContextVar(
+            f"staylead_guest_trace_{id(self)}", default=None,
+        )
+
+    def _admission_limits(self) -> GuestAdmissionLimits:
+        return GuestAdmissionLimits(
+            turns_per_session=self._settings.guest_turns_per_session,
+            turns_per_hotel=self._settings.guest_turns_per_hotel,
+            window_seconds=self._settings.guest_admission_window_seconds,
+            in_flight_per_session=self._settings.guest_in_flight_per_session,
+            in_flight_per_hotel=self._settings.guest_in_flight_per_hotel,
+            provider_calls_per_request=self._settings.guest_provider_calls_per_request,
+            lease_seconds=45,
+        )
 
     def lookup_hotel(self, hotel_slug: str) -> dict[str, Any]:
         try:
@@ -765,6 +805,8 @@ class GuestChatApplication:
         self, *, session_id: str, token: str, request_id: str, question: str | None,
         answer_only_receipt_id: str | None = None,
         turn_deadline_monotonic: float | None = None,
+        admission_parent: ProviderAdmission | None = None,
+        turn_started_at_monotonic: float | None = None,
     ) -> dict[str, Any]:
         if not self._settings.session_signing_secret:
             raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
@@ -775,6 +817,7 @@ class GuestChatApplication:
         if claims.session_id != session_id:
             raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
         loop = asyncio.get_running_loop()
+        trace_started_at = turn_started_at_monotonic or time.monotonic()
         turn_timeout = max(1.0, min(self._settings.ai_turn_timeout_seconds, 90.0))
         if turn_deadline_monotonic is None:
             deadline_monotonic = time.monotonic() + turn_timeout
@@ -815,6 +858,13 @@ class GuestChatApplication:
             raise GuestChatError(503, "storage_unavailable", "Language preference storage is unavailable.", retryable=True) from exc
         current_language = _language_preference_payload(current_language_row)
         reservation_question = question if question is not None else _resume_marker(answer_only_receipt_id or "")
+        payload_hash = request_payload_hash(reservation_question)
+        limits = self._admission_limits() if admission_parent is None else None
+        lease_owner = str(uuid.uuid4()) if admission_parent is None else None
+        lease_until = (
+            datetime.now(UTC) + timedelta(seconds=max(0.0, deadline_monotonic - time.monotonic()))
+            if limits is not None else None
+        )
         try:
             async with asyncio.timeout_at(deadline):
                 remaining = _remaining_seconds(deadline)
@@ -823,6 +873,7 @@ class GuestChatApplication:
                     self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                     request_id=request_id, question=reservation_question, timeout_seconds=remaining,
                     deadline_monotonic=deadline_monotonic, cancellation_event=cancellation_event,
+                    limits=limits, lease_owner=lease_owner, lease_until=lease_until,
                 )
         except TimeoutError as exc:
             cancellation_event.set()
@@ -836,6 +887,8 @@ class GuestChatApplication:
             raise GuestChatError(409, "idempotency_conflict", "request_id was used with different request data.") from exc
         except RequestInProgress as exc:
             raise GuestChatError(409, "request_in_progress", "This request is still processing.", retryable=True) from exc
+        except QuotaExceeded as exc:
+            raise _quota_error(exc) from exc
         except RuntimeError as exc:
             if str(exc) == "brief_apply_no_effect":
                 raise GuestChatError(
@@ -935,8 +988,58 @@ class GuestChatApplication:
                 else "current"
             )
             return cached
+        provider_admission = admission_parent or ProviderAdmission(
+            session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
+            payload_hash=payload_hash, lease_owner=lease_owner or "", limits=self._admission_limits(),
+        )
+        turn_trace = TurnTrace(started_at=trace_started_at)
+        turn_trace.set_metadata(
+            request_id=(admission_parent.request_id if admission_parent is not None else request_id),
+            session_id=session_id, hotel_id=claims.hotel_id,
+            prompt_version=hashlib.sha256((GROUNDED_QA_INSTRUCTIONS + COMMITTED_GROUNDED_QA_INSTRUCTIONS
+                                           + FACT_SELECTION_INSTRUCTIONS + COMMITTED_FACT_SELECTION_INSTRUCTIONS)
+                                          .encode("utf-8")).hexdigest()[:20],
+            answer_schema_version="hospitality-grounded-v2", source_generation=None,
+            brief_version=None, cost_status="unknown",
+            limits_version=hashlib.sha256(json.dumps(asdict(provider_admission.limits), sort_keys=True)
+                                           .encode("utf-8")).hexdigest()[:20],
+            turn_timeout_ms=int(max(0.0, deadline_monotonic - time.monotonic()) * 1000),
+            provider_timeout_ms=int(self._settings.ai_timeout_seconds * 1000),
+            max_output_tokens=min(700, self._settings.ai_max_output_tokens),
+        )
+        turn_trace.record("admission", "ok")
+
+        async def before_provider_call(_call_index: int) -> None:
+            try:
+                await asyncio.wait_for(asyncio.to_thread(
+                    consume_provider_slot, self._engine,
+                    session_id=provider_admission.session_id,
+                    hotel_id=provider_admission.hotel_id,
+                    request_id=provider_admission.request_id,
+                    payload_hash=provider_admission.payload_hash,
+                    lease_owner=provider_admission.lease_owner,
+                    limits=provider_admission.limits,
+                    timeout_seconds=_remaining_seconds(deadline),
+                ), timeout=_remaining_seconds(deadline))
+            except ProviderCallLimitExceeded as exc:
+                if exc.code == "turn_lease_expired":
+                    raise ProviderError("provider_timeout", "The request exceeded its time limit.", retryable=True) from exc
+                raise ProviderError(exc.code, "The request has no provider calls remaining.") from exc
+
+        request_trace_token = self._request_trace.set(turn_trace)
+        provider_scope = None
+        if self._orchestrator is not None:
+            metered_provider = MeteredProvider(
+                self._orchestrator.default_provider, before_call=before_provider_call,
+                trace=turn_trace, max_calls=provider_admission.limits.provider_calls_per_request,
+                max_context_chars=22_000, max_output_tokens=700,
+                provider_timeout_seconds=self._settings.ai_timeout_seconds,
+            )
+            provider_scope = self._orchestrator.provider_scope(metered_provider, trace=turn_trace)
+            provider_scope.__enter__()
         if self._orchestrator is None:
             await self._fail_request(session_id, request_id, "provider_unavailable")
+            self._request_trace.reset(request_trace_token)
             raise GuestChatError(503, "provider_unavailable", "Answer generation is not configured.")
         mutation = None
         brief_context: GuestBriefContext | None = None
@@ -966,6 +1069,7 @@ class GuestChatApplication:
                 )
                 if snapshot is None:
                     raise GuestChatError(404, "hotel_unavailable", "This hotel's records are unavailable.")
+                turn_trace.set_metadata(source_generation=snapshot.generation)
                 source_refs = {source.source_id: source for source in snapshot.sources}
                 history = await asyncio.to_thread(
                     recent_messages, self._engine, session_id, claims.hotel_id,
@@ -1020,6 +1124,7 @@ class GuestChatApplication:
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                         timeout_seconds=_remaining_seconds(deadline),
                     )
+                    turn_trace.set_metadata(brief_version=committed_brief.brief_version)
                     receipt_id_for_answer = answer_only_receipt_id
                     if pure_booking_request:
                         answer = _booking_channel_only_answer(tuple(saved_turn_intents))
@@ -1045,6 +1150,7 @@ class GuestChatApplication:
                         get_guest_brief, self._engine, session_id=session_id, hotel_id=claims.hotel_id,
                         timeout_seconds=_remaining_seconds(deadline),
                     )
+                    turn_trace.set_metadata(brief_version=committed_brief.brief_version)
                     source_utterance_id = str(uuid.uuid4())
                     language_before_turn = current_language["language_tag"]
                     prepared = await self._orchestrator.prepare_turn(
@@ -1160,6 +1266,8 @@ class GuestChatApplication:
                                 },
                                 "guest_brief": _brief_payload(committed_brief),
                             }
+                            turn_trace.record("response", "ok", code="confirmation_required")
+                            confirmation_response["trace"]["execution"] = turn_trace.close(outcome="ok")
                             try:
                                 await asyncio.to_thread(
                                     complete_request_with_response_only,
@@ -1208,6 +1316,7 @@ class GuestChatApplication:
                             ) from exc
                         apply_attempted = False
                         committed_brief = mutation.brief
+                        turn_trace.set_metadata(brief_version=committed_brief.brief_version)
                         receipt_id_for_answer = request_id
                         committed_label_request = _answer_label_request(
                             current_language["language_tag"], prepared.turn_intents,
@@ -1556,33 +1665,49 @@ class GuestChatApplication:
                 language_stale = latest_language["revision"] != answer_presentation["preference_revision"]
                 answer_presentation["freshness"] = "stale" if language_stale else "current"
                 remaining = _remaining_seconds(deadline)
+                turn_trace.record("response", "started")
+                # Persist and return exactly the same terminal snapshot. The live trace
+                # remains open so a persistence exception can still replace this optimistic
+                # success with its actual failure outcome in the error response.
+                trace["execution"] = turn_trace.snapshot(outcome="ok")
                 room_advice_fields = {"room_advice": room_advice_response} if room_advice_response is not None else {}
                 local_guide_fields = {"local_guide": local_guide_response} if local_guide_response is not None else {}
                 booking_fields = {"booking_request": {"requested": True}} if booking_requested else {}
-                result = await asyncio.to_thread(
-                    complete_request,
-                    self._engine, session_id=session_id, hotel_id=claims.hotel_id,
-                    request_id=request_id, question=transcript_question, answer=answer.answer,
-                    evidence=evidence,
-                    expected_generation=snapshot.generation,
-                    evidence_bindings=bindings,
-                    response_fields={"unknowns": list(answer.unknowns),
-                                     "guest_claims": list(answer.guest_claims),
-                                     "trace": trace, "media": media,
-                                     "source_generation": snapshot.generation,
-                                     "language_preference": latest_language,
-                                     "presentation": answer_presentation,
-                                     "answer_eligibility": "stale" if language_stale else "current",
-                                     **brief_fields, **room_advice_fields, **local_guide_fields, **booking_fields},
-                    brief_version_used=brief_version_used,
-                    brief_dependent=brief_dependent,
-                    brief_receipt_id=receipt_id_for_answer,
-                    timeout_seconds=remaining,
-                    deadline_monotonic=deadline_monotonic, cancellation_event=cancellation_event,
-                )
+                try:
+                    result = await asyncio.to_thread(
+                        complete_request,
+                        self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+                        request_id=request_id, question=transcript_question, answer=answer.answer,
+                        evidence=evidence,
+                        expected_generation=snapshot.generation,
+                        evidence_bindings=bindings,
+                        response_fields={"unknowns": list(answer.unknowns),
+                                         "guest_claims": list(answer.guest_claims),
+                                         "trace": trace, "media": media,
+                                         "source_generation": snapshot.generation,
+                                         "language_preference": latest_language,
+                                         "presentation": answer_presentation,
+                                         "answer_eligibility": "stale" if language_stale else "current",
+                                         **brief_fields, **room_advice_fields, **local_guide_fields, **booking_fields},
+                        brief_version_used=brief_version_used,
+                        brief_dependent=brief_dependent,
+                        brief_receipt_id=receipt_id_for_answer,
+                        timeout_seconds=remaining,
+                        deadline_monotonic=deadline_monotonic, cancellation_event=cancellation_event,
+                    )
+                except asyncio.CancelledError:
+                    turn_trace.record("response", "cancelled", code="request_cancelled")
+                    raise
+                except Exception:
+                    turn_trace.record("response", "error", code="response_persistence_failure")
+                    raise
+                turn_trace.record("response", "ok")
+                turn_trace.close(outcome="ok")
                 result.pop("evidence_bindings", None)
                 return result
         except GuestChatError as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code=exc.code)
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
@@ -1632,6 +1757,8 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "storage_unavailable")
             raise GuestChatError(503, "storage_unavailable", "Request storage is unavailable.", retryable=True) from exc
         except ConversationFailure as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code=exc.code)
             diagnostics = exc.validation_diagnostics if _validation_diagnostics_enabled(self._settings) else None
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
@@ -1647,6 +1774,8 @@ class GuestChatApplication:
                 validation_diagnostics=diagnostics,
             ) from exc
         except ScopeError as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code="invalid_session")
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
@@ -1656,6 +1785,8 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "invalid_session")
             raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
         except VersionConflict as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code="state_version_conflict")
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
@@ -1665,6 +1796,8 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "state_version_conflict")
             raise GuestChatError(409, "state_version_conflict", "Session state changed; submit a new request_id.") from exc
         except StaleSource as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code="stale_source")
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
@@ -1674,6 +1807,8 @@ class GuestChatApplication:
             await self._fail_request(session_id, request_id, "stale_source")
             raise GuestChatError(409, "stale_source", "Hotel records changed while this answer was being prepared. Ask again in a new turn.") from exc
         except Exception as exc:
+            if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
+                turn_trace.record("response", "error", code="internal_error")
             if mutation is not None and mutation.receipt.brief_version_after > mutation.receipt.brief_version_before:
                 raise await self._partial_failure(
                     session_id=session_id, hotel_id=claims.hotel_id, request_id=request_id,
@@ -1693,9 +1828,109 @@ class GuestChatApplication:
             else:
                 await self._fail_request(session_id, request_id, "request_cancelled")
             raise
+        finally:
+            active_exception = sys.exc_info()[1]
+            if not turn_trace.closed:
+                failure_event = next((item for item in reversed(turn_trace.events)
+                                      if item.get("status") in {"error", "cancelled", "denied"}), None)
+                turn_trace.close(
+                    outcome="cancelled" if isinstance(active_exception, asyncio.CancelledError)
+                    else "error" if active_exception is not None else "ok",
+                    failure_stage=failure_event.get("stage") if failure_event else None,
+                    failure_code=failure_event.get("code") if failure_event else None,
+                )
+            if isinstance(active_exception, GuestChatError):
+                if active_exception.partial_result is None:
+                    active_exception.partial_result = {}
+                response_trace = active_exception.partial_result.get("trace")
+                if not isinstance(response_trace, dict):
+                    response_trace = {}
+                    active_exception.partial_result["trace"] = response_trace
+                response_trace.setdefault("execution", turn_trace.as_dict())
+            if provider_scope is not None:
+                provider_scope.__exit__(None, None, None)
+            self._request_trace.reset(request_trace_token)
 
     async def confirm_brief_edit(
         self, *, session_id: str, token: str, request_id: str, confirmation_token: str,
+    ) -> dict[str, Any]:
+        turn_timeout = max(1.0, min(self._settings.ai_turn_timeout_seconds, 90.0))
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + turn_timeout
+        deadline_monotonic = time.monotonic() + turn_timeout
+        turn_started_at_monotonic = time.monotonic()
+        trace = TurnTrace(started_at=turn_started_at_monotonic)
+        trace.set_metadata(request_id=request_id, session_id=session_id,
+                           turn_timeout_ms=int(turn_timeout * 1000))
+        trace.record("admission", "started")
+        trace_token = self._request_trace.set(trace)
+        try:
+            async with asyncio.timeout_at(deadline):
+                response = await self._confirm_brief_edit_with_deadline(
+                    session_id=session_id, token=token, request_id=request_id,
+                    confirmation_token=confirmation_token, deadline=deadline,
+                    deadline_monotonic=deadline_monotonic,
+                    turn_started_at_monotonic=turn_started_at_monotonic,
+                )
+            trace.record("admission", "ok")
+            trace.close(outcome="ok")
+            return response
+        except TimeoutError as exc:
+            trace.record("response", "error", code="provider_timeout")
+            final_trace = trace.close(
+                outcome="error", failure_stage="response", failure_code="provider_timeout",
+            )
+            try:
+                saved = await asyncio.wait_for(asyncio.to_thread(
+                    get_completed_response, self._engine, session_id=session_id,
+                    hotel_id=verify_brief_confirmation(
+                        confirmation_token, secret=self._settings.session_signing_secret.get_secret_value(),
+                    ).hotel_id,
+                    request_id=request_id,
+                ), timeout=0.5)
+            except (SQLAlchemyError, TimeoutError, InvalidBriefConfirmation, AttributeError):
+                saved = None
+            if saved and saved.get("status") == "partial_success":
+                # The mutation committed, but the confirmation call exceeded its
+                # deadline before the acknowledgement completed. Preserve the established
+                # first-response contract (502 with receipt); a same-ID replay returns the
+                # durable partial response as 200 without repeating the mutation.
+                error = saved.get("error") if isinstance(saved.get("error"), dict) else {}
+                code = error.get("code") if isinstance(error.get("code"), str) else "provider_timeout"
+                message = (
+                    error.get("message") if isinstance(error.get("message"), str)
+                    else "The trip details were saved, but the answer exceeded its time limit."
+                )
+                raise GuestChatError(
+                    502, code, message, retryable=True, partial_result=saved,
+                ) from exc
+            await self._fail_request(session_id, request_id, "provider_timeout")
+            raise GuestChatError(
+                504, "provider_timeout", "The request exceeded its time limit.", retryable=True,
+                partial_result={"trace": {"execution": final_trace}},
+            ) from exc
+        except GuestChatError as exc:
+            if not any(event.get("status") in {"error", "cancelled", "denied"} for event in trace.events):
+                trace.record("admission", "denied", code=exc.code)
+            final_trace = trace.close(
+                outcome="error",
+                failure_stage="admission" if exc.code == "quota_exceeded" else "response",
+                failure_code=exc.code,
+            )
+            if exc.partial_result is None:
+                exc.partial_result = {}
+            response_trace = exc.partial_result.get("trace")
+            if not isinstance(response_trace, dict):
+                response_trace = {}
+                exc.partial_result["trace"] = response_trace
+            response_trace.setdefault("execution", final_trace)
+            raise
+        finally:
+            self._request_trace.reset(trace_token)
+
+    async def _confirm_brief_edit_with_deadline(
+        self, *, session_id: str, token: str, request_id: str, confirmation_token: str,
+        deadline: float, deadline_monotonic: float, turn_started_at_monotonic: float,
     ) -> dict[str, Any]:
         """Confirm a signed, version-bound proposal without preparing or reinterpreting it."""
         if not self._settings.session_signing_secret:
@@ -1714,11 +1949,14 @@ class GuestChatApplication:
         if confirmation.session_id != session_id or confirmation.hotel_id != session_claims.hotel_id:
             raise GuestChatError(403, "brief_confirmation_scope_mismatch", "This trip update belongs to another chat.")
 
-        turn_timeout = max(1.0, min(self._settings.ai_turn_timeout_seconds, 90.0))
-        deadline = asyncio.get_running_loop().time() + turn_timeout
-        deadline_monotonic = time.monotonic() + turn_timeout
         confirmation_identity = hashlib.sha256(confirmation_token.encode("ascii")).hexdigest()
         reservation_question = f"brief-confirmation:{confirmation_identity}"
+        admission_limits = self._admission_limits()
+        admission_owner = str(uuid.uuid4())
+        admission_hash = request_payload_hash(reservation_question)
+        admission_until = datetime.now(UTC) + timedelta(
+            seconds=max(0.0, deadline_monotonic - time.monotonic()),
+        )
         try:
             session, original = await asyncio.gather(
                 asyncio.to_thread(
@@ -1747,11 +1985,14 @@ class GuestChatApplication:
                 question=reservation_question,
                 timeout_seconds=_remaining_seconds(deadline),
                 deadline_monotonic=deadline_monotonic,
+                limits=admission_limits, lease_owner=admission_owner, lease_until=admission_until,
             )
         except IdempotencyConflict as exc:
             raise GuestChatError(409, "idempotency_conflict", "request_id was used with different confirmation data.") from exc
         except RequestInProgress as exc:
             raise GuestChatError(409, "request_in_progress", "This confirmation is still processing.", retryable=True) from exc
+        except QuotaExceeded as exc:
+            raise _quota_error(exc) from exc
         except RuntimeError as exc:
             if str(exc) == "brief_apply_no_effect":
                 raise GuestChatError(
@@ -1774,6 +2015,11 @@ class GuestChatApplication:
                     session_id=session_id, token=token, request_id=answer_request_id,
                     question=None, answer_only_receipt_id=request_id,
                     turn_deadline_monotonic=deadline_monotonic,
+                    turn_started_at_monotonic=turn_started_at_monotonic,
+                    admission_parent=ProviderAdmission(
+                        session_id=session_id, hotel_id=confirmation.hotel_id, request_id=request_id,
+                        payload_hash=admission_hash, lease_owner=admission_owner, limits=admission_limits,
+                    ),
                 )
                 return _merge_confirmation_trace(
                     {**refreshed, "request_id": request_id}, original.get("trace"),
@@ -1849,6 +2095,11 @@ class GuestChatApplication:
                     session_id=session_id, token=token, request_id=answer_request_id,
                     question=None, answer_only_receipt_id=request_id,
                     turn_deadline_monotonic=deadline_monotonic,
+                    turn_started_at_monotonic=turn_started_at_monotonic,
+                    admission_parent=ProviderAdmission(
+                        session_id=session_id, hotel_id=confirmation.hotel_id, request_id=request_id,
+                        payload_hash=admission_hash, lease_owner=admission_owner, limits=admission_limits,
+                    ),
                 )
             except GuestChatError as exc:
                 raise await self._partial_failure(
@@ -1857,6 +2108,9 @@ class GuestChatApplication:
                     brief_version_used=mutation_result.brief.brief_version,
                     code=exc.code, message=str(exc), deadline=deadline,
                     status=exc.status, preparation_trace=original.get("trace"),
+                    execution_trace=(exc.partial_result.get("trace", {}).get("execution")
+                                     if isinstance(exc.partial_result, dict)
+                                     and isinstance(exc.partial_result.get("trace"), dict) else None),
                 ) from exc
             response = {**response, "request_id": request_id}
             response = _merge_confirmation_trace(response, original.get("trace"))
@@ -1941,6 +2195,7 @@ class GuestChatApplication:
         brief_version_used: int, code: str, message: str, deadline: float, status: int = 502,
         validation_diagnostics: dict[str, Any] | None = None,
         preparation_trace: dict[str, Any] | None = None,
+        execution_trace: dict[str, Any] | None = None,
     ) -> GuestChatError:
         brief = await asyncio.to_thread(
             get_guest_brief, self._engine, session_id=session_id, hotel_id=hotel_id,
@@ -1980,6 +2235,18 @@ class GuestChatApplication:
             partial["error"]["validation_diagnostics"] = validation_diagnostics
         if preparation_trace is not None:
             partial["preparation_trace"] = preparation_trace
+        if execution_trace is not None:
+            safe_execution = dict(execution_trace)
+            safe_execution["request_id"] = request_id
+            partial["trace"] = {"execution": safe_execution}
+        turn_trace = self._request_trace.get()
+        if "trace" not in partial and turn_trace is not None:
+            failure_event = next((item for item in reversed(turn_trace.events)
+                                  if item.get("status") in {"error", "cancelled", "denied"}), None)
+            partial["trace"] = {"execution": turn_trace.close(
+                outcome="error", failure_stage=failure_event.get("stage") if failure_event else None,
+                failure_code=failure_event.get("code") if failure_event else code,
+            )}
         partial = await asyncio.to_thread(
             complete_partial_request, self._engine, session_id=session_id, hotel_id=hotel_id,
             request_id=request_id, response=partial, brief_receipt_id=receipt_id,
@@ -2034,10 +2301,20 @@ class GuestChatApplication:
         )
 
     async def _fail_request(self, session_id: str, request_id: str, code: str) -> None:
+        trace = self._request_trace.get()
+        safe_trace = None
+        if trace is not None:
+            failure_event = next((item for item in reversed(trace.events)
+                                  if item.get("status") in {"error", "cancelled", "denied"}), None)
+            safe_trace = trace.close(
+                outcome="cancelled" if code == "request_cancelled" else "error",
+                failure_stage=failure_event.get("stage") if failure_event else None,
+                failure_code=failure_event.get("code") if failure_event else code,
+            )
         try:
             await asyncio.wait_for(asyncio.to_thread(
                 fail_request, self._engine, session_id=session_id, request_id=request_id,
-                code=code, timeout_seconds=0.5,
+                code=code, timeout_seconds=0.5, trace=safe_trace,
             ), timeout=0.6)
         except (SQLAlchemyError, TimeoutError):
             # Best effort cleanup must not mask the original timeout/provider failure.
