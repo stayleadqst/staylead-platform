@@ -1,6 +1,6 @@
 # Sprint 10 — Nghiệm thu B08
 
-Trạng thái: local verification và [Q độc lập đủ AC1–3/technical DoD PASS](evidence/sprint-10/independent-final-review.json); đang delivery. Chưa nhận story Done, merged hoặc deployed.
+Trạng thái: local verification và [Q độc lập đủ AC1–3/technical DoD PASS](evidence/sprint-10/independent-final-review.json); B08 Done sau merge PR #106; chưa deployed.
 
 Sprint record chính: [#105](https://github.com/stayleadqst/staylead-platform/issues/105). Core duy nhất: [#29 B08](https://github.com/stayleadqst/staylead-platform/issues/29), giữ đủ AC1–3. Không có stretch story; #16/#19 là dependencies dùng lại capability/evidence phù hợp, không đóng parent rộng hơn.
 
@@ -51,3 +51,26 @@ Giới hạn UI/evidence: CITY chứng minh supported breakfast continuation; ca
 Chưa commit/publish/merge tại lúc tạo report. C sẽ đối chiếu source/test pins với tree/head đã publish trước khi chuyển Done. Không manualCI/rerun, không chờ CI làm gate hoặc bypass; workflows tự động có thể chạy khi branch/PR được cập nhật.
 
 Timebox: starts15:40:09, Review16:45, Retro16:55, ends17:00 ngày28-10-2026 +07. Planning/tracker/lịch được bổ sung muộn, không backdate; sự cố và thay đổi quy tắc planning đã ghi trong #105/AGENTS.md. Review bắt đầu thực tế16:47:52+07 (muộn2phút52s so với lịch); snapshot đủAC/QPASS nhưng mergepending. Retro NOT_RUN tại lúc tạo report; Qreview không tự thay hai sự kiện này. Stakeholder feedback thực về planning/process đã có từ Hieu; không có hotel/guest pilot hay product signoff mới.
+
+### Sprint Review thực tế
+
+Bắt đầu16:47:52+07, hoàn thành16:53:39+07 ngày28-10-2026; muộn2phút52s so với lịch16:45, không backdate. C inspect kết quả/demo đã ghi ở bảngAC, finalQ và tree xuất bản. Goal ACHIEVED trong phạm vi local/synthetic đã công bố: supported partial/conflict+confirmation, contact/hours đúng property, fallback outage và continuation đều hoạt động qua consumer thực. #29 đã đóng completed sau merge. Không nhận real-provider/hotel/guest pilot hoặc stakeholder product signoff mới.
+
+PR #106: https://github.com/stayleadqst/staylead-platform/pull/106, head a3b61990501b0164c0dc79bf506dd47801aa8a5e, tree42f32bbcd2c706c0882dcce4c0d09b3ce0acc024 khớp local. Merge c333bc49c84aa57844e465aee5d0139c6baec2fa đọc lại đúng integration; compare candidate→merge files=[] (không source delta). Không manualCI/wait gate/bypass; tự độngCI có thể chạy, trạng tháiCI chưa xác minh.
+
+Feedback thực từ Hieu: thiếu danh sáchstory→ticket trước coding là lỗi nghiêm trọng; dùng tiếngViệt, áp dụng đầy đủ process và max24h. Đã sửa tracker và binding trong sprint, lưu planninggate bắt buộc workspaceAGENTS. Không đồng nhất QPASS với Review; Review này là assessment của C trên bằng chứng và feedback thực.
+
+### Retrospective và đóng sprint — thực tế 2026-10-29T05:48:45.862450+07:00
+
+Retro COMPLETE, thực hiện muộn sau timebox; không sửa ends_at17:00 hoặc backdate thành16:55. Lần kiểm trước09:54:18Z, lần kiểm sau14:57:46Z; dateUTC và clock đều xác nhận14:57:54Z. Khoảng gián đoạn chưa rõ nguyên nhân; hard deadline/wake supervisor chưa được xác minh. Kết quả tại17:00: B08 đã merged/Done và Review COMPLETE, Retro chưa thực hiện đúng lịch. Sprint delivery thành công nhưng có vi phạm planning và lịchRetro. Chỉ thực hiện closure sau hạn, không thêm implementation.
+
+Điều đã hiệu quả: pin candidate/test + fresh Q tìm P1 thật trước delivery; giữ failed evidence và xin đúng extension tại cap; local API/PG/browser chứng minh consumer/recovery thay vì chỉ unit schema.
+
+| Cải tiến | Owner | Kiểm chứng lần sau |
+|---|---|---|
+| Trước coding hiển thị và lưu danh sách story→ticket, fullAC/deps/owners/status, tracker sync và fixed schedule | C | Planninggate trong workspaceAGENTS, kiểm trước dispatch Luna |
+| Test sớm exact orchestrator→API consumer cho output không có text | B, C, freshQ | Positive/negative contract + actual API trước fullbrowser |
+| Xác nhận fault qua API504 và latency trước timeoutbrowser matrix | B/C | Assert fault và no-provider-live guard trước matrix |
+| Mỗi lần tiếp tục execution kiểm clock/ends_at; quá hạn chỉ đóng hồ sơ và ghi actual outcome | C | Phase transition/time inspection; không claim unattended harddeadline đã có |
+
+Các quyết định này là thay đổi cách thực thi, không dựng automationframework hay mở lại S1–S9. Workers B/Q completed, mọi leases đóng; lsof13540/18540/55440 không có listener; web exit130, API cases exit0, pg_ctl stopped. Live inference0, manualCI0; usage/cost coding unavailable. Product pin và harness4/4, productP1repair1 giữ nguyên qua handoff.
