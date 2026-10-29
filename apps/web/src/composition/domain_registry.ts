@@ -42,6 +42,7 @@ export type GuestTurnResultRendererProps = Readonly<{
 export type TurnResultActions = Readonly<{
   selectOption: (args: Readonly<{
     sessionId: string; accessToken: string; result: unknown; optionId: string; target: DomainTarget;
+    signal?: AbortSignal;
   }>) => Promise<unknown>;
   attachSelection: (response: unknown, result: unknown, selection: unknown) => unknown;
 }>;

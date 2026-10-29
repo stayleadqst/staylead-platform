@@ -1,0 +1,91 @@
+{
+  "handoff_version": 1,
+  "worker": "B / transport_builder",
+  "sprint": "Sprint 12",
+  "story": "B11 frontend guest session deletion",
+  "scope": "Frontend only. D02 not selected. Backend owned by A.",
+  "repository": "/Users/ccvn/Documents/project/Staylead/github/staylead-platform",
+  "branch": "sprint-12-retention-transport",
+  "base_head": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+  "handoff_recorded_at": "2026-10-29 09:44:36 +07:00",
+  "validation_execution_time": {
+    "reported_window": "2026-10-29 approximately 09:39-09:42 Asia/Ho_Chi_Minh",
+    "exact_per_command_timestamps_available": false,
+    "note": "The command runner output captured exit codes and results, but did not retain per-command wall-clock timestamps. This range is the contemporaneous execution report; no exact timestamps are inferred."
+  },
+  "validation": [
+    {
+      "name": "contracts",
+      "cwd": "apps/web",
+      "command": "npm run test:contracts",
+      "environment": "Inherited environment; no command-specific variables reported.",
+      "exit_code": 0,
+      "result": "PASS: 51 tests, 0 failures (1..51).",
+      "raw_output": "The tool capture was truncated. Available summary confirms 51/51; complete raw stdout is not available and was not reconstructed."
+    },
+    {
+      "name": "lint",
+      "cwd": "apps/web",
+      "command": "npm run lint",
+      "environment": "Inherited environment; no command-specific variables reported.",
+      "exit_code": 0,
+      "result": "PASS."
+    },
+    {
+      "name": "typecheck",
+      "cwd": "apps/web",
+      "command": "npm run typecheck",
+      "environment": "Inherited environment; no command-specific variables reported.",
+      "exit_code": 0,
+      "result": "PASS; script runs next typegen && tsc --noEmit."
+    },
+    {
+      "name": "build_initial_missing_public_configuration",
+      "cwd": "apps/web",
+      "command": "npm run build",
+      "environment": "No NEXT_PUBLIC_STAYLEAD_DOMAIN or NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION supplied.",
+      "exit_code": 1,
+      "result": "FAIL during prerender of /: DomainRegistrationError: Public domain and guest contract configuration are required.",
+      "classification": "Initial environment/configuration failure. Preserved in this handoff; this was one failed build attempt and is not a product-code failure."
+    },
+    {
+      "name": "build_configured",
+      "cwd": "apps/web",
+      "command": "NEXT_PUBLIC_STAYLEAD_DOMAIN=hospitality NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION=2 npm run build",
+      "environment": {
+        "NEXT_PUBLIC_STAYLEAD_DOMAIN": "hospitality",
+        "NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION": "2"
+      },
+      "exit_code": 0,
+      "result": "PASS."
+    },
+    {
+      "name": "diff_check",
+      "cwd": "repository root",
+      "command": "git diff --check",
+      "environment": "Inherited environment.",
+      "exit_code": 0,
+      "result": "PASS."
+    }
+  ],
+  "source_sha256": {
+    "apps/web/src/app/api/guest/[...path]/route.ts": "51d3f931e104cb03fc56e289876f5c9889b15fd6567d46b0ebceebbc80724133",
+    "apps/web/src/composition/domain_registry.ts": "237b8c5d0030340e0762a94b80dc98b0a6c704ce890d5f2ce76aaa7c60044159",
+    "apps/web/src/domains/hospitality/registration/index.tsx": "acaab9a3a521d57db6b74e9ada4a0105daa09223b49bdcf252a05b3e43d27409",
+    "apps/web/src/shared/api/client.ts": "cd148384e040c41673391a0904dc147a071e0e653f696361284a933a0fa532cc",
+    "apps/web/src/shared/chat/GuestChat.tsx": "19cdaae750bef5a162c03a6ba70f629bdcccec7a6a5e0980ce6daaa6da9804cb",
+    "apps/web/tests/api-client.test.mjs": "43bcfcc48d66bc6306d3cf0be6007f2322b76b922dff1f2f6f0d2067134c9e11"
+  },
+  "builder_b_counters": {
+    "preexisting_counter_file_found": false,
+    "historical_sprint_11_counters_reset": false,
+    "new_failed_operation": "One initial build attempt without required public domain/guest contract environment; subsequent configured build passed.",
+    "repair_attempts_after_final_validation": 0
+  },
+  "limits": [
+    "No backend/API integration or database test was run by this frontend worker.",
+    "No live model, deployment, paid resource, credentials, shared infrastructure, or CI action was used.",
+    "No product code writes or validation reruns are authorized after this evidence handoff without a precise repair dispatch."
+  ],
+  "lease": "Released after this evidence handoff; no further writes by B without a precise repair dispatch."
+}

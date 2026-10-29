@@ -101,6 +101,11 @@ async function forward(request: NextRequest, context: RouteContext) {
     backendPath = "/v1/guest/sessions";
     requiresJsonBody = true;
   } else if (
+    method === "DELETE" && path.length === 2 && path[0] === "sessions"
+    && SESSION_ID_PATTERN.test(path[1])
+  ) {
+    backendPath = `/v1/guest/sessions/${path[1]}`;
+  } else if (
     method === "POST" && path.length === 3 && path[0] === "sessions"
     && SESSION_ID_PATTERN.test(path[1]) && path[2] === "messages"
   ) {
@@ -174,6 +179,7 @@ async function forward(request: NextRequest, context: RouteContext) {
   if (requiresJsonBody) headers.set("content-type", "application/json");
   const authorization = request.headers.get("authorization");
   const scopedGuestRequest = (method === "POST" && path.length === 3 && path[2] === "messages")
+    || (method === "DELETE" && path.length === 2 && path[0] === "sessions")
     || (method === "GET" && path.length === 3 && path[2] === "room-advice")
     || (method === "POST" && path.length === 5 && path[2] === "room-advice" && path[4] === "selection")
     || (method === "POST" && path.length === 3 && path[2] === "freshness")
@@ -192,6 +198,9 @@ async function forward(request: NextRequest, context: RouteContext) {
       cache: "no-store",
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
+    if (upstream.status === 204) {
+      return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
+    }
     if (binaryLimit !== undefined) {
       if (!upstream.ok) {
         const errorBytes = await readBoundedResponse(upstream, MAX_BODY_BYTES);
@@ -243,3 +252,4 @@ async function forward(request: NextRequest, context: RouteContext) {
 
 export const GET = forward;
 export const POST = forward;
+export const DELETE = forward;

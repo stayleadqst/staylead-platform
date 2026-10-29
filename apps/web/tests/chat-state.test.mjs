@@ -7,11 +7,41 @@ import {
   classifyFailure,
   classifySessionFailure,
   hasUnresolvedRequest,
+  isSessionExpired,
+  isSessionInvalidationFailure,
   isCurrentGeneration,
   releaseRequest,
   resolveAnswerOnlyReceipt,
   retryModeForFailure,
+  sessionExpiryDelay,
 } from "../src/shared/chat/chat-state.ts";
+
+test("session expiry is exact at the boundary and malformed expiry fails closed", () => {
+  const now = Date.parse("2026-10-29T03:00:00.000Z");
+  assert.equal(sessionExpiryDelay("2026-10-29T04:00:00.000Z", now), 60 * 60 * 1000);
+  assert.equal(isSessionExpired("2026-10-29T04:00:00.000Z", now), false);
+  assert.equal(sessionExpiryDelay("2026-10-29T03:00:00.000Z", now), 0);
+  assert.equal(isSessionExpired("2026-10-29T03:00:00.000Z", now), true);
+  assert.equal(sessionExpiryDelay("not-a-timestamp", now), 0);
+  assert.equal(isSessionExpired("not-a-timestamp", now), true);
+  assert.equal(sessionExpiryDelay("2026-10-29T04:00:00.000Z", Number.NaN), 0);
+});
+
+test("responses from a session generation cleared at expiry cannot repopulate content", () => {
+  const generation = { current: 7 };
+  const requestGeneration = generation.current;
+  let cachedTranscript = null;
+  generation.current += 1;
+  const lateResponse = { answer: "expired private content" };
+  if (isCurrentGeneration(requestGeneration, generation.current)) cachedTranscript = lateResponse;
+  assert.equal(cachedTranscript, null);
+});
+
+test("authoritative invalid session responses invalidate session-bound cached content", () => {
+  assert.equal(isSessionInvalidationFailure({ code: "invalid_session", outcome: "rejected" }), true);
+  assert.equal(isSessionInvalidationFailure({ code: "session_scope_mismatch", outcome: "rejected" }), true);
+  assert.equal(isSessionInvalidationFailure({ code: "freshness_unavailable", outcome: "unknown" }), false);
+});
 
 test("ambiguous network outcomes and pending requests keep their request ID", () => {
   assert.equal(classifyFailure({ outcome: "unknown" }).retryMode, "same-request");

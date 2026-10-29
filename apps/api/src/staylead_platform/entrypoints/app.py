@@ -1,11 +1,16 @@
 """HTTP transport for the composed StayLead guest-chat application."""
 
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import SQLAlchemyError
 
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies.guest_chat import (
@@ -18,7 +23,12 @@ from staylead_platform.composition.dependencies.operator_guide import (
 from staylead_platform.composition.startup.domain_profile import select_domain_profile
 from staylead_platform.entrypoints.operator.router import router as operator_router
 from staylead_platform.infrastructure.database import create_database_engine
+from staylead_platform.infrastructure.persistence.store import (
+    next_session_expiry,
+    purge_expired_sessions,
+)
 from staylead_platform.platform.contracts.ai_provider import AIProvider
+from staylead_platform.platform.guest_context.sessions.retention import cleanup_delay_seconds
 
 MAX_QUESTION_CHARS = 2000
 GUEST_CONTRACT_VERSION = "2"
@@ -128,7 +138,36 @@ def create_app(
     selected_operator_guide = operator_guide
     if selected_operator_guide is None:
         selected_operator_guide = create_operator_guide_application(selected_settings, engine=database)
-    app = FastAPI(title="StayLead Platform API", version="0.1.0")
+    async def retention_loop() -> None:
+        while True:
+            try:
+                nearest = await asyncio.to_thread(next_session_expiry, database)
+                delay = cleanup_delay_seconds(
+                    now=datetime.now(UTC), next_expiry=nearest,
+                    maintenance_interval_seconds=selected_settings.session_retention_sweep_interval_seconds,
+                )
+                await asyncio.sleep(delay)
+                await asyncio.to_thread(purge_expired_sessions, database)
+            except (SQLAlchemyError, TimeoutError, OSError) as exc:
+                logging.getLogger(__name__).warning(
+                    "guest session retention sweep failed (%s)", type(exc).__name__,
+                )
+                await asyncio.sleep(selected_settings.session_retention_sweep_interval_seconds)
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        await asyncio.to_thread(purge_expired_sessions, database)
+        sweep = asyncio.create_task(retention_loop(), name="guest-session-retention")
+        try:
+            yield
+        finally:
+            sweep.cancel()
+            try:
+                await sweep
+            except asyncio.CancelledError:
+                pass
+
+    app = FastAPI(title="StayLead Platform API", version="0.1.0", lifespan=lifespan)
     app.add_middleware(
         RawRequestBodyLimitMiddleware,
         max_bytes=selected_settings.guest_request_body_limit_bytes,
@@ -171,6 +210,16 @@ def create_app(
     @app.post("/v1/guest/sessions", status_code=201, tags=["guest chat"])
     async def open_guest_session(body: CreateSessionRequest) -> dict[str, Any]:
         return guest_chat.open_session(body.hotel_slug)
+
+    @app.delete("/v1/guest/sessions/{session_id}", status_code=204, tags=["guest chat"])
+    def delete_guest_session(
+        session_id: str,
+        authorization: str | None = Header(default=None),
+    ) -> Response:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.")
+        guest_chat.delete_session(session_id=session_id, token=authorization[7:])
+        return Response(status_code=204, headers={"Cache-Control": "no-store"})
 
     @app.get("/v1/guest/hotels/{hotel_slug}", tags=["guest chat"])
     async def lookup_guest_hotel(hotel_slug: str) -> dict[str, Any]:

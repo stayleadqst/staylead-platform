@@ -1,0 +1,95 @@
+{
+  "recorded_at": "2026-10-29T03:26:15.050226+00:00",
+  "owner": "C aggregate; builder ledgers remain actual attempt sources",
+  "inherited_ref": "github/staylead-platform/docs/product/evidence/sprint-11/counters.json",
+  "reset": false,
+  "repair_journal": [
+    {
+      "class": "b11_post_delete_session_liveness",
+      "attempt": 1,
+      "aliases": [
+        "b11_retention_provider_dispatch_gate"
+      ],
+      "source": "builder-a-counters.json",
+      "state": "completed; counted in broader liveness class, no reset"
+    },
+    {
+      "class": "b11_post_delete_session_liveness",
+      "attempt": 2,
+      "aliases": [
+        "late_language_preference_after_delete"
+      ],
+      "state": "COMPLETED; original independent Q12-1/Q12-2 reproducers PASS on final candidate",
+      "finding": "Q actualHTTP provider delay then DELETE204 then language preference orphan; remains after8daypurge",
+      "source": "q-retention-probe.json",
+      "owner": "A",
+      "cap": 3,
+      "findings": [
+        "Q12-1 late language preference orphan",
+        "Q12-2 concurrent cleanup/delete duplicates quota reservation"
+      ],
+      "scope": "One batched backend lifecycle atomicity/liveness repair round, existing provider gate attempt1 remains counted. No fresh per-function budget."
+    },
+    {
+      "class": "b11_acceptance_harness_A",
+      "attempt": 1,
+      "aliases": [
+        "b11_confirmation_consumer_test_fixture"
+      ],
+      "state": "historical unreserved correction; no reset"
+    },
+    {
+      "class": "b11_acceptance_harness_A",
+      "attempt": 2,
+      "state": "COMPLETED; legitimate due-count oracle preserved; final backend208PASS",
+      "failure": "v2 root204PASS1FAIL: +8day purge globalcountassert0, but shared private DB contains100 other genuinelydue sessions; own orphan cleanup succeeds",
+      "evidence": "root-backend-gates-v2.log test_expiry_purge_uses_clock_and_prunes_redacted_reservations_after_window:236",
+      "required_oracle": "preserve own orphan deletion and exact legitimatelydue session count scoped to pre-run snapshot/batch contract or isolate fixture; do not lower productAC"
+    },
+    {
+      "class": "b11_acceptance_harness_A",
+      "attempt": 3,
+      "state": "completed test-only import-order correction; focused configured Ruff passes; baseline API I001 findings confirmed by exact HEAD comparison; cap exhausted",
+      "failure": "C canonical Ruff --config apps/api/pyproject.toml finds I001 in new B11 test import block; builder prior Ruff report did not establish this configured import gate",
+      "required_scope": "import order only; move local test_b10_trace_postgres import after staylead_platform group; preserve all AC/expectations",
+      "cap": 3,
+      "next_after_cap": "stop further mutations for this harness class; no reset/new lint-class budget",
+      "outcome": "Only moved test_b10_trace_postgres import after staylead_platform imports. Test expectations preserved. No product-source edits. No product test rerun; C v3 backend suite passed 205/205.",
+      "evidence": "builder-a-round3-manifest.json and round3 logs"
+    },
+    {
+      "class": "b11_acceptance_harness_A",
+      "attempt": 4,
+      "state": "completed; app and CLI findings corrected; cap 4/4 exhausted",
+      "cap": 4,
+      "extension_authority": "Hieu direct async reply: Cho phép thêm 1 vòng sửa lint",
+      "extension_recorded_at": "2026-10-29T03:14:14.745688+00:00",
+      "scope": "Only app.py import format + typed DB/runtime cleanup catch + retention_cli.py ISO Z parse simplification; relevant lint/compile/consumer/Qdelta; no scope/AC/policy/timebox/live/deploy changes",
+      "prior_3_attempts_preserved": true,
+      "outcome": "App import formatting and exception type, redacted retry log, and Python 3.11 Z timestamp parser corrected; remaining 3 I001 findings are baseline and preserved.",
+      "evidence": "builder-a-final-batch-manifest.json and builder-a-final-ruff-all-eight.log"
+    },
+    {
+      "class": "b11_post_delete_session_liveness",
+      "attempt": 3,
+      "state": "completed; controlled expiry locks rejected selection/result/brief writes; no further liveness attempts remain",
+      "cap": 3,
+      "finding": "Q12-3 HTTP selection waits across controlledexpiry thenreturns200/stores selection due pre-lock staleclock",
+      "scope": "resample authoritative time after serialization locks; guard select_room_advice_option and same relevant brief/result write paths; no after-expiry commit; actual scoped regression",
+      "source": "q-selection-expiry-probe.json",
+      "no_new_budget_per_function": true,
+      "outcome": "Q12-3 closed locally with actual HTTP selection regression and PostgreSQL lock-wait writer regressions; source pins and commands in builder-a-final-batch-manifest.json",
+      "evidence": "builder-a-final-batch-manifest.json and builder-a-final-focused-tests.log"
+    }
+  ],
+  "other_new_attempts": {
+    "b11_retention_lifecycle_deadline": 1,
+    "b11_delete_scope_binding": 1,
+    "b11_client_expiry_cache_invalidation": 1,
+    "b11_confirmation_consumer_test_fixture": {
+      "attempt": 1,
+      "initially_unreserved": true
+    }
+  },
+  "next_action": "All source leases released; Q full PASS; C publishes exact candidate. Exhausted caps remain exhausted."
+}

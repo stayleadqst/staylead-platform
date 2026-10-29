@@ -194,13 +194,15 @@ function endpoint(target: DomainTarget, suffix = ""): string {
   return `${target.apiBasePath}${suffix}`;
 }
 
-async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
+async function request<T>(url: string, init: RequestInit = {}, expectNoContent = false): Promise<T> {
   let response: Response;
   try {
     response = await fetch(url, {
       ...init,
       cache: "no-store",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: init.signal
+        ? AbortSignal.any([init.signal, AbortSignal.timeout(REQUEST_TIMEOUT_MS)])
+        : AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: { accept: "application/json", ...init.headers },
     });
   } catch {
@@ -244,6 +246,19 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
         ? body as GuestPartialResult
         : undefined,
     });
+  }
+
+  if (expectNoContent) {
+    if (response.status !== 204) {
+      throw new ApiError({
+        status: response.status,
+        code: "invalid_delete_response",
+        message: "The service did not confirm that this chat was deleted.",
+        retryable: true,
+        outcome: "unknown",
+      });
+    }
+    return undefined as T;
   }
 
   try {
@@ -291,6 +306,20 @@ export async function createGuestSession(args: {
   });
 }
 
+export async function deleteGuestSession(args: {
+  sessionId: string;
+  accessToken: string;
+  target: DomainTarget;
+  signal?: AbortSignal;
+}): Promise<void> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  await request<void>(endpoint(args.target, `/sessions/${sessionId}`), {
+    method: "DELETE",
+    headers: { authorization: `Bearer ${args.accessToken}` },
+    signal: args.signal,
+  }, true);
+}
+
 export async function getGuestHotel(args: { hotelSlug: string; target: DomainTarget }): Promise<GuestHotel> {
   const slug = encodeURIComponent(args.hotelSlug);
   const hotel = await request<GuestHotel>(endpoint(args.target, `/hotels/${slug}`));
@@ -312,6 +341,7 @@ export async function sendGuestMessage(args: {
   question?: string;
   answerOnlyReceiptId?: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<GuestMessageResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
   return request<GuestMessageResponse>(endpoint(args.target, `/sessions/${sessionId}/messages`), {
@@ -320,6 +350,7 @@ export async function sendGuestMessage(args: {
       "content-type": "application/json",
       authorization: `Bearer ${args.accessToken}`,
     },
+    signal: args.signal,
     body: JSON.stringify({ request_id: args.requestId, ...(args.question ? { question: args.question } : {}),
       ...(args.answerOnlyReceiptId ? { answer_only_receipt_id: args.answerOnlyReceiptId } : {}) }),
   });
@@ -331,11 +362,13 @@ export async function confirmGuestBriefEdit(args: {
   requestId: string;
   confirmationToken: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<GuestMessageResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
   return request<GuestMessageResponse>(endpoint(args.target, `/sessions/${sessionId}/brief-confirmations`), {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
+    signal: args.signal,
     body: JSON.stringify({ request_id: args.requestId, confirmation_token: args.confirmationToken }),
   });
 }
@@ -385,6 +418,7 @@ export async function checkGuestFreshness(args: {
   accessToken: string;
   requestId: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<GuestFreshnessResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
   return request<GuestFreshnessResponse>(endpoint(args.target, `/sessions/${sessionId}/freshness`), {
@@ -393,6 +427,7 @@ export async function checkGuestFreshness(args: {
       "content-type": "application/json",
       authorization: `Bearer ${args.accessToken}`,
     },
+    signal: args.signal,
     body: JSON.stringify({ request_id: args.requestId }),
   });
 }
@@ -404,6 +439,7 @@ export async function selectGuestRoomAdviceOption(args: {
   resultVersion: number;
   optionId: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<Readonly<{ result_id: string; result_version: number; option_id: string; updated_at: string }>> {
   const sessionId = encodeURIComponent(args.sessionId);
   const resultId = encodeURIComponent(args.resultId);
@@ -411,5 +447,6 @@ export async function selectGuestRoomAdviceOption(args: {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
     body: JSON.stringify({ result_version: args.resultVersion, option_id: args.optionId }),
+    signal: args.signal,
   });
 }

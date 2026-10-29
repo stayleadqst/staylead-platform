@@ -1,0 +1,16 @@
+{
+  "http_status": 404,
+  "http_body": {
+    "error": {
+      "code": "room_advice_unavailable",
+      "message": "This room option is not available in this chat.",
+      "retryable": false
+    }
+  },
+  "controlled_expiry": "2026-10-29T03:23:05.352495+00:00",
+  "completion_time": "2026-10-29T03:23:05.712086+00:00",
+  "selection_persisted": false,
+  "selection_timestamp": null,
+  "request_finished": true,
+  "pins_after_match": true
+}

@@ -1,0 +1,14 @@
+{
+  "http_status": 200,
+  "http_body": {
+    "result_id": "b12c3b54-b423-4272-aecf-cb7ceb6184e8",
+    "result_version": 1,
+    "option_id": "synthetic-option",
+    "updated_at": "2026-10-29T03:13:19.561211+00:00"
+  },
+  "controlled_expiry": "2026-10-29T03:13:20.042076+00:00",
+  "completion_time": "2026-10-29T03:13:20.528289+00:00",
+  "selection_persisted": true,
+  "selection_timestamp": "2026-10-29 10:13:19.561211+07:00",
+  "request_finished": true
+}

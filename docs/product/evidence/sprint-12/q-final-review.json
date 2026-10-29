@@ -1,0 +1,255 @@
+{
+  "scope_ref": "https://github.com/stayleadqst/staylead-platform/issues/34",
+  "planning_ref": "https://github.com/stayleadqst/staylead-platform/issues/110",
+  "phase": "independent_Q_final",
+  "outcome": "PASS_FULL_SCOPED_AC_AND_TECHNICAL_DOD",
+  "recorded_at_utc": "2026-10-29T03:24:26.222288+00:00",
+  "candidate_refs": {
+    "repository": "stayleadqst/staylead-platform",
+    "base": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+    "branch": "sprint-12-retention-transport",
+    "state": "fixed working tree, uncommitted at Q review; base SHA alone does not contain candidate",
+    "manifest": "docs/product/evidence/sprint-12/candidate-final.json",
+    "fingerprint": "8ec664f8f849b7883d6f30eef97cc6be8fdb0c047d3bebf730b239c1070763af",
+    "file_count": 213,
+    "all_pins_before_after_and_final_match": true,
+    "prior_candidates_preserved": [
+      "candidate-v1.json FAIL Q12-1/Q12-2",
+      "candidate-v2.json FAIL Q12-3"
+    ]
+  },
+  "policy": "pilot-retention-24h-ops7d-v1",
+  "independence": {
+    "candidate_edits": 0,
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "high",
+    "actual_model": "unavailable",
+    "actual_effort": "unavailable",
+    "readonly_enforcement": "instruction only; enforced permissionprofile unavailable",
+    "stakeholder_acceptance": false
+  },
+  "ac_results": {
+    "AC1": {
+      "outcome": "PASS",
+      "evidence": [
+        "Clock-controlled24h clamping and before/at expiry cleanup assertions in B11 PG tests",
+        "Old signed bearer cannot use deleted session via messages/freshness/confirmation/room read/selection/media; explicit own repeat DELETE204",
+        "Q12-1 delayed provider language write fenced after DELETE204; lateHTTP401 and no derived orphan even +8day cleanup",
+        "Q12-3 actual HTTP selection waiting across expiry returns404 and persists no selection on final candidate",
+        "Frontend source generation/abort/stateclear review; C actual desktop/mobile delete, authoritative serverexpiry, automatic20s controlled clientexpiry, inflightlateUI"
+      ]
+    },
+    "AC2": {
+      "outcome": "PASS",
+      "evidence": [
+        "B11 tests missing/path/cross-property bearer denial and other session preserved; signed expired own bearer only for idempotent deletion",
+        "C actual two-tab same-hotel isolation: A deleted while B continues; signed property scope checked server-side",
+        "Q concurrent DELETE and scheduledpurge serialize one genuine reservation into exactly one redacted hotel-quota row",
+        "Q delayed complete_request vs DELETE releases locks, raises ScopeError and leaves no content/session/request"
+      ]
+    },
+    "AC3": {
+      "outcome": "PASS",
+      "evidence": [
+        "Independent UTC lifecycle probe startupcatchup/futurenearestexpiry/unrelatedlive/shutdown namedtask1→0",
+        "All session-bearing storage tables inventoried: messages, requests/replay/trace, briefs, language, source utterances, receipts, room results and selections",
+        "Redacted reservation removes original clientID/sessionID/contenthash/response/error/trace; quota retained only600s then pruned, satisfying≤7d maximum",
+        "Historical orphan cleanup controlled +8day assertion; no content survives in redacted opsmetadata",
+        "Final guard tests for room result and brief lockwait across expiry are meaningful and no post-expiry new derived rows; source checked after-lock UTC use"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "Q12-1",
+      "priority": "P1",
+      "blocking": false,
+      "title": "Prevent language preference recreation after deletion",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1907,
+      "related_consumer": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py:1204",
+      "requirement": "B11 AC1/AC3 and approved content+derived deletion policy",
+      "cause": "commit_language_preference locks only its own optional row, never the live owning session. A delayed preparation can insert a fresh preference after DELETE has removed the session. Cleanup only traverses extant sessions, so the orphan survives.",
+      "repro": "Private PG + actual HTTP: pause deterministic provider in preparation, DELETE own session (204), release provider declaring explicit_language_tag=fr. Session and preference counts at delete completion are0; late request504 creates1 language row linked to deleted SID. Explicit purge at now+8days leaves1 row.",
+      "evidence": [
+        "q-retention-probe.py",
+        "q-retention-probe.json",
+        "q-retention-probe-escalated.log"
+      ],
+      "disposition": "CLOSED by independent original reproducer recheck",
+      "closure_candidate": "8ec664f8f849b7883d6f30eef97cc6be8fdb0c047d3bebf730b239c1070763af",
+      "closure_evidence": [
+        "q-retention-probe-v2.json",
+        "q-retention-probe-v2.log"
+      ]
+    },
+    {
+      "id": "Q12-2",
+      "priority": "P2",
+      "blocking": false,
+      "title": "Serialize cleanup before copying quota reservations",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1211,
+      "related_paths": [
+        "delete_guest_session:1286",
+        "purge_expired_sessions:1312"
+      ],
+      "requirement": "B11 AC2/AC3 and unchanged B10 quota accounting",
+      "cause": "Both cleanup paths select without exclusive session claim; concurrent cleanup transactions may copy the same recent reservation into two random redacted rows. Idempotent deletion changes hotel admission count.",
+      "repro": "One reserved request; two actual delete_guest_session calls in concurrent threads. SQLAlchemy after_cursor_execute barrier only schedules both recent SELECTs before DELETE. Both calls returnTrue, session count0, retained quota count2. Explicit delete can overlap scheduled cleanup after phase1 expiry.",
+      "evidence": [
+        "q-double-delete-probe.py",
+        "q-double-delete-probe.json",
+        "q-double-delete-probe.log"
+      ],
+      "disposition": "CLOSED by independent original reproducer recheck",
+      "closure_candidate": "8ec664f8f849b7883d6f30eef97cc6be8fdb0c047d3bebf730b239c1070763af",
+      "closure_evidence": [
+        "q-double-delete-probe-v2.json",
+        "q-lockorder-v2.json"
+      ]
+    },
+    {
+      "id": "Q12-3",
+      "priority": "P2",
+      "blocking": false,
+      "title": "Resample expiry after selection scope locks before writing",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1689,
+      "requirement": "B11 AC1/AC3; approved max24h content/derived lifecycle; expected-results expiry_boundary denies consumer paths at/after boundary",
+      "cause": "select_room_advice_option samples UTC before waiting for session/hotel/result locks and reuses it to check currentness; no actual post-lock expiry check. A live request can wait across expiry and commit derived selection with a backdated timestamp.",
+      "repro": "Actual HTTP on privateQ with unexpired signed token. Existing valid stored result; hold hotel FORUPDATE. Selection starts live and acquires session lock then waits hotel. Advance real time across controlled expires_at, release hotel. API returns200 and selection exists although completion is after expiry.",
+      "observed": {
+        "http_status": 200,
+        "http_body": {
+          "result_id": "b12c3b54-b423-4272-aecf-cb7ceb6184e8",
+          "result_version": 1,
+          "option_id": "synthetic-option",
+          "updated_at": "2026-10-29T03:13:19.561211+00:00"
+        },
+        "controlled_expiry": "2026-10-29T03:13:20.042076+00:00",
+        "completion_time": "2026-10-29T03:13:20.528289+00:00",
+        "selection_persisted": true,
+        "selection_timestamp": "2026-10-29 10:13:19.561211+07:00",
+        "request_finished": true
+      },
+      "evidence": [
+        "q-selection-expiry-probe.py",
+        "q-selection-expiry-probe.json",
+        "q-selection-expiry-probe.log"
+      ],
+      "related_source_risk_only": [
+        "save_room_advice_result samples UTC before lock",
+        "apply_guest_brief_patch samples UTC before lock"
+      ],
+      "note": "Not a claim of post-DELETE-completion leakage. Two prior findings remain independently closed on v2; this is the expiry lock boundary.",
+      "disposition": "CLOSED by independent original reproducer recheck",
+      "closure_candidate": "8ec664f8f849b7883d6f30eef97cc6be8fdb0c047d3bebf730b239c1070763af",
+      "closure_evidence": [
+        "q-selection-expiry-final.json",
+        "q-selection-expiry-final.log"
+      ]
+    }
+  ],
+  "open_failures": [],
+  "validation": {
+    "independent_execution": {
+      "database": "only C-owned private staylead_s12_q on127.0.0.1:55442",
+      "providers": "deterministic explicitly offline; no actual product model calls",
+      "exact_rechecks": [
+        "Q12-1 v1FAIL→v2PASS",
+        "Q12-2 v1FAIL→v2PASS",
+        "Q12-3 v2FAIL→finalPASS"
+      ],
+      "additional_probes": [
+        "startup/background/shutdown lifecycle",
+        "completion requestlock→delete expiry→latecommitdeny",
+        "scheduled purge versus explicit delete exact onequota"
+      ]
+    },
+    "reused_final_gates": {
+      "C_backend": "208 passed,43.65s; runner58694 finalexit0 confirmed byC; raw root-backend-gates-delivery.log",
+      "A_focused": "9B11 PG tests passed,12.49s; new after-lock selection/result/brief guards reviewed",
+      "web": "54contracts/lint/typecheck/configuredbuild PASS;8webpins remain compatible unchanged",
+      "compileall": "A final compileall exit0; gitdiffcheck exit0; CLI Zparse smokeexit0"
+    },
+    "ruff": {
+      "configured_all_eight_exit": 1,
+      "remaining_findings": [
+        {
+          "file": "settings.py",
+          "code": "I001",
+          "cause": "same baseline blank separator after future import"
+        },
+        {
+          "file": "guest_chat.py",
+          "code": "I001",
+          "cause": "same baseline blank separator after future import"
+        },
+        {
+          "file": "store.py",
+          "code": "I001",
+          "cause": "same baseline blank separator after future import"
+        }
+      ],
+      "new_findings": 0,
+      "comparison": "C exact HEAD versus final Ruff --diff correction comparison, source refs below; affected eligible fivefiles RuffPASS",
+      "assessment": "Non-blocking exact unchanged baseline formatting findings; do not report entire configured Ruff check green"
+    },
+    "consumer_evidence": "C executed actual browser→production localNext13542→API18542→privatePG; Q read v1/v2 observation records and visually inspected all supplied desktop/mobile screenshots; Q did not claim those browser actions as its ownexecution",
+    "reuse_reason": "Frontend8pins unchanged and final API denial codes retain existing route contract. Latewrite guards and exceptiontype-only logging do not invalidate verifieddelete/retry/timer UI paths; no redundant fullbrowser rerun requested"
+  },
+  "evidence_refs": [
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-initial-review.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-delta-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-delta-v2-expiry-finding.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-retention-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-retention-probe-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-double-delete-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-double-delete-probe-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lifecycle-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lifecycle-probe-final.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lockorder-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-selection-expiry-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-selection-expiry-final.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-selection-expiry-final.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/root-backend-gates-delivery.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/builder-a-final-batch-manifest.json",
+    "docs/product/evidence/sprint-12/expected-results.json",
+    "docs/product/evidence/sprint-12/browser-observations-v1.json",
+    "docs/product/evidence/sprint-12/browser-observations-v2.json",
+    "docs/product/evidence/sprint-12/web-validation-final.json",
+    "docs/product/evidence/sprint-12/ruff-baseline-comparison.json"
+  ],
+  "changed_records": [
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-final-review.json"
+  ],
+  "counters_used": {
+    "Q_product_repairs": 0,
+    "Q_successful_private_pg_probe_runs_total": 9,
+    "Q_live_inference": 0,
+    "Q_sandbox_denied_before_pg": 1,
+    "Q_own_lifecycle_fixture_timing_correction": 1,
+    "inherited_and_builder_counters": "preserved byC; liveness3/3 and harness4/4 explicitextension exhausted; no reset/relabel byQ",
+    "tokens_cost_usage": "unavailable"
+  },
+  "checkpoint_ref": "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-final-review.json",
+  "next_action": "C may publish authorized own sprint PR into existing sprint-5-canonical-brief after confirming commit/publication retains reviewed content; no addedCIwait/manualCI gate. C owns actual publication, SprintReview/Retro and service cleanup.",
+  "wait_condition": null,
+  "limitations": [
+    "Technical local verification is not stakeholder acceptance or deployment/real-hotel/real-model proof",
+    "Physical retention while a future deployment is stopped is not guaranteed by local in-process cleanup; startup catchup and explicitCLI are verified supported paths",
+    "No live inference, deployment, sharedinfra/credential changes, externalmessages or CI dispatch/rerun byQ",
+    "Raw browser DB observations were executed byC; screenshots are supporting evidence alongside integration/probes, not standalone E2E proof",
+    "Configured all-eight Ruff remains exit1 for the exact three baseline I001 findings; no newlintfinding"
+  ],
+  "operational_state": {
+    "Q_private_services": 0,
+    "Q_active_db_connections": 0,
+    "Q_testclients_and_workers": "closed/joined",
+    "source_hold": "RELEASED",
+    "Q_candidate_mutation_lease": false,
+    "publication_state": "not pushed/merged byQ; coordinator owns delivery",
+    "product_completion": "not claimed"
+  }
+}

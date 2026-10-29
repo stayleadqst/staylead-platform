@@ -97,6 +97,9 @@ from staylead_platform.infrastructure.persistence.store import (
     update_room_advice_presentation,
     validate_evidence_current,
 )
+from staylead_platform.infrastructure.persistence.store import (
+    delete_guest_session as erase_guest_session,
+)
 from staylead_platform.platform.ai_runtime.execution import MeteredProvider
 from staylead_platform.platform.contracts.admission import GuestAdmissionLimits
 from staylead_platform.platform.contracts.ai_provider import AIProvider, ProviderError, Usage
@@ -133,14 +136,16 @@ from staylead_platform.platform.guest_context.sessions.brief_confirmation import
     issue_brief_confirmation,
     verify_brief_confirmation,
 )
+from staylead_platform.platform.guest_context.sessions.retention import SESSION_CONTENT_MAX_AGE
 from staylead_platform.platform.guest_context.sessions.signing import (
     InvalidSessionToken,
     issue_token,
     verify_token,
+    verify_token_for_delete,
 )
 from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
 
-SESSION_TTL = timedelta(hours=24)
+SESSION_TTL = SESSION_CONTENT_MAX_AGE
 MEDIA_MAX_BYTES = {"image/png": 5 * 1024 * 1024, "video/mp4": 20 * 1024 * 1024, "text/vtt": 256 * 1024}
 
 
@@ -801,6 +806,32 @@ class GuestChatApplication:
             "language_preference": _language_preference_payload(None),
         }
 
+    def delete_session(self, *, session_id: str, token: str) -> None:
+        if not self._settings.session_signing_secret:
+            raise GuestChatError(503, "session_signing_unavailable", "Guest sessions are not configured.")
+        try:
+            claims = verify_token_for_delete(
+                token, secret=self._settings.session_signing_secret.get_secret_value(),
+            )
+        except InvalidSessionToken as exc:
+            raise GuestChatError(401, "invalid_session", "A valid guest session is required.") from exc
+        if claims.session_id != session_id:
+            raise GuestChatError(403, "session_scope_mismatch", "The session does not match this request.")
+        try:
+            existing = get_session(self._engine, claims.session_id)
+            if existing is not None and existing["hotel_id"] != claims.hotel_id:
+                raise GuestChatError(
+                    403, "session_scope_mismatch", "The session does not match this request.",
+                )
+            # Missing/already-expired rows are an idempotent successful delete.
+            erase_guest_session(
+                self._engine, session_id=claims.session_id, hotel_id=claims.hotel_id,
+            )
+        except GuestChatError:
+            raise
+        except Exception as exc:
+            raise GuestChatError(503, "storage_unavailable", "Session deletion is unavailable.", retryable=True) from exc
+
     async def send_message(
         self, *, session_id: str, token: str, request_id: str, question: str | None,
         answer_only_receipt_id: str | None = None,
@@ -1179,6 +1210,10 @@ class GuestChatApplication:
                                 expected_revision=current_language["revision"],
                                 timeout_seconds=_remaining_seconds(deadline),
                             )
+                        except ScopeError as exc:
+                            raise GuestChatError(
+                                401, "invalid_session", "A valid guest session is required.",
+                            ) from exc
                         except Exception as exc:
                             raise GuestChatError(503, "storage_unavailable", "Language preference could not be saved.", retryable=True) from exc
                         current_language = _language_preference_payload(current_language_row)
