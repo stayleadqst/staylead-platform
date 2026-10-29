@@ -1,0 +1,11 @@
+{
+  "at_utc": "2026-10-26T03:43:49.930335+00:00",
+  "provider_requests_used": 6,
+  "remaining_provider_entitlement": 12,
+  "semantic_turns_used": 2,
+  "reason": "T2 numeric-binding failure and failed explicitresume; stop inference, fix deterministic safe-portion mechanism underarchitecture\u00a73; preserve failed run, do not claimfullmatrixPASS",
+  "candidate": "9929c33a77eb1354e8468b5130d2b36df12e919e",
+  "original_cap": 18,
+  "additional_allowance": "not yet approved; prepared newnamespace only, no calls",
+  "coordinator_plan": "after fixedcandidate/review, request6additionalrequests and transferunused12 to one final18requestbatch; do not consume both entitlements"
+}

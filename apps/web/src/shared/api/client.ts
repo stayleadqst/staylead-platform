@@ -5,8 +5,26 @@ export type GuestSession = Readonly<{
   access_token: string;
   token_type: "Bearer";
   expires_at: string;
-  hotel: Record<string, unknown>;
+  hotel: Readonly<Record<string, unknown>>;
   config_version: string;
+  language_preference?: GuestLanguagePreference;
+}>;
+
+export type GuestLanguagePreference = Readonly<{
+  language_tag: string;
+  source: "explicit" | "inferred" | "fallback";
+  revision: number;
+}>;
+
+export type GuestPresentation = Readonly<{
+  language_tag: string;
+  direction: "ltr" | "rtl";
+  preference_revision: number;
+  labels: Readonly<Record<string, string>>;
+  local_guide_labels?: Readonly<Record<string, string>>;
+  labels_fallback?: boolean;
+  freshness: "current" | "stale";
+  receipt_id: string | null;
 }>;
 
 export type GuestEvidence = Readonly<{
@@ -48,22 +66,84 @@ export type GuestHotel = Readonly<{
   public_config: Record<string, unknown>;
   config_version: string;
   guest_contract_version: string;
+  booking_channel?: unknown;
 }>;
 
 export type GuestMessageResponse = Readonly<{
   request_id: string;
-  status: "completed";
-  answer: string;
-  evidence: readonly GuestEvidence[];
-  media: readonly GuestMediaDescriptor[];
-  unknowns: readonly string[];
-  trace: Readonly<Record<string, unknown>>;
-  config_version: string;
-  state_version: number;
-  source_generation: number;
+  status: "completed" | "partial_success" | "confirmation_required";
+  confirmation_required?: boolean;
+  brief_confirmation?: GuestBriefConfirmation;
+  answer?: string;
+  evidence?: readonly GuestEvidence[];
+  media?: readonly GuestMediaDescriptor[];
+  unknowns?: readonly string[];
+  guest_claims?: readonly Readonly<{ text: string; refs: readonly string[] }>[];
+  trace?: Readonly<Record<string, unknown>>;
+  config_version?: string;
+  state_version?: number;
+  source_generation?: number;
+  guest_brief?: GuestBriefSnapshot;
+  brief_receipt?: GuestBriefReceipt | null;
+  applied_delta?: Record<string, unknown>;
+  answer_status?: "pending" | "completed" | "failed";
+  brief_version_used?: number | null;
+  brief_dependent?: boolean;
+  brief_narrative_stale?: boolean;
+  replayed?: boolean;
+  error?: Readonly<{ code: string; message: string }>;
+  language_preference?: GuestLanguagePreference;
+  presentation?: GuestPresentation;
+  answer_eligibility?: "current" | "pending" | "stale";
+  room_advice?: unknown;
+  booking_request?: unknown;
 }>;
 
-export type GuestFreshnessResponse = Readonly<{ status: "current" | "stale" }>;
+export type GuestBriefConfirmation = Readonly<{
+  token: string;
+  expected_brief_version: number;
+  changes: readonly Readonly<{
+    field: string;
+    before_present?: boolean;
+    before?: unknown;
+    after_present?: boolean;
+    after?: unknown;
+  }>[];
+  expires_at: string;
+}>;
+
+export type GuestBriefMember = Readonly<{ member_id: string; age: number | null }>;
+export type GuestBriefSnapshot = Readonly<{
+  brief_version: number;
+  dates: Readonly<{ check_in: string | null; check_out: string | null; nights: number | null }>;
+  party: Readonly<{ adults: number | null; children: readonly GuestBriefMember[] }>;
+  pending_fields: readonly string[];
+}>;
+export type GuestBriefReceipt = Readonly<{
+  request_id: string;
+  status: "applied" | "no_change" | "clarification" | "partial_success";
+  brief_version_before: number;
+  brief_version_after: number;
+  applied_delta: Record<string, unknown>;
+  source_refs: readonly Readonly<{ source_utterance_id: string; request_id: string; fields: readonly string[] }>[];
+  answer_status: "pending" | "completed" | "failed";
+  brief_version_used: number | null;
+}>;
+
+export type GuestPartialResult = Readonly<{
+  request_id: string;
+  status: "partial_success";
+  guest_brief: GuestBriefSnapshot;
+  brief_receipt: GuestBriefReceipt;
+  applied_delta: Record<string, unknown>;
+  answer_status: "failed";
+  error: Readonly<{ code: string; message: string }>;
+}>;
+
+export type GuestFreshnessResponse = Readonly<{
+  status: "current" | "stale";
+  room_advice_currentness?: "current" | "stale";
+}>;
 
 export type GuestContractMetadata = Readonly<{
   status: "ok";
@@ -77,6 +157,7 @@ export class ApiError extends Error {
   readonly retryable: boolean;
   readonly requestId?: string;
   readonly outcome: "unknown" | "rejected";
+  readonly partialResult?: GuestPartialResult;
 
   constructor(args: {
     status: number;
@@ -85,6 +166,7 @@ export class ApiError extends Error {
     retryable?: boolean;
     requestId?: string;
     outcome: "unknown" | "rejected";
+    partialResult?: GuestPartialResult;
   }) {
     super(args.message);
     this.name = "ApiError";
@@ -93,6 +175,7 @@ export class ApiError extends Error {
     this.retryable = args.retryable ?? false;
     this.requestId = args.requestId;
     this.outcome = args.outcome;
+    this.partialResult = args.partialResult;
   }
 }
 
@@ -111,13 +194,15 @@ function endpoint(target: DomainTarget, suffix = ""): string {
   return `${target.apiBasePath}${suffix}`;
 }
 
-async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
+async function request<T>(url: string, init: RequestInit = {}, expectNoContent = false): Promise<T> {
   let response: Response;
   try {
     response = await fetch(url, {
       ...init,
       cache: "no-store",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: init.signal
+        ? AbortSignal.any([init.signal, AbortSignal.timeout(REQUEST_TIMEOUT_MS)])
+        : AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       headers: { accept: "application/json", ...init.headers },
     });
   } catch {
@@ -156,7 +241,24 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
       outcome: typeof details?.code === "string" && details.code.startsWith("api_proxy_")
         ? "unknown"
         : "rejected",
+      partialResult: body && typeof body === "object" && "status" in body
+        && (body as { status?: unknown }).status === "partial_success"
+        ? body as GuestPartialResult
+        : undefined,
     });
+  }
+
+  if (expectNoContent) {
+    if (response.status !== 204) {
+      throw new ApiError({
+        status: response.status,
+        code: "invalid_delete_response",
+        message: "The service did not confirm that this chat was deleted.",
+        retryable: true,
+        outcome: "unknown",
+      });
+    }
+    return undefined as T;
   }
 
   try {
@@ -204,6 +306,20 @@ export async function createGuestSession(args: {
   });
 }
 
+export async function deleteGuestSession(args: {
+  sessionId: string;
+  accessToken: string;
+  target: DomainTarget;
+  signal?: AbortSignal;
+}): Promise<void> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  await request<void>(endpoint(args.target, `/sessions/${sessionId}`), {
+    method: "DELETE",
+    headers: { authorization: `Bearer ${args.accessToken}` },
+    signal: args.signal,
+  }, true);
+}
+
 export async function getGuestHotel(args: { hotelSlug: string; target: DomainTarget }): Promise<GuestHotel> {
   const slug = encodeURIComponent(args.hotelSlug);
   const hotel = await request<GuestHotel>(endpoint(args.target, `/hotels/${slug}`));
@@ -222,8 +338,10 @@ export async function sendGuestMessage(args: {
   sessionId: string;
   accessToken: string;
   requestId: string;
-  question: string;
+  question?: string;
+  answerOnlyReceiptId?: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<GuestMessageResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
   return request<GuestMessageResponse>(endpoint(args.target, `/sessions/${sessionId}/messages`), {
@@ -232,7 +350,26 @@ export async function sendGuestMessage(args: {
       "content-type": "application/json",
       authorization: `Bearer ${args.accessToken}`,
     },
-    body: JSON.stringify({ request_id: args.requestId, question: args.question }),
+    signal: args.signal,
+    body: JSON.stringify({ request_id: args.requestId, ...(args.question ? { question: args.question } : {}),
+      ...(args.answerOnlyReceiptId ? { answer_only_receipt_id: args.answerOnlyReceiptId } : {}) }),
+  });
+}
+
+export async function confirmGuestBriefEdit(args: {
+  sessionId: string;
+  accessToken: string;
+  requestId: string;
+  confirmationToken: string;
+  target: DomainTarget;
+  signal?: AbortSignal;
+}): Promise<GuestMessageResponse> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  return request<GuestMessageResponse>(endpoint(args.target, `/sessions/${sessionId}/brief-confirmations`), {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
+    signal: args.signal,
+    body: JSON.stringify({ request_id: args.requestId, confirmation_token: args.confirmationToken }),
   });
 }
 
@@ -281,6 +418,7 @@ export async function checkGuestFreshness(args: {
   accessToken: string;
   requestId: string;
   target: DomainTarget;
+  signal?: AbortSignal;
 }): Promise<GuestFreshnessResponse> {
   const sessionId = encodeURIComponent(args.sessionId);
   return request<GuestFreshnessResponse>(endpoint(args.target, `/sessions/${sessionId}/freshness`), {
@@ -289,6 +427,26 @@ export async function checkGuestFreshness(args: {
       "content-type": "application/json",
       authorization: `Bearer ${args.accessToken}`,
     },
+    signal: args.signal,
     body: JSON.stringify({ request_id: args.requestId }),
+  });
+}
+
+export async function selectGuestRoomAdviceOption(args: {
+  sessionId: string;
+  accessToken: string;
+  resultId: string;
+  resultVersion: number;
+  optionId: string;
+  target: DomainTarget;
+  signal?: AbortSignal;
+}): Promise<Readonly<{ result_id: string; result_version: number; option_id: string; updated_at: string }>> {
+  const sessionId = encodeURIComponent(args.sessionId);
+  const resultId = encodeURIComponent(args.resultId);
+  return request(endpoint(args.target, `/sessions/${sessionId}/room-advice/${resultId}/selection`), {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${args.accessToken}` },
+    body: JSON.stringify({ result_version: args.resultVersion, option_id: args.optionId }),
+    signal: args.signal,
   });
 }

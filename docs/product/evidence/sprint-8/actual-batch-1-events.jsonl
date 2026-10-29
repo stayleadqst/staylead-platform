@@ -1,0 +1,2 @@
+{"call": 1, "latency_ms": 12619, "response_sha256": "8e86292a274d8552118e55bbcc01bcb6ea8b9f732377716fa11d7075e4729ea6", "run_id": "s8-local-guide-20261028-acceptance", "stage": "provider_completed", "turn": 1}
+{"call": 2, "latency_ms": 11634, "response_sha256": "93e76515e732517cb5b7079850f1c174a68ba567d240b7566e3d23987ca070d9", "run_id": "s8-local-guide-20261028-acceptance", "stage": "provider_completed", "turn": 1}

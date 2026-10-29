@@ -1,0 +1,264 @@
+{
+  "method": "Pure schema parser→M4 using exact actual nativecall2+actual committedbrief; two explicit OFFLINE index-only counterfactuals. No actualstate repair/provider/API/DB writes.",
+  "original_static_parser": "accepts range-valid1based indices; existingM4strictguard correctlyrejects",
+  "results": {
+    "exact_original": {
+      "status": "unsupported",
+      "brief_version": 2,
+      "source_generation": 1,
+      "source_refs": [
+        {
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "26a0c15bb4e3653842977b89f7074db041a67372746dd08f79ac5554b7cf24a3",
+          "source_generation": 1,
+          "fact_id": "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        }
+      ],
+      "options": [],
+      "questions": [
+        {
+          "field": "room_advice",
+          "reason": "This arrangement conflicts with a confirmed room rule. Would you like me to try another arrangement?",
+          "locale": "en",
+          "locale_fallback": true,
+          "presentation_key": "question.room_rule_conflict"
+        }
+      ],
+      "explanation_inputs": {
+        "supported_fact_ids": [
+          "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        ],
+        "unknowns": [],
+        "conflicts": [
+          "room_count_mismatch"
+        ],
+        "rejected_alternatives": [],
+        "tradeoffs": [],
+        "availability": "unknown",
+        "rationale_locale": "fr"
+      },
+      "availability": "unknown",
+      "hotel_answer": null,
+      "presentation_labels": {},
+      "presentation_locale": null
+    },
+    "only_room_index_zero": {
+      "status": "conflict",
+      "brief_version": 2,
+      "source_generation": 1,
+      "source_refs": [
+        {
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "26a0c15bb4e3653842977b89f7074db041a67372746dd08f79ac5554b7cf24a3",
+          "source_generation": 1,
+          "fact_id": "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        }
+      ],
+      "options": [],
+      "questions": [
+        {
+          "field": "room_advice",
+          "reason": "This arrangement conflicts with a confirmed room rule. Would you like me to try another arrangement?",
+          "locale": "en",
+          "locale_fallback": true,
+          "presentation_key": "question.room_rule_conflict"
+        }
+      ],
+      "explanation_inputs": {
+        "supported_fact_ids": [
+          "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        ],
+        "unknowns": [],
+        "conflicts": [
+          "candidate_fails_hard_room_check"
+        ],
+        "rejected_alternatives": [],
+        "tradeoffs": [],
+        "availability": "unknown",
+        "rationale_locale": "fr"
+      },
+      "availability": "unknown",
+      "hotel_answer": null,
+      "presentation_labels": {},
+      "presentation_locale": null
+    },
+    "room_and_bed_indices_zero": {
+      "status": "partial",
+      "brief_version": 2,
+      "source_generation": 1,
+      "source_refs": [
+        {
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "26a0c15bb4e3653842977b89f7074db041a67372746dd08f79ac5554b7cf24a3",
+          "source_generation": 1,
+          "fact_id": "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF"
+        },
+        {
+          "source_id": "SRC-HTL-RETREAT03-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "26a0c15bb4e3653842977b89f7074db041a67372746dd08f79ac5554b7cf24a3",
+          "source_generation": 1,
+          "fact_id": "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        }
+      ],
+      "options": [
+        {
+          "option_id": "option-1",
+          "rooms": [
+            {
+              "room_index": 0,
+              "room_type_id": "PINE-GARDEN"
+            }
+          ],
+          "assignments": [
+            {
+              "member_id": "adult-1",
+              "room_index": 0,
+              "bed_index": 0,
+              "bed_type": "queen",
+              "bed_position": null
+            },
+            {
+              "member_id": "62756124-e0df-4c01-8120-500dc1cb858b",
+              "room_index": 0,
+              "bed_index": 0,
+              "bed_type": "queen",
+              "bed_position": null
+            }
+          ],
+          "checks": [
+            {
+              "code": "occupancy",
+              "status": "pass",
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ]
+            },
+            {
+              "code": "bed_configuration",
+              "status": "pass",
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ]
+            },
+            {
+              "code": "bed_sharing_consent",
+              "status": "pass",
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ]
+            },
+            {
+              "code": "child_age_policy",
+              "status": "pass",
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ]
+            },
+            {
+              "code": "guardian_relationship",
+              "status": "pass",
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ]
+            },
+            {
+              "code": "cost_completeness",
+              "status": "unknown",
+              "fact_ids": [
+                "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF"
+              ]
+            }
+          ],
+          "rationale": [
+            {
+              "claim_code": "party_fit",
+              "text": "Cette configuration convient au groupe confirmé et respecte les règles vérifiées de la chambre.",
+              "locale": "fr",
+              "locale_fallback": false,
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ],
+              "presentation_key": "claim.party_fit"
+            },
+            {
+              "claim_code": "bed_setup",
+              "text": "La répartition des couchages correspond à la configuration vérifiée des lits.",
+              "locale": "fr",
+              "locale_fallback": false,
+              "fact_ids": [
+                "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+              ],
+              "presentation_key": "claim.bed_setup"
+            },
+            {
+              "claim_code": "charges_confirmation",
+              "text": "Certains frais pour les enfants ou les couchages supplémentaires ne sont pas inclus dans cette estimation.",
+              "locale": "fr",
+              "locale_fallback": false,
+              "fact_ids": [
+                "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF"
+              ],
+              "presentation_key": "claim.charges_confirmation"
+            }
+          ],
+          "cost": {
+            "currency": "VND",
+            "nightly_subtotal": 2500000,
+            "total": null,
+            "status": "incomplete",
+            "breakdown": [
+              {
+                "label": "Phòng Vườn reference rate",
+                "amount": 5000000,
+                "currency": "VND",
+                "status": "known",
+                "basis": "1 room × 2 night(s)",
+                "fact_ids": [
+                  "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF"
+                ]
+              },
+              {
+                "label": "child charges",
+                "amount": null,
+                "currency": "VND",
+                "status": "unknown",
+                "basis": "per child per room night",
+                "fact_ids": [
+                  "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "questions": [],
+      "explanation_inputs": {
+        "supported_fact_ids": [
+          "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF",
+          "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN"
+        ],
+        "unknowns": [
+          "cost_completeness"
+        ],
+        "conflicts": [],
+        "rejected_alternatives": [],
+        "tradeoffs": [],
+        "availability": "unknown",
+        "rationale_locale": "fr"
+      },
+      "availability": "unknown",
+      "hotel_answer": null,
+      "presentation_labels": {
+        "claim.party_fit": "Cette configuration convient au groupe confirmé et respecte les règles vérifiées de la chambre.",
+        "claim.bed_setup": "La répartition des couchages correspond à la configuration vérifiée des lits.",
+        "claim.charges_confirmation": "Certains frais pour les enfants ou les couchages supplémentaires ne sont pas inclus dans cette estimation."
+      },
+      "presentation_locale": "fr"
+    }
+  },
+  "current_case_inputs_unchanged": true
+}

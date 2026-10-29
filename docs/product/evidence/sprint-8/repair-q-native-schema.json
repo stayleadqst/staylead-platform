@@ -1,0 +1,23 @@
+{
+  "result": "PASS offline native Ajv schema with repaired core20 routing",
+  "cases": [
+    {
+      "locale": "zh",
+      "missing_core_labels": 20,
+      "native_schema_conformant": true,
+      "local_guide_only_valid": true
+    },
+    {
+      "locale": "fr",
+      "missing_core_labels": 20,
+      "native_schema_conformant": true,
+      "local_guide_only_valid": true
+    },
+    {
+      "locale": "ar",
+      "missing_core_labels": 20,
+      "native_schema_conformant": true,
+      "local_guide_only_valid": true
+    }
+  ]
+}

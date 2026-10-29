@@ -26,3 +26,6 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Sprint6 remediation screenshots stay local by explicit Hieu instruction.
+docs/product/evidence/sprint-6/remediation/**/*.png

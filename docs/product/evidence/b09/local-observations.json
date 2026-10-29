@@ -1,0 +1,151 @@
+{
+  "candidate": "1e1d507633b26ef3c739e438ba3a18ec36879477b1049fafaf9bee49ac3115e1",
+  "status": "locally_verified_pending_independent_candidate_review",
+  "product_source_unchanged": true,
+  "product_inference_calls": 0,
+  "providers": "Controlled test doubles only; fake usage values are not real tokens or billing.",
+  "local_gates": {
+    "b09_contract_and_pg_tests": {
+      "passed": 11,
+      "failed": 0,
+      "log": "final-b09-tests.log"
+    },
+    "targeted_inherited_pg_tests": {
+      "passed": 8,
+      "failed": 0,
+      "log": "inherited-targeted-gates.log"
+    },
+    "web_contracts": {
+      "passed": 43,
+      "failed": 0
+    },
+    "web_lint": "PASS",
+    "web_typecheck": "PASS",
+    "web_build": "PASS with documented public profile config",
+    "ruff": "PASS canonical apps/api cwd, command .venv/bin/ruff check --config pyproject.toml src ../../tests",
+    "python_compileall": "PASS",
+    "node_syntax": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "actual_browser": {
+    "unique_cases": [
+      "FAQ200 rendered",
+      "malicious preparation502 refusal/no brief",
+      "mobile390 HTML/script literal guest-text502 refusal/no injected markup/active attacker URL/window flag"
+    ],
+    "runs": 4,
+    "guest_turns": 6,
+    "coordinator_default_runs": 1,
+    "duplicate_builder_default_runs": 1,
+    "html_attempts": 2,
+    "html_first_failure": "Wrong harness selector .message-user; actual DOM is .message.message-guest. Preserved original failure log; repaired only selector and reran only new HTML case.",
+    "last_html_verdict": "PASS",
+    "real_model_calls": 0,
+    "screenshots_visually_reviewed_by_C": 3
+  },
+  "engineering_findings": {
+    "product_defects_observed": [],
+    "test_harness_repairs": [
+      {
+        "id": "B09-BROWSER-SELECTOR-1",
+        "repair_rounds": 1,
+        "outcome": "PASS",
+        "assertions_weakened": false
+      }
+    ],
+    "coordination_failure": "One redundant builder browser run; preserved its artifacts and DB rows, then enforced C-only browser dispatch by assignment. No unattended fencing claim."
+  },
+  "setup_failures": [
+    {
+      "id": "SETUP-PG-IPC",
+      "cause": "restricted sandbox shared-memory IPC",
+      "resolution": "authorized isolated PostgreSQL setup outside sandbox"
+    },
+    {
+      "id": "SETUP-NEXT-LISTEN",
+      "cause": "restricted sandbox loopback listen",
+      "resolution": "authorized loopback-only startup outside sandbox"
+    },
+    {
+      "id": "SETUP-BUILD-PROFILE",
+      "cause": "coordinator omitted documented public profile env",
+      "resolution": "reran build only with explicit config; lint/contracts/typecheck not repeated"
+    },
+    {
+      "id": "SETUP-RUFF-CWD",
+      "cause": "noncanonical root invocation changed import classification and reported49 I001 errors in unchanged baseline",
+      "resolution": "canonical apps/api invocation PASS; no unrelated source reformat or waived gate"
+    }
+  ],
+  "local_artifact_root": "/Users/ccvn/Documents/project/Staylead/validation/b09-20261028",
+  "artifacts": {
+    "browser/b09-browser-positive.png": {
+      "sha256": "504a58af3dc2ad82345936eb22f926aa91cd4981ffbaad32f85610527b06df1f",
+      "bytes": 311119
+    },
+    "browser/b09-browser-refusal.png": {
+      "sha256": "2f0090292b1285338b9bf40748ee9bf7486deee42c5d269922a1def5224a3b07",
+      "bytes": 283744
+    },
+    "browser-db-observations.json": {
+      "sha256": "71982777d91b1199e177a4fec1fb05cd23b53cff720df63900fca2acf95b17fa",
+      "bytes": 668
+    },
+    "browser-html/b09-browser-html-refusal.png": {
+      "sha256": "25d09f5d6d9c6ddfedd9f4a915cd16089f72db92e8207bbbfcc8deb928bffc73",
+      "bytes": 150372
+    },
+    "browser-html-repair1.log": {
+      "sha256": "7faf2b222e45fcaf711c68d4b3641c04a1e1ebd956f00c8c37a1af9c2e5c1b94",
+      "bytes": 395
+    },
+    "browser-html.log": {
+      "sha256": "3e383cdf43b1f27bfe98c471248b3fb110e90cbdd67744bcf3da1bd4f1066ab7",
+      "bytes": 548
+    },
+    "browser-run.log": {
+      "sha256": "5daf136ac096b70bdc064100825f0eeb7379a82078ce73250c18b65290f32d54",
+      "bytes": 525
+    },
+    "builder/b09-browser-positive.png": {
+      "sha256": "504a58af3dc2ad82345936eb22f926aa91cd4981ffbaad32f85610527b06df1f",
+      "bytes": 311119
+    },
+    "builder/b09-browser-refusal.png": {
+      "sha256": "2f0090292b1285338b9bf40748ee9bf7486deee42c5d269922a1def5224a3b07",
+      "bytes": 283744
+    },
+    "final-b09-tests.log": {
+      "sha256": "cb611cde235a62bd6e6315f0fc93ffb932d93a41e123ca9a3a8e0338f5508ba2",
+      "bytes": 640
+    },
+    "final-canonical-ruff.log": {
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "bytes": 19
+    },
+    "final-ruff.log": {
+      "sha256": "49effdee5496cc7e09a5312dbbd05cc941b14950bb554c5eaa4e4add8b8be747",
+      "bytes": 64527
+    },
+    "inherited-targeted-gates.log": {
+      "sha256": "7db9f430df65f54672dfc8fa7fb57a6fc31451c0eb788af0db739b9b715a41b2",
+      "bytes": 639
+    },
+    "web-build.log": {
+      "sha256": "d6170f9810ef03139e6df4298e726683785a69344283fe1265ec727a0c64b46d",
+      "bytes": 844
+    },
+    "web-gates.json": {
+      "sha256": "c1d3f15fdbc85dc67bfd6e66e9683f599fe92157e4cc59d21ce5ac5df2e7d9db",
+      "bytes": 839
+    }
+  },
+  "tokens": {
+    "coordinator": "unavailable",
+    "builder": "unavailable",
+    "reviewer": "unavailable",
+    "product_inference": 0
+  },
+  "deployment": "not performed",
+  "automation": "not created/enabled"
+}

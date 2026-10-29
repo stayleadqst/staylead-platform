@@ -28,7 +28,7 @@ def issue_token(*, secret: str, session_id: str, hotel_id: str, expires_at: int)
     return f"{encoded}.{base64.urlsafe_b64encode(signature).rstrip(b'=').decode('ascii')}"
 
 
-def verify_token(token: str, *, secret: str, now: int | None = None) -> SessionClaims:
+def _verify_signature(token: str, *, secret: str) -> SessionClaims:
     try:
         encoded, signed = token.split(".", 1)
         padding = "=" * (-len(signed) % 4)
@@ -41,6 +41,16 @@ def verify_token(token: str, *, secret: str, now: int | None = None) -> SessionC
         claims = SessionClaims(values["sid"], values["hid"], int(values["exp"]))
     except (ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
         raise InvalidSessionToken("invalid token") from exc
+    return claims
+
+
+def verify_token(token: str, *, secret: str, now: int | None = None) -> SessionClaims:
+    claims = _verify_signature(token, secret=secret)
     if claims.expires_at <= (now if now is not None else int(time.time())):
         raise InvalidSessionToken("expired token")
     return claims
+
+
+def verify_token_for_delete(token: str, *, secret: str) -> SessionClaims:
+    """Verify token ownership for deletion, including after normal read expiry."""
+    return _verify_signature(token, secret=secret)

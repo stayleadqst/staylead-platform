@@ -1,0 +1,41 @@
+{
+  "human_reply": "Cho phép batch mới4/8",
+  "approved_published_commit": "ba37ca1be1ad32a660227126a57aa0ff93c00edf",
+  "approved_product_candidate": "d7ca88db6c1251a7dc9ff64acdf9d6624731b5865a46d322f28f55dde3b5e35a",
+  "run_id": "s7-room-advice-20261027-reacceptance3",
+  "case_matrix_sha256": "9a8d77345f34b0a1b3b77c560b676995883d5ca22781db5ad50fc5b13e4656e6",
+  "max_guest_turns": 4,
+  "max_requests": 8,
+  "exact_previous_case_turns": [
+    1,
+    2,
+    6,
+    7
+  ],
+  "new_turns": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+    "status": "halted",
+    "guest_turns": 6,
+    "codex_requests": 11,
+    "state_sha256": "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5",
+    "lifetime_requests": 36,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 3,
+    "unused_slots": "closed; no replay/reset/reallocation",
+    "actual_outcome": {
+      "city1": "PASS",
+      "city2": "FAIL invented hard twin",
+      "family3_5": "PASS",
+      "pine6": "FAIL invented child-1; HTTP500",
+      "pine7": "Blocked dependency; not attempted"
+    },
+    "no_further_calls": true
+  },
+  "status": "Authority and approved cases prepared0600; no config/state/API/modelcall yet."
+}

@@ -1,0 +1,176 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> apps/api/src/staylead_platform/domains/hospitality/schemas/fact_selection.py:3:1
+  |
+1 |   """Bounded M1 candidate selection schema for low-overlap multilingual requests."""
+2 |
+3 | / from pydantic import BaseModel, Field
+4 | | from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
+  | |________________________________________________________________________________________________^
+help: Organize imports
+  |
+3 | from pydantic import BaseModel, Field
+4 +
+5 | from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py:3:1
+  |
+1 |   """Structured answer wire schema registered by Hospitality composition."""
+2 |
+3 | / from pydantic import BaseModel, Field
+4 | | from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
+  | |________________________________________________________________________________________________^
+help: Organize imports
+  |
+3 | from pydantic import BaseModel, Field
+4 +
+5 | from staylead_platform.domains.hospitality.schemas.guest_brief import HospitalityGuestBriefPatch
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py:3:1
+   |
+ 1 |   """Hospitality-owned guest travel brief schema and semantic validation."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from datetime import date
+ 6 | | from typing import Annotated, Literal
+ 7 | | from uuid import UUID, uuid4
+ 8 | |
+ 9 | | from pydantic import BaseModel, ConfigDict, Field, ValidationError
+10 | | from staylead_platform.platform.contracts.guest_brief import (
+11 | |     GuestBriefProposal,
+12 | |     GuestBriefSnapshot,
+13 | |     ValidatedGuestBriefPatch,
+14 | | )
+   | |_^
+help: Organize imports
+   |
+9  | from pydantic import BaseModel, ConfigDict, Field, ValidationError
+10 +
+11 | from staylead_platform.platform.contracts.guest_brief import (
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> apps/api/src/staylead_platform/infrastructure/persistence/store.py:3:1
+   |
+ 1 |   """PostgreSQL persistence for versioned hotel knowledge and anonymous guest sessions."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import hashlib
+ 6 | | import json
+ 7 | | import time
+ 8 | | import uuid
+ 9 | | from datetime import UTC, datetime
+10 | | from threading import Event
+11 | | from typing import Any
+12 | |
+13 | | from sqlalchemy import (
+14 | |     JSON,
+15 | |     Boolean,
+16 | |     Column,
+17 | |     DateTime,
+18 | |     Float,
+19 | |     Integer,
+20 | |     LargeBinary,
+21 | |     MetaData,
+22 | |     String,
+23 | |     Table,
+24 | |     Text,
+25 | |     UniqueConstraint,
+26 | |     and_,
+27 | |     delete,
+28 | |     insert,
+29 | |     inspect,
+30 | |     select,
+31 | |     text,
+32 | |     update,
+33 | | )
+34 | | from sqlalchemy.dialects.postgresql import insert as pg_insert
+35 | | from sqlalchemy.engine import Engine
+36 | | from staylead_platform.platform.contracts.guest_brief import (
+37 | |     GuestBriefContext,
+38 | |     GuestBriefMutationResult,
+39 | |     GuestBriefReceipt,
+40 | |     GuestBriefSnapshot,
+41 | |     GuestBriefSourceRef,
+42 | |     ValidatedGuestBriefPatch,
+43 | | )
+44 | | from staylead_platform.platform.contracts.knowledge import (
+45 | |     ActiveKnowledgeSnapshot,
+46 | |     EvidenceBinding,
+47 | |     FreshnessDecision,
+48 | |     SourceVersionRef,
+49 | | )
+   | |_^
+50 |
+51 |   metadata = MetaData()
+   |
+help: Organize imports
+   |
+35 | from sqlalchemy.engine import Engine
+36 +
+37 | from staylead_platform.platform.contracts.guest_brief import (
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py:3:1
+   |
+ 1 |   """Bounded M3 knowledge Q&A with conditional semantic fact selection."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | import asyncio
+ 6 | | import json
+ 7 | | import re
+ 8 | | from dataclasses import dataclass
+ 9 | | from typing import Any
+10 | |
+11 | | from pydantic import BaseModel, ValidationError
+12 | | from staylead_platform.platform.contracts.ai_provider import (
+13 | |     AIProvider,
+14 | |     GenerationRequest,
+15 | |     GenerationResult,
+16 | |     ProviderError,
+17 | |     Usage,
+18 | | )
+19 | | from staylead_platform.platform.contracts.guest_brief import (
+20 | |     GuestBriefProposal,
+21 | |     GuestBriefSnapshot,
+22 | |     PreparedGuestTurn,
+23 | | )
+24 | | from staylead_platform.platform.knowledge.retrieval.retriever import KnowledgeRetriever
+   | |_______________________________________________________________________________________^
+25 |
+26 |   _NUMBER = re.compile(r"(?<!\w)\d+(?:[.,]\d+)*(?!\w)")
+   |
+help: Organize imports
+   |
+11 | from pydantic import BaseModel, ValidationError
+12 +
+13 | from staylead_platform.platform.contracts.ai_provider import (
+   |
+
+Found 5 errors.
+[*] 5 fixable with `--fix`.
+
+Correction: the previous command used `--config apps/api/pyproject.toml`, which does not select I001;
+its reported pass did not resolve the five import-order findings. The exact import-only fix and check
+were then run without that config:
+  apps/api/.venv/bin/ruff check --select I --fix \
+    apps/api/src/staylead_platform/domains/hospitality/schemas/fact_selection.py \
+    apps/api/src/staylead_platform/domains/hospitality/schemas/grounded_answer.py \
+    apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py \
+    apps/api/src/staylead_platform/infrastructure/persistence/store.py \
+    apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py
+  Found 5 errors (5 fixed, 0 remaining).
+  apps/api/.venv/bin/ruff check --select I <same five files>
+  All checks passed.
+  apps/api/.venv/bin/python -m py_compile <same five files>
+  Passed.
+
+Final configured gate after all import fixes:
+All checks passed!

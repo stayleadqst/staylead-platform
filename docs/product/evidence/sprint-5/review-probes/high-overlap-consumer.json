@@ -1,0 +1,10 @@
+{
+  "high_overlap_mixed_calls": 2,
+  "high_overlap_faq_only_calls": 1,
+  "brief_version_after_faq": 1,
+  "patch_enabled_sequence": [
+    true,
+    false,
+    true
+  ]
+}

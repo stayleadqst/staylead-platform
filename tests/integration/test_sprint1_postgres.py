@@ -70,7 +70,9 @@ class FakeProvider:
         if "Select only fact IDs" in request.instructions:
             index = json.loads(request.input_text)["candidate_index"]
             eligible = [item["fact_id"] for item in index]
-            result = {"fact_ids": eligible[:4]}
+            result = {
+                "fact_ids": eligible[:4], "turn_intents": ["hotel_information"],
+            }
         else:
             facts = json.loads(request.input_text)["facts"]
             if facts:
@@ -81,6 +83,7 @@ class FakeProvider:
                 }
             else:
                 result = {"supported_claims": [], "unknowns": ["This detail is not in the available records."], "conflicts": []}
+            result["turn_intents"] = ["hotel_information"]
         return GenerationResult(
             text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
             request_id=f"fake-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),
@@ -98,11 +101,13 @@ def settings_for(database_url: str, *, ai_turn_timeout_seconds: float = 45.0) ->
 
 
 def test_explicit_migration_fixture_bootstrap_and_hotel_scoped_provenance(engine) -> None:
-    assert schema_version(engine) == 4
+    assert schema_version(engine) == 8
     cities = facts_for_hotel(engine, "HTL-CITY01")
     beach = facts_for_hotel(engine, "HTL-BEACH02")
-    assert len(cities) == 109
-    assert len(beach) == 108
+    assert len(cities) == 115
+    assert len(beach) == 114
+    assert sum(item["field"] in {"room_type", "reference_rate"} for item in cities) == 6
+    assert sum(item["field"] in {"room_type", "reference_rate"} for item in beach) == 6
     assert all(item["hotel_id"] == "HTL-CITY01" for item in cities)
     assert all(item["provenance"]["source_id"].startswith("SRC-HTL-CITY01") for item in cities)
     assert all(item["fact_id"] != "F-HTL-CITY01-004" for item in cities)
@@ -234,13 +239,16 @@ def test_turn_deadline_bounds_postgres_lock_wait_and_cleans_reservation(engine) 
 
     assert response.status_code == 504
     assert elapsed < 1.8
+    assert provider.calls == 0
     assert get_session(engine, session["session_id"])["state_version"] == 0
     assert recent_messages(engine, session["session_id"], "HTL-CITY01") == []
     with engine.connect() as connection:
-        request = connection.execute(select(requests).where(
+        request = connection.execute(select(requests.c.request_id).where(
             requests.c.request_id == request_id,
-        )).mappings().one()
-    assert request["status"] == "error"
+        )).first()
+    # Admission itself waited past the deadline, so no durable reservation or
+    # provider call should exist for this rejected request.
+    assert request is None
     time.sleep(0.05)
     assert get_session(engine, session["session_id"])["state_version"] == 0
 
@@ -259,7 +267,10 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                 await asyncio.to_thread(allow_model.wait)
             if "Select only fact IDs" in request.instructions:
                 candidate_index = json.loads(request.input_text)["candidate_index"]
-                result = {"fact_ids": [candidate_index[0]["fact_id"]]}
+                result = {
+                    "fact_ids": [candidate_index[0]["fact_id"]],
+                    "turn_intents": ["hotel_information"],
+                    }
             else:
                 facts = json.loads(request.input_text)["facts"]
                 fact_id = facts[0]["fact_id"]
@@ -267,6 +278,7 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                     "supported_claims": [{"text": "The available record covers breakfast.", "fact_ids": [fact_id]}],
                     "unknowns": [], "conflicts": [],
                 }
+            result["turn_intents"] = ["hotel_information"]
             return GenerationResult(
                 text=json.dumps(result), provider="fake", deployment="test", model="offline-fake",
                 request_id=f"gated-{self.calls}", usage=Usage(input_tokens=5, output_tokens=5, total_tokens=10),
@@ -288,7 +300,7 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                 "SELECT session_id FROM guest_sessions WHERE session_id = :session_id FOR UPDATE"
             ), {"session_id": opened["session_id"]})
             session_locked.set()
-            release_session.wait(timeout=2)
+            release_session.wait(timeout=3)
 
     def hold_request_row() -> None:
         deadline = time.monotonic() + 3
@@ -307,9 +319,6 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
                 return
             time.sleep(0.01)
 
-    session_holder = threading.Thread(target=hold_session_row, daemon=True)
-    session_holder.start()
-    assert session_locked.wait(timeout=2)
     result: dict[str, Any] = {}
 
     def send() -> None:
@@ -321,21 +330,35 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
         except GuestChatError as exc:
             result["error"] = exc
 
-    caller = threading.Thread(target=send, daemon=True)
+    caller = threading.Thread(target=send, name="deadline-caller", daemon=True)
     caller.start()
-    request_holder = threading.Thread(target=hold_request_row, daemon=True)
-    assert model_started.wait(timeout=2)
-    request_holder.start()
-    assert request_locked.wait(timeout=2)
-    allow_model.set()
-    caller.join(timeout=3)
-    release_session.set()
-    session_holder.join(timeout=2)
-    request_holder.join(timeout=2)
+    request_holder = threading.Thread(
+        target=hold_request_row, name="deadline-request-lock-holder", daemon=True,
+    )
+    session_holder = threading.Thread(target=hold_session_row, daemon=True)
+    try:
+        assert model_started.wait(timeout=2)
+        session_holder.start()
+        assert session_locked.wait(timeout=2)
+        request_holder.start()
+        assert request_locked.wait(timeout=2)
+        allow_model.set()
+        caller.join(timeout=3)
+    finally:
+        allow_model.set()
+        release_session.set()
+        caller.join(timeout=2)
+        if request_holder.ident is not None:
+            request_holder.join(timeout=2)
+        if session_holder.ident is not None:
+            session_holder.join(timeout=2)
 
     assert not caller.is_alive()
+    assert not request_holder.is_alive()
+    assert not session_holder.is_alive()
     assert result.get("error") is not None
     assert result["error"].status == 504
+    assert result["error"].code == "provider_timeout"
     assert get_session(engine, opened["session_id"])["state_version"] == 0
     assert recent_messages(engine, opened["session_id"], "HTL-CITY01") == []
     with engine.connect() as connection:
@@ -343,7 +366,17 @@ def test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits(en
             requests.c.request_id == request_id,
         )).mappings().one()
     assert request_row["status"] == "error"
-    assert request_row["response"] is None
+    trace = request_row["response"]["trace"]
+    assert trace["outcome"] in {"error", "cancelled"}
+    # The absolute deadline can be reached in different awaited phases depending
+    # on scheduling; the persisted stage must match the last recorded failure.
+    failed_events = [
+        item for item in trace["events"] if item["status"] in {"error", "cancelled", "denied"}
+    ]
+    assert failed_events
+    assert trace["failure_stage"] in {"retrieval", "provider", "response"}
+    assert trace["failure_stage"] == failed_events[-1]["stage"]
+    assert "answer" not in request_row["response"]
 
 
 def test_cancelled_turn_marks_request_failed_and_keeps_session_unmodified(engine) -> None:

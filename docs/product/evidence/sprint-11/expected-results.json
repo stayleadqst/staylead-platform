@@ -1,0 +1,78 @@
+{
+  "written_at": "2026-10-29T01:04:17.386114+00:00",
+  "scope": "B10 #31 AC1–4",
+  "classification": "Expected outcomes defined before candidate verification; not PASS evidence",
+  "cases": [
+    {
+      "id": "AC1-simple",
+      "input": "simple hotel FAQ; scoped synthetic source, injected offline provider",
+      "expected": "one request trace links outcome/retrieval/provider/response, versions known or unknown, per-stage duration, attempted calls including failure, sourced tokens/cost unknown; no question/prompt/transcript/secrets"
+    },
+    {
+      "id": "AC1-tool-failure",
+      "input": "controlled retrieval/domain tool failure before/after provider",
+      "expected": "safe failure stage, no invented tool outcome, total calls accurate, no exception credential text"
+    },
+    {
+      "id": "AC2-provider-time",
+      "input": "controlled provider exceeding25s or lower explicit test setting",
+      "expected": "whole-turn bounded, no subsequent dispatch, authoritative M2 stays correct or persisted partialsuccess receipt; no late commit"
+    },
+    {
+      "id": "AC2-cancel",
+      "input": "cancel while waiting provider or storage/apply",
+      "expected": "cancel event reaches writes, no unsafe late commit/replay overwrite; valid prior committedbrief remains recoverable"
+    },
+    {
+      "id": "AC2-context",
+      "input": "history requiringcompression; hardneeds in authoritativebrief;22000char limit exceeded aftercompression",
+      "expected": "brief/constraints retained independently of summary; rejects overflow before provider"
+    },
+    {
+      "id": "AC2-steps",
+      "input": "attempt third provider dispatch inclfailure/retry/restart",
+      "expected": "two durable slots maximum; rejected call never reaches innerprovider"
+    },
+    {
+      "id": "AC3-benchmark",
+      "input": "simple and mixedFAQ+brief edit with independent expectedstate/facts via composedHTTP/PG; fakeprovider",
+      "expected": "separate class observations of actualoutcome, route/calls/latency/tokens ifknown, unknowncost; no livequality/optimization/uptimeclaim"
+    },
+    {
+      "id": "AC4-body",
+      "input": "rawpayload65536 and65537 bytes; streamedbody withoutContentLength",
+      "expected": "bytesabove64KiB HTTP413 beforedownstreamprovider/tool; charquestion2000 preserved; noContentLengthbypass"
+    },
+    {
+      "id": "AC4-sessionquota",
+      "input": "12 distinct admitted IDs/session/600s then13; samerequestretry",
+      "expected": "13 rejected, replays do not spendnewquota and do not reset2callcounter; windowboundary deterministic"
+    },
+    {
+      "id": "AC4-propertyquota",
+      "input": "120 distinct requests acrosssessionssameproperty/600s then121; otherproperty",
+      "expected": "121 rejected correctly scoped; unrelatedproperty quota unaffected"
+    },
+    {
+      "id": "AC4-inflight",
+      "input": "simultaneous newrequests 1session or5sessionssameproperty; cancellation/timeoutexpiry",
+      "expected": "max1/session and4/property atomic, rejected zeroprovidertoolcalls, release/expiry no stuckcapacity or unsafeoldwriter"
+    },
+    {
+      "id": "AC4-restart",
+      "input": "recreateapp/DBengine afterreservations/providerfailure",
+      "expected": "rollingquota/providerattempts persist, no processlocalreset"
+    },
+    {
+      "id": "regression-confirmation",
+      "input": "B09 proposal→guestconfirmation→internalanswer; answer-onlyresume, samerequestreplay",
+      "expected": "no nestedadmissiondeadlock/doublequota, existingCAS/confirmation/stateauthority preserved; slotsnotreset"
+    },
+    {
+      "id": "regression-web",
+      "input": "web receives new quota/body/step failure through existingclient errorhandling",
+      "expected": "safe observableerror and usefulretry/contact fallback as existingcontract; no malformed answer/currentstateclaim"
+    }
+  ],
+  "evidence_mapping": "candidate/test commands/observations to be filled afterchecks; reuse S1-S10 only ifpinsunaffected"
+}

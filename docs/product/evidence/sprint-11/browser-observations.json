@@ -1,0 +1,46 @@
+{
+  "recorded_at": "2026-10-29T01:34:45.604823+00:00",
+  "source_candidate": "ed8138c868ad9d28e8248dc6252fe4df25cd1bb04e0f0984085e8a45f75a9d11",
+  "classification": "Actual browser FAQ then11 direct-store synthetic quota reservations; next actual browser request tests limit UI, NOT12 real guest turns",
+  "session_id": "71e4d27c-c670-447c-89e6-c959cdf4ffdf",
+  "hotel_id": "HTL-CITY01",
+  "before": [
+    {
+      "id": "e8c54761-00d1-414b-b048-e99addc347dc",
+      "status": "completed",
+      "provider_calls": 2
+    }
+  ],
+  "seeded_ids": [
+    "c-b10-browser-seed-20bdc309-1519-4d56-9709-4d4ac6339cf9",
+    "c-b10-browser-seed-82c04811-c1b9-4695-80a2-5ca4659828b7",
+    "c-b10-browser-seed-4a1163b1-1ca6-43be-8197-29207d45660f",
+    "c-b10-browser-seed-a761a6b7-e710-47c4-b43c-4bd225129d39",
+    "c-b10-browser-seed-c8be386f-de67-45aa-b156-3073f4062162",
+    "c-b10-browser-seed-895ec3e3-03e4-43da-a54e-0dd338d141ec",
+    "c-b10-browser-seed-3185a046-9213-4423-a621-6ddff436b4a3",
+    "c-b10-browser-seed-959ea2e3-edd0-4619-bad7-e50f85c0a8e2",
+    "c-b10-browser-seed-7740080d-5e60-433e-a252-a8503e477496",
+    "c-b10-browser-seed-9475e810-7b5a-4104-a78d-e0015514e93f",
+    "c-b10-browser-seed-c2233f24-cfa2-4cdd-aa40-ca7edba887cd"
+  ],
+  "rows_before_rejection": 12,
+  "provider_calls_before_rejection": 2,
+  "messages_before_rejection": 2,
+  "after_rejection": {
+    "request_rows": 12,
+    "provider_calls": 2,
+    "messages": 2,
+    "brief_version": 0
+  },
+  "checked_at": "2026-10-29T01:35:03.659410+00:00",
+  "observed_ui": "The request limit has been reached. Wait briefly, then try again.",
+  "http_status": 429,
+  "http_status_provenance": "API test-server request log, actual browser via web proxy",
+  "positive_ui": "Breakfast buffet at Ben Gio, floor 1, 06:30-09:30. (Asia/Ho_Chi_Minh) [F-HTL-CITY01-040]",
+  "retry_mode": "none; no automatic retry and no unknown-outcome claim",
+  "source_pin": "ed8138c868ad9d28e8248dc6252fe4df25cd1bb04e0f0984085e8a45f75a9d11",
+  "screenshot": "browser-quota-v3.png",
+  "screenshot_sha256": "b87f807b04ce6c688e6aeab4ebe839014a44cc1c7c668b231b7e182c1aeeed98",
+  "scope_note": "C seeded11 durable synthetic quota reservations directly via store. One prior FAQ and the rejected next question travelled real browser→production web→actual API→PostgreSQL→offline provider. This is not12 real guest/model turns."
+}

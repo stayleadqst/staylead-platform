@@ -1,0 +1,18 @@
+{
+  "phase": "2-committed-answer-prompt",
+  "attempts_before": 4,
+  "attempts_after": 6,
+  "semantic_guest_turns": 2,
+  "answer_only_resumes": 1,
+  "resume_selector_ms": 19367.9,
+  "final_answer_cancelled_after_ms_approx": 25595,
+  "whole_turn_seconds": 45,
+  "result": "HTTP504 provider_timeout; unknown completion, same-ID UI verification required",
+  "brief_version": 2,
+  "child_count": 1,
+  "child_age": null,
+  "mutation_on_resume": false,
+  "underlying_http_latency_cause": "unknown; phase timing absent",
+  "provider_call6_usage": "unavailable",
+  "provider_completion_after_cancel": "unknown"
+}

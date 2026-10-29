@@ -1,0 +1,63 @@
+{
+  "candidate": "9929c33a77eb1354e8468b5130d2b36df12e919e",
+  "at_utc": "2026-10-26T03:34:28.020569+00:00",
+  "checks": [
+    {
+      "command": [
+        "apps/api/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/contracts/test_grounded_qa.py",
+        "tests/contracts/test_sprint6_validation_diagnostics.py",
+        "tests/contracts/test_sprint6_language.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "final-local-gate-1.log"
+    },
+    {
+      "command": [
+        "python3",
+        "docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "log": "final-local-gate-2.log"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "docs/product/evidence/sprint-6/remediation/test_operator_resume_routing.mjs"
+      ],
+      "exit_code": 0,
+      "log": "final-local-gate-3.log"
+    },
+    {
+      "command": [
+        "apps/api/.venv/bin/ruff",
+        "check",
+        "apps/api/src",
+        "tests/contracts/test_grounded_qa.py",
+        "tests/contracts/test_sprint6_validation_diagnostics.py"
+      ],
+      "exit_code": 0,
+      "log": "final-local-gate-4.log"
+    },
+    {
+      "command": [
+        "apps/api/.venv/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "apps/api/src"
+      ],
+      "exit_code": 0,
+      "log": "final-local-gate-5.log"
+    }
+  ],
+  "postgresql": "10passed separately; source/state logic unchanged afterward",
+  "web_builder_report": "36contracts,15state,lint,typecheck,productionbuild PASS; actual mocked productionbrowser recovery proof PASS",
+  "web_build_newer_than_changed_sources": true,
+  "web_build_id": "KoWXkqVZtcvpx-aK8b9mw"
+}

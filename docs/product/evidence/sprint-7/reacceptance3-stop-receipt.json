@@ -1,0 +1,17 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance3",
+  "status": "halted",
+  "guest_turns": 4,
+  "codex_requests": 8,
+  "state_sha256": "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b",
+  "lifetime_requests": 44,
+  "unused_guest_slots": 0,
+  "unused_request_slots": 0,
+  "actual_outcome": {
+    "city1": "PASS",
+    "city2": "PASS",
+    "pine3": "PASS",
+    "pine4": "FAIL failed explicit access relaxation; no semantic receipt4"
+  },
+  "runners": "API46945/browser9109 stopped; no retry"
+}

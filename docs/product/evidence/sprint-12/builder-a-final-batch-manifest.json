@@ -1,0 +1,82 @@
+{
+  "base_head": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+  "scope": [
+    "B11 Q12-3 active-session expiry recheck after lock waits in selection, room-result, and guest-brief persistence",
+    "Hieu-authorized one additional restricted lint cleanup round"
+  ],
+  "reservations": [
+    {
+      "class": "b11_post_delete_session_liveness",
+      "attempt": 3,
+      "cap": 3,
+      "finding": "Q12-3 expiry lock-clock stale timestamp",
+      "reserved_before_mutation": true
+    },
+    {
+      "class": "b11_acceptance_harness_A",
+      "attempt": 4,
+      "cap": 4,
+      "authority": "Hieu direct async reply for one extra lint round",
+      "reserved_before_mutation": true
+    }
+  ],
+  "changes": [
+    "Selection rechecks session expiry after session/hotel/result and selection-row locks, refreshing updated_at immediately before persistence.",
+    "Room result writes and idempotent replays recheck expiry after locks and again immediately before insert/replay return.",
+    "Guest brief writes recheck expiry after parent and brief-row locks and before mutation, retaining injected-clock behavior for deterministic callers.",
+    "Added bounded actual-HTTP selection lock/expiry test plus controlled PostgreSQL lock tests for room-result and guest-brief writers; assertions require no post-expiry persisted output.",
+    "Retention loop catches SQLAlchemyError, TimeoutError, and OSError, logs only exception type, then retries after the configured interval.",
+    "Retention CLI relies on Python 3.11+ datetime.fromisoformat support for Z timestamps."
+  ],
+  "files_sha256": {
+    "apps/api/src/staylead_platform/composition/configuration/settings.py": "8e29e9fb6ca6fed5b74d71c65a7cfdf9b6b62c92d7ab0166a5a03617fb796553",
+    "apps/api/src/staylead_platform/infrastructure/persistence/store.py": "9eebea331e138a6f2a1c1bc934910b5b7473da3a0683d7b6d7b9ae4b7bbac085",
+    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py": "5fcc9fdb87ac94aee61471ffafd738207488ae5ddb47c7c69436d4e3adfc7218",
+    "apps/api/src/staylead_platform/entrypoints/app.py": "b5bc8858be0966f92d56b7a2c3ba0324a4a4f9aa6e87bab5bba0d9dbbcbda89e",
+    "apps/api/src/staylead_platform/infrastructure/persistence/retention_cli.py": "e6c327692bbbc09b64e98715784513ce86b3072543a1ec102f84527ee5a50ffb",
+    "apps/api/src/staylead_platform/platform/guest_context/sessions/retention.py": "ac6eead76790fa907d2d0202a2f33bb6098ae55c7e4326eab2d98d88434797fa",
+    "apps/api/src/staylead_platform/platform/guest_context/sessions/signing.py": "c540bc3e48af915c541e1620d9f739ea30b2241f7d20851de8d45865883c2f8c",
+    "tests/integration/test_b11_retention_postgres.py": "fbc5849a19e2e85ccbc6089ec504e85f361cdff0db3079dbd3adef90b50bf3e8"
+  },
+  "verification": {
+    "focused_tests": {
+      "command": "PYTHONPATH=apps/api/src:tests/integration STAYLEAD_TEST_DATABASE_URL=postgresql+psycopg://ccvn@127.0.0.1:55442/staylead_s12_a apps/api/.venv/bin/python3.14 -m pytest tests/integration/test_b11_retention_postgres.py -q",
+      "exit_code": 0,
+      "result": "9 passed, 1 Starlette deprecation warning, 12.49s",
+      "log": "validation/sprint-12-20261029/builder-a-final-focused-tests.log"
+    },
+    "ruff_eligible": {
+      "command": "apps/api/.venv/bin/ruff check --config apps/api/pyproject.toml apps/api/src/staylead_platform/entrypoints/app.py apps/api/src/staylead_platform/infrastructure/persistence/retention_cli.py apps/api/src/staylead_platform/platform/guest_context/sessions/retention.py apps/api/src/staylead_platform/platform/guest_context/sessions/signing.py tests/integration/test_b11_retention_postgres.py",
+      "exit_code": 0,
+      "log": "validation/sprint-12-20261029/builder-a-final-ruff-eligible.log"
+    },
+    "ruff_all_eight_owned_files": {
+      "exit_code": 1,
+      "remaining": "Three known pre-existing I001 findings in settings.py, guest_chat.py, store.py; these are the baseline blank-separator issues and were not changed in the lint round. App I001, app BLE001, CLI FURB162, and new test issues are resolved.",
+      "log": "validation/sprint-12-20261029/builder-a-final-ruff-all-eight.log"
+    },
+    "settings_exact_base_comparison": {
+      "exit_code": 1,
+      "result": "Same I001 on exact HEAD source via stdin; confirms settings.py finding is baseline.",
+      "log": "validation/sprint-12-20261029/builder-a-final-settings-base.log"
+    },
+    "compileall": {
+      "exit_code": 0,
+      "log": "validation/sprint-12-20261029/builder-a-final-compileall.log"
+    },
+    "diff_check": {
+      "exit_code": 0,
+      "log": "validation/sprint-12-20261029/builder-a-final-diff-check.log"
+    },
+    "retention_cli_z_timestamp_smoke": {
+      "exit_code": 0,
+      "log": "validation/sprint-12-20261029/builder-a-final-cli-smoke.log"
+    },
+    "C_v3_backend_gate_before_round4": {
+      "exit_code": 0,
+      "result": "205 passed, 19.98s; C owns final integrated gates."
+    }
+  },
+  "uncommitted": true,
+  "recorded_at_utc": "2026-10-29T03:20:26.143499+00:00"
+}

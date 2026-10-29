@@ -36,7 +36,7 @@ Yêu cầu kiến trúc bắt buộc nằm trong [AI_ARCHITECTURE.md](architectu
 - Giữ các repo Staylead cũ nguyên trạng; chỉ đọc tham khảo khi cần. Phát triển mới trong `staylead-platform`.
 - Không tự chạy/rerun GitHub CI hoặc lấy việc chờ CI làm bước bàn giao; không bypass required checks. CI tự chạy phải được báo đúng sự thật.
 - Phân biệt rõ proposed, implemented, locally verified, pushed và deployed; nêu blocker cụ thể, không cam kết khi thiếu bằng chứng.
-- Runtime AI mục tiêu hiện tại: Foundry Grok `grok-4-1-fast-reasoning`, qua adapter thay thế được. Đây không phải tên model của coding agent; không tự thay model hoặc thêm reasoning setting chưa được xác minh hỗ trợ.
+- Theo yêu cầu mới của Hieu ngày2026-10-23, Sprint5 dùng kết quả CodexCLI qua adapter `codex_cli` opt-in local/test với đăng nhập ChatGPT hiện có, thay Grok cho bộ nghiệm thu được phép. Mô hình suy luận local được cấu hình riêng với coding agent. FoundryGrok vẫn là adapter được hỗ trợ; bằng chứng lỗi cũ giữ nguyên, không gọi thêm Grok và không nhận đã khắc phục Grok. Không tự thay provider ngoài phạm vi đã duyệt hoặc thêm setting chưa xác minh.
 - Tuyệt đối không lưu Azure credentials (API keys, tokens, client secrets, connection strings có secrets) lên GitHub: source/history, issues/comments, PR, logs hoặc evidence. Chỉ dùng tên biến và placeholder trong nội dung công khai; giá trị thật ở local config bị Git ignore hoặc secret store được phép. Redact trước mọi bàn giao; không thu thập credentials chỉ để lập sprint.
 
 ## 5. Tiết kiệm Azure LLM và kiểm thử không phát sinh phí mặc định

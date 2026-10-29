@@ -1,0 +1,1788 @@
+{
+  "kind": "independent source-derived expectations; not executed product evidence",
+  "baseline": "a46a63eb4b589b8518f9477ebd66e81d89a0f054",
+  "synthetic": true,
+  "source_files": {
+    "properties.json": "627dd25e733d7ec59be02619eeb813d8c2b037e02d51fd11680eb9a6e88a868e",
+    "sources.json": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f",
+    "facts.json": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0",
+    "manifest.json": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2"
+  },
+  "source_versions": "CATALOG 1.0 per hotel; 2026-10-01..2027-09-30",
+  "room_rates": {
+    "CITY-STD": 1800000,
+    "CITY-TWN": 1950000,
+    "CITY-FAM": 2900000,
+    "BEACH-GDN": 2600000,
+    "BEACH-FAM": 3800000,
+    "BEACH-POOL": 4500000,
+    "PINE-LOFT": 2200000,
+    "PINE-GARDEN": 2500000,
+    "PINE-CABIN": 4100000
+  },
+  "cases": [
+    {
+      "id": "city-solo-3n",
+      "members": 1,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "nights": 3,
+      "known_room_subtotal_vnd": 5400000,
+      "expected": "Reference only; no live availability; one queen accommodates one consenting guest."
+    },
+    {
+      "id": "city-couple-3n",
+      "members": 2,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "nights": 3,
+      "known_room_subtotal_vnd": 5400000,
+      "expected": "Two adults may share queen only if sharing authorized; bed count is not guest count."
+    },
+    {
+      "id": "city-colleagues-separate-beds-2n",
+      "members": 2,
+      "room": "CITY-TWN",
+      "rooms": 1,
+      "nights": 2,
+      "known_room_subtotal_vnd": 3900000,
+      "expected": "Two single beds; no invented discount; no double counted included breakfast."
+    },
+    {
+      "id": "city-three-adults-2n",
+      "members": 3,
+      "room": "CITY-STD",
+      "rooms": 1,
+      "expected": "Reject occupancy 3>2, never fit or sold out."
+    },
+    {
+      "id": "city-two-twin-2n",
+      "members": 3,
+      "room": "CITY-TWN",
+      "rooms": 2,
+      "nights": 2,
+      "known_room_subtotal_vnd": 7800000,
+      "expected": "Exactly-once assignment; per-room capacity≤2; no unused fictional adult fees for room with one guest."
+    },
+    {
+      "id": "beach-family-2n",
+      "adults": 2,
+      "children_ages": [
+        7
+      ],
+      "room": "BEACH-GDN",
+      "rooms": 1,
+      "nights": 2,
+      "known_room_subtotal_vnd": 5200000,
+      "expected": "3 occupants counts child; queen+sofa capacity3; explicit guardian/sharing needed; child fee unknown makes full total incomplete, budget certification forbidden."
+    },
+    {
+      "id": "retreat-child-age7-loft",
+      "adults": 1,
+      "children_ages": [
+        7
+      ],
+      "room": "PINE-LOFT",
+      "expected": "Reject below typed minimum8 even though7 absent from boundary samples."
+    },
+    {
+      "id": "retreat-child-age8-loft",
+      "adults": 1,
+      "children_ages": [
+        8
+      ],
+      "room": "PINE-LOFT",
+      "expected": "Age eligible by typed minimum8; explicit guardian/bed sharing still checked; do not require sample-age whitelist."
+    },
+    {
+      "id": "retreat-cabin-bunk-age6",
+      "children_ages": [
+        6
+      ],
+      "room": "PINE-CABIN",
+      "expected": "Conflict: boundary sample prohibits upper bunk for6 vs prose prohibits under6; do not silently certify."
+    },
+    {
+      "id": "nonprice-without-dates",
+      "room": "CITY-TWN",
+      "expected": "Useful room-fit and 1950000VND/room-night reference possible without full dates; total unknown."
+    },
+    {
+      "id": "access-unverified",
+      "room": "BEACH-GDN",
+      "hard_requirements": [
+        "wheelchair bathroom"
+      ],
+      "expected": "Not certified fit; bathroom unverified. Explain unknown/next confirmation, no diagnosis."
+    },
+    {
+      "id": "unknown-cot-conflict",
+      "room": "BEACH-GDN",
+      "expected": "Cot prose free1 vs typed allowedfalse must remain conflict/needs confirmation, not free available."
+    }
+  ],
+  "global_invariants": [
+    "Unknown child/extra-adult/extra-bed charges are not zero.",
+    "Rate includes2 adults and0 children; costs checked per room assignment, not global party headcount.",
+    "Age12/17 adult-rate child remains minor requiring guardian.",
+    "No total/in-budget when required fees unknown; no implicit currency conversion.",
+    "Correct hotel/source/version/expiry/revoke controls all derived claims.",
+    "Language-only edit preserves mathematics and assignment; need change invalidates affected result.",
+    "Booking destination from trusted server config only, no model/source/guest authority; no PII or query params."
+  ],
+  "source_bindings": {
+    "SRC-HTL-CITY01-ACCESS": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "e3bae5ce085824c9fc087a222d2fe94485c7886116f1cb51473503cfad46621b",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-AMENITY": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "3524cd938a313de067f0543497e0a9f66be4305deaba325cf346544c9588d54e",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-CATALOG": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "c5401e7e960f619d9cc4e2241e468327cb6d096828c9877b515c08e5053a5dbf",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-CONTACT": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "1fc121347fbdf8552e12e39fe71ae2f330a5a6d00e5312491a2b124d33469870",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-FOOD": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "a847c0f2778ece7bd1bac0645689a370a71f9c4816f432b6bce925f1aa52bfc1",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-LOCAL": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "c56d376d8f72caf67396f448b14518ee47ea94aecce68a96f8b0c9866aade269",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-LUGGAGE": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "a28968353c888c8383a50bf688b61f98e5ec3cbf30df1f469294d260eeb1abbc",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-OVERVIEW": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "34fef212a11e8c6b893f2f4255464db75a3897606c0fb682afcdf4a5028000a1",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-PAY": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "f34d12bbeaad657649b1fbaef6b4bdb24ef1f274b06c81a2f11d84b391693e30",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-POLICY": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "1648587facc647ee84ba9a6e057c1fbc82db28e926d8f960efd30729980eb21e",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-ROOM": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "f8ef66ff66ae586328721d9d3955947390ce894bba3629c4f094d1c2b2f72859",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-SAFETY": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "228e998e8c7decffa9425e00c0c650302e3059be4dad1cac894348f1c77d17cb",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-STAY": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "fd0a2335f28a19363f4f0154ca3d79d07b02f3bd97deac5dcb1ca34a851ec25a",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-SUPPORT": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "94387c5e2f6fe517070e43faabb19ccec097d640acbfdd12e58245ee509a8e62",
+      "source_generation": 1
+    },
+    "SRC-HTL-CITY01-TRANSPORT": {
+      "hotel_id": "HTL-CITY01",
+      "version": "1.0",
+      "expected_hash": "2d74e25b0dcf1428ffd75f50b8d94c3a3831ae95b00bbc564c43c69f0b437681",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-ACCESS": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "070c9d855fc469cc4affde884135dc893863700c7b694ecf9d148ebfaa48e6cf",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-AMENITY": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "960363df78dc9383e5e88077b98c0f06920f16c721b9d81474eb4ebf7e5d009a",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-CATALOG": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "0dd300ac58dbe8aac3da37909c6db021017d94e8192e3b7469b6ed4052494d3a",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-CONTACT": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "fd44e217422447558f5c4e18af09c9ae3485c9eadfbec5c287477a900c424b03",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-FOOD": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "29ec09f058e451b2363b44cd29e63af10deff6faa06cc7f082de866dac78941c",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-LOCAL": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "9ce83661e7a46866a732e0bfee614bd307114ab2b95121ffde2b4c1017fd93b8",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-LUGGAGE": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "bfe2fc5143b18d12998ee4aa8d24114a6af4f079606845fc46e385d90ea5d936",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-OVERVIEW": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "00208b3468ba107db00f00cf1a3fe52e8942ddc1278d87f0c83e28e32cc45969",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-PAY": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "914a85233ed5fbbf88a3209d3bd26078b2d2b52d04ae2360d4305e8a6faf19fa",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-POLICY": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "7a800ddc4cc4fb9ae4b65bc7d85788d4bbb8a14f1b4c45af04b8eddbb0b9085f",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-ROOM": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "15d66768f77a20700b8c115e950981507fee620a995074f11ee11c65eb514916",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-SAFETY": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "9f2517629f75978c8e951c21c2d4e1ed5e8fafe4617189026c3d9f40f64e0f47",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-STAY": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "6b9da0551f13c52f1fc804eb5fa18b1bec377d32acfb399c17dbef5527958b96",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-SUPPORT": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "474b78f49c4f96a14055c3bee8fb16a085393d8da892e53111d435212c4f03b6",
+      "source_generation": 1
+    },
+    "SRC-HTL-BEACH02-TRANSPORT": {
+      "hotel_id": "HTL-BEACH02",
+      "version": "1.0",
+      "expected_hash": "54419dace01683d5034808a7a69cdacf1a2d1d319d82d539e2c9b59390e785da",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-ACCESS": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "a6e1be1d222f927e349e1e76a3a7158b908e4e84729ef4b3615cdc1d307fbfe6",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-AMENITY": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "a463c4a843c4e2634ba612aabec4e9b5279d992d25fa61da087997d1eab4e082",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-CATALOG": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "26a0c15bb4e3653842977b89f7074db041a67372746dd08f79ac5554b7cf24a3",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-CONTACT": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "1e9024da33db6005ea1d1ff6c6468f6752436d00a3ad2d9d0682e48565ccca68",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-FOOD": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "1edf07bfddc050c80f4ab39ae892b104e4b6b206335305d584743cbf26c67297",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-LOCAL": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "397fefc97709cd606ee22b7f794f4662efc1a78095fff092ea1f64c3001aeffc",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-LUGGAGE": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "4a82c5e7d51aee628ad6da42ac203b8ed12c1e4a3cb29fd5bb58a0e64b0b2bdb",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-OVERVIEW": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "f125962c0355d283911c86a7a2c31bfcda981b3be1cf002c9f02c2949ddc4b2b",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-PAY": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "eb8a5427222306e20b050b9c08fd3d2349ad7e899da9b6d93aee45c881ba4d82",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-POLICY": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "9bb871246260bfb5e0fc3d80450ecd256b64be7bf46f59a441147d4b08221edb",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-ROOM": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "4e6ed898ce5fcbc8fc09ad6ec41f2f70e6a8731b404bfcf3d15ca27e039f38d9",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-SAFETY": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "3be6a37474179ebb834e1bc6c8a45c7ac29845915933fc4eed331496e9ab0857",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-STAY": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "50d75acb8b533da3b4a9c08c2c6f5fd2eb0d433841321401c2a62dc27845f8b8",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-SUPPORT": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "3f1940c4993787f33d122e3461cb566bddbcaed4b8c826f9fdfaa1b4ff326d54",
+      "source_generation": 1
+    },
+    "SRC-HTL-RETREAT03-TRANSPORT": {
+      "hotel_id": "HTL-RETREAT03",
+      "version": "1.0",
+      "expected_hash": "d34d6cee68517c56d9f280c42c78f9b08da5e24153adbf16586c95cff8349772",
+      "source_generation": 1
+    }
+  },
+  "projected_fact_owners": {
+    "F-HTL-CITY01-001": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-OVERVIEW"
+    },
+    "F-HTL-CITY01-002": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-OVERVIEW"
+    },
+    "F-HTL-CITY01-003": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-OVERVIEW"
+    },
+    "F-HTL-CITY01-005": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-006": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-007": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-008": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-009": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LUGGAGE"
+    },
+    "F-HTL-CITY01-010": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CONTACT"
+    },
+    "F-HTL-CITY01-011": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-012": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-059": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-013": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-014": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-015": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-016": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-017": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-018": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-019": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-020": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ACCESS"
+    },
+    "F-HTL-CITY01-021": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-022": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-023": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-024": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-025": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-026": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-027": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-028": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-029": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-030": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-031": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-032": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CONTACT"
+    },
+    "F-HTL-CITY01-033": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CONTACT"
+    },
+    "F-HTL-CITY01-034": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-035": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-036": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-040": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-041": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-042": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-043": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-044": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-045": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-046": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-047": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-048": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-049": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-050": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-052": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-053": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-054": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-055": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-056": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-057": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-058": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-060": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-061": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-STAY"
+    },
+    "F-HTL-CITY01-062": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LUGGAGE"
+    },
+    "F-HTL-CITY01-063": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LUGGAGE"
+    },
+    "F-HTL-CITY01-064": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-065": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-066": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-067": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-068": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ACCESS"
+    },
+    "F-HTL-CITY01-069": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ACCESS"
+    },
+    "F-HTL-CITY01-070": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-071": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-072": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-073": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-074": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-075": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-076": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-077": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-078": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-079": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-080": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-081": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-082": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-083": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-084": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-085": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-086": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-087": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-088": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-089": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-090": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-091": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-092": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SAFETY"
+    },
+    "F-HTL-CITY01-093": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-094": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-095": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-096": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-097": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-098": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-099": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-100": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-102": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-103": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-104": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-105": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-106": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-PAY"
+    },
+    "F-HTL-CITY01-107": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-108": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-FOOD"
+    },
+    "F-HTL-CITY01-109": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-110": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-LOCAL"
+    },
+    "F-HTL-CITY01-111": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-ROOM"
+    },
+    "F-HTL-CITY01-112": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-AMENITY"
+    },
+    "F-HTL-CITY01-113": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-SUPPORT"
+    },
+    "F-HTL-CITY01-114": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-TRANSPORT"
+    },
+    "F-HTL-CITY01-115": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-POLICY"
+    },
+    "F-HTL-CITY01-ROOM_TYPE-CITY-STD": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-CITY01-ROOM_TYPE-CITY-TWN": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-CITY01-ROOM_TYPE-CITY-FAM": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-CITY01-REFERENCE_RATE-RATE-CITY-STD-REF": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-CITY01-REFERENCE_RATE-RATE-CITY-TWN-REF": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-BEACH02-012": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-CITY01-REFERENCE_RATE-RATE-CITY-FAM-REF": {
+      "hotel_id": "HTL-CITY01",
+      "source_id": "SRC-HTL-CITY01-CATALOG"
+    },
+    "F-HTL-BEACH02-001": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-OVERVIEW"
+    },
+    "F-HTL-BEACH02-002": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-OVERVIEW"
+    },
+    "F-HTL-BEACH02-003": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-OVERVIEW"
+    },
+    "F-HTL-BEACH02-005": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-006": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-007": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-008": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-009": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LUGGAGE"
+    },
+    "F-HTL-BEACH02-010": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CONTACT"
+    },
+    "F-HTL-BEACH02-011": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-013": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-014": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-015": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-016": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-017": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-018": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-019": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-020": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ACCESS"
+    },
+    "F-HTL-BEACH02-021": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-022": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-023": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-024": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-025": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-026": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-027": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-028": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-029": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-030": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-031": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-032": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CONTACT"
+    },
+    "F-HTL-BEACH02-033": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CONTACT"
+    },
+    "F-HTL-BEACH02-034": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-035": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-036": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-040": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-041": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-042": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-043": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-044": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-045": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-046": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-047": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-048": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-049": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-051": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-052": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-053": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-054": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-055": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-056": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-057": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-058": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-059": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-060": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-STAY"
+    },
+    "F-HTL-BEACH02-061": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LUGGAGE"
+    },
+    "F-HTL-BEACH02-062": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LUGGAGE"
+    },
+    "F-HTL-BEACH02-063": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-064": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-065": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-066": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-067": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ACCESS"
+    },
+    "F-HTL-BEACH02-068": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ACCESS"
+    },
+    "F-HTL-BEACH02-069": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-070": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-071": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-072": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-073": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-074": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-075": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-076": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-077": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-078": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-079": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-080": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-081": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-082": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-083": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-084": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-085": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-086": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-087": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-088": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-089": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-090": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-091": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SAFETY"
+    },
+    "F-HTL-BEACH02-092": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-093": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-094": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-095": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-096": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-097": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-098": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-099": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-101": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-102": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-SUPPORT"
+    },
+    "F-HTL-BEACH02-103": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-104": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-105": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-PAY"
+    },
+    "F-HTL-BEACH02-106": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-107": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-108": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-FOOD"
+    },
+    "F-HTL-BEACH02-109": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-TRANSPORT"
+    },
+    "F-HTL-BEACH02-110": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-LOCAL"
+    },
+    "F-HTL-BEACH02-111": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-ROOM"
+    },
+    "F-HTL-BEACH02-112": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-AMENITY"
+    },
+    "F-HTL-BEACH02-113": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-114": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-POLICY"
+    },
+    "F-HTL-BEACH02-ROOM_TYPE-BEACH-GDN": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-BEACH02-ROOM_TYPE-BEACH-FAM": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-BEACH02-ROOM_TYPE-BEACH-POOL": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-BEACH02-REFERENCE_RATE-RATE-BEACH-GDN-REF": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-BEACH02-REFERENCE_RATE-RATE-BEACH-FAM-REF": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-RETREAT03-012": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-BEACH02-REFERENCE_RATE-RATE-BEACH-POOL-REF": {
+      "hotel_id": "HTL-BEACH02",
+      "source_id": "SRC-HTL-BEACH02-CATALOG"
+    },
+    "F-HTL-RETREAT03-001": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-OVERVIEW"
+    },
+    "F-HTL-RETREAT03-002": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-OVERVIEW"
+    },
+    "F-HTL-RETREAT03-003": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-OVERVIEW"
+    },
+    "F-HTL-RETREAT03-005": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-006": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-007": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-008": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-009": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LUGGAGE"
+    },
+    "F-HTL-RETREAT03-010": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CONTACT"
+    },
+    "F-HTL-RETREAT03-011": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-013": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-014": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-015": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-016": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-017": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-018": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-019": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-020": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ACCESS"
+    },
+    "F-HTL-RETREAT03-021": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-022": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-057": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-023": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-024": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-025": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-026": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-027": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-028": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-029": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-030": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-031": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-032": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CONTACT"
+    },
+    "F-HTL-RETREAT03-033": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CONTACT"
+    },
+    "F-HTL-RETREAT03-034": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-035": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-036": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-040": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-041": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-042": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-043": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-044": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-045": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-046": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-047": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-048": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-049": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-050": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-051": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-053": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-054": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-055": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-056": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-058": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-059": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-060": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-061": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-062": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-STAY"
+    },
+    "F-HTL-RETREAT03-063": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LUGGAGE"
+    },
+    "F-HTL-RETREAT03-064": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LUGGAGE"
+    },
+    "F-HTL-RETREAT03-065": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-066": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-067": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-068": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-069": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ACCESS"
+    },
+    "F-HTL-RETREAT03-070": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ACCESS"
+    },
+    "F-HTL-RETREAT03-071": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-072": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-073": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-074": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-075": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-076": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-077": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-078": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-079": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-080": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-081": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-082": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-083": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-084": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-085": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-086": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-087": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-088": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-089": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-090": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-091": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-092": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-093": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SAFETY"
+    },
+    "F-HTL-RETREAT03-094": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-095": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-096": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-097": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-098": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-099": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-100": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-101": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-103": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-104": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-SUPPORT"
+    },
+    "F-HTL-RETREAT03-105": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-106": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-107": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-PAY"
+    },
+    "F-HTL-RETREAT03-108": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-109": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-FOOD"
+    },
+    "F-HTL-RETREAT03-110": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-TRANSPORT"
+    },
+    "F-HTL-RETREAT03-111": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-LOCAL"
+    },
+    "F-HTL-RETREAT03-112": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-ROOM"
+    },
+    "F-HTL-RETREAT03-113": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-114": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-AMENITY"
+    },
+    "F-HTL-RETREAT03-115": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-116": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-POLICY"
+    },
+    "F-HTL-RETREAT03-ROOM_TYPE-PINE-LOFT": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    },
+    "F-HTL-RETREAT03-ROOM_TYPE-PINE-GARDEN": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    },
+    "F-HTL-RETREAT03-ROOM_TYPE-PINE-CABIN": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    },
+    "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-LOFT-REF": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    },
+    "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-GARDEN-REF": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    },
+    "F-HTL-RETREAT03-REFERENCE_RATE-RATE-PINE-CABIN-REF": {
+      "hotel_id": "HTL-RETREAT03",
+      "source_id": "SRC-HTL-RETREAT03-CATALOG"
+    }
+  },
+  "identity_provenance": "Readonly approved synthetic M1 snapshot. All45 imported source owners/versions checked against original pinned fixture index;3unapproved INTERNAL sources intentionally excluded. Snapshot hashes bind source+projectedfacts+media, not rawTXT. Identity oracle only; independent cost/policy expected values unchanged."
+}

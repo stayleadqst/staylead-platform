@@ -1,0 +1,16 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance4",
+  "status": "halted",
+  "guest_turns": 1,
+  "codex_requests": 2,
+  "state_sha256": "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c",
+  "lifetime_requests": 46,
+  "unused_guest_slots": 1,
+  "unused_request_slots": 2,
+  "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+  "actual_outcome": {
+    "pine1": "FAIL unrequested hardbedtype clarification; generic VI access question",
+    "pine2": "Blocked dependency/notattempted"
+  },
+  "runners": "API45685/browser9067 stopped; no retry"
+}

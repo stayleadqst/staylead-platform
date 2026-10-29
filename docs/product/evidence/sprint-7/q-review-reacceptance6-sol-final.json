@@ -1,0 +1,42 @@
+{
+  "verdict": "PASS_READY_FOR_APPROVED_FRESH_SOL_LOW_PINE2_4_BATCH",
+  "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "pins": {
+    "count": 237,
+    "digest_match": true,
+    "before_after_repo_snapshot_match": true,
+    "exact3controls_delta": [
+      "tests/contracts/test_sprint7_acceptance_harness.py",
+      "tools/evals/sprint7_browser.mjs",
+      "tools/evals/sprint7_runtime.py"
+    ],
+    "evidence": "q-review-reacceptance6-sol-pins.json",
+    "product327_unchanged": true
+  },
+  "inputs": "q-review-reacceptance6-sol-cases.json:cases23e0baa5/authorityd1fd022a regular0600 exactpublished2objects/oracle4adda/fullclosedR5receipt match",
+  "critical_predecessor": "Runtime+actualemittedbrowser+actualprivatebindingtest use /private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-state.json SHA9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee,HALTED2/4,lifetime50. Older same-R5runID bootstrap1zero state is notused.",
+  "fresh_scope": "NewrunR6fresh0/0,only2Pineoriginalturns,max4requests,Sol/low2calls25s45s700,noretry/nofallback/stopfirstfailure; nocontinuationoroldallowancetransfer",
+  "independent_checks": [
+    {
+      "evidence": "q-review-reacceptance6-sol-bootstrap-results.json",
+      "result": "Actualemittedbootstrap passes actualprivateinputs; wrongparentrun/hash/lifetime/seed/matrix/continuation/actualpriorbytes reject"
+    },
+    {
+      "evidence": "q-review-reacceptance6-sol-semantic-gate-results.json",
+      "result": "Actualfsroot-onlyAPIbodyhashreceipt gate valid0600pass advances; wrongidentity/body/fail/symlink0644/missing reject; no nextguest/provider whilewaiting"
+    },
+    {
+      "tests": "Realbuild_provider Sol/Luna low construction+exactCLIargs/otherprofilesreject; actualapprovedprivatecases+priorreceipt test; realTestClient unapprovedingress",
+      "result": "3PASS,3knownwarnings. No actualsubprocess/provider/API/DBwrites."
+    }
+  ],
+  "reused_proofs": [
+    "Reviewedproduct327zero-basedpromptcontract+strictunchangedM4 andactualcapturecounterfactual",
+    "Prioractualproducer→drivergoodVI/Pine2Frenchpositive+13semantic/source/mathnegatives, guardcodeunchanged",
+    "AcceptedCityR3comparison/edit/stale409/reselection,FamilyR2age/sharing/guardian/budget/unknownfees,B07officialchannelactualPASS"
+  ],
+  "root_gates_receipt": "reacceptance6-sol-local-gates.json:23harness/API+wholeRuff/compilePASS3knownwarnings; B21/NodeSyntaxSmoke/diffPASS. Product284backend/16isolatedPG/frontend53pins40tests+lint/typecheck/build reused; nooverlapsummed.",
+  "activation": "Rootsoleactivator/semanticmarkerwriter. No config/stateinitializedorprovider/actualDBwritebyQ.",
+  "actual_acceptance": "NOT_YET_PASS; priorR5turn1PASS/turn2FAIL stayshistorical. Need actualPine2linkedchain/source/math/FrenchcurrentUIselection/readonlyDB success beforefullC01/Sprint7verdict."
+}

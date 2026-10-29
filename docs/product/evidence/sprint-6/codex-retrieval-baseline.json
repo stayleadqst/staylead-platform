@@ -1,0 +1,6221 @@
+{
+  "result": "completed",
+  "probe": "original_query_lexical_retrieval_baseline",
+  "database_transaction_mode": "read_only",
+  "llm_calls": 0,
+  "provider_calls": 0,
+  "hotel_id": "HTL-CITY01",
+  "history_policy": "last 4 preceding pinned guest utterances; bounded context only",
+  "guest_utterances_included_in_output": false,
+  "turns": [
+    {
+      "turn": 1,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-032",
+        "F-HTL-CITY01-022",
+        "F-HTL-CITY01-036",
+        "F-HTL-CITY01-011",
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-043",
+        "F-HTL-CITY01-017",
+        "F-HTL-CITY01-041",
+        "F-HTL-CITY01-026",
+        "F-HTL-CITY01-047",
+        "F-HTL-CITY01-107",
+        "F-HTL-CITY01-110",
+        "F-HTL-CITY01-019",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-029",
+        "F-HTL-CITY01-048",
+        "F-HTL-CITY01-079",
+        "F-HTL-CITY01-013",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-113"
+      ],
+      "expected_fact_coverage": 1.0,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 31,
+      "term_coverage": 0.122044,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 2,
+      "expected_fact_ids": [],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-081",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-064",
+        "F-HTL-CITY01-113",
+        "F-HTL-CITY01-065",
+        "F-HTL-CITY01-091",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-108",
+        "F-HTL-CITY01-052",
+        "F-HTL-CITY01-053",
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-085",
+        "F-HTL-CITY01-097",
+        "F-HTL-CITY01-087",
+        "F-HTL-CITY01-089",
+        "F-HTL-CITY01-095",
+        "F-HTL-CITY01-054",
+        "F-HTL-CITY01-077",
+        "F-HTL-CITY01-061",
+        "F-HTL-CITY01-060"
+      ],
+      "expected_fact_coverage": null,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 13,
+      "term_coverage": 0.163167,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 3,
+      "expected_fact_ids": [],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-081",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-032",
+        "F-HTL-CITY01-113",
+        "F-HTL-CITY01-022",
+        "F-HTL-CITY01-064",
+        "F-HTL-CITY01-065",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-036",
+        "F-HTL-CITY01-011",
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-043",
+        "F-HTL-CITY01-017",
+        "F-HTL-CITY01-041",
+        "F-HTL-CITY01-026",
+        "F-HTL-CITY01-091",
+        "F-HTL-CITY01-048",
+        "F-HTL-CITY01-108",
+        "F-HTL-CITY01-052",
+        "F-HTL-CITY01-053"
+      ],
+      "expected_fact_coverage": null,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 13,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 4,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-081",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-032",
+        "F-HTL-CITY01-113",
+        "F-HTL-CITY01-022",
+        "F-HTL-CITY01-064",
+        "F-HTL-CITY01-065",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-036",
+        "F-HTL-CITY01-011",
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-043",
+        "F-HTL-CITY01-017",
+        "F-HTL-CITY01-041",
+        "F-HTL-CITY01-026",
+        "F-HTL-CITY01-091",
+        "F-HTL-CITY01-048",
+        "F-HTL-CITY01-108",
+        "F-HTL-CITY01-052",
+        "F-HTL-CITY01-053"
+      ],
+      "expected_fact_coverage": 1.0,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 3,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 5,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-021",
+        "F-HTL-CITY01-112",
+        "F-HTL-CITY01-081",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-032",
+        "F-HTL-CITY01-113",
+        "F-HTL-CITY01-022",
+        "F-HTL-CITY01-064",
+        "F-HTL-CITY01-065",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-036",
+        "F-HTL-CITY01-011",
+        "F-HTL-CITY01-040",
+        "F-HTL-CITY01-043",
+        "F-HTL-CITY01-017",
+        "F-HTL-CITY01-041",
+        "F-HTL-CITY01-026",
+        "F-HTL-CITY01-091",
+        "F-HTL-CITY01-048"
+      ],
+      "expected_fact_coverage": 1.0,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 5,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 6,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-S6-URL-001",
+        "F-HTL-CITY01-081",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-064",
+        "F-HTL-CITY01-065",
+        "F-HTL-CITY01-113",
+        "F-HTL-CITY01-112",
+        "F-HTL-CITY01-021",
+        "F-HTL-CITY01-091",
+        "F-HTL-CITY01-108",
+        "F-HTL-CITY01-052",
+        "F-HTL-CITY01-053",
+        "F-HTL-CITY01-094",
+        "F-HTL-CITY01-085",
+        "F-HTL-CITY01-097",
+        "F-HTL-CITY01-087",
+        "F-HTL-CITY01-089",
+        "F-HTL-CITY01-095",
+        "F-HTL-CITY01-054"
+      ],
+      "expected_fact_coverage": 0.5,
+      "missing_expected_fact_ids": [
+        "F-HTL-CITY01-046"
+      ],
+      "query_term_count": 23,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 7,
+      "expected_fact_ids": [],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-S6-URL-001",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-029",
+        "F-HTL-CITY01-079",
+        "F-HTL-CITY01-021",
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-112"
+      ],
+      "expected_fact_coverage": null,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 8,
+      "term_coverage": 0.083749,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 8,
+      "expected_fact_ids": [],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-S6-URL-001",
+        "F-HTL-CITY01-021",
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-112",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-029",
+        "F-HTL-CITY01-079"
+      ],
+      "expected_fact_coverage": null,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 7,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "turn": 9,
+      "expected_fact_ids": [],
+      "candidate_fact_ids": [
+        "F-HTL-CITY01-S6-URL-001",
+        "F-HTL-CITY01-021",
+        "F-HTL-CITY01-074",
+        "F-HTL-CITY01-112",
+        "F-HTL-CITY01-018",
+        "F-HTL-CITY01-029",
+        "F-HTL-CITY01-079"
+      ],
+      "expected_fact_coverage": null,
+      "missing_expected_fact_ids": [],
+      "query_term_count": 2,
+      "term_coverage": 0.0,
+      "candidate_index": [
+        {
+          "fact_id": "F-HTL-CITY01-001",
+          "subject": "property",
+          "topic": "identity",
+          "field": "name"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-002",
+          "subject": "property",
+          "topic": "identity",
+          "field": "address"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-003",
+          "subject": "property",
+          "topic": "identity",
+          "field": "property_type"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-005",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "check_in_window"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-006",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "check_out_time"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-007",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "early_check_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-008",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "late_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-009",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_storage"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-010",
+          "subject": "service",
+          "topic": "reception",
+          "field": "staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-011",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_changes"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-012",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "cancellation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-059",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "arrival_after_staffed_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-013",
+          "subject": "payment",
+          "topic": "deposit",
+          "field": "deposit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-014",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "accepted_methods"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-015",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-016",
+          "subject": "room",
+          "topic": "rooms",
+          "field": "quiet_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-017",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "extra_person"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-018",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_age_definition"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-019",
+          "subject": "room",
+          "topic": "guardian",
+          "field": "minor_guardian"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-020",
+          "subject": "property",
+          "topic": "access",
+          "field": "step_free_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-021",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-022",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-023",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "pets"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-024",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-025",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "emergency_contact"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-026",
+          "subject": "safety",
+          "topic": "security",
+          "field": "key_control"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-027",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "guest_data"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-028",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-029",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-030",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-031",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "complaint"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-032",
+          "subject": "service",
+          "topic": "language",
+          "field": "languages"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-033",
+          "subject": "service",
+          "topic": "contact",
+          "field": "contact_channel"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-034",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_updates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-035",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-036",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "unavailable_service"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-040",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-041",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_requests"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-042",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergy_handling"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-043",
+          "subject": "amenity",
+          "topic": "gym",
+          "field": "gym"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-044",
+          "subject": "amenity",
+          "topic": "pool",
+          "field": "pool"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-045",
+          "subject": "amenity",
+          "topic": "spa",
+          "field": "spa"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-046",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-047",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "workspace"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-048",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_transfer"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-049",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "construction_noise"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-050",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "nearby"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-052",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "booking_reference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-053",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "name_mismatch"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-054",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "walk_in"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-055",
+          "subject": "reservation",
+          "topic": "cancel",
+          "field": "refund_timing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-056",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "currency"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-057",
+          "subject": "payment",
+          "topic": "payments",
+          "field": "card_authorization"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-058",
+          "subject": "payment",
+          "topic": "invoice",
+          "field": "invoice_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-060",
+          "subject": "stay",
+          "topic": "checkin",
+          "field": "identity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-061",
+          "subject": "stay",
+          "topic": "checkout",
+          "field": "checkout_key_return"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-062",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-063",
+          "subject": "stay",
+          "topic": "luggage",
+          "field": "luggage_after_checkout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-064",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-065",
+          "subject": "room",
+          "topic": "child",
+          "field": "child_supervision"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-066",
+          "subject": "room",
+          "topic": "occupancy",
+          "field": "occupancy_rule"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-067",
+          "subject": "room",
+          "topic": "beds",
+          "field": "bed_preference"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-068",
+          "subject": "property",
+          "topic": "access",
+          "field": "access_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-069",
+          "subject": "room",
+          "topic": "access",
+          "field": "accessible_room_availability"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-070",
+          "subject": "dining",
+          "topic": "food",
+          "field": "outside_food"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-071",
+          "subject": "dining",
+          "topic": "dietary",
+          "field": "dietary_notice"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-072",
+          "subject": "dining",
+          "topic": "allergies",
+          "field": "allergen_escalation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-073",
+          "subject": "amenity",
+          "topic": "amenities",
+          "field": "amenity_hours"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-074",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "wifi_help"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-075",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_delicates"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-076",
+          "subject": "service",
+          "topic": "laundry",
+          "field": "laundry_claim"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-077",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_vehicle_limit"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-078",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "parking_clearance"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-079",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_booking_cutoff"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-080",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "transfer_fare_status"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-081",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "child_seat_confirmation"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-082",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "route_accessibility"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-083",
+          "subject": "policy",
+          "topic": "pets",
+          "field": "assistance_animal_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-084",
+          "subject": "policy",
+          "topic": "smoking",
+          "field": "smoking_fee"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-085",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "noise_report"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-086",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-087",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "immediate_hazard"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-088",
+          "subject": "safety",
+          "topic": "safety",
+          "field": "fire_route"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-089",
+          "subject": "safety",
+          "topic": "security",
+          "field": "visitor_access"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-090",
+          "subject": "safety",
+          "topic": "security",
+          "field": "cash_valuables"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-091",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "data_correction"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-092",
+          "subject": "privacy",
+          "topic": "privacy",
+          "field": "photo_consent"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-093",
+          "subject": "service",
+          "topic": "lostfound",
+          "field": "lost_found_tracking"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-094",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "housekeeping_optout"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-095",
+          "subject": "service",
+          "topic": "housekeeping",
+          "field": "linen_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-096",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "maintenance_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-097",
+          "subject": "service",
+          "topic": "maintenance",
+          "field": "repair_entry"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-098",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_acknowledgement"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-099",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_priority"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-100",
+          "subject": "service",
+          "topic": "complaints",
+          "field": "support_followup"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-102",
+          "subject": "service",
+          "topic": "outage",
+          "field": "outage_unknown_eta"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-103",
+          "subject": "service",
+          "topic": "unavailability",
+          "field": "alternative_request"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-104",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "directions_scope"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-105",
+          "subject": "local",
+          "topic": "weather",
+          "field": "weather_activity_check"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-106",
+          "subject": "reservation",
+          "topic": "booking",
+          "field": "corporate_rate"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-107",
+          "subject": "amenity",
+          "topic": "workspace",
+          "field": "meeting_room_capacity"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-108",
+          "subject": "dining",
+          "topic": "food",
+          "field": "breakfast_child"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-109",
+          "subject": "transport",
+          "topic": "transport",
+          "field": "airport_pickup_point"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-110",
+          "subject": "local",
+          "topic": "localguide",
+          "field": "business_district"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-111",
+          "subject": "room",
+          "topic": "room",
+          "field": "connecting_rooms"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-112",
+          "subject": "amenity",
+          "topic": "wifi",
+          "field": "meeting_wifi"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-113",
+          "subject": "service",
+          "topic": "support",
+          "field": "business_printing"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-114",
+          "subject": "transport",
+          "topic": "parking",
+          "field": "ev_charging"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-115",
+          "subject": "policy",
+          "topic": "noise",
+          "field": "meeting_event"
+        },
+        {
+          "fact_id": "F-HTL-CITY01-S6-URL-001",
+          "subject": "service",
+          "topic": "contact",
+          "field": "acceptance_information_url"
+        }
+      ],
+      "conflicts": []
+    }
+  ]
+}

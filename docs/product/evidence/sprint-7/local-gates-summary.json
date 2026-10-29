@@ -1,0 +1,25 @@
+{
+  "offline_candidate": "396cc7f3dec2fb619961ce9a83e8549bdca2485b0da555df4eaf41b5ed47b8f5",
+  "backend_contract_architecture_api_tests": 216,
+  "postgres_regression_tests": 42,
+  "post_final_clarification_focused_tests": 126,
+  "frontend_contract_tests": 40,
+  "frontend_lint_typecheck_build": "PASS",
+  "canonical_backend_ruff": "PASS;17baselineimportissuesfixedintestsonly",
+  "python_compile": "PASS",
+  "production_browser": "PASS with fake provider; actual application/domain/PG; stale old card disabled/new current selectable",
+  "web_source_before_after_build": "af69be96abae3e3eb3fc0e70b629ee8f0ab72b48275901a473bf8f2986807ee6",
+  "live_requests": 1,
+  "live_completed_turns": 0,
+  "live_status": "BLOCKED",
+  "actual_usage": {
+    "input_tokens": 10979,
+    "output_tokens": 396,
+    "total_tokens_reported": null,
+    "provider_latency_ms": 7420.9
+  },
+  "measured_agent_tokens_and_monetary_usage": "unavailable",
+  "manual_github_ci": false,
+  "deployed": false,
+  "full_story_done": false
+}

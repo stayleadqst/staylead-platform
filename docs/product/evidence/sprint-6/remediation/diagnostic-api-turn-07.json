@@ -1,0 +1,68 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-4",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 7,
+  "request_id_sha256": "9f768cb0112e7bf0",
+  "question_sha256": "7fe1768d10c4f475c4af514a4229cd91d3d195b6ce25e95c5ca163e815fc6c47",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 502,
+  "response": {
+    "status": "partial_success",
+    "answer_eligibility": "pending",
+    "language_preference": {
+      "language_tag": "hi",
+      "source": "explicit",
+      "revision": 7
+    },
+    "presentation": {
+      "language_tag": "hi",
+      "direction": "ltr",
+      "preference_revision": 7,
+      "freshness": "current",
+      "labels_fallback": true
+    },
+    "brief_receipt": {
+      "status": "partial_success",
+      "brief_version_before": 3,
+      "brief_version_after": 4,
+      "answer_status": "failed",
+      "brief_version_used": 4
+    },
+    "guest_brief": {
+      "brief_version": 4,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "c63c9445cf9de165"
+          }
+        ]
+      },
+      "pending_fields": [
+        "dates.check_out"
+      ]
+    },
+    "error": {
+      "code": "unsupported_output",
+      "retryable": true
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-4",
+    "codex_requests": 14,
+    "guest_turns": 7,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "status": "completed"
+}

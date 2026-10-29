@@ -1,14 +1,19 @@
 """Provider-neutral text generation contracts used by M3."""
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 
 @dataclass(frozen=True)
 class GenerationRequest:
+    """Provider-neutral generation request with optional native-structured-output hints."""
+
     instructions: str
     input_text: str
     max_output_tokens: int = 700
+    # Adapters may ignore these when their API does not support JSON Schema output.
+    response_schema: dict[str, Any] | None = None
+    response_envelope_key: str | None = None
 
 
 @dataclass(frozen=True)

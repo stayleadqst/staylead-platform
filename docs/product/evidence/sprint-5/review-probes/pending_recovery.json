@@ -1,0 +1,93 @@
+{
+  "adults_resolution": {
+    "data": {
+      "dates": {
+        "check_in": null,
+        "check_out": null,
+        "nights": null
+      },
+      "party": {
+        "adults": 2,
+        "children": []
+      }
+    },
+    "pending_fields": [
+      "party.adults"
+    ],
+    "delta": {
+      "party": {
+        "adults": 2
+      }
+    },
+    "status": "applied"
+  },
+  "child_resolution": {
+    "data": {
+      "dates": {
+        "check_in": "2027-05-10",
+        "check_out": "2027-05-13",
+        "nights": 3
+      },
+      "party": {
+        "adults": 2,
+        "children": []
+      }
+    },
+    "pending_fields": [
+      "party.children.member"
+    ],
+    "delta": {
+      "party": {
+        "children_removed": [
+          {
+            "member_id": "71fd84ef-0256-4ed1-9904-63137459fa93",
+            "age": 7
+          }
+        ]
+      }
+    },
+    "status": "applied"
+  },
+  "known_checkin_only": {
+    "data": {
+      "dates": {
+        "check_in": null,
+        "check_out": null,
+        "nights": null
+      },
+      "party": {
+        "adults": null,
+        "children": []
+      }
+    },
+    "pending_fields": [
+      "dates.check_in",
+      "dates.check_out"
+    ],
+    "delta": {},
+    "status": "clarification"
+  },
+  "pending_known_age_claim": {
+    "data": {
+      "dates": {
+        "check_in": "2027-05-10",
+        "check_out": "2027-05-13",
+        "nights": 3
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "member_id": "71fd84ef-0256-4ed1-9904-63137459fa93",
+            "age": 7
+          }
+        ]
+      }
+    },
+    "pending_fields": [
+      "party.children.71fd84ef-0256-4ed1-9904-63137459fa93.age"
+    ],
+    "delta": {},
+    "status": "no_change"
+  }
+}

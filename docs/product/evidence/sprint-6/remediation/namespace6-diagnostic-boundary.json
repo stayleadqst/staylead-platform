@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-26T05:35:17.540939+00:00",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "classification": "same-product API diagnostics3\u20139 after T2UI failure; not full UI/copy matrix",
+  "source_product_fingerprint": "70498d890019fcf62ac6580e545b7c8e16360357500a725149c49a984997512a",
+  "helper_sha256": "0ac097ec3321581e036dc376e48de588382fb424b2a3424bfbff2f2ff7944c56",
+  "preflight_review": "Q18testsPASS; CactualPGresolvedT2anchor/scoped2requestrecords beforeT3; no call in preflight",
+  "counter_at_transition": {
+    "provider_requests": 4,
+    "guest_turns": 2
+  },
+  "counter_at_checkpoint_afterT4": {
+    "provider_requests": 8,
+    "guest_turns": 4
+  },
+  "no_T2_retry": true,
+  "automatic_retries": 0,
+  "same_existing_session": true,
+  "product_change_during_run": false,
+  "artifact_permissions": "exclusive0600",
+  "raw_capture": "private only",
+  "UI_clipboard_checked_for_diagnostics": false
+}

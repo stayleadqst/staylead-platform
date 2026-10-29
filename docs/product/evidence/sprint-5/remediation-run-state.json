@@ -1,0 +1,10 @@
+{
+  "run_id": "s5-r2-90-20261023",
+  "initialized_at": "2026-10-23T12:17:02.571187+00:00",
+  "max_additional_attempts": 8,
+  "observed_attempts": 7,
+  "prior_attempts": 1,
+  "authority": "Hieu requested immediate Sprint5 blocker remediation and dependent acceptance; no automatic paid retry or existing-limit increase.",
+  "semantic_guest_turns": 2,
+  "answer_only_resumes": 1
+}

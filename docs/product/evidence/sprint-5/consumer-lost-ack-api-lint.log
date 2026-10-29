@@ -1,0 +1,19 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/contracts/test_sprint5_consumer_api.py:1:1
+  |
+1 | / from __future__ import annotations
+2 | |
+3 | | import pytest
+4 | | from pydantic import ValidationError
+5 | |
+6 | | from staylead_platform.entrypoints.app import MessageRequest
+  | |____________________________________________________________^
+help: Organize imports
+  |
+4 | from pydantic import ValidationError
+  -
+5 | from staylead_platform.entrypoints.app import MessageRequest
+  |
+
+Found 1 error.
+[*] 1 fixable with `--fix`.

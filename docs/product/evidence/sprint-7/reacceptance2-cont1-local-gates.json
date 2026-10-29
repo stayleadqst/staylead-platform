@@ -1,0 +1,31 @@
+{
+  "candidate_sha256": "4797d219e4fed676574419d3d57d8135b1951da0762c483e8af799439ae521f4",
+  "backend_tests": 275,
+  "backend_warnings": 3,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "node_syntax": "PASS",
+  "offline_smoke": "PASS",
+  "diff_check": "PASS",
+  "reused_postgres": 14,
+  "reused_frontend_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "reuse_reason": "Only prep guidance/schema descriptions and bounded controls changed; validation/M4/persistence functions unchanged and earlier independent domain parity/AST proof retained.",
+  "new_continuation_calls": 0,
+  "seed": [
+    2,
+    4
+  ],
+  "allowed_cases": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "max_new": [
+    5,
+    10
+  ],
+  "no_city_retry": true
+}

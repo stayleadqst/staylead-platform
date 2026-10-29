@@ -100,6 +100,45 @@ def parse_fixture_pack(fixture_root: str | Path, *, reference_date: date | None 
             prepared_fact["valid_from"] = effective_from
             prepared_fact["valid_to"] = effective_to
             selected.append(prepared_fact)
+        # The authored pack keeps the machine-readable room catalog and reference
+        # rates beside the prose facts. Project them through the same approved,
+        # versioned source gate so consumers never read the fixture directly.
+        for collection, subject, field in (
+            (properties_doc.get("room_types", {}).get(hotel_id, ()), "room", "room_type"),
+            (properties_doc.get("room_rates_reference", ()), "rate", "reference_rate"),
+        ):
+            for item in collection:
+                if not isinstance(item, dict) or item.get("hotel_id", hotel_id) != hotel_id:
+                    continue
+                if field == "room_type" and not item.get("room_type_id"):
+                    continue
+                if field == "reference_rate" and not item.get("rate_id"):
+                    continue
+                refs = item.get("source_refs")
+                if not isinstance(refs, list) or len(refs) != 1:
+                    raise FixtureImportError(f"Missing singular source provenance for {field}.")
+                ref = refs[0]
+                source = hotel_sources.get(ref.get("source_id"))
+                if (not source or source.get("version") != ref.get("version")
+                        or source.get("hotel_id") != hotel_id):
+                    raise FixtureImportError(f"Unapproved source reference for {field}.")
+                start = item.get("valid_from", source.get("valid_from", today))
+                end = item.get("valid_to", source.get("valid_to", today))
+                effective_from = max(start, source.get("valid_from", "0000"))
+                effective_to = min(end, source.get("valid_to", "9999"))
+                if effective_from > effective_to or not effective_from <= today <= effective_to:
+                    continue
+                identity = item["room_type_id"] if field == "room_type" else item["rate_id"]
+                selected.append({
+                    "fact_id": f"F-{hotel_id}-{field.upper()}-{identity}",
+                    "topic": "room_catalog" if field == "room_type" else "room_rates",
+                    "subject": subject, "field": field, "value": dict(item),
+                    "conditions": {}, "status": "confirmed",
+                    "valid_from": effective_from, "valid_to": effective_to,
+                    "source_refs": [dict(ref)], "approved": True, "visibility": "guest",
+                    "hotel_id": hotel_id, "synthetic": bool(item.get("synthetic", True)),
+                    "version": "1.0",
+                })
         if not selected:
             raise FixtureImportError(f"No eligible guest facts for {hotel_id}.")
         config = {

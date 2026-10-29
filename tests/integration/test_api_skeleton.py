@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from staylead_platform.composition.startup.domain_profile import (
     UnsupportedDomainError,
     select_domain_profile,
@@ -14,7 +15,7 @@ def test_health_reports_selected_hospitality_profile() -> None:
 
     assert response.status_code == 200
     assert response.json() == {
-        "status": "ok", "domain": "hospitality", "guest_contract_version": "1",
+        "status": "ok", "domain": "hospitality", "guest_contract_version": "2",
     }
 
 

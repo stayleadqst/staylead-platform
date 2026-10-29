@@ -1,0 +1,76 @@
+{
+  "verdict": "PASS scoped mappedFamily/Pinecases3-7only readiness; C01/fullSprintstillBLOCKEDbyCitygap",
+  "candidate_sha256": "390daa4c53acc70b3dcb2b26676a065e8226a38261dd705c8d2b739d796cbbee",
+  "all_hashes_before": 237,
+  "all_hashes_after": 237,
+  "digest_verified": true,
+  "delta_from_fcdd": [
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py",
+    "tests/contracts/test_grounded_qa.py",
+    "tests/contracts/test_sprint7_acceptance_harness.py",
+    "tools/evals/sprint7_browser.mjs",
+    "tools/evals/sprint7_runtime.py",
+    "tools/evals/sprint7_browser_helpers.mjs"
+  ],
+  "prompt_review_reused": "q-review-reacceptance1-prompt-fix.json; originalcapturestillrejects, typedcorrectedproposalvalid; no validator/parser/IDguardchanges",
+  "source_case_oracle_authority": {
+    "matrix": "d48d28c04b23f0ea7151a3e24c6f5556169bdfdd2a7a0caca0ed7d01e338ec50",
+    "oracle": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+    "exactoriginal7casefileunchanged": true,
+    "continuationrecord_matches_actualauthority": true
+  },
+  "parent": {
+    "status": "halted",
+    "counters": [
+      1,
+      1
+    ],
+    "sha256": "16ead6f78ee2687e3a2e490886930b04b87b8938186b393a5f5c2004805d191a",
+    "prior_closed_completed_counters": [
+      9,
+      16
+    ],
+    "prior_closed_sha256": "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd",
+    "prior_lifetime_requests": 17,
+    "lifetime_current_beforecontinuation": 18
+  },
+  "mapping": [
+    {
+      "budget_turn": 2,
+      "approved_case_turn": 3
+    },
+    {
+      "budget_turn": 3,
+      "approved_case_turn": 4
+    },
+    {
+      "budget_turn": 4,
+      "approved_case_turn": 5
+    },
+    {
+      "budget_turn": 5,
+      "approved_case_turn": 6
+    },
+    {
+      "budget_turn": 6,
+      "approved_case_turn": 7
+    }
+  ],
+  "bounds": "Seed1/1, originalglobalcap7/14; max5newturns/10newrequests; enforceendmax6/11; unused1guest/3requestsnotrepurposed; same2calls25s45s700gpt6luna-low",
+  "executed_checks": [
+    "Actualclosedprior+haltedparentSHA/content/matrix guard PASS; wrongparenthash/mappingreject",
+    "Currentruntime fullsource/case/oracle verifier and in-memoryvalidseed1/1; fresh0/0,guest7,requests12reject",
+    "All5canonicalM2producer briefs passed actualcurrentbrowsercheckBrief; capturedactual-shapedhardconflictoptionrejects",
+    "RealTestClient unapproved/blockedcase2 rejected400withunchanged1/1and0fakeprovider; approvedcase3passes200→2/2and1fakeprovider",
+    "FourtargetedtestsPASS; actualmatrix/authority/producerpublicshape andinitializerwrongmatrixnofiles/nooverwriteincluded"
+  ],
+  "targeted_test_output": "....                                                                     [100%]\n=============================== warnings summary ===============================\ntests/contracts/test_sprint7_acceptance_harness.py::Sprint7HarnessTests::test_runtime_middleware_rejects_unapproved_question_without_slot_or_provider_call\n  /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/api/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\ntests/contracts/test_sprint7_acceptance_harness.py::Sprint7HarnessTests::test_runtime_middleware_rejects_unapproved_question_without_slot_or_provider_call\n  /Users/ccvn/Documents/project/Staylead/github/staylead-platform/tools/evals/sprint7_runtime.py:632: DeprecationWarning: \n          on_event is deprecated, use lifespan event handlers instead.\n  \n          Read more about it in the\n          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).\n          \n    @app.on_event(\"startup\")\n\ntests/contracts/test_sprint7_acceptance_harness.py::Sprint7HarnessTests::test_runtime_middleware_rejects_unapproved_question_without_slot_or_provider_call\n  /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/api/.venv/lib/python3.14/site-packages/fastapi/applications.py:4723: DeprecationWarning: \n          on_event is deprecated, use lifespan event handlers instead.\n  \n          Read more about it in the\n          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).\n          \n    return self.router.on_event(event_type)  # ty: ignore[deprecated]\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 20 deselected, 3 warnings in 0.64s",
+  "consumer_contract_reuse": "Unchangedactualsessionpublic_confighotel_idfields, selectionresultIDs/version/currentness andpost-turncounterbaseline, sourceflatreforacle andunknownpartialguards reused. BrowserexecutesfreshBeach3/4/5thenfreshPine6/7; onlyPine7requiresUIselection.",
+  "provenance": "Nativefilenames/events/browserpayload include bothglobalbudgetturnandapprovedcaseID; firstfailurehalts; no City1retry/amended2/DBseeding/replay/historyrepair",
+  "reported_root_gates": "Root260backendPASS/RuffcompileNodeofflinesmokeDiffPASS; reused31PG/53frontend40proofs unaffected",
+  "limitations": [
+    "ActualFamily/Pineundernewpromptunverifieduntilcapture; modelsemanticreliabilitynotprovedbyofflinefixtures",
+    "No fullC01/SprintDone even5PASS: ChineseCitycouple→edit/comparison/selectionstale stillmissing; B07priorPASSunaffected",
+    "Qno actualprovider/API/DBwrites/configstateinit"
+  ]
+}

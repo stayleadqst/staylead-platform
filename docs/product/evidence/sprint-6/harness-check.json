@@ -1,0 +1,85 @@
+{
+  "artifact": "Sprint 6 bounded acceptance infrastructure",
+  "status": "prepared_offline_live_not_executed_by_helper",
+  "probes": {
+    "persistent_request_limit_refusal": true,
+    "persistent_guest_turn_limit_refusal": true,
+    "malformed_state_refusal": true,
+    "boolean_counter_refusal": true,
+    "secret_and_utterance_redaction": true,
+    "explicit_opt_in_gate": true,
+    "missing_state_blocks_startup": true,
+    "no_server_or_provider_startup": true,
+    "db_summary_scopes_state_and_hashes_child_id": true,
+    "all_checks_passed": true
+  },
+  "synthetic_corpus": {
+    "validation": "normal parse_fixture_pack passed",
+    "provider_calls": 0,
+      "database_opened": false,
+    "server_started": false,
+    "external_network_calls": 0,
+    "baseline_modified": false,
+    "baseline_manifest_sha256": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2",
+    "baseline_sources_sha256": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f",
+    "baseline_guest_source_document_sha256": "deb3198c93131b2eba0f12adb1c8dab9e1de6f68ede15b586ac35a6a2d9ba887",
+    "baseline_facts_sha256": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0",
+    "overlay": {
+      "source_id": "SRC-HTL-CITY01-S6-URL",
+      "fact_id": "F-HTL-CITY01-S6-URL-001",
+      "url": "https://sprint6.example.invalid/HTL-CITY01/info",
+      "synthetic": true,
+      "real_hotel_or_operator_approval": false,
+      "source_text_sha256": "46dc4182b4385ab08e7b01ce77dba6d8d0ae52ed43032e0468d5d390cc14a758",
+      "source_registry_sha256": "c818201c410b5f5221b4b3f90ca4014fad5f29feb3e68709a3f8868ca3c6b0dd",
+      "guest_source_document_sha256": "deb3198c93131b2eba0f12adb1c8dab9e1de6f68ede15b586ac35a6a2d9ba887",
+      "fact_corpus_sha256": "23f767bd919f6029b183edbcfd1de6da6f6ea5b0faef2944e51b422aae5efaf0",
+      "pack_manifest_sha256": "6ca96cbc9afa119582f56b3526f491c7220623c5529ad3882735e18a996619cf"
+    },
+    "internal_unapproved_url_facts_excluded": [
+      "F-HTL-CITY01-038",
+      "F-HTL-CITY01-101"
+    ],
+    "output_root": "/private/tmp/staylead-sprint6-corpus/knowledge-v1"
+  },
+  "matrix": {
+    "turns": 9,
+    "max_codex_requests": 18,
+    "max_calls_per_turn": 2,
+    "brief_version_sequence": [
+      1,
+      2,
+      3,
+      3,
+      3,
+      3,
+      4,
+      5,
+      5
+    ],
+    "preference_revision_sequence": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8
+    ],
+    "provider_calls": 0,
+    "servers_started": 0
+  },
+  "static_checks": {
+    "ruff": "passed",
+    "py_compile": "passed",
+    "node_check": "passed",
+    "json_parse": "passed",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "No PostgreSQL session was opened; original-query retrieval probe is prepared for C to run after the overlay import.",
+    "No API or browser was started; no Codex/provider request or semantic verdict exists."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "pull_request": "https://github.com/stayleadqst/staylead-platform/pull/99",
+  "draft": true,
+  "merged": false,
+  "deployed": false,
+  "head_branch": "sprint-7-room-advisory",
+  "base_branch": "sprint-5-canonical-brief",
+  "published_code_commit": "feebb8a69b6a862675ec484efb3161d48745c66f",
+  "published_code_tree": "287cb05201d5707cc369cf6722fb7e8790a19597",
+  "local_source_commit_before_API_publication": "c2f845edeb6a9b4d2ec4dd7324bec2f7ef0a9c46",
+  "fetched_remote_equal_local_tree": true,
+  "offline_product_fingerprint": "396cc7f3dec2fb619961ce9a83e8549bdca2485b0da555df4eaf41b5ed47b8f5",
+  "actual_failed_fingerprint": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "live_guest_turns": 1,
+  "live_codex_requests": 1,
+  "blocked_issues": [
+    39,
+    28,
+    97
+  ],
+  "new_backlog_story": 98,
+  "manual_CI_started": false,
+  "CI_result_claimed": false,
+  "note": "Report-only receipt follows published code; no product/source/case/oracle changes. All235 pins verified before receipt commit."
+}

@@ -1,0 +1,132 @@
+{
+  "verdict": "FAIL case3AC1explicitadultsharingomitted; case4answerfailedafterage7M2commit; fullC01/SprintDoDBLOCKED",
+  "candidate": "390daa4c53acc70b3dcb2b26676a065e8226a38261dd705c8d2b739d796cbbee",
+  "immutable_snapshot_237_verified": true,
+  "case3": {
+    "budget_turn": 2,
+    "HTTP": 200,
+    "newproviderrequests": 2,
+    "valid": "adult2/childageunknownstableID/guardianadult1/separatebedtrue/dates2n/pendingage/currentversionedresult/agequestion",
+    "failure": "Explicitadultqueen-bedsharingconsent absent from nativeops/canonicalbrief/applied_delta/receipt; no party.bed_sharing. Modelomission, notsafeinferenceopportunity.",
+    "driver_gap": "Drivercheckedchildguardian/separatebed butfailedtoassertadultconsent beforeadvancing. Qpositiveproducerreadinessprobe didnotexercise thisnegative; futuregate mustreject omittedconsent."
+  },
+  "case4": {
+    "budget_turn": 3,
+    "HTTP_reported_by_root": 502,
+    "browser_capture": "Browserclosedwhilewaiting; no turn04 APIcapture. DBpersistedpartial_successresponseisprimaryerrorbodyevidence.",
+    "newproviderrequests": 2,
+    "M2": "Samechildstable-child-ID-redacted age7committedbrief1→2; guardian/separatebed/dates/adults preserved; adultconsentstillabsent",
+    "answer_error": {
+      "code": "unsupported_output",
+      "message": "The model returned an unsupported number."
+    },
+    "verified_cause": "MixedFAQvalidsourceamount3800000 formatted3,800,000; exactnumericliteralvalidator rejects. Replacingformatonly passes existingguard. Notunsupportedprice/source, notmissingM2commit.",
+    "result": "No newresult/messagepair; onlycase3resultbrief1 remains whilecurrentbrief2 makes itstale by dependency rule.",
+    "native_candidate": "ActualBEACH-FAMhas2queens+sofa; assignmentsusevalidindices0,1,2. No bedtypeerror."
+  },
+  "readonly_evidence": "q-review-reacceptance1-cont1-actual-db-readonly.json; readonly=on, sessionstate1/brief2,2requestscompletedinclpartialerror,2receipts/utterances,2messages,1result,0selections",
+  "protocol_evidence": "q-review-reacceptance1-cont1-actual-protocol.json",
+  "chronology": [
+    {
+      "stage": "provider_reserved",
+      "turn": 2,
+      "case_turn": 3,
+      "call": 1,
+      "unix_time": 1793083677.302658
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 2,
+      "case_turn": 3,
+      "call": 1,
+      "unix_time": 1793083685.763509,
+      "latency_ms": 8460.7,
+      "output_tokens": 303
+    },
+    {
+      "stage": "provider_reserved",
+      "turn": 2,
+      "case_turn": 3,
+      "call": 2,
+      "unix_time": 1793083685.836119
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 2,
+      "case_turn": 3,
+      "call": 2,
+      "unix_time": 1793083701.696394,
+      "latency_ms": 15860.0,
+      "output_tokens": 51
+    },
+    {
+      "stage": "http_completed",
+      "turn": 2,
+      "case_turn": 3,
+      "status": 200,
+      "unix_time": 1793083702.2360508,
+      "latency_ms": 25010.8
+    },
+    {
+      "stage": "provider_reserved",
+      "turn": 3,
+      "case_turn": 4,
+      "call": 1,
+      "unix_time": 1793083702.7003882
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 3,
+      "case_turn": 4,
+      "call": 1,
+      "unix_time": 1793083708.998724,
+      "latency_ms": 6298.2,
+      "output_tokens": 272
+    },
+    {
+      "stage": "provider_reserved",
+      "turn": 3,
+      "case_turn": 4,
+      "call": 2,
+      "unix_time": 1793083709.087821
+    },
+    {
+      "stage": "provider_completed",
+      "turn": 3,
+      "case_turn": 4,
+      "call": 2,
+      "unix_time": 1793083716.602386,
+      "latency_ms": 7513.8,
+      "output_tokens": 397
+    },
+    {
+      "stage": "http_completed",
+      "turn": 3,
+      "case_turn": 4,
+      "status": 502,
+      "unix_time": 1793083716.852443,
+      "latency_ms": 14204.8
+    }
+  ],
+  "stop_chronology": "Case4advanced andbothrequestsreservedbefore rootreceived/processed semanticstopmessage. Do NOT claimstopbeforecase4. Rootstoppedbrowser/API; browserfailureclosedpage issecondary, notrootcause.",
+  "sealed_allocation": {
+    "parentseed": [
+      1,
+      1
+    ],
+    "newattempted_cases": [
+      3,
+      4
+    ],
+    "final_global": [
+      3,
+      5
+    ],
+    "hash": "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75",
+    "lifetime_provider_requests": 22,
+    "cases5_7": "unattempted"
+  },
+  "B07": "PriorapprovedsyntheticpilotAC1-3PASSunchanged",
+  "no_full_acceptance": "No Familychain/PineFrench/CitycoupleeditactualPASS; no fullSprintDone. Preserveallfailedobservations.",
+  "effects": "Qno provider/API/modelcalls orDBwrites; enforcedreadonlyqueryrolledback."
+}

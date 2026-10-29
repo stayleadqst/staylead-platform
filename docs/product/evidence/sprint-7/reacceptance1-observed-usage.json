@@ -1,0 +1,13 @@
+{
+  "scope": "new explicit reacceptance1 allocation only; historical17attempts excluded",
+  "reserved_requests": 8,
+  "completed_responses_with_usage": 7,
+  "failed_attempts_without_usage": 1,
+  "observed_input_tokens": 90408,
+  "observed_output_tokens": 1804,
+  "usage_limitation": "Failedcase7 emitted>700outputtokens, but exactcount/inputusageunavailable; totalsareobservedpartialusage, notcompletebilling",
+  "billing_amount": "unavailable",
+  "global_guest_turns": 5,
+  "global_requests": 8,
+  "lifetime_requests": 25
+}

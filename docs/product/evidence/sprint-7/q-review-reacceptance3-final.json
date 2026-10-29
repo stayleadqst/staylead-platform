@@ -1,0 +1,38 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance3",
+  "candidate_sha256": "345a71417443a90f51410ecad93bbced5effc1f248a7077ab492a9c1b8e34123",
+  "verdict": "PASS_READINESS_SINGLE_EXPLICITLY_APPROVED_FRESH4_8",
+  "findings": [],
+  "provisional_findings_resolved": [
+    "Removed copied Family requires_separate_bed=true conjunct from Pine sharing cases; actual canonical Pine producer passes.",
+    "Removed forced CITY-STD assertion; actual checked TWN-only5.85m under6m passes.",
+    "Restored City1 max_rooms null invariant and exactCity2 falsepair/noinventedphysicaltype guard."
+  ],
+  "pins": "237before/after repository+snapshot,digest and actualruntime._verify_candidate_inputs PASS; only4controlfiles change from productd7.",
+  "private_identity": "Actual matrix9a8d/authority0600/oracle4adda match; exact closedprior6/11 SHA9a7b/lifetime36/unused1+3closed; continuationnull; fresh0/0+4/8.",
+  "executed_checks": [
+    "All4canonicalM2+M4producer outputs pass actual browser brief/room/percase branches; validTWNonlyCity1 and no-ownbed Pine positive.",
+    "Negatives reject inferredroomlimit/exacttype,samesleepingsurface,lostPineconsent,genericaccessrestatement,changedchildID,Frenchfallback,falsecompleteunknownfees.",
+    "Actual browser startup block passes actualprivate cases/oracle/priorreceipt; wrongpriorrun/hash/lifetime/seed/matrix/continuation/priorbytes reject.",
+    "Actual semantic await function passes exactregular0600run/candidate/turn/pass/APIbodySHA; wrongidentity/verdict/body,symlink0644,missingtimeout reject; no API/provider/reservation whilewaiting.",
+    "3targeted testcases PASS: realinprocess fakeTestClient wrongutterance400zeroreserve/provider, exactnextfakecall; initializerbindsapproval/candidate/matrix/nooverwrite;2call/700cap beforelaunch."
+  ],
+  "source_inspection": "City1select→City2oldcardstale/disabled+stalePOST409→newexactcurrentselection; Pine3knownneedsverification→4sameIDage8/onlyaccessclear/French/currentselection; privatecapturesprecedegate; markerturns1..4 maporiginal1,2,6,7.",
+  "root_reported_gates": "B20harness and root22focused pass, Ruff/compile/Node/smoke/diff PASS; reuse unchanged277productbackend15PG40frontend53pins. Counts overlap and are not summed.",
+  "product_reuse": "q-review-reacceptance2-final-mechanism.json PASS reused; Family3–5/B07 acceptedactual evidence unchanged.",
+  "limits": [
+    "Readiness is not actualACPASS; prior City2/Pine6failures unchanged.",
+    "No actualprovider/API/DBwrites or paidcalls byQ; offlineTestClient usesfakes.",
+    "No newconfig/state was present during Qpin review; root alone mayinitializeafterPASS.",
+    "Exactly4guest/max8requests,2calls25s45s700Luna/low,noautoretry,stopfirstblockingfailure; no newscope/optionalturn."
+  ],
+  "evidence": [
+    "q-review-reacceptance3-cases.json",
+    "q-review-reacceptance3-runtime-provisional.json",
+    "q-review-reacceptance3-producer.py",
+    "q-review-reacceptance3-producer-results.json",
+    "q-review-reacceptance3-bootstrap-results.json",
+    "q-review-reacceptance3-semantic-gate-results.json",
+    "q-review-reacceptance3-final-pins.json"
+  ]
+}

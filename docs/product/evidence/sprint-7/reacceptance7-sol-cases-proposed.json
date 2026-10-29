@@ -1,0 +1,80 @@
+{
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "effort": "low",
+  "no_automatic_retry": true,
+  "stop_at_first_blocking_failure": true,
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "cases": [
+    {
+      "turn": 1,
+      "source_case": 7,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đi cùng con 7 tuổi và là người giám hộ của bé. Chúng tôi có thể ở chung phòng và chung giường lớn. Ở 2026-11-10 đến 2026-11-12; bắt buộc không có bậc và phòng tắm phù hợp xe lăn. Tư vấn phần có căn cứ, đừng tự bỏ điều kiện.",
+      "expected": [
+        "M2 adult1/child7/explicitguardian/sharetrue/dates2n/hardstepfree+wheelchairbathroom",
+        "LOFT/GARDENminimumage8 rejected at7; CABINaccesssupportunknown =>no certifiedhardaccessfit",
+        "Keeprequirements, explainunknown/incompatible ratherthansoldout, no relaxationwithoutconsent; no forcedoptions"
+      ],
+      "approved_previous_turn": 6,
+      "previous_run_turn": 3
+    },
+    {
+      "turn": 2,
+      "source_case": 8,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đồng ý bỏ yêu cầu không bậc và yêu cầu phòng tắm xe lăn. Sửa tuổi con thành 8; tôi vẫn là người giám hộ và chúng tôi đồng ý chung giường lớn. Giữ ngày ở. Hãy tư vấn lại. Répondez en français.",
+      "expected": [
+        "SamechildID age7→8, preserveguardian/sharing/dates; clearonlytwohardaccessrequirements authorizedbycurrentquote; M2commitbeforedependentresult",
+        "LOFT4.4m/GARDEN5m/CABIN8.2m known2nbase ifproposed; familychargesunknown/nulltotal; age8eligibilityverified",
+        "French checkedrationale/questions withoutENfallback afterM4filtersclaims; actualcardlanguagefr; source/brief/resultversions traceable",
+        "Current UIselection0provider; previousresultstale ifany; no reservation/payment"
+      ],
+      "approved_previous_turn": 7,
+      "previous_run_turn": 4
+    }
+  ],
+  "run_id": "s7-room-advice-20261028-reacceptance7-sol-proposed",
+  "status": "PROPOSED ONLY; requires direct NEW manual Pine2/4 allowance",
+  "authorized_for_live_calls": false,
+  "proposed_max_guest_turns": 2,
+  "proposed_max_requests": 4,
+  "model": "gpt-6.1-sol",
+  "candidate_sha256": "dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab",
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+    "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "state_sha256": "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27",
+    "lifetime_requests": 52,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 2,
+    "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+    "actual_outcome": {
+      "pine1": "FAIL AC2 unnecessary generic room_advice question despite all relevant saved nonpending requirements",
+      "pine2": "Blocked dependency/notattempted"
+    },
+    "runners": "API62558 SIGTERM exit143; browser35519 SIGTERM then exact ownedPID13138 SIGKILL exit137; no marker01/turn2/retry"
+  },
+  "source_matrix_run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "source_matrix_turns": [
+    1,
+    2
+  ],
+  "purpose": "Fresh ONE Pine session, EXACT two original utterances/expectations. Typed-state consumer removes unsupported broad model hint when hardaccess requirements are saved/nonpending; preserves actual missing/pending/conflict/rate questions. Strict one-specific-hotel-verification question checked for original Pine1. Index guidance retained, but Pine2 actual after indexfix still not run. Reuse City/Family/B07. Preserve actual R6FAIL/closed1/2lifetime52; no retry/reset/reallocation/amended input/history repair.",
+  "profile_change": {
+    "from": "gpt-6.1-sol/low",
+    "proposed": "gpt-6.1-sol/low",
+    "model_profile_previously_approved": true,
+    "new_manual_allowance_approved": false
+  },
+  "max_guest_turns": 2,
+  "max_codex_requests": 4,
+  "no_fallback": true
+}

@@ -1,0 +1,30 @@
+{
+  "transaction_read_only": "on",
+  "guest_sessions_count": 1,
+  "guest_requests_count": 1,
+  "guest_messages_count": 0,
+  "guest_briefs_count": 0,
+  "guest_brief_source_utterances_count": 0,
+  "guest_brief_receipts_count": 0,
+  "guest_room_advice_results_count": 0,
+  "guest_room_advice_selections_count": 0,
+  "guest_language_preferences_count": 0,
+  "sessions": [
+    {
+      "session_id_sha256": "97ec6194e7c4d76462c738dbb14693bfb2dd5fe51f76cf1dfeae3f7217d2f4fd",
+      "hotel_id": "HTL-CITY01",
+      "state_version": 0
+    }
+  ],
+  "requests": [
+    {
+      "request_id_sha256": "19167842fbee4f48726e4637685922af6a5e3a0c76bfa54fe9658b8db6a2e25c",
+      "hotel_id": "HTL-CITY01",
+      "expected_version": 0,
+      "status": "error",
+      "error_code": "invalid_model_output",
+      "has_response": false
+    }
+  ],
+  "trace_audit_tables": []
+}

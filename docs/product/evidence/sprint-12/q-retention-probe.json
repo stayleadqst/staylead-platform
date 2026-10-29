@@ -1,0 +1,29 @@
+{
+  "rows_at_delete_completion": {
+    "guest_sessions": 0,
+    "guest_language_preferences": 0,
+    "guest_requests": 0
+  },
+  "delete_status": 204,
+  "late_http_status": 504,
+  "provider_calls": 1,
+  "rows_after_late_completion": {
+    "guest_sessions": 0,
+    "guest_language_preferences": 1,
+    "guest_requests": 0,
+    "guest_messages": 0,
+    "guest_briefs": 0
+  },
+  "late_language_row": {
+    "session_id": "f08246fb-7f08-4e1c-9ba9-9e86ea13582e",
+    "hotel_id": "HTL-CITY01",
+    "language_tag": "fr",
+    "source": "explicit",
+    "revision": 1,
+    "updated_at": "2026-10-29 09:54:52.249028+07:00"
+  },
+  "later_purge_count": 0,
+  "language_rows_after_8day_cleanup": 1,
+  "pins_before_match": true,
+  "pins_after_match": true
+}

@@ -1,0 +1,26 @@
+{
+  "candidate_sha256": "93b38c3012e267fe1e415fe101c811932e62abac2eb0d4704fbc28fd5b44ffdc",
+  "tests": {
+    "backend": {
+      "passed": 252,
+      "log_sha256": "a582de98928f92361ef2d7068bebb0ce7015d8d760a50089248fcdde6b34fc46"
+    },
+    "postgres": {
+      "passed": 31,
+      "database": "staylead_sprint7",
+      "log_sha256": "82e492557d3e6155704cb0559394b2730e22f1b222803602ceac263bc83a60c9"
+    }
+  },
+  "ruff": "PASS canonical apps/api/pyproject.toml",
+  "compile": "PASS",
+  "diff": "PASS",
+  "frontend": "reuse unchanged53pins:40contracts/lint/typecheck/buildPASS",
+  "live_provider_calls": 0,
+  "reuse_from_candidate": "c6e118ec6ff2c928e05580828e49599ffeb09bb98491bb9efde5aa7ca3d766fd",
+  "only_delta": "browser case9 GET exactresultID guard; no backend/PG/frontend change",
+  "final_browser_delta": {
+    "harness_passed": 19,
+    "node_syntax": "PASS",
+    "diff": "PASS"
+  }
+}

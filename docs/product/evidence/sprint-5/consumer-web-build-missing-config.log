@@ -1,0 +1,4 @@
+$ npm --prefix apps/web run build
+Observed failure: production prerender of / stopped with DomainRegistrationError: Public domain and guest contract configuration are required.
+Cause: NEXT_PUBLIC_STAYLEAD_DOMAIN and NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION were unset.
+The configured rerun in consumer-web-build.log passed.

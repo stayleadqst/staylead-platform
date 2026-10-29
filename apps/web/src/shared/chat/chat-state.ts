@@ -6,17 +6,84 @@ export type FailureInput = Readonly<{
 
 export type RetryMode = "same-request" | "new-request" | "new-session" | "none";
 
+/** Return zero for malformed/expired timestamps so callers fail closed. */
+export function sessionExpiryDelay(expiresAt: string, now = Date.now()): number {
+  const expiry = Date.parse(expiresAt);
+  if (!Number.isFinite(expiry) || !Number.isFinite(now)) return 0;
+  return Math.max(0, expiry - now);
+}
+
+export function isSessionExpired(expiresAt: string, now = Date.now()): boolean {
+  return sessionExpiryDelay(expiresAt, now) === 0;
+}
+
+export function isSessionInvalidationFailure(error: FailureInput): boolean {
+  return error.code === "invalid_session" || error.code === "session_scope_mismatch";
+}
+
+export type AnswerOnlyReceiptTurn = {
+  id: string;
+  resumeReceiptId?: string;
+  answerOnlyReceiptId?: string;
+  retryMode?: RetryMode;
+  sameIdOnly?: boolean;
+  sending?: boolean;
+  partialSuccess?: boolean;
+  error?: string;
+  recovered?: boolean;
+  receipt?: { answer_status?: string } | null;
+};
+
+/**
+ * A later successful answer-only continuation resolves every pending UI turn
+ * associated with that committed receipt, without replacing historical answers.
+ */
+export function resolveAnswerOnlyReceipt<T extends AnswerOnlyReceiptTurn>(
+  turns: readonly T[],
+  receiptId: string,
+  completedTurnId: string,
+): T[] {
+  return turns.map((item) => {
+    if (item.id === completedTurnId ||
+        (item.resumeReceiptId !== receiptId && item.answerOnlyReceiptId !== receiptId)) return item;
+    return {
+      ...item,
+      resumeReceiptId: undefined,
+      retryMode: undefined,
+      sameIdOnly: false,
+      sending: false,
+      partialSuccess: false,
+      error: undefined,
+      recovered: true,
+      receipt: item.receipt ? { ...item.receipt, answer_status: "completed" } : item.receipt,
+    };
+  });
+}
+
+export function retryModeForFailure(retryMode: RetryMode, hasCommittedPartialResult: boolean): RetryMode | undefined {
+  // A partial result means the edit was committed. Only answer-only resume is safe.
+  return hasCommittedPartialResult ? undefined : retryMode;
+}
+
 export function classifyFailure(error: FailureInput): { message: string; retryMode: RetryMode } {
+  if (error.code === "quota_exceeded") {
+    return {
+      message: "The request limit has been reached. Wait briefly, then try again.",
+      retryMode: "none",
+    };
+  }
+  if (error.code === "brief_apply_no_effect" || error.code === "request_failed") {
+    return {
+      message: error.code === "brief_apply_no_effect"
+        ? "The trip update was not saved. Submit it again as a new request."
+        : "That request ended without an answer. Retry to submit it as a new request.",
+      retryMode: "new-request",
+    };
+  }
   if (error.outcome === "unknown" || error.code === "request_in_progress") {
     return {
       message: "Your request may still be processing. Retry to check the same request.",
       retryMode: "same-request",
-    };
-  }
-  if (error.code === "request_failed") {
-    return {
-      message: "That request ended without an answer. Retry to submit it as a new request.",
-      retryMode: "new-request",
     };
   }
   if (error.code === "invalid_session" || error.code === "session_scope_mismatch") {
@@ -37,10 +104,10 @@ export function classifyFailure(error: FailureInput): { message: string; retryMo
       retryMode: "none",
     };
   }
-  if (error.outcome === "rejected" && error.retryable) {
+  if (error.retryable) {
     return {
-      message: "The previous attempt failed. Retry to submit it as a new request.",
-      retryMode: "new-request",
+      message: "We could not verify whether this request finished. Retry this same request to check.",
+      retryMode: "same-request",
     };
   }
   return {

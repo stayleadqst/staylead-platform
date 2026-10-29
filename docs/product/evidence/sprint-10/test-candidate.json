@@ -1,0 +1,8 @@
+{
+  "apps/web/tests/booking-channel.test.mjs": "088240e66f018ad7a6e07246eb961ea6381a4ec2330c9f93a4d9db38f7536775",
+  "tests/b08/__init__.py": "8ebb694893e8e1854b3bbf88e8e4ac49eef1069019e6a49bd683552a93cf369f",
+  "tests/b08/api_app.py": "86d9b1297b3548e286d642ae517d65d2345c0a8b49efed2701bcb6ad450477a6",
+  "tests/contracts/test_grounded_qa.py": "a26112116cc65aa433ea90be60d31c7faa2dd45a1c553330a68eb9ad2ccb358e",
+  "tests/contracts/test_sprint10_b08_contact.py": "9d3514a6ed9c7408ae5e712b697580c9dd96df7aec83f3d8ad3170734da982e5",
+  "tests/e2e/hospitality/b08-recovery.mjs": "996c156a80da3a56e1a5d6808e12309472764b935b45da8c90655104fc430d20"
+}

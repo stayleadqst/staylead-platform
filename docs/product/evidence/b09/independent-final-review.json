@@ -1,0 +1,41 @@
+{
+  "candidate": "891515af41444208931c671cad0b54dbaa57f18f5cd6e4296fe19c5965f79ce0",
+  "baseline": "d304238a1cb2b427650e03a2de81af92aa6ae255",
+  "files": 282,
+  "reviewer": "/root/q_b09_final",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "verdict": "PASS",
+  "scope": "Full scoped B09-AC1\u20133 and bounded local technical DoD; publication/merge are coordinator actions, not claimed by review.",
+  "manifest_verification": "All282 file hashes and aggregate independently verified",
+  "ac": {
+    "AC1": "PASS: authenticated server-owned session/property scope, evidence/result/receipt/currentness/replay and relevant API/PG regressions",
+    "AC2": "PASS: every actual M2 data/pending change requires exact validated canonical mutation confirmation, purpose-separated HMAC/scope/version/expiry, generated child IDs preserved, no capability/commit before confirmation, committed answers cannot introduce mutation authority",
+    "AC3": "PASS: actual browser/API/PG positive/refusal/confirm/cancel/recovery; one commit, bounded answer continuation, replay/partial/answer-only boundaries"
+  },
+  "closed_findings": [
+    "Initial P1 model-proposed M2 relaxation without trusted consent",
+    "P2 canceled confirmation same-ID recovery500; now503brief_apply_no_effect, no effects/provider call, explicit UI new-ID retry only after positive no-effect determination",
+    "P1 regression portability: mandatory asyncio, optional uvloop"
+  ],
+  "independent_checks": {
+    "contract_tests_passed": 6,
+    "postgres_recovery_regression_passed": 1,
+    "browser_evidence": "Inspected confirm/cancel screenshots, final FAQ/refusal/HTML/PG observations and final no-effect recovery log",
+    "web_gates": "45contracts/lint/typecheck/build PASS"
+  },
+  "no_open_actionable_findings": true,
+  "expired_confirmation_replay": "Intentional five-minute refusal without effects; nonblocking, no retention-policy expansion",
+  "limitations": [
+    "Controlled offline provider/synthetic properties establish server enforcement, not real-model semantic resistance or real-hotel approval",
+    "Q made zero candidate edits/live inference/browser or service starts/GitHub mutations/CI executions",
+    "Token metrics unavailable"
+  ],
+  "recorded_at": "2026-10-28T08:11:44.641528+00:00",
+  "whitespace_delivery_delta": {
+    "previous_candidate": "ec8a92cea7fb7d0423dee8fe104b8c03d1966f32ea65532ff0415de64275bae0",
+    "file": "tests/b09/api_app.py",
+    "change": "Remove two excess trailing LF bytes only; substantive content identical, no behavior change",
+    "verification": "Q independently verified all282 file hashes/aggregate and compared staged ec8a92 snapshot to final891515; prior fullPASS/evidence/limits apply; no tests rerun"
+  }
+}

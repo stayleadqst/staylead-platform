@@ -1,0 +1,33 @@
+{
+  "startup": {
+    "6d38363d-e1b1-4919-91e1-946b9656a1be": {
+      "guest_sessions": 0,
+      "guest_messages": 0
+    },
+    "0e98bfec-570f-4340-bd95-5f7a5f21b314": {
+      "guest_sessions": 1,
+      "guest_messages": 1
+    },
+    "b12f39b1-edf2-43b1-ace0-d3d1beb417ae": {
+      "guest_sessions": 1,
+      "guest_messages": 1
+    }
+  },
+  "after_nearest_expiry": {
+    "6d38363d-e1b1-4919-91e1-946b9656a1be": {
+      "guest_sessions": 0,
+      "guest_messages": 0
+    },
+    "0e98bfec-570f-4340-bd95-5f7a5f21b314": {
+      "guest_sessions": 0,
+      "guest_messages": 0
+    },
+    "b12f39b1-edf2-43b1-ace0-d3d1beb417ae": {
+      "guest_sessions": 1,
+      "guest_messages": 1
+    }
+  },
+  "retention_tasks_active": 1,
+  "retention_tasks_after_shutdown": 0,
+  "pins_after_match": true
+}

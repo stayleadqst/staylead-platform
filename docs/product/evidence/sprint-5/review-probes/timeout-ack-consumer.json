@@ -1,0 +1,13 @@
+{
+  "timeout_http": 504,
+  "timeout_error": {
+    "code": "provider_timeout",
+    "message": "The request exceeded its time limit.",
+    "retryable": true
+  },
+  "partial_returned": false,
+  "children_after_timed_out_commit": 1,
+  "same_id_replay_status": "partial_success",
+  "same_id_extra_calls": 0,
+  "children_after_offered_raw_new_id_retry": 2
+}

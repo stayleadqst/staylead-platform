@@ -1,0 +1,64 @@
+{
+  "product_candidate": "d3bfe54b525dd605e33127d3c8968b7deb9a0ba0",
+  "web_gates_reported_by_builder": {
+    "contract_tests": 35,
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "public_build_config": {
+      "NEXT_PUBLIC_STAYLEAD_DOMAIN": "hospitality",
+      "NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION": "1"
+    },
+    "saved_command_logs_available": false
+  },
+  "browser_observed_by_coordinator": {
+    "production_web": "http://127.0.0.1:13016",
+    "browser": "installed Google Chrome through bundled Playwright",
+    "mode": "offline mocked HTTP consumer checks; no model calls",
+    "matrix_prefix": "6 text/script cases x desktop/mobile real clipboard, keyboard, lang/dir, overflow, fallback; pending and stale checks reached before race count assertion",
+    "prefix_log": "browser-presentation-final.log",
+    "remaining_races": "PASS after event synchronization and stable old-card locator fixes",
+    "races_log": "browser-races-identity-final.log",
+    "limitations": [
+      "Initial browser launch path mismatch, then harness English warning expectation and race synchronization/locator errors; no product changes were required.",
+      "Race-only log summary inherited full-matrix boolean fields even though only race checks reran; only the three race assertions are evidence from that invocation. Corrected source now reports checks_run accurately.",
+      "Prefix assertions completed without failure before the logged count assertion; no standalone full-matrix PASS log is claimed."
+    ]
+  },
+  "backend_gates": {
+    "coordinator_integrated_run": "114 passed, 1 failed old freshness mock seam",
+    "log": "backend-final-tests.log",
+    "fix": "test-only get_language_preference mock plus new answer_eligibility assertion; production unchanged",
+    "builder_affected_recheck": {
+      "freshness_api": 6,
+      "language_contract": 3,
+      "language_postgres": 2,
+      "all_passed": true
+    },
+    "coordinator_ruff": "PASS",
+    "coordinator_in_memory_compile_source_count": 76
+  },
+  "live_provider_calls_so_far": 2,
+  "final_offline_product_candidate": "5ac41db7646c49d2fc2acce5387781f4fa67ee9e",
+  "final_focused_backend_recheck": {
+    "builder": 37,
+    "independent_reviewer": 37,
+    "direct_label_schema_cache_probes": 6,
+    "all_passed": true
+  },
+  "review_findings": {
+    "closed": [
+      "date_time_literal_identity",
+      "explicit_script_direction_parity",
+      "committed_language_authority",
+      "malformed_optional_labels_fallback"
+    ],
+    "remaining_identified_code_findings": 0,
+    "shared_actual_model_DoD": "BLOCKED"
+  },
+  "final_focused_production_browser": {
+    "log": "browser-rtl-script-corrected.log",
+    "az_Arab_main_brief_answer_direction": "PASS"
+  },
+  "final_candidate_live_rerun": false
+}

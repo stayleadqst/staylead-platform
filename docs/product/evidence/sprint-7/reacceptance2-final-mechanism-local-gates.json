@@ -1,0 +1,17 @@
+{
+  "candidate_sha256": "d7ca88db6c1251a7dc9ff64acdf9d6624731b5865a46d322f28f55dde3b5e35a",
+  "backend_tests": 277,
+  "backend_warnings": 3,
+  "postgres_tests": 15,
+  "postgres_warnings": 1,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "diff_check": "PASS",
+  "source_files": 237,
+  "frontend_tests_reused": 40,
+  "frontend_pins_unchanged": 53,
+  "frontend_reuse": "All frontend pins unchanged; previous lint/typecheck/build PASS reused.",
+  "node_control_gates_reused": "Node syntax/smoke PASS from4797d219; controls unchanged.",
+  "actual_model_retests": 0,
+  "status": "Offline gates PASS; actual City/Pine reacceptance remains required."
+}

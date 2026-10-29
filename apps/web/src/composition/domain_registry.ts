@@ -7,6 +7,45 @@ export type DomainTarget = Readonly<{
 }>;
 
 export type AnswerRendererProps = Readonly<{ answer: string }>;
+export type GuestBriefRendererProps = Readonly<{
+  brief: unknown;
+  receipt?: unknown;
+  delta?: unknown;
+  labels?: Readonly<Record<string, string>>;
+}>;
+export type GuestBriefConfirmationChange = Readonly<{
+  field: string;
+  before_present?: boolean;
+  before?: unknown;
+  after_present?: boolean;
+  after?: unknown;
+}>;
+export type GuestBriefConfirmationLine = Readonly<{
+  field: string;
+  before: string;
+  after: string;
+}>;
+export type GuestTurnResultRendererProps = Readonly<{
+  response: unknown | null;
+  bookingChannel: unknown;
+  languageTag: string;
+  localGuideLabels?: Readonly<Record<string, string>>;
+  staleMessage?: string;
+  stale: boolean;
+  freshnessError: boolean;
+  selectionDisabled: boolean;
+  pendingOptionId: string | null;
+  selectionError: string;
+  onSelectOption: (turnId: string, result: unknown, optionId: string) => void;
+  turnId?: string;
+}>;
+export type TurnResultActions = Readonly<{
+  selectOption: (args: Readonly<{
+    sessionId: string; accessToken: string; result: unknown; optionId: string; target: DomainTarget;
+    signal?: AbortSignal;
+  }>) => Promise<unknown>;
+  attachSelection: (response: unknown, result: unknown, selection: unknown) => unknown;
+}>;
 
 export type DomainRegistration = Readonly<{
   domain: string;
@@ -14,6 +53,10 @@ export type DomainRegistration = Readonly<{
   apiBasePath: string;
   landing: ComponentType;
   answerRenderer: ComponentType<AnswerRendererProps>;
+  guestBriefRenderer: ComponentType<GuestBriefRendererProps>;
+  formatBriefConfirmationChanges?: (changes: readonly GuestBriefConfirmationChange[]) => readonly GuestBriefConfirmationLine[];
+  turnResultRenderer: ComponentType<GuestTurnResultRendererProps>;
+  turnResultActions?: TurnResultActions;
   themeClass: string;
   content: Readonly<{
     brand: string;
