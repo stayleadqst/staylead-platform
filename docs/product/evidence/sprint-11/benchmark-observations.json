@@ -1,0 +1,225 @@
+{
+  "benchmark": "offline-b10-http-postgres",
+  "mixed": {
+    "confirmation_elapsed_ms": 63,
+    "confirmation_provider_calls": 1,
+    "confirmation_request_id": "5d68e9fa-cabf-4825-921a-a88ad0b345da",
+    "confirmation_trace": {
+      "answer_schema_version": "hospitality-grounded-v2",
+      "brief_version": 1,
+      "cost_status": "unknown",
+      "elapsed_ms": 63,
+      "events": [
+        {
+          "stage": "admission",
+          "status": "ok"
+        },
+        {
+          "duration_ms": 6,
+          "stage": "retrieval",
+          "status": "ok"
+        },
+        {
+          "calls": 1,
+          "deployment": "b10-offline",
+          "duration_ms": 0,
+          "input_tokens": 3,
+          "model": "deterministic",
+          "output_tokens": 4,
+          "provider": "fake",
+          "provider_request_id": "offline-4",
+          "stage": "provider",
+          "status": "ok",
+          "total_tokens": 7
+        },
+        {
+          "stage": "response",
+          "status": "started"
+        }
+      ],
+      "failure_code": null,
+      "failure_stage": null,
+      "hotel_id": "HTL-CITY01",
+      "limits_version": "5a5dad28c0e438b0af9f",
+      "max_output_tokens": 700,
+      "outcome": "ok",
+      "prompt_version": "659beab6454952a8ef9a",
+      "provider_timeout_ms": 25000,
+      "request_id": "5d68e9fa-cabf-4825-921a-a88ad0b345da",
+      "schema_version": 1,
+      "session_id": "c3d98c24-e846-4236-961c-b22b8b957660",
+      "source_generation": 1,
+      "turn_timeout_ms": 44962
+    },
+    "expected": "brief version 1 and sourced FAQ after confirmation",
+    "observed": {
+      "brief_version": 1,
+      "has_evidence": true,
+      "status": 200
+    },
+    "per_request_call_cap": 2,
+    "preparation_elapsed_ms": 31,
+    "preparation_provider_calls": 1,
+    "preparation_request_id": "5ae6fa7e-5824-4afd-816a-d124a967c76c",
+    "preparation_trace": {
+      "answer_schema_version": "hospitality-grounded-v2",
+      "brief_version": 0,
+      "cost_status": "unknown",
+      "elapsed_ms": 31,
+      "events": [
+        {
+          "stage": "admission",
+          "status": "ok"
+        },
+        {
+          "duration_ms": 8,
+          "stage": "retrieval",
+          "status": "ok"
+        },
+        {
+          "calls": 1,
+          "deployment": "b10-offline",
+          "duration_ms": 0,
+          "input_tokens": 3,
+          "model": "deterministic",
+          "output_tokens": 4,
+          "provider": "fake",
+          "provider_request_id": "offline-3",
+          "stage": "provider",
+          "status": "ok",
+          "total_tokens": 7
+        },
+        {
+          "code": "confirmation_required",
+          "stage": "response",
+          "status": "ok"
+        }
+      ],
+      "failure_code": null,
+      "failure_stage": null,
+      "hotel_id": "HTL-CITY01",
+      "limits_version": "5a5dad28c0e438b0af9f",
+      "max_output_tokens": 700,
+      "outcome": "ok",
+      "prompt_version": "659beab6454952a8ef9a",
+      "provider_timeout_ms": 25000,
+      "request_id": "5ae6fa7e-5824-4afd-816a-d124a967c76c",
+      "schema_version": 1,
+      "session_id": "c3d98c24-e846-4236-961c-b22b8b957660",
+      "source_generation": 1,
+      "turn_timeout_ms": 44992
+    },
+    "workflow_elapsed_ms": 128
+  },
+  "provider": "deterministic-fake",
+  "simple": {
+    "elapsed_ms": 78,
+    "expected": "200 grounded FAQ",
+    "observed": 200,
+    "provider_calls": 2,
+    "source_usage": [
+      {
+        "calls": 1,
+        "deployment": "b10-offline",
+        "duration_ms": 0,
+        "input_tokens": 3,
+        "model": "deterministic",
+        "output_tokens": 4,
+        "provider": "fake",
+        "provider_request_id": "offline-1",
+        "stage": "provider",
+        "status": "ok",
+        "total_tokens": 7
+      },
+      {
+        "calls": 2,
+        "deployment": "b10-offline",
+        "duration_ms": 0,
+        "input_tokens": 3,
+        "model": "deterministic",
+        "output_tokens": 4,
+        "provider": "fake",
+        "provider_request_id": "offline-2",
+        "stage": "provider",
+        "status": "ok",
+        "total_tokens": 7
+      }
+    ],
+    "trace": {
+      "answer_schema_version": "hospitality-grounded-v2",
+      "brief_version": 0,
+      "cost_status": "unknown",
+      "elapsed_ms": 78,
+      "events": [
+        {
+          "stage": "admission",
+          "status": "ok"
+        },
+        {
+          "duration_ms": 10,
+          "stage": "retrieval",
+          "status": "ok"
+        },
+        {
+          "calls": 1,
+          "deployment": "b10-offline",
+          "duration_ms": 0,
+          "input_tokens": 3,
+          "model": "deterministic",
+          "output_tokens": 4,
+          "provider": "fake",
+          "provider_request_id": "offline-1",
+          "stage": "provider",
+          "status": "ok",
+          "total_tokens": 7
+        },
+        {
+          "duration_ms": 5,
+          "stage": "retrieval",
+          "status": "ok"
+        },
+        {
+          "calls": 2,
+          "deployment": "b10-offline",
+          "duration_ms": 0,
+          "input_tokens": 3,
+          "model": "deterministic",
+          "output_tokens": 4,
+          "provider": "fake",
+          "provider_request_id": "offline-2",
+          "stage": "provider",
+          "status": "ok",
+          "total_tokens": 7
+        },
+        {
+          "stage": "response",
+          "status": "started"
+        }
+      ],
+      "failure_code": null,
+      "failure_stage": null,
+      "hotel_id": "HTL-CITY01",
+      "limits_version": "5a5dad28c0e438b0af9f",
+      "max_output_tokens": 700,
+      "outcome": "ok",
+      "prompt_version": "659beab6454952a8ef9a",
+      "provider_timeout_ms": 25000,
+      "request_id": "3d79bcab-35a6-4272-aa48-5ade249c1894",
+      "schema_version": 1,
+      "session_id": "c3d98c24-e846-4236-961c-b22b8b957660",
+      "source_generation": 1,
+      "turn_timeout_ms": 44985
+    }
+  },
+  "recorded_at": "2026-10-29T01:41:45.353137+00:00",
+  "source_fingerprint": "4f74ba27d4daccfe2e320c7d6c5506b13aaec5fbc2d8761fdf8005a1bba6a5f8",
+  "test_fingerprint": "04d6cd7d2646ae537a782d725b732e835fa51ad66bde433b2db774d25e67e273",
+  "source_log_sha256": "b76e74756dbd0775d1d33acfdf3d4727000a8ec3c23183a4c335b68550c9be58",
+  "limitations": [
+    "Deterministic offline provider/usage; cost unknown.",
+    "execution.elapsed_ms and simple elapsed_ms stop at precommit terminal snapshot, excluding final commit and HTTP serialization.",
+    "Only mixed.workflow_elapsed_ms measures the full workflow externally."
+  ],
+  "functional_reviewed_source_fingerprint": "ed8138c868ad9d28e8248dc6252fe4df25cd1bb04e0f0984085e8a45f75a9d11",
+  "delivery_delta": "Q PASS: one EOF blank line removed only; other 223 source and all 60 test files unchanged. All current files match manifest; functional observations carry over without retest."
+}

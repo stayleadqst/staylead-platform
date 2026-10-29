@@ -18,6 +18,13 @@ test("ambiguous network outcomes and pending requests keep their request ID", ()
   assert.equal(classifyFailure({ code: "request_in_progress", outcome: "rejected" }).retryMode, "same-request");
 });
 
+test("quota rejection is explained as not started without same-request ambiguity", () => {
+  const result = classifyFailure({ code: "quota_exceeded", outcome: "rejected", retryable: false });
+  assert.equal(result.retryMode, "none");
+  assert.match(result.message, /limit has been reached/);
+  assert.doesNotMatch(result.message, /verify whether this request finished/);
+});
+
 test("a confirmed terminal request failure offers a new request only on explicit retry", () => {
   assert.equal(classifyFailure({ code: "request_failed", outcome: "rejected" }).retryMode, "new-request");
 });

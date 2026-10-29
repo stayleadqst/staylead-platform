@@ -51,6 +51,12 @@ export function retryModeForFailure(retryMode: RetryMode, hasCommittedPartialRes
 }
 
 export function classifyFailure(error: FailureInput): { message: string; retryMode: RetryMode } {
+  if (error.code === "quota_exceeded") {
+    return {
+      message: "The request limit has been reached. Wait briefly, then try again.",
+      retryMode: "none",
+    };
+  }
   if (error.code === "brief_apply_no_effect" || error.code === "request_failed") {
     return {
       message: error.code === "brief_apply_no_effect"

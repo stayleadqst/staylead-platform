@@ -5,8 +5,11 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import time
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -308,6 +311,12 @@ class GroundedQAOrchestrator:
         local_guide: LocalGuideCapability | None = None,
     ) -> None:
         self._provider = provider
+        self._request_provider: ContextVar[AIProvider | None] = ContextVar(
+            f"staylead_request_provider_{id(self)}", default=None,
+        )
+        self._request_trace: ContextVar[Any | None] = ContextVar(
+            f"staylead_request_trace_{id(self)}", default=None,
+        )
         self._retriever = retriever
         self._instructions = instructions
         self._committed_instructions = committed_instructions
@@ -328,6 +337,47 @@ class GroundedQAOrchestrator:
         self._room_advice = room_advice
         self._local_guide = local_guide
 
+    @contextmanager
+    def provider_scope(self, provider: AIProvider, trace: Any | None = None) -> Iterator[None]:
+        """Bind a provider wrapper to this async request without shared mutation."""
+        provider_token = self._request_provider.set(provider)
+        trace_token = self._request_trace.set(trace)
+        try:
+            yield
+        finally:
+            self._request_trace.reset(trace_token)
+            self._request_provider.reset(provider_token)
+
+    def _active_provider(self) -> AIProvider:
+        provider = self._request_provider.get() or self._provider
+        if provider is None:
+            raise ConversationFailure("provider_unavailable", "Answer generation is not configured.")
+        return provider
+
+    @property
+    def default_provider(self) -> AIProvider:
+        if self._provider is None:
+            raise ConversationFailure("provider_unavailable", "Answer generation is not configured.")
+        return self._provider
+
+    async def _observe(self, stage: str, awaitable: Any) -> Any:
+        trace = self._request_trace.get()
+        started = time.monotonic()
+        try:
+            result = await awaitable
+        except asyncio.CancelledError:
+            if trace is not None:
+                trace.record(stage, "cancelled", duration_ms=max(0, int((time.monotonic() - started) * 1000)))
+            raise
+        except BaseException as exc:
+            if trace is not None:
+                code = exc.code if isinstance(exc, (ConversationFailure, ProviderError)) else "stage_failure"
+                trace.record(stage, "error", duration_ms=max(0, int((time.monotonic() - started) * 1000)), code=code)
+            raise
+        if trace is not None:
+            trace.record(stage, "ok", duration_ms=max(0, int((time.monotonic() - started) * 1000)))
+        return result
+
     async def answer(
         self, *, hotel_id: str, question: str, history: list[dict[str, str]],
         deadline: float | None = None,
@@ -346,25 +396,25 @@ class GroundedQAOrchestrator:
         local_guide_result = None
         if "local_guide" in turn_intents and self._local_guide is not None:
             capability_timeout = self._remaining(deadline)
-            local_guide_result = await asyncio.wait_for(self._local_guide.recommend(LocalGuideRequest(
+            local_guide_result = await self._observe("capability", asyncio.wait_for(self._local_guide.recommend(LocalGuideRequest(
                 hotel_id=hotel_id, question=question, locale=preferred_language_tag,
                 brief_version=brief.brief_version if brief is not None else 0,
                 brief_data=dict(brief.data) if brief is not None else {}, now=datetime.now(UTC),
                 timeout_seconds=capability_timeout,
-            )), timeout=capability_timeout)
+            )), timeout=capability_timeout))
         retrieved = None
         if prefetched_facts is not None:
             relevant_facts = list(prefetched_facts)
         elif selected_fact_ids is not None:
-            relevant_facts = list(await asyncio.to_thread(
+            relevant_facts = list(await self._observe("retrieval", asyncio.to_thread(
                 self._retriever.get_by_ids, hotel_id, set(selected_fact_ids),
                 timeout_seconds=self._remaining(deadline),
-            )) if selected_fact_ids else []
+            ))) if selected_fact_ids else []
         else:
-            retrieved = await asyncio.to_thread(
+            retrieved = await self._observe("retrieval", asyncio.to_thread(
                 self._retriever.retrieve, hotel_id, question, history,
                 timeout_seconds=self._remaining(deadline),
-            )
+            ))
             relevant_facts = list(retrieved.facts)
         if retrieved is not None and retrieved.candidate_index and retrieved.term_coverage < 0.45:
             selection_input = json.dumps({
@@ -380,7 +430,7 @@ class GroundedQAOrchestrator:
                     self._preparation_selection_schema_factory(brief)
                     if extract_guest_patch and self._preparation_selection_schema_factory is not None else None
                 )
-                selected = await self._provider.generate(GenerationRequest(
+                selected = await self._active_provider().generate(GenerationRequest(
                     instructions=(
                         self._selection_instructions
                         if extract_guest_patch else self._committed_selection_instructions
@@ -406,10 +456,10 @@ class GroundedQAOrchestrator:
                 else:
                     selected_patch = None
                 if selected_ids:
-                    relevant_facts = list(await asyncio.to_thread(
+                    relevant_facts = list(await self._observe("retrieval", asyncio.to_thread(
                         self._retriever.get_by_ids, hotel_id, selected_ids,
                         timeout_seconds=self._remaining(deadline),
-                    ))
+                    )))
                 else:
                     relevant_facts = []
             except ProviderError:
@@ -496,7 +546,7 @@ class GroundedQAOrchestrator:
                 if not extract_guest_patch and self._committed_output_schema_factory is not None
                 else None
             )
-            generated = await self._provider.generate(GenerationRequest(
+            generated = await self._active_provider().generate(GenerationRequest(
                 instructions=(self._instructions if extract_guest_patch else self._committed_instructions)
                 + language_instruction,
                 input_text=evidence,
@@ -705,10 +755,10 @@ class GroundedQAOrchestrator:
         label_source_texts: dict[str, str] | None = None,
     ) -> PreparedGuestTurn:
         """Combine low-overlap selection with patch understanding in call one."""
-        retrieved = await asyncio.to_thread(
+        retrieved = await self._observe("retrieval", asyncio.to_thread(
             self._retriever.retrieve, hotel_id, question, history,
             timeout_seconds=self._remaining(deadline),
-        )
+        ))
         if retrieved.candidate_index and retrieved.term_coverage < 0.45:
             selection_input = json.dumps({
                 "hotel_id": hotel_id, "question": question,
@@ -724,7 +774,7 @@ class GroundedQAOrchestrator:
                     self._preparation_selection_schema_factory(brief)
                     if self._preparation_selection_schema_factory is not None else None
                 )
-                selected = await self._provider.generate(GenerationRequest(
+                selected = await self._active_provider().generate(GenerationRequest(
                     instructions=self._selection_instructions,
                     input_text=selection_input, max_output_tokens=self._max_output_tokens,
                     response_schema=selection_schema,
@@ -865,7 +915,7 @@ class GroundedQAOrchestrator:
             preparation_input["hotel_information_facts"] = list(hotel_information_facts)
         if include_presentation_labels:
             preparation_input["presentation_templates"] = self._room_advice.presentation_templates()
-        generated = await self._provider.generate(GenerationRequest(
+        generated = await self._active_provider().generate(GenerationRequest(
             instructions=self._room_advice.preparation_instructions(
                 context.locale, include_hotel_answer=mixed_hotel_request,
                 include_presentation_labels=include_presentation_labels,
@@ -911,7 +961,10 @@ class GroundedQAOrchestrator:
             mixed_hotel_request=mixed_hotel_request,
         )
         draft = replace(draft, hotel_answer=hotel_answer)
-        return await self._room_advice.recommend(context=selected_context, draft=draft, deadline=remaining), generated
+        recommended = await self._observe("capability", self._room_advice.recommend(
+            context=selected_context, draft=draft, deadline=remaining,
+        ))
+        return recommended, generated
 
     def _validate_room_advice_hotel_answer(
         self, answer: RoomAdviceHotelAnswer | None, *, context: RoomAdviceContext,
@@ -1020,7 +1073,7 @@ class GroundedQAOrchestrator:
         if request is None:
             return self._room_advice.relocalize(result, locale), None
         try:
-            generated = await self._provider.generate(GenerationRequest(
+            generated = await self._active_provider().generate(GenerationRequest(
                 instructions=request["instructions"],
                 input_text=json.dumps(request["input"], ensure_ascii=False, separators=(",", ":")),
                 max_output_tokens=self._max_output_tokens,

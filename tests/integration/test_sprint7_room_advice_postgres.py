@@ -477,7 +477,7 @@ def engine():
     if not TEST_DSN:
         pytest.skip("Set STAYLEAD_TEST_DATABASE_URL to an isolated Sprint 7 PostgreSQL database.")
     database = create_database_engine(TEST_DSN)
-    assert apply_migrations(database) == 7
+    assert apply_migrations(database) == 8
     import_fixture_pack(database, FIXTURE_ROOT)
     yield database
     database.dispose()

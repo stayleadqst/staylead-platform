@@ -36,6 +36,7 @@ from staylead_platform.domains.hospitality.schemas.preparation_output import (
 from staylead_platform.domains.hospitality.validators.guest_clarification import (
     validate_pending_guest_clarification,
 )
+from staylead_platform.infrastructure.observability.turn_trace import TurnTrace
 from staylead_platform.platform.contracts.ai_provider import (
     GenerationRequest,
     GenerationResult,
@@ -46,6 +47,10 @@ from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefSnapshot,
 )
 from staylead_platform.platform.contracts.knowledge import KnowledgeFact
+from staylead_platform.platform.contracts.room_advice import (
+    RoomAdviceContext,
+    RoomAdviceDraft,
+)
 from staylead_platform.platform.conversation.orchestrator.grounded_qa import (
     ConversationFailure,
     GroundedQAOrchestrator,
@@ -182,6 +187,83 @@ def test_low_overlap_multilingual_question_gets_scoped_semantic_selection() -> N
     assert answer.usage.total_tokens == 60
     assert [item["fact_id"] for item in answer.citations] == ["F-HTL-CITY01-040"]
     assert "06:30" in answer.answer and "09:30" in answer.answer
+
+
+def test_context_compression_keeps_authoritative_brief_separate_from_recent_history() -> None:
+    provider = FakeProvider()
+
+    async def capture_then_stop(request: GenerationRequest) -> GenerationResult:
+        provider.calls.append(request)
+        raise RuntimeError("stop after request capture")
+
+    provider.generate = capture_then_stop  # type: ignore[method-assign]
+    retriever = KnowledgeRetriever(MemoryFacts())
+    retriever.retrieve = lambda hotel_id, question, context, timeout_seconds=None: RetrievalResult(
+        hotel_id=hotel_id, facts=(), conflicts=(), query_terms=40, term_coverage=0.1,
+        candidate_index=({"fact_id": "F-HTL-CITY01-040", "subject": "dining", "field": "breakfast"},),
+    )  # type: ignore[method-assign]
+    brief = GuestBriefSnapshot(brief_version=7, data={
+        "dates": {"check_in": "2027-05-10", "check_out": "2027-05-13", "nights": 3},
+        "party": {"adults": 2, "children": []},
+    })
+    history = [{"role": "user", "content": f"history-{index}"} for index in range(8)]
+    with pytest.raises(ConversationFailure, match="invalid preparation data"):
+        asyncio.run(build(provider, retriever=retriever).prepare_turn(
+            hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=history, brief=brief,
+        ))
+    payload = json.loads(provider.calls[0].input_text)
+    assert payload["recent_context"] == history[-4:]
+    assert payload["guest_brief"]["brief_version"] == 7
+    assert payload["guest_brief"]["data"]["dates"]["nights"] == 3
+
+
+def test_room_advice_capability_failure_is_timed_and_redacted_in_trace() -> None:
+    class Provider:
+        async def generate(self, request: GenerationRequest) -> GenerationResult:
+            return GenerationResult("{}", "fake", "test", "offline", "room-1", Usage(1, 1, 2))
+
+    class FailingRoomAdvice:
+        def needs_presentation_labels(self, _locale):
+            return False
+
+        def eligible_facts(self, _context):
+            return ()
+
+        def select_facts(self, _facts, *, question, brief_data):
+            return ()
+
+        def preparation_instructions(self, _locale, **_kwargs):
+            return "offline room advice"
+
+        def preparation_output_schema(self, **_kwargs):
+            return {}
+
+        def parse_draft(self, _text):
+            return RoomAdviceDraft(status="needs_clarification")
+
+        async def recommend(self, **_kwargs):
+            raise RuntimeError("private room capability payload")
+
+    provider = Provider()
+    orchestrator = build(FakeProvider())
+    orchestrator._provider = provider
+    orchestrator._room_advice = FailingRoomAdvice()
+    trace = TurnTrace()
+    context = RoomAdviceContext(
+        hotel_id="HTL-CITY01", brief_version=0,
+        brief_data={"dates": {}, "party": {"adults": None, "children": []}},
+        pending_fields=(), source_generation=1, facts=(), question="Recommend a room",
+    )
+    with orchestrator.provider_scope(provider, trace=trace), pytest.raises(
+        RuntimeError, match="private room capability payload",
+    ):
+        asyncio.run(orchestrator.recommend_committed_room_advice(context=context))
+    capability_events = [event for event in trace.events if event["stage"] == "capability"]
+    assert len(capability_events) == 1
+    assert capability_events[0]["status"] == "error"
+    assert capability_events[0]["duration_ms"] >= 0
+    assert capability_events[0]["code"] == "stage_failure"
+    assert "private room capability payload" not in json.dumps(trace.as_dict())
 
 
 def _url_retriever(*, include_url_fact: bool = True, url_hotel_id: str = "HTL-CITY01") -> KnowledgeRetriever:

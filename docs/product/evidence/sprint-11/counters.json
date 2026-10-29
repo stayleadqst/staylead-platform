@@ -1,0 +1,224 @@
+{
+  "recorded_at": "2026-10-29T01:41:45.353137+00:00",
+  "owner": "C aggregate; builder ledgers retain single per-class ownership",
+  "builder_a": {
+    "builder": "B10 A",
+    "compatibility_test_assumption_adaptations": 1,
+    "product_repairs": [
+      {
+        "class": "b10_admission_serialized_clock",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Q reproduced a session quota race in reserve_request: request A captured its admission timestamp before waiting for the hotel/session serialization locks; request B then reserved and failed, after which A resumed using the older timestamp and was admitted too, exceeding a turns_per_session=1 limit.",
+        "evidence": "/private/tmp/q_s11_quota_race.py and parent Q report",
+        "repair": "Sample the implicit admission clock only after the hotel advisory and session row locks are held, retaining explicit now injection for boundary tests. Add deterministic concurrency regression proving serialized quota admission and a single accepted reservation.",
+        "rerun": "PASS: tests/integration/test_b10_admission.py and the two adapted deadline tests passed together; deterministic concurrency regression confirms only the first serialized reservation is accepted."
+      }
+    ],
+    "test_adaptation_failures": [
+      {
+        "class": "b09_tamper_fixture_base64_alias",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Confirmed deterministic base64url alias: a SHA-256 signature is 32 bytes (256 bits), yielding 42 full base64url characters plus a final character with four meaningful bits and two ignored low padding bits. For suffix A, changing it to B changes only ignored pad bits and decodes to the identical signature bytes; verify_brief_confirmation accepts the bytes, then the exact issued-token comparison returns 404 before any effect, while the test incorrectly expected cryptographic tamper 409.",
+        "evidence": "tests/integration/test_b09_security_api.py:666 and Python's urlsafe_b64decode behavior for a 32-byte signature; token verifier in apps/api/src/staylead_platform/platform/guest_context/sessions/brief_confirmation.py",
+        "repair": "Change a significant encoded signature character (the penultimate base64url character), assert the decoded signature bytes differ from the issued signature, and preserve the expected 409 plus no-M2/no-extra-provider-call assertions.",
+        "rerun": "PASS: the exact asyncio parameterized integration case passed after switching to a significant signature character; its decoded-byte inequality assertion passed, response remained 409, brief_version did not change, and provider-call count remained unchanged."
+      },
+      {
+        "class": "absolute_deadline_lock_observer_asyncio_worker_identity",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Focused adaptation run: quota-clock regression and pre-admission deadline test passed; the staged-lock test timed out waiting for the commit lock event because SQLAlchemy work runs in asyncio.to_thread worker threads rather than the caller thread.",
+        "evidence": "focused pytest run for test_quota_clock_is_sampled_after_admission_serialization_locks and the two Sprint 1 deadline tests",
+        "repair": "Observe the test's request-specific guest_requests SELECT FOR UPDATE independent of thread name; the existing row-holder remains separately observable by its request_locked event.",
+        "rerun": "Superseded by the final authorized lock-holder handshake adaptation; final focused test passed."
+      },
+      {
+        "class": "absolute_deadline_lock_observer_pooled_connection_marker",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Focused rerun still timed out waiting for the commit-row lock event. The observer's Connection.info marker persisted with the pooled connection after the holder check-in, so the application worker was misclassified as the test holder and ignored.",
+        "evidence": "focused pytest run of test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits",
+        "repair": "Name the dedicated lock-holder thread and filter that thread by name, leaving application async worker queries observable; remove the pooled connection marker.",
+        "rerun": "Superseded by the final authorized lock-holder handshake adaptation; final focused test passed."
+      },
+      {
+        "class": "absolute_deadline_lock_observer_statement_match",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Focused rerun again timed out waiting for the client SQLAlchemy event to identify the application request-row lock; the service execution path did not produce the assumed matching event within the one-second turn budget.",
+        "evidence": "focused pytest run of test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits",
+        "repair": "Replace fragile in-process event matching with PostgreSQL pg_stat_activity observation of the actual blocked guest_requests/session row statements, then stage and release the two locks against the absolute deadline.",
+        "rerun": "Superseded by the final authorized lock-holder handshake adaptation; final focused test passed."
+      },
+      {
+        "class": "absolute_deadline_pg_activity_lock_match",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Focused run did not observe the assumed pg_stat_activity query-text pattern for the client lock wait before the one-second deadline; the test-only wait observer was unreliable.",
+        "evidence": "focused pytest run of test_absolute_deadline_rolls_back_after_two_individually_short_lock_waits",
+        "repair": "Use the authorized simpler handshake adaptation: start the session and request row holders only after model_started, keep request lock for 0.6 seconds, then let the already-held session lock consume the remaining absolute deadline; retain bounded waits and finally cleanup.",
+        "rerun": "PASS: final handshake adaptation passed while preserving the two staged lock waits and bounded 504 behavior."
+      }
+    ],
+    "failures": [
+      {
+        "class": "deadline_lock_tests_pre_admission_session_lock_assumption",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Root backend gate run: 187 passed, 2 failed. The first test expected an error guest_requests row after the session row was locked before reserve_request; new admission correctly times out before creating a reservation. The second waited for model_started while holding the session row, but admission now correctly blocks before provider dispatch, so its old synchronization premise timed out.",
+        "evidence": "validation/sprint-11-20261029/root-backend-gates.log",
+        "repair": "Test-only adaptation authorized: preserve 504, bounded duration, unchanged session/messages, zero provider calls, and no reservation before admission; move the two staged lock waits in the absolute-deadline case after the provider-start handshake; add robust worker release/join cleanup.",
+        "rerun": "PASS: both authorized test adaptations passed in the final focused run; root backend gate recheck pending."
+      },
+      {
+        "class": "deadline_lock_tests_pre_admission_session_lock_assumption",
+        "attempt": 2,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Q combined candidate v3 gate: 194 passed, 1 failed. The adapted absolute-deadline test preserved HTTP 504, no M2/session/messages, and request error, but its exact failure_stage='response' assertion failed once because the deadline landed in retrieval; the exact rerun passed, confirming scheduler-dependent stage selection.",
+        "evidence": "validation/sprint-11-20261029/root-backend-gates-v3.log and Q report",
+        "repair": "Keep the 504/provider_timeout and all rollback assertions; allow only retrieval/provider/response stages and require failure_stage to equal the last actual error/cancelled/denied trace event, rather than assuming the scheduler phase.",
+        "rerun": "PASS: exact adapted test passed three consecutive isolated-PostgreSQL repetitions after asserting provider_timeout and matching the last recorded failure event stage among retrieval/provider/response; all rollback/no-answer assertions remain."
+      }
+    ]
+  },
+  "builder_b": {
+    "builder": "B10 B",
+    "failures": [
+      {
+        "class": "b10_contract_test_async_runner_missing_plugin",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": true,
+        "initial_result": "4 async contract tests could not run because pytest-asyncio is absent",
+        "repair": "Converted tests to asyncio.run; no test plugin added",
+        "rerun": "4 passed"
+      },
+      {
+        "class": "b10_observer_missing_time_import",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": true,
+        "initial_result": "grounded-QA regression suite had 59 failures sharing NameError: time is not defined in _observe",
+        "repair": "Imported time in grounded_qa.py",
+        "rerun": "109 passed across test_b10_runtime.py and test_grounded_qa.py"
+      },
+      {
+        "class": "b10_test_contract_expectations",
+        "attempt": 1,
+        "aliases": [
+          "b10_trace_test_expected_nested_metadata"
+        ],
+        "initial_attempt_started_before_ledger_reservation": true,
+        "initial_result": "offline HTTP/PostgreSQL request succeeded; assertion looked for metadata nested object, while trace contract correctly emits allowlisted metadata fields at top level",
+        "repair": "Aligned assertion to the flat trace contract",
+        "rerun": "1 passed; offline HTTP/PostgreSQL simple and mixed turns observed"
+      },
+      {
+        "class": "b10_execution_trace_path_consistency",
+        "attempt": 1,
+        "aliases": [
+          "b10_execution_trace_path_normalization"
+        ],
+        "initial_attempt_started_before_ledger_reservation": true,
+        "initial_result": "Coordinator-retained builder-message provenance (raw log unavailable): confirmation-required mixed preparation response omitted trace.execution, retrieval-failure trace shape was flat while success was nested; compression test expected a raw provider error (the latter is separately counted under b10_test_contract_expectations attempt 2)",
+        "repair": "Normalized early-success and error trace attachment while preserving legacy response fields",
+        "rerun": "Prior frozen source b37faa9d focused backend run reported 113/113 passed; this round later found deeper lifecycle/stage/confirmation issues"
+      },
+      {
+        "class": "b10_execution_trace_path_consistency",
+        "attempt": 2,
+        "aliases": [
+          "b10_confirmation_required_response_missing_execution_trace",
+          "b10_error_response_trace_shape_inconsistent"
+        ],
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Q independently reproduced success closure before final persistence (DB status error but durable/HTTP execution trace outcome ok), confirmation-child provider failure lost its trace from parent partial response and replay, invalid-model output had no failure stage, and actual RoomAdvice capability path had no capability event",
+        "repair": "Kept a terminal success snapshot open through complete_request, then closed according to actual returned outcome; propagated child execution trace into parent partial/replay; recorded response failures and observed M4 room advice capability execution",
+        "rerun": "Exact focused run passed: 117 passed across test_b10_trace_postgres.py, test_b10_runtime.py, and test_grounded_qa.py"
+      },
+      {
+        "class": "b10_execution_trace_path_consistency",
+        "attempt": 3,
+        "aliases": [
+          "b10_first_response_replay_elapsed_parity"
+        ],
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Root v2 final gate reproduced first HTTP response execution.elapsed_ms differing from same-ID durable replay (43 vs 33 ms and 35 vs 26 ms); success snapshot was persisted precommit, but first response serialized later closed trace",
+        "repair": "Created one terminal trace snapshot immediately before complete_request and reused that exact serialized snapshot for first response and durable replay; the live trace closes for state only and remains available for error correction",
+        "rerun": "Exact focused suite including both replay regressions passed: 120 passed"
+      },
+      {
+        "class": "b10_benchmark_call_attribution",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Benchmark printed cumulative provider.calls after mixed flow, attributing 4 calls to a simple FAQ that used 2",
+        "repair": "Pending: capture provider call delta at each request boundary; report provider usage from that request execution trace only",
+        "rerun": "pending"
+      },
+      {
+        "class": "b10_confirmation_turn_deadline",
+        "attempt": 1,
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Q confirmed multi-stage confirmation admission exceeded configured 1s whole-turn deadline across two individually sub-1s database waits; TimeoutError escaped as HTTP 500",
+        "repair": "Pending: enforce the same absolute deadline across all confirmation storage/admission work and map expiry to stable bounded 504; coordinate A's store lock-wait deadline refresh",
+        "rerun": "pending"
+      },
+      {
+        "class": "b10_confirmation_turn_deadline",
+        "attempt": 2,
+        "aliases": [
+          "b10_confirmation_committed_delayed_ack_status"
+        ],
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "Root v2 final gate reproduced established delayed-ack contract regression: committed M2 past deadline returned saved partial as HTTP 200 rather than existing HTTP 502 partial_success with receipt and same-ID recovery",
+        "repair": "When whole-turn timeout observes a durable partial_success after committed M2, raise the established 502 with the saved partial receipt; same-ID replay still returns the durable partial as 200",
+        "rerun": "Existing delayed-ack regression passed in focused suite: first response 502 partial_success and same-ID recovery 200"
+      },
+      {
+        "class": "b10_test_contract_expectations",
+        "attempt": 2,
+        "aliases": [
+          "b10_context_test_expected_raw_provider_error"
+        ],
+        "initial_attempt_started_before_ledger_reservation": true,
+        "initial_result": "orchestrator correctly wrapped provider exception as ConversationFailure; test expected raw RuntimeError",
+        "repair": "Asserted typed ConversationFailure while validating the captured prepared request",
+        "rerun": "1 context-compression contract passed"
+      },
+      {
+        "class": "b10_test_contract_expectations",
+        "attempt": 3,
+        "aliases": [
+          "b10_room_advice_capability_error_code"
+        ],
+        "initial_attempt_started_before_ledger_reservation": false,
+        "initial_result": "RoomAdvice capability failure test expected provider_failure, but the existing _observe contract emits the bounded generic stage_failure code",
+        "repair": "Aligned the assertion with the established safe stage_failure contract",
+        "rerun": "1 passed within the focused run (117 passed total)"
+      }
+    ]
+  },
+  "final_reconciliation": {
+    "b10_benchmark_call_attribution": "PASS final benchmark: simple2, preparation1, confirmation1; earlier pending field is retained historical text",
+    "b10_confirmation_turn_deadline": "PASS independent 1s/1.013s reproducer plus final regression gates",
+    "deadline_lock_test_harness": "A ledger retains four unsuccessful observer strategies before final handshake. Do not treat relabeling as new repair budget or erase attempts; no further repairs authorized under an exhausted class.",
+    "initial_unreserved_attempts": "Preserved honestly; raw early logs unavailable where stated, coordinator-retained builder messages only."
+  },
+  "preserved_sprint10": {
+    "closed_harness": 4,
+    "harness_cap": 4,
+    "product_P1_repair": 1,
+    "closure_commit_approval_timeout_retry": 1,
+    "live_inference": 0
+  },
+  "coordinator_setup_failures": {
+    "git_fetch_sandbox_dns": 1,
+    "initdb_shared_memory_sandbox": 1,
+    "web_build_missing_public_config": 1,
+    "api_interpreter_symlink": 1,
+    "checkpoint_missing_counter_key": 1,
+    "cleanup_pg_binary_path": 1,
+    "staged_untracked_eof_whitespace": 1
+  },
+  "new_live_product_inference": 0
+}

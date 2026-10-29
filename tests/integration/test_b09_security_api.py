@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import importlib.util
 import json
 import os
@@ -17,10 +18,13 @@ from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 from pydantic import SecretStr
 from sqlalchemy import delete, func, select, update
-
 from staylead_platform.composition.configuration.settings import Settings
-from staylead_platform.composition.dependencies import guest_chat as guest_chat_composition
-from staylead_platform.domains.hospitality.registration.local_guide import HospitalityLocalGuide
+from staylead_platform.composition.dependencies import (
+    guest_chat as guest_chat_composition,
+)
+from staylead_platform.domains.hospitality.registration.local_guide import (
+    HospitalityLocalGuide,
+)
 from staylead_platform.domains.hospitality.registration.local_guide_labels import (
     LOCAL_GUIDE_LABEL_KEYS,
     local_guide_label_source_texts,
@@ -42,7 +46,9 @@ from staylead_platform.infrastructure.persistence.store import (
     messages,
     requests,
 )
-from staylead_platform.infrastructure.source_connectors.knowledge_v1 import import_fixture_pack
+from staylead_platform.infrastructure.source_connectors.knowledge_v1 import (
+    import_fixture_pack,
+)
 from staylead_platform.infrastructure.source_connectors.local_guide import (
     activate_local_guide_source,
     import_local_guide_pack,
@@ -52,7 +58,9 @@ from staylead_platform.platform.contracts.ai_provider import (
     GenerationResult,
     Usage,
 )
-from staylead_platform.platform.conversation.responses.presentation_labels import label_source_texts
+from staylead_platform.platform.conversation.responses.presentation_labels import (
+    label_source_texts,
+)
 from staylead_platform.platform.guest_context.sessions.signing import issue_token
 
 TEST_DSN = os.environ.get("STAYLEAD_TEST_DATABASE_URL")
@@ -663,12 +671,23 @@ def test_ordinary_question_quote_requires_confirmation_before_clearing_hard_need
     assert current.data["local_guide_preferences"]["hard_accessibility_needs"] == ["step_free"]
     assert len(provider.calls) == 3, "no answer/capability call may run before explicit confirmation"
     challenge_token = relaxed.json()["brief_confirmation"]["token"]
-    tampered = challenge_token[:-1] + ("A" if challenge_token[-1] != "A" else "B")
+    encoded_claims, encoded_signature = challenge_token.rsplit(".", 1)
+    tampered_signature = encoded_signature[:-2] + (
+        "A" if encoded_signature[-2] != "A" else "B"
+    ) + encoded_signature[-1]
+    def decode_signature(value: str) -> bytes:
+        return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+
+    assert decode_signature(tampered_signature) != decode_signature(encoded_signature)
+    tampered = f"{encoded_claims}.{tampered_signature}"
+    calls_before_tamper = len(provider.calls)
     tamper_response = client.post(
         f"/v1/guest/sessions/{session['session_id']}/brief-confirmations",
         headers=headers, json={"request_id": f"b09-tampered-confirm-{uuid4()}", "confirmation_token": tampered},
     )
     assert tamper_response.status_code == 409
+    assert len(provider.calls) == calls_before_tamper
+    assert get_guest_brief(engine, session_id=session["session_id"], hotel_id="HTL-CITY01").brief_version == seeded_brief.brief_version
     foreign_session = _open(client, "harbor-city-demo")
     wrong_scope = client.post(
         f"/v1/guest/sessions/{foreign_session['session_id']}/brief-confirmations",

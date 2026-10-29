@@ -1,0 +1,26 @@
+{
+  "recorded_at": "2026-10-29T01:13:48.798926+00:00",
+  "scope": "Coordinator independent admission verification; not full B10 acceptance",
+  "command": "STAYLEAD_TEST_DATABASE_URL=<isolated C PostgreSQL database> PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m pytest -q tests/integration/test_b10_admission.py",
+  "environment": {
+    "postgresql_port": 55441,
+    "database": "staylead_s11_verify",
+    "provider": "none invoked by admission suite",
+    "network": "authorized local loopback after sandbox escalation"
+  },
+  "result": {
+    "exit_code": 0,
+    "passed": 9,
+    "warnings": 1,
+    "duration_seconds": 1.24
+  },
+  "warning": "Starlette/httpx TestClient deprecation; no failure",
+  "files": {
+    "apps/api/src/staylead_platform/composition/configuration/settings.py": "11fed93210ba72ff1eb7e260425d3d0bfaff1d3337144d3c7652575661ad0973",
+    "apps/api/src/staylead_platform/entrypoints/app.py": "eda1a2d1ab0dc08fed1ec45bca6acd3b0d88b1bdb125d9fa4de45e96ed107aa0",
+    "apps/api/src/staylead_platform/infrastructure/persistence/store.py": "b9775c45314a83d7a99a7050bf20ade2193025523f28c480a58a6da8d141103e",
+    "apps/api/src/staylead_platform/platform/contracts/admission.py": "f89ebf89603b0f6d1b390d61758208dc2f606c03e97dce0983eb51cce830779d",
+    "tests/integration/test_b10_admission.py": "2e5e597f66f39e12e681b6abb4d6de437c64f1fa2f4d4ad0c4bffb6c34b879d7"
+  },
+  "validity": "A trace sanitizer metadata alignment pending; rerun impacted case after that change"
+}

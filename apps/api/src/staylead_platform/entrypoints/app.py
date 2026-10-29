@@ -24,6 +24,61 @@ MAX_QUESTION_CHARS = 2000
 GUEST_CONTRACT_VERSION = "2"
 
 
+class RawRequestBodyLimitMiddleware:
+    """Reject oversized raw HTTP bodies before any route or parser can dispatch work."""
+
+    def __init__(self, app: Any, *, max_bytes: int) -> None:
+        self.app = app
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+        path = scope.get("path", "")
+        if not path.startswith("/v1/guest/"):
+            await self.app(scope, receive, send)
+            return
+        content_lengths = [value for key, value in scope.get("headers", []) if key.lower() == b"content-length"]
+        try:
+            if content_lengths and max(int(value) for value in content_lengths) > self.max_bytes:
+                await self._too_large(send)
+                return
+        except ValueError:
+            # Let the HTTP server/framework report malformed Content-Length headers.
+            pass
+
+        body = bytearray()
+        while True:
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                return
+            body.extend(message.get("body", b""))
+            if len(body) > self.max_bytes:
+                await self._too_large(send)
+                return
+            if not message.get("more_body", False):
+                break
+
+        replayed = False
+
+        async def replay_receive() -> dict[str, Any]:
+            nonlocal replayed
+            if not replayed:
+                replayed = True
+                return {"type": "http.request", "body": bytes(body), "more_body": False}
+            return await receive()
+
+        await self.app(scope, replay_receive, send)
+
+    async def _too_large(self, send: Any) -> None:
+        body = b'{"error":{"code":"request_too_large","message":"Request body exceeds the allowed size.","retryable":false}}'
+        await send({"type": "http.response.start", "status": 413, "headers": [
+            (b"content-type", b"application/json"), (b"content-length", str(len(body)).encode("ascii")),
+        ]})
+        await send({"type": "http.response.body", "body": body})
+
+
 class CreateSessionRequest(BaseModel):
     hotel_slug: str = Field(min_length=1, max_length=120, pattern=r"^[a-z0-9-]+$")
 
@@ -74,6 +129,10 @@ def create_app(
     if selected_operator_guide is None:
         selected_operator_guide = create_operator_guide_application(selected_settings, engine=database)
     app = FastAPI(title="StayLead Platform API", version="0.1.0")
+    app.add_middleware(
+        RawRequestBodyLimitMiddleware,
+        max_bytes=selected_settings.guest_request_body_limit_bytes,
+    )
     app.state.domain_profile = profile
     app.state.guest_chat = guest_chat
     app.state.settings = selected_settings

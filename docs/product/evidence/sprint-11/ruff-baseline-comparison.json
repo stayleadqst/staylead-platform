@@ -1,0 +1,144 @@
+{
+  "recorded_at": "2026-10-29T01:30:56.108261+00:00",
+  "base": "e42d57f0ca7a1721f58a2f59fc8c1eeb27a057bb",
+  "method": "same Ruff stdin-filename and flags, exact base source vs current candidate",
+  "results": [
+    {
+      "file": "tests/integration/test_sprint4_lifecycle_postgres.py",
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "issues_equal": true,
+      "baseline_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 75,
+            "row": 55
+          }
+        }
+      ],
+      "candidate_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 75,
+            "row": 55
+          }
+        }
+      ]
+    },
+    {
+      "file": "tests/integration/test_sprint5_brief_postgres.py",
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "issues_equal": true,
+      "baseline_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 2,
+            "row": 38
+          }
+        }
+      ],
+      "candidate_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 2,
+            "row": 38
+          }
+        }
+      ]
+    },
+    {
+      "file": "tests/integration/test_sprint6_language_postgres.py",
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "issues_equal": true,
+      "baseline_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 2,
+            "row": 17
+          }
+        }
+      ],
+      "candidate_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 2,
+            "row": 17
+          }
+        }
+      ]
+    },
+    {
+      "file": "tests/integration/test_sprint7_room_advice_postgres.py",
+      "baseline_exit": 1,
+      "candidate_exit": 1,
+      "issues_equal": true,
+      "baseline_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 78,
+            "row": 49
+          }
+        }
+      ],
+      "candidate_issues": [
+        {
+          "code": "I001",
+          "message": "Import block is un-sorted or un-formatted",
+          "location": {
+            "column": 1,
+            "row": 3
+          },
+          "end_location": {
+            "column": 78,
+            "row": 49
+          }
+        }
+      ]
+    }
+  ],
+  "disposition": "Pre-existing import-order errors, untouched import blocks; preserve as baseline, no broad formatting changes."
+}

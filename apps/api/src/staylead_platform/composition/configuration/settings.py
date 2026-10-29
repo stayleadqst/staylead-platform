@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     ai_timeout_seconds: float = 25.0
     ai_turn_timeout_seconds: float = 45.0
     ai_max_output_tokens: int = 700
+    guest_request_body_limit_bytes: int = Field(default=65_536, gt=0)
+    guest_turns_per_session: int = Field(default=12, gt=0)
+    guest_turns_per_hotel: int = Field(default=120, gt=0)
+    guest_admission_window_seconds: int = Field(default=600, gt=0)
+    guest_in_flight_per_session: int = Field(default=1, gt=0)
+    guest_in_flight_per_hotel: int = Field(default=4, gt=0)
+    guest_provider_calls_per_request: int = Field(default=2, gt=0)
     validation_diagnostics: bool = False
     codex_cli_executable: str = "codex"
     codex_cli_model: str = "gpt-6-luna"
