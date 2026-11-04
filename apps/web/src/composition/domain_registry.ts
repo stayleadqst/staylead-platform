@@ -38,6 +38,7 @@ export type GuestTurnResultRendererProps = Readonly<{
   selectionError: string;
   onSelectOption: (turnId: string, result: unknown, optionId: string) => void;
   turnId?: string;
+  onRequestChange: (message: string) => void;
 }>;
 export type TurnResultActions = Readonly<{
   selectOption: (args: Readonly<{

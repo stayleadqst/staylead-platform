@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Protocol
 
+from staylead_platform.domains.hospitality.recommendations.transport import compare_transport
 from staylead_platform.domains.hospitality.registration.local_guide_pack import (
     HOTEL_ID,
     LocalGuidePack,
@@ -312,6 +313,16 @@ class HospitalityLocalGuide:
                 "unknowns": record["_unknowns"], "unknown_codes": record["_unknown_codes"], "fact_ids": ids,
             })
             unknowns.extend(record["_unknowns"])
+        transport_options, transport_fact_ids, transport_unknowns = compare_transport(
+            facts, request.brief_data, request.pending_fields,
+        )
+        fact_ids.extend(transport_fact_ids)
+        unknowns.extend(transport_unknowns)
+        transport_fact_set = set(transport_fact_ids)
+        for fact in facts:
+            if fact.fact_id in transport_fact_set:
+                source = _source_ref(fact)
+                source_ref_facts[(str(source["source_id"]), str(source["source_version"]))].append(source)
         conflict_messages = tuple(
             f"{item['subject_id']} {item['field']} conflict must be resolved before relying on it."
             for item in conflicts if item["subject_id"] in {claim["venue_id"] for claim in claims}
@@ -320,6 +331,7 @@ class HospitalityLocalGuide:
             hotel_id=request.hotel_id, generation=snapshot.generation,
             selected_venue_ids=tuple(claim["venue_id"] for claim in claims),
             fact_ids=tuple(dict.fromkeys(fact_ids)), supported_claims=tuple(claims),
+            transport_options=transport_options,
             unknowns=tuple(dict.fromkeys(unknowns)), conflicts=conflict_messages,
             source_refs=tuple({
                 "hotel_id": items[0]["hotel_id"], "source_id": key[0],

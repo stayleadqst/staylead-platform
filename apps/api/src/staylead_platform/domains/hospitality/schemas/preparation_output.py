@@ -17,6 +17,7 @@ ROOM_REQUIREMENT_FIELDS = (
     "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
     "preferred_bed_types", "avoided_bed_types", "max_rooms",
 )
+TRANSPORT_PREFERENCE_FIELDS = ("mode", "luggage_count", "child_seat_count", "access_needs")
 
 
 def _string(*, maximum: int = 2000, minimum: int = 1) -> dict[str, Any]:
@@ -145,6 +146,26 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
             "clear_fields": {"type": "array", "items": {"type": "string", "enum": guide_clearable},
                              "minItems": 1, "maxItems": len(guide_clearable)},
         }))
+    transport_fields = {
+        "mode": {"anyOf": [{"type": "string", "enum": ["walk", "taxi"]}, {"type": "null"}]},
+        "luggage_count": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 30}, {"type": "null"}]},
+        "child_seat_count": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 10}, {"type": "null"}]},
+        "access_needs": {"anyOf": [_array({"type": "string", "enum": ["step_free", "wheelchair_access"]}, maximum=2), {"type": "null"}]},
+    }
+    transport_clearable = [
+        field for field in TRANSPORT_PREFERENCE_FIELDS
+        if field in ((brief.data.get("transport_preferences") or {}) if brief else {})
+    ]
+    transport_set = _operation_schema("set_transport_preferences", {
+        **transport_fields, "clear_fields": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
+    })
+    transport_variants = [transport_set]
+    if transport_clearable:
+        transport_variants.append(_operation_schema("set_transport_preferences", {
+            **{field: {"type": "null"} for field in TRANSPORT_PREFERENCE_FIELDS},
+            "clear_fields": {"type": "array", "items": {"type": "string", "enum": transport_clearable},
+                             "minItems": 1, "maxItems": len(transport_clearable)},
+        }))
     ops = [
         _operation_schema("set_dates", {
             "check_in": _nullable_string(maximum=10), "check_out": _nullable_string(maximum=10),
@@ -160,6 +181,7 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
         _operation_schema("remove_child", {"member_id": _string(maximum=64)}),
         {"anyOf": room_requirement_variants},
         {"anyOf": guide_variants},
+        {"anyOf": transport_variants},
         _operation_schema("set_child_guardian", {
             "child_id": _string(maximum=64), "guardian_id": _string(maximum=64),
         }),

@@ -27,6 +27,59 @@ export type GuestPresentation = Readonly<{
   receipt_id: string | null;
 }>;
 
+export type GuestTransportCheck = Readonly<{
+  required: number | readonly string[] | null;
+  available: number | "supported" | "unsupported" | "unknown" | readonly string[] | null;
+  status: "fit" | "not_fit" | "unknown" | "not_required";
+}>;
+
+export type GuestSourceReference = Readonly<{
+  source?: Readonly<Record<string, unknown>>;
+  fact_ids?: readonly string[];
+  source_id?: string;
+  source_version?: string;
+  source_hash?: string;
+  source_generation?: number;
+  section?: string;
+  fact_id?: string;
+  status?: string;
+}>;
+
+export type GuestTransportOption = Readonly<{
+  provider_id: string;
+  name: string;
+  mode: string;
+  route: Readonly<{ from: string; to: string; duration_minutes: number | null }>;
+  fit_status: "fit" | "not_fit" | "unknown";
+  checks: Readonly<{
+    passenger_capacity: GuestTransportCheck;
+    luggage: GuestTransportCheck;
+    child_seat: GuestTransportCheck;
+    access: GuestTransportCheck;
+  }>;
+  price: Readonly<{
+    amount: number | null;
+    total_amount: number | null;
+    currency: string | null;
+    basis: "per_vehicle_one_way" | "per_person_one_way" | null;
+    status: "known" | "unknown" | "non_comparable";
+  }>;
+  tradeoffs: readonly string[];
+  unknowns: readonly string[];
+  contact: Readonly<{
+    url: string | null;
+    status: string;
+    source_refs: readonly GuestSourceReference[];
+  }>;
+  source_refs: readonly GuestSourceReference[];
+  synthetic: true;
+}>;
+
+export type GuestLocalGuide = Readonly<{
+  transport_options?: readonly GuestTransportOption[];
+  [key: string]: unknown;
+}>;
+
 export type GuestEvidence = Readonly<{
   fact_id: string;
   hotel_id: string;
@@ -96,6 +149,7 @@ export type GuestMessageResponse = Readonly<{
   presentation?: GuestPresentation;
   answer_eligibility?: "current" | "pending" | "stale";
   room_advice?: unknown;
+  local_guide?: GuestLocalGuide;
   booking_request?: unknown;
 }>;
 

@@ -1,13 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 import type { GuestTurnResultRendererProps } from "@/composition/domain_registry";
 import { safeBookingDestination } from "@/domains/hospitality/registration/booking-channel";
 import { roomAdviceCostView } from "@/domains/hospitality/registration/room-advice-cost";
 import { roomAdviceStatusLabel } from "@/domains/hospitality/registration/room-advice-status";
 import { directionForLanguageTag, normalizeLanguageTag } from "@/shared/chat/presentation";
-import { formatLocalGuidePrice, localGuideSourceLine, localGuideVerificationText, visibleLocalGuideClaims } from "@/domains/hospitality/registration/local-guide-presentation";
+import {
+  approvedSyntheticTransportUrl,
+  formatLocalGuidePrice,
+  formatTransportPrice,
+  localGuideSourceLine,
+  localGuideVerificationText,
+  transportCheckLabel,
+  visibleLocalGuideClaims,
+} from "@/domains/hospitality/registration/local-guide-presentation";
+import type { GuestTransportOption } from "@/shared/api/client";
 
 type BookingChannelData = {
   destination_url: string | null;
@@ -46,6 +55,7 @@ type LocalGuide = {
   localized_conflicts?: readonly string[];
   source_refs: readonly { source?: Record<string, unknown>; fact_ids?: readonly string[] }[];
   metadata?: { synthetic?: boolean; locale?: string | null };
+  transport_options?: readonly GuestTransportOption[];
 };
 
 const LOCAL_GUIDE_LABELS = {
@@ -74,11 +84,29 @@ function localGuideLabels(languageTag: string, supplied: Readonly<Record<string,
   };
 }
 
-function LocalGuidePanel({ result, languageTag, suppliedLabels, stale, freshnessError, staleMessage }: {
+function LocalGuidePanel({ result, languageTag, suppliedLabels, stale, freshnessError, staleMessage,
+  onRequestChange, requestDisabled, bookingChannel,
+}: {
   result: LocalGuide; languageTag: string; suppliedLabels?: Readonly<Record<string, string>>;
   stale: boolean; freshnessError: boolean; staleMessage: string;
+  onRequestChange: (message: string) => void; requestDisabled: boolean; bookingChannel?: BookingChannelData | null;
 }) {
   const labels = localGuideLabels(languageTag, suppliedLabels);
+  const [transportMode, setTransportMode] = useState("");
+  const [luggageCount, setLuggageCount] = useState("");
+  const checkValue = (value: unknown) => value === null ? "unknown"
+    : Array.isArray(value) ? value.join(", ") : String(value);
+  const requestTransportEdit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const changes = [
+      transportMode ? `mode to ${transportMode}` : "",
+      luggageCount !== "" ? `luggage_count to ${luggageCount}` : "",
+    ].filter(Boolean);
+    if (!changes.length) return;
+    onRequestChange(`Please update only my transport preferences (${changes.join("; ")}). Keep the confirmed passenger count and other confirmed requirements unchanged. If any required trip information is missing, ask me rather than assuming it. Recheck fit and the total price using current source records.`);
+    setTransportMode("");
+    setLuggageCount("");
+  };
   const localizedReason = (code: string) => code.startsWith("interest:")
     ? labels.interest(code.slice("interest:".length))
     : code === "available_catalog_match" ? labels.fitStatus : code.replaceAll("_", " ");
@@ -106,6 +134,62 @@ function LocalGuidePanel({ result, languageTag, suppliedLabels, stale, freshness
     {!(stale || freshnessError) && !!result.conflicts.length && <details><summary>{labels.conflicts} ({result.conflicts.length})</summary><ul>
       {(result.localized_conflicts?.length ? result.localized_conflicts : [labels.conflicts]).map((conflict, index) => <li key={`conflict-${index}`}>{conflict}</li>)}
     </ul></details>}
+    {!stale && !freshnessError && !!result.transport_options?.length && <section className="transport-options" data-testid="transport-options" aria-label="Transport options">
+      <h2>Transport options</h2>
+      {result.transport_options.filter((option) => option.synthetic === true).map((option) => {
+        const contactUrl = option.contact.status === "approved" ? approvedSyntheticTransportUrl(option.contact.url) : null;
+        const checks = [
+          ["Passenger seats (excluding driver)", option.checks.passenger_capacity],
+          ["Luggage", option.checks.luggage], ["Child seat", option.checks.child_seat], ["Accessibility", option.checks.access],
+        ] as const;
+        return <article className="transport-option" data-testid="transport-option" data-fit={option.fit_status}
+          key={option.provider_id}>
+          <h3>{option.name}</h3>
+          <p>Demo route only · {option.mode} · {option.route.from} → {option.route.to}
+            {option.route.duration_minutes !== null ? ` · demo duration ${option.route.duration_minutes} min` : " · demo duration unknown"}
+            · not an app quote or confirmed trip</p>
+          <p className={`transport-fit transport-fit-${option.fit_status}`} role="status">
+            {option.fit_status === "fit" ? "Fits the supplied requirements"
+              : option.fit_status === "not_fit" ? "Does not fit the supplied requirements" : "Fit could not be confirmed"}
+          </p>
+          <ul className="transport-checks">{checks.map(([name, check]) => <li key={name} data-check-status={check.status}>
+            <strong>{name}:</strong> required {checkValue(check.required)}; source says {checkValue(check.available)}. {transportCheckLabel(check.status)}.
+          </li>)}</ul>
+          <p><strong>Price basis:</strong> {formatTransportPrice(option.price, languageTag)}</p>
+          {!!option.tradeoffs.length && <div><strong>Trade-offs from the source-backed comparison</strong><ul>
+            {option.tradeoffs.map((tradeoff, index) => <li key={`${index}-${tradeoff}`}>{tradeoff}</li>)}
+          </ul></div>}
+          {!!option.unknowns.length && <div className="transport-unknowns" role="note"><strong>Needs confirmation</strong><ul>
+            {option.unknowns.map((unknown, index) => <li key={`${index}-${unknown}`}>{unknown}</li>)}
+          </ul></div>}
+          {contactUrl && <p><a href={contactUrl} target="_blank" rel="noreferrer">
+            {contactUrl.startsWith("https://example.com/synthetic/")
+              ? "Open synthetic provider contact" : "Open official provider service page"}
+          </a></p>}
+          {!contactUrl && <p className="status-note">Ask the hotel to verify transport. This is not a provider, booking, or availability confirmation.
+            {bookingChannel?.contact && <span> Hotel contact: <span dir="auto">{bookingChannel.contact}</span></span>}
+          </p>}
+          {!!option.source_refs.length && <details><summary>Transport source records ({option.source_refs.length})</summary><ul>
+            {option.source_refs.map((ref, index) => <li key={`${String(ref.source?.source_id ?? "source")}-${index}`}>{localGuideSourceLine(ref)}</li>)}
+          </ul></details>}
+          <p className="status-note">Synthetic transport data for technical testing; no rental, booking, or message was made.</p>
+        </article>;
+      })}
+      <form className="transport-edit" data-testid="transport-edit" onSubmit={requestTransportEdit}>
+        <h3>Ask to change transport</h3>
+        <label>Mode
+          <select value={transportMode} onChange={(event) => setTransportMode(event.target.value)} disabled={requestDisabled}>
+            <option value="">Keep current mode</option><option value="walk">Walking</option><option value="taxi">Taxi</option>
+          </select>
+        </label>
+        <label>Luggage count
+          <input type="number" min="0" step="1" value={luggageCount} onChange={(event) => setLuggageCount(event.target.value)}
+            placeholder="Leave unchanged" disabled={requestDisabled} />
+        </label>
+        <p className="status-note">Passenger count comes from confirmed trip details. If it is missing, the system should ask before calculating fit.</p>
+        <button type="submit" disabled={requestDisabled || (!transportMode && luggageCount === "")}>Send request in chat</button>
+      </form>
+    </section>}
     {!!result.source_refs.length && <details><summary>{labels.records} ({result.source_refs.length})</summary><ul>
       {result.source_refs.map((ref, index) => {
         return <li key={`${String(ref.source?.source_id ?? "source")}-${index}`}>
@@ -287,7 +371,8 @@ export function HospitalityTurnResultRenderer(props: GuestTurnResultRendererProp
       channel={bookingChannel} languageTag={props.languageTag} requested={Boolean(response?.booking_request)} />}
     {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
       suppliedLabels={props.localGuideLabels} stale={guideStale} freshnessError={props.freshnessError}
-      staleMessage={guideStaleMessage} />}
+      staleMessage={guideStaleMessage} onRequestChange={props.onRequestChange}
+      requestDisabled={props.selectionDisabled} bookingChannel={bookingChannel} />}
   </>;
   const labels = labelsFor(props.languageTag);
   const stale = result.currentness !== "current" || props.stale || props.freshnessError;
@@ -295,7 +380,8 @@ export function HospitalityTurnResultRenderer(props: GuestTurnResultRendererProp
     {Boolean(response?.booking_request) && <BookingChannel key="requested" channel={bookingChannel} languageTag={props.languageTag} requested />}
     {localGuide && <LocalGuidePanel result={localGuide} languageTag={props.languageTag}
       suppliedLabels={props.localGuideLabels} stale={guideStale || result.currentness !== "current"}
-      freshnessError={props.freshnessError} staleMessage={guideStaleMessage} />}
+      freshnessError={props.freshnessError} staleMessage={guideStaleMessage}
+      onRequestChange={props.onRequestChange} requestDisabled={props.selectionDisabled} bookingChannel={bookingChannel} />}
     <section className="room-advice" data-testid="room-advice" data-room-advice="true"
       lang={props.languageTag} dir={directionForLanguageTag(props.languageTag)} aria-label={labels.roomOptions}>
       <h2>{labels.roomOptions}</h2>

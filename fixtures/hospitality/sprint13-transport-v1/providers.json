@@ -1,0 +1,51 @@
+[
+  {
+    "provider_id": "TR-01",
+    "name": "Lotus Shuttle",
+    "seats_excluding_driver": 4,
+    "luggage_capacity": 2,
+    "child_seat": "unknown",
+    "access": "unknown",
+    "conditions": [
+      "Synthetic record only"
+    ],
+    "availability": "unknown",
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "transport/providers/TR-01",
+    "price": {
+      "amount": 180000,
+      "currency": "VND",
+      "basis": "per_vehicle_one_way"
+    },
+    "contact_url": "https://example.com/synthetic/providers/tr-01",
+    "access_capabilities": [],
+    "convenience": "One vehicle stays with the group for this route.",
+    "vehicle_change": "No vehicle change is specified in this synthetic route.",
+    "pickup": "Pickup point is the synthetic hotel entrance."
+  },
+  {
+    "provider_id": "TR-02",
+    "name": "River Taxi",
+    "seats_excluding_driver": 6,
+    "luggage_capacity": "unknown",
+    "child_seat": "supported",
+    "access": "unsupported",
+    "conditions": [
+      "Synthetic record only"
+    ],
+    "availability": "unknown",
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "transport/providers/TR-02",
+    "price": {
+      "amount": 45000,
+      "currency": "VND",
+      "basis": "per_person_one_way"
+    },
+    "access_capabilities": [
+      "step_free"
+    ],
+    "convenience": "Taxi mode is listed for this route.",
+    "vehicle_change": "A vehicle change is not described in the source.",
+    "pickup": "Pickup details are not stated in the source."
+  }
+]

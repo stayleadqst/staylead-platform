@@ -1,0 +1,30 @@
+[
+  {
+    "source_id": "S8-GUIDE-PRIMARY",
+    "version": "3.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-01-01",
+    "valid_to": "2027-03-31",
+    "checked_at": "2026-10-29",
+    "title": "Synthetic transport comparison source",
+    "url": "https://example.invalid/synthetic/s8-guide-primary",
+    "provenance": {
+      "label": "synthetic Sprint 13 transport fixture; not a real hotel/provider approval"
+    }
+  },
+  {
+    "source_id": "S8-GUIDE-SECONDARY",
+    "version": "1.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-01-01",
+    "valid_to": "2027-03-31",
+    "checked_at": "2026-10-29",
+    "title": "Synthetic transport comparison source",
+    "url": "https://example.invalid/synthetic/s8-guide-secondary",
+    "provenance": {
+      "label": "synthetic Sprint 13 transport fixture; not a real hotel/provider approval"
+    }
+  }
+]

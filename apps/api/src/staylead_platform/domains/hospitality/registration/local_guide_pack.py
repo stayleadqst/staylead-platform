@@ -8,10 +8,12 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 PACK_ID = "staylead-hospitality-local-guide-v1"
 PACK_ROOT = "sprint8-local-guide-v1"
-PACK_ROOTS = {PACK_ROOT, "sprint8-local-guide-v2-primary", "sprint8-local-guide-v2-secondary"}
+PACK_ROOTS = {PACK_ROOT, "sprint8-local-guide-v2-primary", "sprint8-local-guide-v2-secondary",
+              "sprint13-transport-v1", "sprint15-transport-v1"}
 HOTEL_ID = "HTL-S8-DEMO"
 PACK_FILES = ("sources.json", "venues.json", "providers.json", "routes.json")
 
@@ -182,9 +184,12 @@ def _validate_records(hotel: dict[str, Any], venues: list[Any], providers: list[
             or sum(1 for row in venues if isinstance(row, dict) and row.get("kind") == "attraction") != 3:
         raise LocalGuidePackValidationError("The catalog must contain three dining venues and three attractions.")
     provider_fields = {"provider_id", "name", "seats_excluding_driver", "luggage_capacity", "child_seat", "access",
-                       "conditions", "availability", "source_id", "section"}
+                       "conditions", "availability", "source_id", "section", "price", "contact_url",
+                       "access_capabilities", "convenience", "vehicle_change", "pickup"}
     for item in providers:
-        if not isinstance(item, dict) or set(item) != provider_fields:
+        required_provider_fields = provider_fields - {"price", "contact_url", "access_capabilities", "convenience",
+                                                       "vehicle_change", "pickup"}
+        if not isinstance(item, dict) or not required_provider_fields <= set(item) or set(item) - provider_fields:
             raise LocalGuidePackValidationError("Provider fields do not match the local-guide schema.")
         _required_string(item["provider_id"], "provider_id")
         _required_string(item["source_id"], "provider.source_id")
@@ -193,8 +198,8 @@ def _validate_records(hotel: dict[str, Any], venues: list[Any], providers: list[
         if not _required_string(item["name"], "provider.name"):
             raise LocalGuidePackValidationError("Provider name is required.")
         seats = item["seats_excluding_driver"]
-        if isinstance(seats, bool) or not isinstance(seats, int) or seats < 0:
-            raise LocalGuidePackValidationError("Seats must be a nonnegative count excluding the driver.")
+        if seats is not None and (isinstance(seats, bool) or not isinstance(seats, int) or seats < 0):
+            raise LocalGuidePackValidationError("Seats must be a nonnegative count excluding the driver or unknown.")
         if item["luggage_capacity"] != "unknown" and (
             isinstance(item["luggage_capacity"], bool) or not isinstance(item["luggage_capacity"], int)
             or item["luggage_capacity"] < 0
@@ -207,6 +212,37 @@ def _validate_records(hotel: dict[str, Any], venues: list[Any], providers: list[
             raise LocalGuidePackValidationError("Provider suitability and availability must use explicit supported/unknown states.")
         if not isinstance(item["conditions"], list) or any(not isinstance(v, str) for v in item["conditions"]):
             raise LocalGuidePackValidationError("Provider conditions must be a list of text records.")
+        if "price" in item:
+            price = item["price"]
+            if (not isinstance(price, dict) or set(price) != {"amount", "currency", "basis"}
+                    or isinstance(price["amount"], bool) or not isinstance(price["amount"], int)
+                    or price["amount"] < 0 or price["currency"] != "VND"
+                    or price["basis"] not in {"per_vehicle_one_way", "per_person_one_way"}):
+                raise LocalGuidePackValidationError("Transport price must use a typed synthetic VND one-way basis.")
+        if "contact_url" in item:
+            contact = item["contact_url"] if isinstance(item["contact_url"], str) else ""
+            try:
+                parsed = urlsplit(contact)
+                synthetic_contact = (
+                    parsed.scheme == "https" and parsed.hostname == "example.com"
+                    and parsed.path.startswith("/synthetic/") and not parsed.query and not parsed.fragment
+                    and not parsed.username and not parsed.password
+                )
+            except ValueError:
+                synthetic_contact = False
+            official_contact = contact in {
+                "https://www.grab.com/vn/transport/car/",
+                "https://www.greensm.com/vn-vi/greensm-car",
+            }
+            if not synthetic_contact and not official_contact:
+                raise LocalGuidePackValidationError("Provider contact must be an approved exact HTTPS transport page or synthetic example.com path without query or fragment.")
+        capabilities = item.get("access_capabilities", [])
+        if (not isinstance(capabilities, list) or len(set(capabilities)) != len(capabilities)
+                or any(value not in {"step_free", "wheelchair_access"} for value in capabilities)):
+            raise LocalGuidePackValidationError("Transport access capabilities must use precise supported literals.")
+        for field in ("convenience", "vehicle_change", "pickup"):
+            if field in item and (not isinstance(item[field], str) or not item[field].strip()):
+                raise LocalGuidePackValidationError("Transport tradeoff facts must be nonempty text.")
     if {item.get("provider_id") for item in providers if isinstance(item, dict)} != {"TR-01", "TR-02"}:
         raise LocalGuidePackValidationError("The provider catalog must contain exactly TR-01 and TR-02.")
     route_fields = {"route_id", "provider_id", "mode", "from", "to", "duration_minutes", "time_source", "source_id", "section"}

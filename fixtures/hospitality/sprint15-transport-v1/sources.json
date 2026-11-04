@@ -1,0 +1,44 @@
+[
+  {
+    "source_id": "S15-HTL-DEMO",
+    "version": "1.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-11-04",
+    "valid_to": "2026-11-04",
+    "checked_at": "2026-11-04",
+    "title": "Synthetic Lotus demo route and venue snapshot",
+    "url": "https://example.invalid/synthetic/s15-htl-demo",
+    "provenance": {
+      "label": "Synthetic demo hotel/venue facts only; not a real property approval or route estimate."
+    }
+  },
+  {
+    "source_id": "S15-GRAB-CAR",
+    "version": "1.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-11-04",
+    "valid_to": "2026-11-04",
+    "checked_at": "2026-11-04",
+    "title": "Synthetic snapshot of official GrabCar service page",
+    "url": "https://example.invalid/synthetic/s15-grab-car",
+    "provenance": {
+      "label": "Synthetic research snapshot of official public service page reviewed 2026-11-04; not a quote, hotel approval, seat/capacity fact, or trip availability."
+    }
+  },
+  {
+    "source_id": "S15-GREEN-SM-CAR",
+    "version": "1.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-11-04",
+    "valid_to": "2026-11-04",
+    "checked_at": "2026-11-04",
+    "title": "Synthetic snapshot of official Green SM Car service page",
+    "url": "https://example.invalid/synthetic/s15-green-sm-car",
+    "provenance": {
+      "label": "Synthetic research snapshot of official public service page reviewed 2026-11-04; not a quote, hotel approval, seat/capacity fact, or trip availability."
+    }
+  }
+]

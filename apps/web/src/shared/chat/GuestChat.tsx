@@ -516,9 +516,8 @@ export function GuestChat({
     }
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const text = question.trim();
+  function sendMessage(message: string) {
+    const text = message.trim();
     if (!text || !canStartRequest(Boolean(session), activeRequest.current === generation.current, unresolvedRequest)) return;
     const submittedGeneration = generation.current;
     const submittedSessionId = session?.session_id;
@@ -536,6 +535,11 @@ export function GuestChat({
         || session?.session_id !== submittedSessionId) return;
       await deliver(turn, turn.id);
     })();
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    sendMessage(question);
   }
 
   function retry(turn: ChatTurn) {
@@ -671,7 +675,7 @@ export function GuestChat({
         <TurnResultRenderer response={null} bookingChannel={session?.hotel.booking_channel ?? null}
           languageTag={activeLanguageTag} stale={false} freshnessError={false}
           selectionDisabled={busy} pendingOptionId={roomAdvicePending} selectionError=""
-          onSelectOption={selectTurnResultOption} />
+          onSelectOption={selectTurnResultOption} onRequestChange={sendMessage} />
         {guestBrief && guestBrief.brief_version > 0 && <div lang={session?.language_preference?.language_tag ?? "en"}
           dir={directionForLanguageTag(session?.language_preference?.language_tag ?? "en")}>
           <GuestBriefRenderer brief={guestBrief} labels={activeLabels} />
@@ -770,7 +774,7 @@ export function GuestChat({
                 stale={turn.stale ?? false} freshnessError={Boolean(turn.freshnessError)}
                 selectionDisabled={busy}
                 pendingOptionId={roomAdvicePending} selectionError={roomAdviceError}
-                turnId={turn.id} onSelectOption={selectTurnResultOption} />}
+                turnId={turn.id} onSelectOption={selectTurnResultOption} onRequestChange={sendMessage} />}
               {turn.answer && !!turn.answer.answer && <AnswerCard
                 response={turn.answer}
                 session={session}

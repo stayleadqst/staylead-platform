@@ -1,5 +1,9 @@
 # Staylead Platform — mandatory working context
 
+## Current mandatory user rule — factual service research before solutions, 2026-10-29
+
+Before proposing any service solution, representative simulation/fixture or implementation plan, read and apply [Market and Service Research Rules](docs/research/MARKET_SERVICE_RESEARCH_RULES.md). This applies to all service types and all coordinators/builders/reviewers. Research the actual local market, commonly used options and real operating model; ground capacity/eligibility/price/availability and suitability in evidence, keep unknowns explicit, and do not substitute synthetic tests for market validity. Hieu specifically identified Grab/Xanh SM and unrealistic transport cases as the trigger; the rule is general. Existing AC/DoD/M1–M6, limits, repair STOP and historical evidence remain in force. No new live calls, external actions or extra approval/framework are authorized by this rule.
+
 ## Sprint 9 / B09 final technical acceptance — 2026-10-28
 
 Fresh independent Q PASS full #30 B09 AC1–3/technical DoD on candidate `891515af41444208931c671cad0b54dbaa57f18f5cd6e4296fe19c5965f79ce0`/282 files. See `docs/product/evidence/b09/independent-final-review.json`. Initial P1 unauthorized M2 edits, uvloop clock mismatch and P2 cancellation-replay recovery are fixed and verified. Source/test leases closed; C may complete already-authorized commit/push/own PR/merge from `pilot-b09-security` into existing `sprint-5-canonical-brief`, then stop after #30. No new live inference, second story, deployment or CI dispatch/rerun. Earlier in-progress/repair notes below are history.
