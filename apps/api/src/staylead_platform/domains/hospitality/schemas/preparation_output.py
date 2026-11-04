@@ -15,7 +15,7 @@ TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "r
 ROOM_REQUIREMENT_FIELDS = (
     "budget_amount", "budget_currency", "budget_basis", "budget_strength", "budget_inclusions", "sharing",
     "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
-    "preferred_bed_types", "avoided_bed_types", "max_rooms",
+    "preferred_bed_types", "preferred_views", "avoided_bed_types", "max_rooms",
 )
 TRANSPORT_PREFERENCE_FIELDS = ("mode", "luggage_count", "child_seat_count", "access_needs")
 
@@ -102,6 +102,10 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
         "hard_bed_types": {"description": HARD_BED_TYPES_DESCRIPTION,
                            "anyOf": [_array({"type": "string", "enum": list(CANONICAL_BED_TYPES)}, maximum=8), {"type": "null"}]},
         "preferred_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
+        "preferred_views": {
+            "description": "Guest-stated soft room-view preferences only; never a hard requirement or inferred value.",
+            "anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}],
+        },
         "avoided_bed_types": {"anyOf": [_array(_string(maximum=64), maximum=8), {"type": "null"}]},
         "max_rooms": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": 10}, {"type": "null"}]},
     }

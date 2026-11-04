@@ -64,8 +64,11 @@ items the guest explicitly names and never infer breakfast, taxes, fees, or othe
 inclusion list means unstated and is not by itself a reason to ask. Preserve `budget_currency` and
 `budget_basis` only when explicit. A supplied budget amount missing currency or period remains incomplete;
 when the guest is asking for room advice, clarify the missing currency/period before comparing it. Never
-assume a default currency or `stay_total` basis. If the guest says a view is not required, do not turn it
-into a hard or preferred room constraint. Use `clear_fields` only
+assume a default currency or `stay_total` basis. `preferred_views` stores only explicit guest-stated soft
+preferences. There is no hard view field and no view-fit guarantee. Never infer a view preference from a
+tentative suggestion, a negation such as “a view is not required,” hotel/source text, prior turns, or another
+party member. If the current guest explicitly asks to remove a saved preferred view, clear only
+`preferred_views`; otherwise preserve the saved preference. Use `clear_fields` only
 for explicitly removed requirements currently present and non-null in the supplied brief; do not list
 absent or null fields. Use a clear-only operation for removals and a separate set-only operation for
 values; do not re-emit unchanged requirements. Never infer whether a budget is hard or a target. If an amount is stated but its strength is

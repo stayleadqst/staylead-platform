@@ -1,0 +1,79 @@
+{
+  "note": "Read-only comparison to accepted S9 source; an earlier attempted S8 confirmation lookup failed because that module did not yet exist. No writes/DB/test or product change.",
+  "apps/api/src/staylead_platform/infrastructure/persistence/store.py": {
+    "apply_guest_brief_patch": {
+      "exists_previous": true,
+      "same_ast": false
+    },
+    "_room_advice_currentness": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "get_guest_brief_receipt": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "select_room_advice_option": {
+      "exists_previous": true,
+      "same_ast": false
+    },
+    "complete_request": {
+      "exists_previous": true,
+      "same_ast": true
+    }
+  },
+  "apps/api/src/staylead_platform/platform/guest_context/sessions/brief_confirmation.py": {
+    "InvalidBriefConfirmation": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "brief_state_changes": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "BriefConfirmationClaims": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_canonical_json": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_key": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_proposal_hash": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "issue_brief_confirmation": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "verify_brief_confirmation": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_required_text": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_required_nonnegative_int": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_required_text_tuple": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_required_object": {
+      "exists_previous": true,
+      "same_ast": true
+    },
+    "_required_dict_tuple": {
+      "exists_previous": true,
+      "same_ast": true
+    }
+  }
+}

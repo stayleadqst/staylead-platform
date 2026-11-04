@@ -1,0 +1,31 @@
+{
+  "recorded_at_utc": "2026-11-04T14:58:22.207763+00:00",
+  "base": "62a3a30d89dc60deba24b6558c8f0ff224588564",
+  "base_tree": "edeb630e1b67e9535c761d327f53fa390f9fa94b",
+  "checkout": "/private/tmp/staylead-s17-canonical",
+  "branch": "sprint-17-b05-safe-edits",
+  "files_sha256": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "ab690ee0b4b3c14eace8b993a2cefc2e3bbbfc95031a2b76dd746e522f3522fe",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": "c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py": "28a7e37e753076b9be9474878f4a61d00da592a2b95ac832370be835e88472b9",
+    "apps/web/src/domains/hospitality/registration/brief-format.ts": "d1e421934e40f41f54e6c00073e3a6bab1998aff7040ea8943f77de7a24aa23f",
+    "apps/web/src/shared/chat/GuestChat.tsx": "73e1ccac4a69d6f5c070f2a5d1d6830e402e023160eec8b92ae0b5c97bc859aa",
+    "apps/web/src/shared/chat/chat-state.ts": "973063f6f10313fd89150e236adaa95beab641dc06707e25ebe8cb2facedf407",
+    "apps/web/tests/chat-state.test.mjs": "1a3ff8e1ec39c4ec034e4f10e19346e7563305a57d15ace76973b822b3d219f9",
+    "apps/web/tests/guest-brief-format.test.mjs": "bc1da7eee56f0cdd860cdee87ff566234743658155f879248fe8ee74f7dd5069",
+    "tests/sprint17_safe_edits/test_preferred_views.py": "86a46a2e6f33a9c6dfe7e190ab25f87245c76b2764c202256aac62a292856b42"
+  },
+  "fingerprint": "1b9717bb977274467d8329f7c502e3daa6ebccd4cae6a2e0ae2e20776a937416",
+  "prior_candidate": "17bfe904681d20ab699c1006da2ea28e6a179c0d235cb02f4f007d3083464c61",
+  "original6v2pins_unchanged": true,
+  "new3product3files": [
+    "apps/web/src/shared/chat/GuestChat.tsx",
+    "apps/web/src/shared/chat/chat-state.ts",
+    "apps/web/tests/chat-state.test.mjs"
+  ],
+  "source_state": "C_FROZEN_afterB27tests_lint_type_build4PASS_report",
+  "consumer_fixed_UI": "PENDING",
+  "product_repairs": "3/3EXHAUSTED",
+  "harness_repairs": "3/3EXHAUSTED",
+  "not_committed": true
+}

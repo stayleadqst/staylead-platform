@@ -7,6 +7,7 @@ import {
   classifyFailure,
   classifySessionFailure,
   hasUnresolvedRequest,
+  isAnswerStale,
   isSessionExpired,
   isSessionInvalidationFailure,
   isCurrentGeneration,
@@ -15,6 +16,18 @@ import {
   retryModeForFailure,
   sessionExpiryDelay,
 } from "../src/shared/chat/chat-state.ts";
+
+test("answer currentness follows the current brief version and fails closed on a mismatch", () => {
+  assert.equal(isAnswerStale(false, 1, 2), true, "an earlier answer is stale after the brief advances");
+  assert.equal(isAnswerStale(false, 2, 2), false, "an answer from the current brief stays current");
+  assert.equal(isAnswerStale(false, 3, 2), true, "a future-version mismatch also fails closed");
+});
+
+test("answer currentness preserves known stale state and tolerates absent version metadata", () => {
+  assert.equal(isAnswerStale(true, 2, 2), true, "an existing stale signal is preserved");
+  assert.equal(isAnswerStale(false, undefined, 2), false, "missing response metadata does not invent staleness");
+  assert.equal(isAnswerStale(false, null, 2), false, "a null response version preserves existing behavior");
+});
 
 test("session expiry is exact at the boundary and malformed expiry fails closed", () => {
   const now = Date.parse("2026-10-29T03:00:00.000Z");
