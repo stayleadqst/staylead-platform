@@ -27,6 +27,7 @@ CanonicalBedType = Literal[
     "bunk", "cot", "crib", "double", "extra_bed", "king", "queen", "single", "sofa_bed", "twin",
 ]
 BudgetInclusion = Annotated[str, StringConstraints(min_length=1, max_length=120, strip_whitespace=True)]
+SoftRoomView = Annotated[str, StringConstraints(min_length=1, max_length=64, strip_whitespace=True)]
 HARD_BED_TYPES_DESCRIPTION = (
     "Exact canonical physical bed types only. A request for separate sleeping surfaces is an arrangement, "
     "not a bed type; do not infer single or twin from it."
@@ -96,14 +97,15 @@ class SetRoomRequirements(_PatchOperation):
         default=None, max_length=8, description=HARD_BED_TYPES_DESCRIPTION,
     )
     preferred_bed_types: list[str] | None = Field(default=None, max_length=8)
+    preferred_views: list[SoftRoomView] | None = Field(default=None, max_length=8)
     avoided_bed_types: list[str] | None = Field(default=None, max_length=8)
     max_rooms: int | None = Field(default=None, ge=1, le=10)
     clear_fields: list[Literal[
         "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
         "budget_inclusions",
         "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
-        "preferred_bed_types", "avoided_bed_types", "max_rooms",
-    ]] = Field(default_factory=list, max_length=12)
+        "preferred_bed_types", "preferred_views", "avoided_bed_types", "max_rooms",
+    ]] = Field(default_factory=list, max_length=13)
 
 
 class SetLocalGuidePreferences(_PatchOperation):
@@ -205,8 +207,8 @@ class GuestPatchAuthorization(BaseModel):
         r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.(?:age|requires_separate_bed))?|room_requirements\."
         r"(?:budget_amount|budget_currency|budget_basis|budget_strength|budget_inclusions|sharing|"
         r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
-        r"preferred_bed_types|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?|transport_preferences(?:\.(?:mode|luggage_count|child_seat_count|access_needs))?)$"
-    ))]] = Field(min_length=1, max_length=12)
+        r"preferred_bed_types|preferred_views|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?|transport_preferences(?:\.(?:mode|luggage_count|child_seat_count|access_needs))?)$"
+    ))]] = Field(min_length=1, max_length=13)
     intent: Literal["explicit_request", "clarification"]
     current_turn_quote: str = Field(min_length=1, max_length=500)
 
@@ -397,7 +399,7 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
         requirement_fields = (
             "budget_amount", "budget_currency", "budget_basis", "budget_strength", "budget_inclusions", "sharing",
             "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
-            "preferred_bed_types", "avoided_bed_types", "max_rooms",
+            "preferred_bed_types", "preferred_views", "avoided_bed_types", "max_rooms",
         )
         cleared = set(operation.get("clear_fields") or ())
         return [

@@ -1,0 +1,58 @@
+{
+  "reviewer": "/root/q_b05_independent",
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "high",
+  "actual_model_effort_tokens": "unavailable",
+  "authority": "RESUME_AUTHORITY_AND_PLAN.json; actual Hieu clarification Sprint 17 — B05 #22",
+  "candidate": "1b9717bb977274467d8329f7c502e3daa6ebccd4cae6a2e0ae2e20776a937416",
+  "base": "62a3a30d89dc60deba24b6558c8f0ff224588564",
+  "source_files": 9,
+  "pins_verified_before_after": true,
+  "harness_fixture_pins_verified": 8,
+  "build_id": "hPiQFBQXrGEUo6xs_Aydx",
+  "ready_to_merge": true,
+  "verdict": "YES_FULL_B05_TECHNICAL_AC1_3_DOD",
+  "ac1": "PASS: exact view clear/budget/member edits and retention; proposed state requires confirmation; actual add/clear/lower/cancel plus component oracle",
+  "ac2": "PASS: precise inherited CAS/replay/confirmation/currentness evidence; fresh actual immediate stale+disabled old selection after repaired confirmation",
+  "ac3": "PASS: applied receipt authority, exact retained-state oracle, actual continuation; independent version transitions and precise inherited concurrency/partial/answer-only recovery evidence",
+  "closed_findings": [
+    "Q17-1 P2 native/domain 13-field cardinality mismatch; product repair2, four actual successful independent parse/auth checks plus source/A22",
+    "Q17-2 P2 old selected room remained current-looking immediately after confirm; original actual failure retained, product repair3, fresh actual fixed UI and Q helper10 PASS"
+  ],
+  "open_actionable_findings": [],
+  "independent_checks": {
+    "currentness_transition_cases_passed": 10,
+    "exact_m4_projection_oracles_passed": 2,
+    "source_pins_before_after": "all9match",
+    "runtime_harness_fixture_hashes": "all8match",
+    "v2_cardinality_checks_completed_before_probe_error": 4,
+    "v2_whole_inline_probe": "FAILED_KeyError_in_Q_empty_container_expectation; no correction/rerun; not a product failure"
+  },
+  "reviewed_local_gates": "A22/Ruff4/compile4/diff; B27/ESLint/typegen/tsc/final webpack production build; own helper10",
+  "offline_stub_invocations": {
+    "preflight": 8,
+    "ui_preserved_failure": 4,
+    "ui_fresh_fixed": 8,
+    "ui_separate_cancel": 3,
+    "ui_total": 15,
+    "sum_separate_recording_contexts": 23,
+    "provider_ids_globally_unique": false
+  },
+  "live_model_calls": 0,
+  "product_repair_budget": "3/3EXHAUSTED",
+  "shared_harness_repair_budget": "3/3EXHAUSTED",
+  "report": "REVIEW_RESUMED_FINAL.md",
+  "ui_evidence": "../b/browser-consumer-postfix-observations.json",
+  "ui_evidence_sha256": "70ed4d8600fd9a83aba511ba594c4c14107b161185705dc0ca8e2b29a3bb0a4a",
+  "provider_evidence_sha256": "e4e50f1a6912464f591a97c38beb264d9a3f47deabba66701421687e32c05cc1",
+  "earlier_expired_run_ready_no_preserved": true,
+  "q_candidate_runtime_leases": "RELEASED",
+  "limitations": [
+    "Q reviewed frozen actual B AX/step report and raw provider state; Q did not operate browser, inspect a fresh DB snapshot or persist screenshots",
+    "Screenshots/AX remain in B CUA transcript; no screenshot file persisted",
+    "Controlled offline/synthetic technical acceptance, not real-model quality, real hotel/source approval, actual participants, live availability or commercial quote",
+    "No fresh forced-partial/concurrency UI run: exact compatible S5/S7/S9 guard evidence reused with source proof",
+    "Publication/merge/Review/Retro/deployment/CI outcomes not claimed by Q",
+    "No additional repair allowance, runtime authority or next sprint plan"
+  ]
+}

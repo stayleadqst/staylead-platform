@@ -6,6 +6,16 @@ export type FailureInput = Readonly<{
 
 export type RetryMode = "same-request" | "new-request" | "new-session" | "none";
 
+/** Keep an answer stale when its recorded brief version differs from the current brief. */
+export function isAnswerStale(
+  existingStale: boolean,
+  responseBriefVersion: number | null | undefined,
+  currentBriefVersion: number | null | undefined,
+): boolean {
+  return existingStale || (responseBriefVersion != null && currentBriefVersion != null
+    && responseBriefVersion !== currentBriefVersion);
+}
+
 /** Return zero for malformed/expired timestamps so callers fail closed. */
 export function sessionExpiryDelay(expiresAt: string, now = Date.now()): number {
   const expiry = Date.parse(expiresAt);

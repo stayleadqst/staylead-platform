@@ -11,6 +11,7 @@ import {
   classifyFailure,
   classifySessionFailure,
   hasUnresolvedRequest,
+  isAnswerStale,
   isSessionExpired,
   isSessionInvalidationFailure,
   isCurrentGeneration,
@@ -771,7 +772,8 @@ export function GuestChat({
                   turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en",
                   turn.answer.presentation?.labels,
                 ).stale_answer}
-                stale={turn.stale ?? false} freshnessError={Boolean(turn.freshnessError)}
+                stale={isAnswerStale(turn.stale ?? false, turn.answer.brief_version_used, guestBrief?.brief_version)}
+                freshnessError={Boolean(turn.freshnessError)}
                 selectionDisabled={busy}
                 pendingOptionId={roomAdvicePending} selectionError={roomAdviceError}
                 turnId={turn.id} onSelectOption={selectTurnResultOption} onRequestChange={sendMessage} />}
@@ -780,7 +782,7 @@ export function GuestChat({
                 session={session}
                 target={target}
                 AnswerRenderer={AnswerRenderer}
-                stale={turn.stale ?? false}
+                stale={isAnswerStale(turn.stale ?? false, turn.answer.brief_version_used, guestBrief?.brief_version)}
                 freshnessError={turn.freshnessError}
                 historicalLanguageTag={turn.answer.presentation?.language_tag ?? turn.languageTag ?? "en"}
                 currentPreferenceRevision={session?.language_preference?.revision ?? -1}

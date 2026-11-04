@@ -8,6 +8,21 @@ export type HospitalityBriefDelta = Readonly<{
     children_updated?: readonly { age: number | null }[];
     children_removed?: readonly unknown[];
   }>;
+  room_requirements?: Readonly<{
+    preferred_views?: readonly string[] | null;
+    budget_amount?: number | null;
+    budget_currency?: string | null;
+    budget_basis?: "stay_total" | "per_night" | null;
+    budget_strength?: "hard" | "target" | null;
+    budget_inclusions?: readonly string[] | null;
+    sharing?: "allow" | "prefer" | "avoid" | null;
+    hard_accessibility_needs?: readonly string[] | null;
+    preferred_accessibility_needs?: readonly string[] | null;
+    hard_bed_types?: readonly string[] | null;
+    preferred_bed_types?: readonly string[] | null;
+    avoided_bed_types?: readonly string[] | null;
+    max_rooms?: number | null;
+  }>;
 }>;
 
 export function formatHospitalityBriefDelta(changes: HospitalityBriefDelta): string {
@@ -35,6 +50,38 @@ export function formatHospitalityBriefDelta(changes: HospitalityBriefDelta): str
   }
   const removed = changes.party?.children_removed?.length ?? 0;
   if (removed) lines.push(`Removed ${removed === 1 ? "a child" : `${removed} children`} from the trip.`);
+
+  const room = changes.room_requirements;
+  if (room) {
+    const fields = [
+      ["preferred_views", "View preferences"],
+      ["budget_amount", "Room budget amount"],
+      ["budget_currency", "Room budget currency"],
+      ["budget_basis", "Room budget basis"],
+      ["budget_strength", "Room budget requirement"],
+      ["budget_inclusions", "Included in room budget"],
+      ["sharing", "Bed-sharing preference"],
+      ["hard_accessibility_needs", "Required room accessibility"],
+      ["preferred_accessibility_needs", "Preferred room accessibility"],
+      ["hard_bed_types", "Required bed types"],
+      ["preferred_bed_types", "Preferred bed types"],
+      ["avoided_bed_types", "Bed types to avoid"],
+      ["max_rooms", "Maximum rooms"],
+    ] as const;
+    for (const [key, label] of fields) {
+      if (!Object.hasOwn(room, key)) continue;
+      const value = room[key];
+      let readable: string;
+      if (value === null || value === undefined) {
+        readable = "Not set";
+      } else if (Array.isArray(value)) {
+        readable = value.length ? value.join(", ") : "None";
+      } else {
+        readable = String(value);
+      }
+      lines.push(`${label}: ${readable}.`);
+    }
+  }
   return lines.length ? lines.join(" ") : "No trip details changed.";
 }
 
@@ -48,6 +95,13 @@ const CONFIRMATION_FIELDS: Readonly<Record<string, string>> = {
   "party.guardians": "Guardians",
   "party.bed_sharing": "Bed sharing",
   "room_requirements.hard_accessibility_needs": "Required room accessibility",
+  "room_requirements.preferred_views": "View preferences",
+  "room_requirements.budget_amount": "Room budget amount",
+  "room_requirements.budget_currency": "Room budget currency",
+  "room_requirements.budget_basis": "Room budget basis",
+  "room_requirements.budget_strength": "Room budget requirement",
+  "room_requirements.budget_inclusions": "Included in room budget",
+  "room_requirements.sharing": "Bed-sharing preference",
   "room_requirements.preferred_accessibility_needs": "Preferred room accessibility",
   "room_requirements.hard_bed_types": "Required bed types",
   "room_requirements.preferred_bed_types": "Preferred bed types",
