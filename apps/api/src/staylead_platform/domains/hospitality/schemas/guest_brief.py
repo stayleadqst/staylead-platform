@@ -6,7 +6,14 @@ from datetime import date
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    ValidationError,
+    model_validator,
+)
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
     GuestBriefSnapshot,
@@ -19,6 +26,7 @@ CANONICAL_BED_TYPES = (
 CanonicalBedType = Literal[
     "bunk", "cot", "crib", "double", "extra_bed", "king", "queen", "single", "sofa_bed", "twin",
 ]
+BudgetInclusion = Annotated[str, StringConstraints(min_length=1, max_length=120, strip_whitespace=True)]
 HARD_BED_TYPES_DESCRIPTION = (
     "Exact canonical physical bed types only. A request for separate sleeping surfaces is an arrangement, "
     "not a bed type; do not infer single or twin from it."
@@ -78,6 +86,7 @@ class SetRoomRequirements(_PatchOperation):
     budget_currency: str | None = Field(default=None, min_length=3, max_length=3)
     budget_basis: Literal["stay_total", "per_night"] | None = None
     budget_strength: Literal["hard", "target"] | None = None
+    budget_inclusions: list[BudgetInclusion] | None = Field(default=None, max_length=8)
     sharing: Literal["allow", "prefer", "avoid"] | None = Field(
         default=None, description="Bed sharing preference; this does not authorize sharing without party.bed_sharing consent.",
     )
@@ -91,9 +100,10 @@ class SetRoomRequirements(_PatchOperation):
     max_rooms: int | None = Field(default=None, ge=1, le=10)
     clear_fields: list[Literal[
         "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+        "budget_inclusions",
         "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
         "preferred_bed_types", "avoided_bed_types", "max_rooms",
-    ]] = Field(default_factory=list, max_length=11)
+    ]] = Field(default_factory=list, max_length=12)
 
 
 class SetLocalGuidePreferences(_PatchOperation):
@@ -193,10 +203,10 @@ class GuestPatchAuthorization(BaseModel):
     target_fields: list[Annotated[str, Field(max_length=128, pattern=(
         r"^(?:dates\.(?:check_in|check_out)|party\.(?:adults|children|guardians|bed_sharing)|room_requirements|"
         r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.(?:age|requires_separate_bed))?|room_requirements\."
-        r"(?:budget_amount|budget_currency|budget_basis|budget_strength|sharing|"
+        r"(?:budget_amount|budget_currency|budget_basis|budget_strength|budget_inclusions|sharing|"
         r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
         r"preferred_bed_types|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?|transport_preferences(?:\.(?:mode|luggage_count|child_seat_count|access_needs))?)$"
-    ))]] = Field(min_length=1, max_length=11)
+    ))]] = Field(min_length=1, max_length=12)
     intent: Literal["explicit_request", "clarification"]
     current_turn_quote: str = Field(min_length=1, max_length=500)
 
@@ -385,7 +395,7 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
         return ["party.bed_sharing"]
     if op == "set_room_requirements":
         requirement_fields = (
-            "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+            "budget_amount", "budget_currency", "budget_basis", "budget_strength", "budget_inclusions", "sharing",
             "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
             "preferred_bed_types", "avoided_bed_types", "max_rooms",
         )

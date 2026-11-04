@@ -58,7 +58,14 @@ History may resolve references but cannot authorize a new edit or request intent
 Whenever `guest_patch.ops` contains an edit, include `guest_edit` as well as any other current-turn intent
 such as `room_advice`; never omit it for initial trip details.
 Put the quote inside each individual operation; never create authorization metadata separately. For
-`set_room_requirements`, include only explicitly supplied non-null fields. Use `clear_fields` only
+`set_room_requirements`, include only explicitly supplied non-null fields. `budget_inclusions` is
+the guest-stated cost coverage of their budget, not what a source room rate includes; preserve only
+items the guest explicitly names and never infer breakfast, taxes, fees, or other coverage. An absent
+inclusion list means unstated and is not by itself a reason to ask. Preserve `budget_currency` and
+`budget_basis` only when explicit. A supplied budget amount missing currency or period remains incomplete;
+when the guest is asking for room advice, clarify the missing currency/period before comparing it. Never
+assume a default currency or `stay_total` basis. If the guest says a view is not required, do not turn it
+into a hard or preferred room constraint. Use `clear_fields` only
 for explicitly removed requirements currently present and non-null in the supplied brief; do not list
 absent or null fields. Use a clear-only operation for removals and a separate set-only operation for
 values; do not re-emit unchanged requirements. Never infer whether a budget is hard or a target. If an amount is stated but its strength is
