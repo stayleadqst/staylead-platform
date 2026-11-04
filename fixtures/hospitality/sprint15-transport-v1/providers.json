@@ -1,0 +1,40 @@
+[
+  {
+    "provider_id": "TR-01",
+    "name": "GrabCar",
+    "seats_excluding_driver": null,
+    "luggage_capacity": "unknown",
+    "child_seat": "unknown",
+    "access": "unknown",
+    "conditions": [
+      "Synthetic app-flow snapshot; no trip quote or vehicle assignment"
+    ],
+    "availability": "unknown",
+    "source_id": "S15-GRAB-CAR",
+    "section": "transport/providers/TR-01",
+    "contact_url": "https://www.grab.com/vn/transport/car/",
+    "access_capabilities": [],
+    "convenience": "Enter pickup and destination in the Grab app to see the offered car service and trip fare before requesting; this demo has no quote. GrabCar is not represented here as a taxi-meter service.",
+    "vehicle_change": "The service shown is request-specific; the vehicle assigned to this synthetic demo trip is not known.",
+    "pickup": "The user enters a pickup in the app; this demo endpoint is not a confirmed pickup."
+  },
+  {
+    "provider_id": "TR-02",
+    "name": "Green SM Car",
+    "seats_excluding_driver": null,
+    "luggage_capacity": "unknown",
+    "child_seat": "unknown",
+    "access": "unknown",
+    "conditions": [
+      "Synthetic app-flow snapshot; no trip quote or vehicle assignment"
+    ],
+    "availability": "unknown",
+    "source_id": "S15-GREEN-SM-CAR",
+    "section": "transport/providers/TR-02",
+    "contact_url": "https://www.greensm.com/vn-vi/greensm-car",
+    "access_capabilities": [],
+    "convenience": "Choose Green SM Car after setting pickup and destination in the app to view the trip fare before confirming; this demo has no quote and does not model a taxi-meter fare.",
+    "vehicle_change": "Green SM Car is the service label; the vehicle assigned to this synthetic demo trip is not known.",
+    "pickup": "The pickup point is selected in the app; this demo endpoint is not a confirmed pickup."
+  }
+]

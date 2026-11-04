@@ -16,7 +16,6 @@ from types import SimpleNamespace
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel, ValidationError
-
 from staylead_platform.platform.contracts.ai_provider import (
     AIProvider,
     GenerationRequest,
@@ -60,6 +59,7 @@ _SAFE_VALIDATION_FIELDS = frozenset({
     "supported_claims", "text", "fact_ids", "unknowns", "conflicts", "guest_patch", "ops", "op",
     "set_dates", "set_adults", "add_child", "set_child_age", "remove_child", "clarify",
     "check_in", "check_out", "count", "age", "member_id", "reason", "guest_claims", "refs",
+    "set_transport_preferences", "mode", "luggage_count", "child_seat_count", "access_needs", "clear_fields",
     "guest_brief_refs", "guest_clarification", "field", "options", "conversational_acknowledgement", "intent",
     "explicit_language_tag", "inferred_language_tag", "label_bundle", "turn_intents",
     "guest_patch_authorizations", "operation_index", "target_fields", "current_turn_quote",
@@ -289,6 +289,7 @@ class GroundedQAOrchestrator:
         committed_selection_instructions: str,
         selection_schema: type[BaseModel],
         claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
+        safe_fact_projector: Callable[[dict[str, Any]], str | None] | None = None,
         clarification_validator: Callable[
             [Any, str, dict[str, Any] | None, tuple[str, ...], tuple[str, ...]],
             tuple[str, tuple[str, ...]] | None,
@@ -325,6 +326,7 @@ class GroundedQAOrchestrator:
         self._committed_selection_instructions = committed_selection_instructions
         self._selection_schema = selection_schema
         self._claim_formatter = claim_formatter
+        self._safe_fact_projector = safe_fact_projector
         self._clarification_validator = clarification_validator
         self._committed_output_schema_factory = committed_output_schema_factory
         self._preparation_selection_schema_factory = preparation_selection_schema_factory
@@ -400,8 +402,11 @@ class GroundedQAOrchestrator:
                 hotel_id=hotel_id, question=question, locale=preferred_language_tag,
                 brief_version=brief.brief_version if brief is not None else 0,
                 brief_data=dict(brief.data) if brief is not None else {}, now=datetime.now(UTC),
-                timeout_seconds=capability_timeout,
+                timeout_seconds=capability_timeout, pending_fields=brief.pending_fields if brief is not None else (),
             )), timeout=capability_timeout))
+        # Presence of the composed capability marks this as a transport-aware
+        # turn even when the checked result has no approved routes to render.
+        transport_bearing = local_guide_result is not None
         retrieved = None
         if prefetched_facts is not None:
             relevant_facts = list(prefetched_facts)
@@ -483,6 +488,12 @@ class GroundedQAOrchestrator:
                     "sponsored", "sponsor_label", "price", "duration_minutes", "hours_status", "unknown_codes",
                 )} for claim in local_guide_result.supported_claims
             ] if local_guide_result is not None else []),
+            "local_guide_transport_options": ([{
+                key: option.get(key) for key in (
+                    "provider_id", "name", "mode", "route", "fit_status", "checks", "price",
+                    "tradeoffs", "unknowns", "synthetic",
+                )
+            } for option in local_guide_result.transport_options] if local_guide_result else []),
             "local_guide_unknowns": list(local_guide_result.unknowns) if local_guide_result else [],
         }
         evidence = json.dumps({
@@ -603,33 +614,68 @@ class GroundedQAOrchestrator:
                 raise ConversationFailure(
                     "invalid_model_output", "The model returned content outside this turn's scope."
                 ) from exc
+        if transport_bearing:
+            # Validate the original payload first so unauthorized operations or
+            # out-of-scope intents cannot disappear before the existing guards.
+            # Then suppress only model-authored knowledge prose; validated
+            # patches, guest-brief claims, clarifications, acknowledgement,
+            # language, and label metadata continue through their validators.
+            payload = payload.model_copy(update={
+                "supported_claims": [], "unknowns": [], "conflicts": [],
+            })
         facts_by_id = {fact["fact_id"]: fact for fact in relevant_facts}
         cited: list[str] = []
         rendered_claims: list[str] = []
-        for claim in payload.supported_claims:
-            claim_ids = list(dict.fromkeys(claim.fact_ids))
-            if not claim_ids or any(fact_id not in facts_by_id for fact_id in claim_ids):
-                raise ConversationFailure("invalid_model_output", "The model cited evidence outside this hotel context.")
-            references = _FACT_REFERENCE.findall(claim.text)
-            tokens = _FACT_TOKEN.findall(claim.text)
-            if tokens != references or (references and set(references) != set(claim_ids)):
-                raise ConversationFailure("invalid_model_output", "A supported claim includes invalid evidence references.")
-            cited_claim_facts = [facts_by_id[item] for item in claim_ids]
-            _validate_supported_literals(claim.text, cited_claim_facts)
-            formatted_text = (
-                self._claim_formatter(claim.text, cited_claim_facts)
-                if self._claim_formatter is not None else claim.text
-            )
-            if not isinstance(formatted_text, str):
-                raise ConversationFailure("invalid_model_output", "The claim formatter returned invalid text.")
-            formatted_references = _FACT_REFERENCE.findall(formatted_text)
-            formatted_tokens = _FACT_TOKEN.findall(formatted_text)
-            if formatted_tokens != formatted_references or formatted_references != references:
-                raise ConversationFailure("invalid_model_output", "The claim formatter changed evidence references.")
-            _validate_supported_literals(formatted_text, cited_claim_facts)
-            cited.extend(claim_ids)
-            labels = " ".join(f"[{fact_id}]" for fact_id in claim_ids)
-            rendered_claims.append(formatted_text if references else f"{formatted_text} {labels}")
+        projected_unknowns: list[str] = []
+        if transport_bearing:
+            if "hotel_information" in turn_intents:
+                conflicted_ids = {
+                    fact_id for conflict in conflicts
+                    if not str(conflict.get("topic", "")).startswith("local_guide.")
+                    for fact_id in conflict.get("fact_ids", ())
+                }
+                for fact in relevant_facts:
+                    fact_id = fact.get("fact_id")
+                    if not isinstance(fact_id, str) or str(fact.get("topic", "")).startswith("local_guide."):
+                        continue
+                    if fact_id in conflicted_ids:
+                        projected_unknowns.append(
+                            "Current approved hotel records conflict on a relevant detail; please confirm it with the hotel."
+                        )
+                        continue
+                    projected = self._safe_fact_projector(fact) if self._safe_fact_projector else None
+                    if projected is None:
+                        projected_unknowns.append(
+                            "A relevant approved hotel detail cannot be summarized safely; please confirm it with the hotel."
+                        )
+                        continue
+                    cited.append(fact_id)
+                    rendered_claims.append(f"{projected} [{fact_id}]")
+        else:
+            for claim in payload.supported_claims:
+                claim_ids = list(dict.fromkeys(claim.fact_ids))
+                if not claim_ids or any(fact_id not in facts_by_id for fact_id in claim_ids):
+                    raise ConversationFailure("invalid_model_output", "The model cited evidence outside this hotel context.")
+                references = _FACT_REFERENCE.findall(claim.text)
+                tokens = _FACT_TOKEN.findall(claim.text)
+                if tokens != references or (references and set(references) != set(claim_ids)):
+                    raise ConversationFailure("invalid_model_output", "A supported claim includes invalid evidence references.")
+                cited_claim_facts = [facts_by_id[item] for item in claim_ids]
+                _validate_supported_literals(claim.text, cited_claim_facts)
+                formatted_text = (
+                    self._claim_formatter(claim.text, cited_claim_facts)
+                    if self._claim_formatter is not None else claim.text
+                )
+                if not isinstance(formatted_text, str):
+                    raise ConversationFailure("invalid_model_output", "The claim formatter returned invalid text.")
+                formatted_references = _FACT_REFERENCE.findall(formatted_text)
+                formatted_tokens = _FACT_TOKEN.findall(formatted_text)
+                if formatted_tokens != formatted_references or formatted_references != references:
+                    raise ConversationFailure("invalid_model_output", "The claim formatter changed evidence references.")
+                _validate_supported_literals(formatted_text, cited_claim_facts)
+                cited.extend(claim_ids)
+                labels = " ".join(f"[{fact_id}]" for fact_id in claim_ids)
+                rendered_claims.append(formatted_text if references else f"{formatted_text} {labels}")
         for text in (*payload.unknowns, *payload.conflicts):
             _validate_untrusted_field(text, facts_by_id)
         raw_guest_clarification = getattr(payload, "guest_clarification", None)
@@ -684,6 +730,13 @@ class GroundedQAOrchestrator:
                 raw_acknowledgement.text, question=question,
             )
         rendered_guest_claims = [claim["text"] for claim in guest_claims]
+        if transport_bearing:
+            # Keep validated M2 references and actions, but never surface model
+            # prose that could turn party facts into transport assurances.
+            guest_claims = ()
+            rendered_guest_claims = []
+            guest_clarification = None
+            acknowledgement = None
         has_meaningful_text = any(
             _FACT_REFERENCE.sub("", part).strip() for part in (
                 *rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts,
@@ -703,7 +756,7 @@ class GroundedQAOrchestrator:
             if not allow_empty_preparation:
                 raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
-        answer_unknowns = (
+        answer_unknowns = tuple(dict.fromkeys(projected_unknowns)) if transport_bearing else (
             *payload.unknowns,
             *((guest_clarification,) if guest_clarification is not None else ()),
         )

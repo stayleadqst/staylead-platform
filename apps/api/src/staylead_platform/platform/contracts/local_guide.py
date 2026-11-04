@@ -23,6 +23,7 @@ class LocalGuideRequest:
     brief_data: dict[str, Any]
     now: datetime
     timeout_seconds: float | None = None
+    pending_fields: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class LocalGuideResult:
     selected_venue_ids: tuple[str, ...] = ()
     fact_ids: tuple[str, ...] = ()
     supported_claims: tuple[dict[str, Any], ...] = ()
+    transport_options: tuple[dict[str, Any], ...] = ()
     unknowns: tuple[str, ...] = ()
     conflicts: tuple[str, ...] = ()
     source_refs: tuple[dict[str, Any], ...] = ()

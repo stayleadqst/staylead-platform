@@ -162,3 +162,22 @@ body {
 .local-guide-venue { margin-top: 12px; padding: 12px; border: 1px solid #e0e8e1; border-radius: 10px; background: #fff; }
 .local-guide-venue h3 { margin: 0 0 8px; }
 .local-guide-venue p { margin: 6px 0; }
+.transport-options { display: grid; gap: 12px; max-width: 100%; margin-top: 16px; padding-top: 14px; border-top: 1px solid #dce6dd; }
+.transport-options h2, .transport-option h3, .transport-edit h3 { margin: 0; }
+.transport-option, .transport-edit { min-width: 0; padding: 14px; border: 1px solid #dce6dd; border-radius: 12px; background: #fff; overflow-wrap: anywhere; }
+.transport-option p { margin: 8px 0; }
+.transport-option a { color: #176247; font-weight: 700; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.transport-fit { font-weight: 700; }
+.transport-fit-not_fit { color: #8a3d2e; }
+.transport-fit-unknown { color: #73552b; }
+.transport-checks { display: grid; gap: 7px; margin: 8px 0; padding-inline-start: 22px; }
+.transport-unknowns { margin-top: 10px; padding: 10px; border-inline-start: 3px solid #b99a63; background: #fff9ec; }
+.transport-unknowns ul { margin: 6px 0 0; padding-inline-start: 22px; }
+.transport-edit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.transport-edit label { display: grid; gap: 5px; min-width: 0; font-size: 13px; font-weight: 700; }
+.transport-edit input, .transport-edit select { width: 100%; min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid #98aaa2; border-radius: 8px; background: white; color: inherit; font: inherit; }
+.transport-edit input:focus-visible, .transport-edit select:focus-visible { outline: 3px solid #93b8a3; outline-offset: 2px; }
+.transport-edit p, .transport-edit h3, .transport-edit button { grid-column: 1 / -1; }
+.transport-edit button { justify-self: start; min-height: 42px; padding: 8px 14px; border: 0; border-radius: 10px; background: #235845; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.transport-edit button:disabled { background: #aebbb3; cursor: not-allowed; }
+@media (max-width: 560px) { .transport-edit { grid-template-columns: minmax(0, 1fr); } }

@@ -9,6 +9,106 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 _CLOCK = re.compile(r"(?<![0-9A-Za-z_])([01]?[0-9]|2[0-3]):([0-5][0-9])(?::([0-5][0-9]))?(?![0-9A-Za-z_])")
 _URL = re.compile(r"https?://[^\s<>\]\[\"']+", re.IGNORECASE)
+_FIELD = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
+_FACT_LABELS = {
+    "name": "Property name",
+    "address": "Address",
+    "property_type": "Property type",
+    "check_in_window": "Check-in window",
+    "check_out_time": "Check-out time",
+    "early_check_in": "Early check-in",
+    "late_checkout": "Late checkout",
+    "breakfast_hours": "Breakfast hours",
+    "staffed_hours": "Reception staffed hours",
+    "quiet_hours": "Quiet hours",
+    "luggage_storage": "Luggage storage",
+    "cancellation": "Cancellation terms",
+    "booking_changes": "Booking changes",
+    "deposit": "Deposit",
+    "accepted_methods": "Accepted payment methods",
+    "invoice_request": "Invoice request",
+    "extra_person": "Extra-person occupancy",
+    "child_age_definition": "Child age definition",
+    "minor_guardian": "Minor guest policy",
+    "step_free_access": "Step-free access",
+    "reservation_required": "Reservation required",
+    "minimum_age": "Minimum age",
+    "maximum_age": "Maximum age",
+    "applicability": "Applies to",
+    "season": "Season",
+}
+_PROVENANCE_ONLY_CONDITIONS = {"synthetic", "source_checked_at"}
+
+
+def _safe_scalar(value: Any) -> str | None:
+    if isinstance(value, bool):
+        return "yes" if value else "no"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, str) and value and len(value) <= 600 and not any(
+        unicodedata.category(char) in {"Cc", "Cf"} for char in value
+    ):
+        return value
+    return None
+
+
+def _condition_text(conditions: Any) -> str | None:
+    if not isinstance(conditions, dict):
+        return None if conditions is None else ""
+    details = []
+    for key, value in conditions.items():
+        if key in _PROVENANCE_ONLY_CONDITIONS:
+            continue
+        if not isinstance(key, str) or not _FIELD.fullmatch(key) or key.endswith(("_id", "_ids", "_code")):
+            return ""
+        if key == "timezone":
+            rendered = _valid_timezone(value)
+            if rendered is None:
+                return ""
+            details.append(f"timezone {rendered}")
+            continue
+        rendered = _safe_scalar(value)
+        if rendered is None and isinstance(value, dict) and set(value) == {"start", "end"}:
+            start, end = _safe_scalar(value.get("start")), _safe_scalar(value.get("end"))
+            if start and end:
+                rendered = f"{start} to {end}"
+        if rendered is None:
+            return ""
+        label = _FACT_LABELS.get(key, key.replace("_", " ").capitalize())
+        details.append(f"{label.lower()} {rendered}")
+    return ", ".join(details) if details else None
+
+
+def project_grounded_fact(fact: dict[str, Any]) -> str | None:
+    """Render a current M1 Hospitality fact without using model-authored prose.
+
+    Only a small set of guest-safe labels and scalar values are projected. Local
+    guide facts use their typed server-side cards, while unsupported or complex
+    values become a safe confirmation prompt instead of being serialized.
+    """
+    if not isinstance(fact, dict) or str(fact.get("topic", "")).startswith("local_guide."):
+        return None
+    field = fact.get("field")
+    if not isinstance(field, str) or not _FIELD.fullmatch(field) or field.endswith(("_id", "_ids", "_code")):
+        return None
+    label = _FACT_LABELS.get(field, field.replace("_", " ").capitalize())
+    if fact.get("status") != "confirmed":
+        return f"The current approved hotel record does not confirm {label.lower()}; please verify it with the hotel."
+    value = fact.get("value")
+    rendered = None
+    if field == "check_in_window" and isinstance(value, dict) and set(value) <= {"start", "end"}:
+        start, end = _safe_scalar(value.get("start")), _safe_scalar(value.get("end"))
+        if start and end:
+            rendered = f"{start} to {end}"
+    if rendered is None:
+        rendered = _safe_scalar(value)
+    if rendered is None:
+        return f"The current approved hotel record for {label.lower()} cannot be summarized safely; please confirm this detail with the hotel."
+    conditions = _condition_text(fact.get("conditions"))
+    if conditions == "":
+        return f"The current approved hotel record for {label.lower()} cannot be summarized safely; please confirm this detail with the hotel."
+    suffix = f" ({conditions})" if conditions else ""
+    return f"{label}: {rendered}{suffix}."
 
 
 def _ascii_decimal_digits(text: str) -> str:

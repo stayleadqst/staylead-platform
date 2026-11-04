@@ -7,7 +7,6 @@ from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
-
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
     GuestBriefSnapshot,
@@ -125,6 +124,33 @@ class SetLocalGuidePreferences(_PatchOperation):
         return self
 
 
+class SetTransportPreferences(_PatchOperation):
+    """Explicit trip transport constraints; no party or luggage counts are inferred."""
+
+    op: Literal["set_transport_preferences"]
+    mode: Literal["walk", "taxi"] | None = None
+    luggage_count: int | None = Field(default=None, ge=0, le=30)
+    child_seat_count: int | None = Field(default=None, ge=0, le=10)
+    access_needs: list[Literal["step_free", "wheelchair_access"]] | None = Field(default=None, max_length=2)
+    clear_fields: list[Literal["mode", "luggage_count", "child_seat_count", "access_needs"]] = Field(
+        default_factory=list, max_length=4,
+    )
+
+    @model_validator(mode="after")
+    def must_change_a_field(self) -> SetTransportPreferences:
+        supplied = {
+            field for field in self.model_fields_set - {"op", "clear_fields", "current_turn_quote"}
+            if getattr(self, field) is not None
+        }
+        if not supplied and not self.clear_fields:
+            raise ValueError("A transport preference operation must set or clear at least one field.")
+        if supplied & set(self.clear_fields):
+            raise ValueError("A transport preference cannot be set and cleared in one operation.")
+        if self.access_needs is not None and len(set(self.access_needs)) != len(self.access_needs):
+            raise ValueError("Transport access needs must be unique.")
+        return self
+
+
 class SetChildGuardian(_PatchOperation):
     op: Literal["set_child_guardian"]
     child_id: str = Field(min_length=1, max_length=64)
@@ -145,7 +171,7 @@ class ClarifyField(_PatchOperation):
 
 GuestBriefOperation = Annotated[
     SetDates | SetAdults | AddChild | SetChildAge | SetChildSeparateBed | RemoveChild | SetRoomRequirements
-    | SetLocalGuidePreferences
+    | SetLocalGuidePreferences | SetTransportPreferences
     | SetChildGuardian | SetBedSharing | ClarifyField,
     Field(discriminator="op"),
 ]
@@ -162,13 +188,14 @@ class GuestPatchAuthorization(BaseModel):
     model_config = ConfigDict(extra="forbid")
     operation_index: int = Field(ge=0, le=11)
     op: Literal["set_dates", "set_adults", "add_child", "set_child_age", "set_child_separate_bed", "remove_child",
-                "set_room_requirements", "set_local_guide_preferences", "set_child_guardian", "set_bed_sharing", "clarify"]
+                "set_room_requirements", "set_local_guide_preferences", "set_transport_preferences",
+                "set_child_guardian", "set_bed_sharing", "clarify"]
     target_fields: list[Annotated[str, Field(max_length=128, pattern=(
         r"^(?:dates\.(?:check_in|check_out)|party\.(?:adults|children|guardians|bed_sharing)|room_requirements|"
         r"party\.(?:children|guardians)\.[A-Za-z0-9_-]+(?:\.(?:age|requires_separate_bed))?|room_requirements\."
         r"(?:budget_amount|budget_currency|budget_basis|budget_strength|sharing|"
         r"hard_accessibility_needs|preferred_accessibility_needs|hard_bed_types|"
-        r"preferred_bed_types|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?)$"
+        r"preferred_bed_types|avoided_bed_types|max_rooms)|local_guide_preferences(?:\.(?:venue_kinds|interests|pace|budget_amount|budget_currency|budget_basis|budget_strength|hard_accessibility_needs|allergy_requirements|child_safety_required))?|transport_preferences(?:\.(?:mode|luggage_count|child_seat_count|access_needs))?)$"
     ))]] = Field(min_length=1, max_length=11)
     intent: Literal["explicit_request", "clarification"]
     current_turn_quote: str = Field(min_length=1, max_length=500)
@@ -377,6 +404,13 @@ def _patch_target_fields(operation: dict[str, Any]) -> list[str]:
             f"local_guide_preferences.{field}" for field in preference_fields
             if field in cleared or operation.get(field) is not None
         ]
+    if op == "set_transport_preferences":
+        preference_fields = ("mode", "luggage_count", "child_seat_count", "access_needs")
+        cleared = set(operation.get("clear_fields") or ())
+        return [
+            f"transport_preferences.{field}" for field in preference_fields
+            if field in cleared or field in operation and operation.get(field) is not None
+        ]
     if op == "clarify" and isinstance(operation.get("field"), str):
         return [operation["field"]]
     return []
@@ -410,6 +444,8 @@ def validate_guest_brief_proposal(
         data["room_requirements"] = dict(current.data.get("room_requirements") or {})
     if "local_guide_preferences" in current.data:
         data["local_guide_preferences"] = dict(current.data.get("local_guide_preferences") or {})
+    if "transport_preferences" in current.data:
+        data["transport_preferences"] = dict(current.data.get("transport_preferences") or {})
     data["dates"].setdefault("check_in", None)
     data["dates"].setdefault("check_out", None)
     data["dates"].setdefault("nights", None)
@@ -419,7 +455,8 @@ def validate_guest_brief_proposal(
         data["party"]["guardians"] = dict(data["party"].get("guardians") or {})
     pending = set(current.pending_fields)
     fields: set[str] = set()
-    delta: dict[str, object] = {"dates": {}, "party": {}, "room_requirements": {}, "local_guide_preferences": {}}
+    delta: dict[str, object] = {"dates": {}, "party": {}, "room_requirements": {}, "local_guide_preferences": {},
+                                "transport_preferences": {}}
     clarification = False
     changed = False
     for operation in patch.ops:
@@ -637,6 +674,31 @@ def validate_guest_brief_proposal(
                 pending.discard("local_guide_preferences.budget_strength")
             fields.update(f"local_guide_preferences.{key}" for key in preference_fields
                           if key in operation.clear_fields or getattr(operation, key) is not None)
+        elif isinstance(operation, SetTransportPreferences):
+            if "transport_preferences" in pending:
+                pending.discard("transport_preferences")
+                pending.update({
+                    "transport_preferences.mode", "transport_preferences.luggage_count",
+                    "transport_preferences.child_seat_count", "transport_preferences.access_needs",
+                })
+            preferences = data.setdefault("transport_preferences", {})
+            preference_fields = ("mode", "luggage_count", "child_seat_count", "access_needs")
+            for key in operation.clear_fields:
+                if key in preferences:
+                    preferences.pop(key)
+                    delta["transport_preferences"][key] = None
+                    changed = True
+                pending.discard(f"transport_preferences.{key}")
+            for key in operation.model_fields_set - {"op", "clear_fields", "current_turn_quote"}:
+                value = getattr(operation, key)
+                if key not in operation.clear_fields and value is not None and preferences.get(key) != value:
+                    preferences[key] = value
+                    delta["transport_preferences"][key] = value
+                    changed = True
+                if value is not None:
+                    pending.discard(f"transport_preferences.{key}")
+            fields.update(f"transport_preferences.{key}" for key in preference_fields
+                          if key in operation.clear_fields or getattr(operation, key) is not None)
         elif isinstance(operation, SetBedSharing):
             fields.add("party.bed_sharing")
             all_members = {f"adult-{index}" for index in range(1, (data["party"].get("adults") or 0) + 1)}
@@ -660,6 +722,8 @@ def validate_guest_brief_proposal(
             if operation.field not in {
                 "dates.check_in", "dates.check_out", "party.adults", "party.children.member",
                 "room_requirements", "room_requirements.hard_bed_types", "room_requirements.budget_strength",
+                "transport_preferences", "transport_preferences.mode", "transport_preferences.luggage_count",
+                "transport_preferences.child_seat_count", "transport_preferences.access_needs",
             } and not child_age_field:
                 raise ValueError("The clarification field is outside the guest brief.")
             fields.add(operation.field)
@@ -673,10 +737,14 @@ def validate_guest_brief_proposal(
         delta.pop("room_requirements")
     if not delta["local_guide_preferences"]:
         delta.pop("local_guide_preferences")
+    if not delta["transport_preferences"]:
+        delta.pop("transport_preferences")
     if data.get("room_requirements") == {}:
         data.pop("room_requirements")
     if data.get("local_guide_preferences") == {}:
         data.pop("local_guide_preferences")
+    if data.get("transport_preferences") == {}:
+        data.pop("transport_preferences")
     requirements = data.get("room_requirements") or {}
     if requirements.get("budget_amount") is not None and requirements.get("budget_strength") not in {"hard", "target"}:
         pending.add("room_requirements.budget_strength")

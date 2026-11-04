@@ -1,0 +1,5 @@
+# Sprint 15 transport comparison pack
+
+Synthetic consumer-test data for the existing Lotus Pilot Demo property. The service labels and app operating steps are grounded in official GrabCar and Green SM Car pages reviewed 2026-11-04. This pack is not hotel-approved source data and does not report real-trip quotes, assigned vehicles, seats, luggage capacity, child-seat availability, accessibility, or current availability. Those fields remain unknown. The earlier `sprint13-transport-v1` pack is retained as a boundary-test fixture only; it is not market evidence or a representative transport service model.
+
+The four directional route endpoints and durations are demo-only and are not provider routes or app estimates. All legs use taxi service mode; no walking leg is used to evaluate vehicle seating or price. The app pages describe an in-app trip fare; this pack contains no fare quote, and it does not model taxi-meter services such as GrabTaxi. The six venue records remain synthetic demo venues. Sources are staged with `guest_approved: false`. No booking, dispatch, message, or PII transfer was performed.
