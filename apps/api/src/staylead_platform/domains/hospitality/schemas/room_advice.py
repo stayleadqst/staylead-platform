@@ -23,6 +23,7 @@ PRESENTATION_LABEL_KEYS = (
     "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
     "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
     "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+    "question.budget_currency", "question.budget_basis",
     "question.accessibility_confirmation",
     "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
     "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
@@ -86,6 +87,7 @@ class RoomAdvicePresentationLabel(BaseModel):
         "claim.party_fit", "claim.bed_setup", "claim.reference_price", "claim.policy_confirmation",
         "claim.accessibility_confirmation", "claim.preference_tradeoff", "claim.charges_confirmation",
         "question.dates", "question.party", "question.age", "question.room", "question.budget_strength",
+        "question.budget_currency", "question.budget_basis",
         "question.accessibility_confirmation",
         "question.rate_basis", "question.rate_validity_window", "question.hard_budget_exceeded",
         "question.source_fact_conflict", "question.room_rule_conflict", "question.generic",
@@ -105,12 +107,12 @@ class RoomAdvicePreparation(BaseModel):
     options: list[RoomAdviceOption] = Field(default_factory=list, max_length=4)
     questions: list[RoomAdviceQuestion] = Field(default_factory=list, max_length=6)
     hotel_answer: RoomAdviceHotelAnswer | None = None
-    presentation_labels: list[RoomAdvicePresentationLabel] = Field(default_factory=list, max_length=17)
+    presentation_labels: list[RoomAdvicePresentationLabel] = Field(default_factory=list, max_length=19)
 
 
 class RoomAdviceLocalizationPreparation(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    presentation_labels: list[RoomAdvicePresentationLabel] = Field(min_length=1, max_length=17)
+    presentation_labels: list[RoomAdvicePresentationLabel] = Field(min_length=1, max_length=19)
 
 
 def _object(properties: dict[str, Any], required: list[str] | None = None) -> dict[str, Any]:

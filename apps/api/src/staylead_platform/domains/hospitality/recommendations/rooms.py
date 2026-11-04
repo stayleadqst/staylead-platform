@@ -11,7 +11,6 @@ from datetime import UTC, date, datetime
 from typing import Any
 
 from pydantic import ValidationError
-
 from staylead_platform.domains.hospitality.schemas.room_advice import (
     RoomAdviceLocalizationPreparation,
     RoomAdviceOption,
@@ -41,6 +40,8 @@ _QUESTION_TEMPLATES = {
     "question.party": "How many adults will stay?",
     "question.age": "How old is each child?",
     "question.room": "Which room requirement should I use?",
+    "question.budget_currency": "What currency is that budget amount in?",
+    "question.budget_basis": "Does that budget cover the whole stay or each night?",
     "question.budget_strength": "Is this budget a hard limit or a target?",
     "question.accessibility_confirmation": (
         "Your access needs are recorded, but no checked option has confirmed them. "
@@ -61,6 +62,8 @@ _CLAIM_KEYS = {code: f"claim.{code}" for code in (
 _QUESTION_FIELD_KEYS = {
     "dates.check_in": "question.dates", "dates.check_out": "question.dates",
     "party.adults": "question.party", "party.children.age": "question.age",
+    "room_requirements.budget_currency": "question.budget_currency",
+    "room_requirements.budget_basis": "question.budget_basis",
     "room_requirements.budget_strength": "question.budget_strength",
     "room_requirements.hard_accessibility_needs": "question.accessibility_confirmation",
     "room_advice": "question.room",
@@ -308,6 +311,10 @@ def _localized_question(
         key = "age"
     elif field == "room_requirements.budget_strength":
         key = "budget_strength"
+    elif field == "room_requirements.budget_currency":
+        key = "budget_currency"
+    elif field == "room_requirements.budget_basis":
+        key = "budget_basis"
     elif field == "room_requirements.hard_accessibility_needs":
         key = "accessibility_confirmation"
     elif field == "room_advice" or field.startswith("room_requirements."):
@@ -319,6 +326,8 @@ def _localized_question(
         "en": {"dates": "What are your check-in and check-out dates?",
                "party": "How many adults will stay?", "age": "How old is each child?",
                "room": "Which room requirement should I use?",
+               "budget_currency": "What currency is that budget amount in?",
+               "budget_basis": "Does that budget cover the whole stay or each night?",
                "budget_strength": "Is this budget a hard limit or a target?",
                "accessibility_confirmation": (
                    "Your access needs are recorded, but no checked option has confirmed them. "
@@ -327,6 +336,8 @@ def _localized_question(
         "vi": {"dates": "Bạn nhận phòng và trả phòng vào ngày nào?",
                "party": "Có bao nhiêu người lớn sẽ lưu trú?", "age": "Mỗi trẻ bao nhiêu tuổi?",
                "room": "Tôi nên áp dụng yêu cầu phòng nào?",
+               "budget_currency": "Khoản ngân sách này dùng loại tiền tệ nào?",
+               "budget_basis": "Ngân sách này áp dụng cho cả kỳ lưu trú hay mỗi đêm?",
                "budget_strength": "Ngân sách này là giới hạn bắt buộc hay mức mục tiêu?",
                "accessibility_confirmation": (
                    "Tôi đã ghi nhận yêu cầu tiếp cận, nhưng chưa có phương án nào được xác nhận là đáp ứng. "
@@ -335,6 +346,8 @@ def _localized_question(
         "zh": {"dates": "您的入住和退房日期是什么时候？",
                "party": "将有几位成人入住？", "age": "每位儿童分别几岁？",
                "room": "您希望我采用哪项房间要求？",
+               "budget_currency": "这笔预算使用什么货币？",
+               "budget_basis": "这笔预算适用于整个住宿期还是每晚？",
                "budget_strength": "这项预算是硬性上限还是目标金额？",
                "accessibility_confirmation": (
                    "我已记录您的无障碍需求，但目前没有已核实的方案确认能够满足。请向酒店确认客房是否符合这些需求。"
@@ -342,6 +355,8 @@ def _localized_question(
         "ja": {"dates": "チェックイン日とチェックアウト日を教えてください。",
                "party": "宿泊する大人は何人ですか？", "age": "お子様はそれぞれ何歳ですか？",
                "room": "どの客室条件を適用しますか？",
+               "budget_currency": "この予算額の通貨は何ですか？",
+               "budget_basis": "この予算は滞在全体ですか、それとも1泊あたりですか？",
                "budget_strength": "この予算は上限ですか、それとも目標額ですか？",
                "accessibility_confirmation": (
                    "アクセシビリティのご要望を記録しましたが、確認済みの案では対応できると確認できていません。客室が要件を満たすかホテルにご確認ください。"
@@ -693,10 +708,42 @@ server validates phrases and inserts checked amount/currency values itself.
             requirements.get("budget_amount") is not None
             and requirements.get("budget_strength") not in {"hard", "target"}
         )
+        budget_context_pending: set[str] = set()
+        if requirements.get("budget_amount") is not None:
+            for field in ("budget_currency", "budget_basis"):
+                pending_field = f"room_requirements.{field}"
+                if requirements.get(field) is None:
+                    budget_context_pending.add(pending_field)
+                    pending.add(pending_field)
         if budget_strength_unknown:
             pending.add("room_requirements.budget_strength")
-        if "room_requirements.budget_strength" in pending:
+        for field in ("room_requirements.budget_currency", "room_requirements.budget_basis"):
+            if field in budget_context_pending and field not in [q.get("field") for q in questions]:
+                questions.append({"field": field})
+        if (
+            "room_requirements.budget_strength" in pending
+            and "room_requirements.budget_strength" not in [q.get("field") for q in questions]
+        ):
             questions.append({"field": "room_requirements.budget_strength"})
+        if budget_context_pending:
+            non_budget_pending = pending - budget_context_pending - {"room_requirements.budget_strength"}
+            if not non_budget_pending:
+                questions = [question for question in questions if question.get("field") != "room_advice"]
+            explanation_inputs = {"unknowns": [
+                field.removeprefix("room_requirements.budget_").replace("_", " ")
+                for field in sorted(budget_context_pending)
+            ]}
+            if has_known_nonpending_access_needs:
+                explanation_inputs["known_hard_accessibility_needs"] = True
+            result = RoomAdviceResult(
+                status="needs_clarification", brief_version=context.brief_version,
+                source_generation=context.source_generation,
+                source_refs=tuple(_source(f, context.source_generation) for f in active),
+                questions=tuple(questions),
+                explanation_inputs=explanation_inputs,
+                hotel_answer=draft.hotel_answer,
+            )
+            return relocalize_checked(result)
         other_pending_room_requirements = (
             pending - {"room_requirements.budget_strength"}
             if budget_strength_unknown else pending
@@ -1156,10 +1203,10 @@ server validates phrases and inserts checked amount/currency values itself.
             if requirements.get("budget_strength") == "hard" and requirements.get("budget_amount") is not None:
                 budget_currency = requirements.get("budget_currency")
                 comparable = nightly_complete and len(currencies) == 1 and budget_currency in currencies
-                if requirements.get("budget_basis", "stay_total") == "stay_total":
+                if requirements.get("budget_basis") == "stay_total":
                     known_lower_bound = base_subtotal + additional_total if base_subtotal is not None else None
                     complete_basis_value = known_lower_bound if complete else None
-                elif nightly_subtotal is not None:
+                elif requirements.get("budget_basis") == "per_night" and nightly_subtotal is not None:
                     if additional_total == 0:
                         known_lower_bound = nightly_subtotal
                     elif nights and additional_total % nights == 0:
@@ -1180,7 +1227,8 @@ server validates phrases and inserts checked amount/currency values itself.
                                                       *(rate["fact_id"] for rate in rates_by_room.values() if rate),
                                                   })})
                     continue
-                if basis_value is None or complete_basis_value is None:
+                if (basis_value is None or complete_basis_value is None
+                        or requirements.get("budget_inclusions")):
                     checks.append({"code": "budget", "status": "unknown", "fact_ids": [rate["fact_id"] for rate in rates_by_room.values() if rate]})
             unknown_codes = {check["code"] for check in checks if check["status"] == "unknown"}
             option_fact_ids = {room_records[index]["fact_id"] for index in room_indices}

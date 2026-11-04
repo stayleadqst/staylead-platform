@@ -13,7 +13,7 @@ from staylead_platform.platform.contracts.guest_brief import GuestBriefSnapshot
 
 TURN_INTENTS = ("hotel_information", "guest_state", "guest_edit", "courtesy", "room_advice", "local_guide", "booking_request")
 ROOM_REQUIREMENT_FIELDS = (
-    "budget_amount", "budget_currency", "budget_basis", "budget_strength", "sharing",
+    "budget_amount", "budget_currency", "budget_basis", "budget_strength", "budget_inclusions", "sharing",
     "hard_accessibility_needs", "preferred_accessibility_needs", "hard_bed_types",
     "preferred_bed_types", "avoided_bed_types", "max_rooms",
 )
@@ -93,6 +93,8 @@ def _patch_schema(brief: GuestBriefSnapshot | None = None) -> dict[str, Any]:
         "budget_currency": _nullable_string(maximum=3),
         "budget_basis": {"anyOf": [{"type": "string", "enum": ["stay_total", "per_night"]}, {"type": "null"}]},
         "budget_strength": {"anyOf": [{"type": "string", "enum": ["hard", "target"]}, {"type": "null"}]},
+        # Guest-stated costs covered by the budget; distinct from source rate inclusions.
+        "budget_inclusions": {"anyOf": [_array(_string(maximum=120), maximum=8, minimum=1), {"type": "null"}]},
         "sharing": {"description": "Bed-sharing preference only; does not authorize sharing.",
                     "anyOf": [{"type": "string", "enum": ["allow", "prefer", "avoid"]}, {"type": "null"}]},
         "hard_accessibility_needs": {"anyOf": [_array(_string(maximum=120), maximum=8), {"type": "null"}]},
