@@ -1,0 +1,87 @@
+{
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "effort": "low",
+  "no_automatic_retry": true,
+  "stop_at_first_blocking_failure": true,
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "cases": [
+    {
+      "turn": 1,
+      "source_case": 7,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đi cùng con 7 tuổi và là người giám hộ của bé. Chúng tôi có thể ở chung phòng và chung giường lớn. Ở 2026-11-10 đến 2026-11-12; bắt buộc không có bậc và phòng tắm phù hợp xe lăn. Tư vấn phần có căn cứ, đừng tự bỏ điều kiện.",
+      "expected": [
+        "M2 adult1/child7/explicitguardian/sharetrue/dates2n/hardstepfree+wheelchairbathroom",
+        "LOFT/GARDENminimumage8 rejected at7; CABINaccesssupportunknown =>no certifiedhardaccessfit",
+        "Keeprequirements, explainunknown/incompatible ratherthansoldout, no relaxationwithoutconsent; no forcedoptions"
+      ],
+      "approved_previous_turn": 6,
+      "previous_run_turn": 3
+    },
+    {
+      "turn": 2,
+      "source_case": 8,
+      "session": "fresh-pine",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đồng ý bỏ yêu cầu không bậc và yêu cầu phòng tắm xe lăn. Sửa tuổi con thành 8; tôi vẫn là người giám hộ và chúng tôi đồng ý chung giường lớn. Giữ ngày ở. Hãy tư vấn lại. Répondez en français.",
+      "expected": [
+        "SamechildID age7→8, preserveguardian/sharing/dates; clearonlytwohardaccessrequirements authorizedbycurrentquote; M2commitbeforedependentresult",
+        "LOFT4.4m/GARDEN5m/CABIN8.2m known2nbase ifproposed; familychargesunknown/nulltotal; age8eligibilityverified",
+        "French checkedrationale/questions withoutENfallback afterM4filtersclaims; actualcardlanguagefr; source/brief/resultversions traceable",
+        "Current UIselection0provider; previousresultstale ifany; no reservation/payment"
+      ],
+      "approved_previous_turn": 7,
+      "previous_run_turn": 4
+    }
+  ],
+  "run_id": "s7-room-advice-20261027-reacceptance5-sol-proposed",
+  "status": "PROPOSED ONLY; requires explicit NEWPine2/4 plus inference model change approval",
+  "authorized_for_live_calls": false,
+  "proposed_max_guest_turns": 2,
+  "proposed_max_requests": 4,
+  "model": "gpt-6.1-sol",
+  "candidate_sha256": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance4",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "state_sha256": "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c",
+    "lifetime_requests": 46,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 2,
+    "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+    "actual_outcome": {
+      "pine1": "FAIL unrequested hardbedtype clarification; generic VI access question",
+      "pine2": "Blocked dependency/notattempted"
+    },
+    "runners": "API45685/browser9067 stopped; no retry"
+  },
+  "source_matrix_run_id": "s7-room-advice-20261027-reacceptance4",
+  "source_matrix_turns": [
+    1,
+    2
+  ],
+  "purpose": "FreshONEPinesession, EXACT two original utterances/expectations; reuse acceptedCity/Family/B07. Try Sol/low after repeated Luna/low semantic errors; no controlled comparative evidence or success guarantee. No automatic fallback, retry, extra repairturn, history repair or increase to25s/45s/700.",
+  "profile_change": {
+    "from": "gpt-6-luna/low",
+    "proposed": "gpt-6.1-sol/low",
+    "approved": false,
+    "local_cli_metadata": "Solslug andloweffortlisted; no inference/access test performed",
+    "official_docs": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "reason": "Primary unrequested hard-bed clarification remains model-dependent; changing only prompt under identical profile is weak default after repeated failures",
+    "limits_unchanged": [
+      2,
+      4,
+      2,
+      25,
+      45,
+      700
+    ],
+    "current_runtime_model_unchanged": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "candidate_sha256": "345a71417443a90f51410ecad93bbced5effc1f248a7077ab492a9c1b8e34123",
+  "root_focused_harness_and_api_tests": 22,
+  "warnings": 3,
+  "builder_harness_tests": 20,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "diff_check": "PASS",
+  "node_syntax_and_offline_smoke": "PASS bybuilder, no API/model/browser",
+  "product_unchanged_from": "d7ca88db6c1251a7dc9ff64acdf9d6624731b5865a46d322f28f55dde3b5e35a",
+  "reused_backend": 277,
+  "reused_postgres": 15,
+  "reused_frontend_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "reuse_reason": "Only4harness/control files changed; full product/schema/M4/persistence/frontend unchanged. Overlapping tests not summed.",
+  "new_live_config_state_or_model_calls": false
+}

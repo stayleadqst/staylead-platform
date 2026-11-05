@@ -1,0 +1,28 @@
+{
+  "authorized_for_live_calls": false,
+  "candidate_sha256": "f4af97b878f78986015a5203edb5ff33c103732897b2eb226dd0aaf6bec53182",
+  "harness_sha256": "66c7f6d466d5e8edacf6673a8ee5d700be093229f745a5685dd94ddd46df8a24",
+  "case_sha256": "680840d55ecf61df8b95fb011c43a575901648845e4307fe9f0f4e10eb106a78",
+  "oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+  "source_data_and_prompt_pins": "candidate-manifest.json exact files map; independent oracle raw source versions and source_snapshot_precondition",
+  "provider": "codex_cli local/test only",
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "limits": {
+    "guest_turns": 4,
+    "provider_requests": 8,
+    "calls_per_turn": 2,
+    "seconds_per_call": 25,
+    "seconds_per_turn": 45,
+    "output_tokens": 700,
+    "automatic_retry": false,
+    "fallback": false,
+    "stop_first_blocking_failure": true
+  },
+  "native_output_token_limit": false,
+  "output_limit_enforcement": "Inherited Codex CLI adapter post-checks reported output usage and rejects over700; no verified native generation/billing token cap. Stop on first blocking failure. Requested profile and returned usage recorded when available.",
+  "workflow": "Only reviewed browser controller; root/Q semantic receipts before advancing; final turn independently reviewed before completed sealing. On failure stop/seal all remaining slots; no direct extra guest requests/reset/reuse/S7 allowance.",
+  "expected_data": "Fresh baseline primary1.0 + secondary1.0, generation3; exact source hashes in independent oracle. Both fresh priorities use the same catalog.",
+  "cases": "Four exact authored inputs in acceptance-cases-proposed.json; Q expected outcomes in independent-oracle.json; mobile/RTL observed within these4 turns",
+  "next_action": "Requires fresh explicit human approval on #100 before private authorized config/state or real provider activation."
+}

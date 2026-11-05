@@ -1,0 +1,64 @@
+{
+  "candidate_sha256": "dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab",
+  "manifest": "candidate-manifest-reacceptance6-sol-question-remediation-final.json",
+  "verdict": "PASS scoped offline code review; no remaining actionable finding",
+  "scope": "Final P2 early-return repair and exact two-file delta from initial96a; reuse prior valid actual/source/math/validator/frontend evidence. Not actual acceptance PASS.",
+  "source_binding": {
+    "count": 237,
+    "repo_and_snapshot_before_after": "PASS",
+    "candidate_digest": "PASS",
+    "delta_from_initial": [
+      "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "tests/contracts/test_room_advice.py"
+    ],
+    "delta_from_actual": [
+      "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "tests/contracts/test_room_advice.py",
+      "tools/evals/sprint7_browser.mjs"
+    ]
+  },
+  "independently_verified": [
+    "Original unknown-adults generic-only reproducer emits only the actual missing party.adults question; no derived access question.",
+    "Unknown-adults explicit access question retains trusted known-needs marker and Vietnamese hotel-verification text; party.adults retained.",
+    "More than40 members with generic-only or explicit access questions retains processing_limit and assignment-limit cause; new generic-to-access derivation does not execute.",
+    "Exact failed R6 native draft now produces one correct hotel-verification question, without the unsupported broad room_advice hint.",
+    "Actual emitted browser branches accept canonical M2/M4 Pine1 and French partial Pine2; 14 targeted negative mutations reject, including original unnecessary question.",
+    "Three affected pytest cases PASS; prior seven necessity/pending/conflict/rate cases and prior narrow product proofs reused.",
+    "Future R7 exact two case objects unchanged; candidate updated, authorized_for_live_calls=false, Sol/low2/4 and2calls/25s/45s/700/no retry/no fallback unchanged.",
+    "Proposal and manifest prior_allocation exactly match sealed R6 stop receipt; state SHA verified4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27."
+  ],
+  "root_reported_gates": {
+    "candidate_sha256": "dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab",
+    "source_pins": 237,
+    "root_gate": {
+      "contracts_architecture_api": "292 PASS",
+      "warnings": "3 known deprecations",
+      "isolated_pg": "16 PASS,1 known deprecation",
+      "ruff": "PASS full src/tests/runtime",
+      "compile": "PASS src/runtime",
+      "diff": "PASS"
+    },
+    "builder": "88 room-advice tests/Ruff/compile/NodeSyntax/diffPASS",
+    "fixed_review_finding": "Known-access metadata preserved in missing-party/processing-limit earlyreturns, generic access derivation after these earlyreturns; actual missing-adults/status retained",
+    "frontend_reused": "53pins unchanged,40tests/lint/typecheck/buildPASS",
+    "actual_after_fix": "NOT RUN; R6sealed1/2/lifetime52 unused1/2closed"
+  },
+  "commands": [
+    "PYTHONPATH=apps/api/src apps/api/.venv/bin/python validation/.../q-review-reacceptance6-sol-question-final-probe.py (absolute evidence path used)",
+    "PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m pytest -q tests/contracts/test_room_advice.py -k 'known_access_preserves_missing_party_question_and_confirmation_context or known_access_does_not_replace_processing_limit_with_hotel_confirmation'"
+  ],
+  "evidence": [
+    "q-review-reacceptance6-sol-question-final-probe-results.json",
+    "q-review-reacceptance6-sol-question-final-probe.py",
+    "q-review-reacceptance6-sol-question-final-driver-probe-results.json",
+    "q-review-reacceptance6-sol-question-remediation-initial.json",
+    "q-review-reacceptance6-sol-actual.json",
+    "q-review-reacceptance6-sol-question-final-actual-draft-results.json"
+  ],
+  "limitations": [
+    "No provider/model/API calls, DB access or writes, actual state repair, product mutation, activation, or new allowance.",
+    "Original R6 turn1 remains AC2 FAIL; turn2 not attempted; HALTED1/2/lifetime52 and unused1/2closed preserved.",
+    "Fresh Pine2 linked actual French rationale/questions/current UI selection remains missing; C01/fullSprint actual acceptance remains Blocked. City/Family/B07 accepted evidence remains valid.",
+    "Publication of this reviewed offline fix is supported; proposed future run still requires direct new manual allowance. No quality guarantee or live success inferred."
+  ]
+}

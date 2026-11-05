@@ -1,0 +1,133 @@
+{
+  "observation": "read_only_postgresql_snapshot",
+  "session": {
+    "session_id": "2ae411dd-30ae-4eec-a37a-3c8effd8141d",
+    "hotel_id": "HTL-CITY01",
+    "state_version": 4,
+    "created_at": "2026-10-23T20:22:50.406665+07:00"
+  },
+  "guest_brief": {
+    "brief_version": 4,
+    "data": {
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": []
+      }
+    },
+    "pending_fields": [],
+    "updated_at": "2026-10-23T20:24:07.723441+07:00"
+  },
+  "receipt_count": 4,
+  "receipts": [
+    {
+      "request_id": "ab65f7dd-9e42-4298-9f55-e969051e2715",
+      "status": "applied",
+      "brief_version_before": 0,
+      "brief_version_after": 1,
+      "applied_delta": {
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2
+        }
+      },
+      "source_utterance_id": "8720f43b-feb7-4cc2-8f00-1bb1460aead2",
+      "source_fields": [
+        "dates.check_in",
+        "dates.check_out",
+        "party.adults"
+      ],
+      "answer_status": "completed",
+      "brief_version_used": 1,
+      "brief_dependent": true,
+      "created_at": "2026-10-23T20:23:10.702884+07:00"
+    },
+    {
+      "request_id": "ef3aab5a-de54-4ae7-bcba-a169ed4cf1ea",
+      "status": "partial_success",
+      "brief_version_before": 1,
+      "brief_version_after": 2,
+      "applied_delta": {
+        "party": {
+          "children_added": [
+            {
+              "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+              "age": null
+            }
+          ]
+        }
+      },
+      "source_utterance_id": "4870cda6-eb16-4ef4-8a53-90074c6a4612",
+      "source_fields": [
+        "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b"
+      ],
+      "answer_status": "completed",
+      "brief_version_used": 2,
+      "brief_dependent": true,
+      "created_at": "2026-10-23T20:23:28.551931+07:00"
+    },
+    {
+      "request_id": "988daace-397d-44de-9f7b-225df05c0e9b",
+      "status": "applied",
+      "brief_version_before": 2,
+      "brief_version_after": 3,
+      "applied_delta": {
+        "dates": {
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "children_updated": [
+            {
+              "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+              "age": 7
+            }
+          ]
+        }
+      },
+      "source_utterance_id": "d929de42-2398-4c88-b51a-22021dfd51b8",
+      "source_fields": [
+        "dates.check_out",
+        "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b.age"
+      ],
+      "answer_status": "completed",
+      "brief_version_used": 3,
+      "brief_dependent": true,
+      "created_at": "2026-10-23T20:23:47.522445+07:00"
+    },
+    {
+      "request_id": "ce85a436-60f5-4ce1-b7ec-b2f7e5093006",
+      "status": "applied",
+      "brief_version_before": 3,
+      "brief_version_after": 4,
+      "applied_delta": {
+        "party": {
+          "children_removed": [
+            {
+              "member_id": "3bc810f7-0c29-4402-8c1f-53d22383427b",
+              "age": 7
+            }
+          ]
+        }
+      },
+      "source_utterance_id": "134b86fd-35b5-412d-acdc-3e3c9596be63",
+      "source_fields": [
+        "party.children.3bc810f7-0c29-4402-8c1f-53d22383427b"
+      ],
+      "answer_status": "completed",
+      "brief_version_used": 4,
+      "brief_dependent": true,
+      "created_at": "2026-10-23T20:24:07.723441+07:00"
+    }
+  ],
+  "source_utterance_text_included": false,
+  "answer_payload_included": false
+}

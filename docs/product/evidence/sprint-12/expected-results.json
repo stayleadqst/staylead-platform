@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "scope_ref": "https://github.com/stayleadqst/staylead-platform/issues/34",
+  "written_before_observations": true,
+  "policy": "pilot-retention-24h-ops7d-v1",
+  "base": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+  "source": "Hieu approved policy + B11 AC1–3 + unchanged B10 quota contract; C expectations independent of builder implementation",
+  "cases": [
+    {
+      "id": "own_delete",
+      "ac": [
+        "AC1",
+        "AC2"
+      ],
+      "input": "sessionA with committed transcript/brief/derived; valid own bearer DELETE",
+      "expected": "204; all conversation content/derived erased; no old token/replay/confirmation/advice/media read can restore; sessionB unaffected"
+    },
+    {
+      "id": "foreign_delete",
+      "ac": [
+        "AC2"
+      ],
+      "input": "bearerA DELETE sidB, cross-property, missing/tampered bearer",
+      "expected": "reject before read/write; both sessionB and its content retained; no provider call"
+    },
+    {
+      "id": "repeat_delete",
+      "ac": [
+        "AC1",
+        "AC2"
+      ],
+      "input": "same valid signed own bearer repeats DELETE after success/lost reply",
+      "expected": "204 safe idempotent; no recreated session, no returned old content"
+    },
+    {
+      "id": "expiry_boundary",
+      "ac": [
+        "AC1",
+        "AC3"
+      ],
+      "input": "controlled UTC clock before and at created+24h",
+      "expected": "before boundary usable; at/after denies all content consumer paths; expiry cleanup removes content/derived without touching others; old cache cannot restore"
+    },
+    {
+      "id": "request_delete_race",
+      "ac": [
+        "AC1",
+        "AC2"
+      ],
+      "input": "in-flight delayed offline provider / commit / confirmation / selection with concurrent delete",
+      "expected": "after delete completion no surviving content/derived or late answer/brief/result commit; dispatch after invalid session rejected; UI late reply ignored"
+    },
+    {
+      "id": "quota_after_delete",
+      "ac": [
+        "AC2",
+        "AC3"
+      ],
+      "input": "quota-counted property reservation then delete within600s and new session at same property",
+      "expected": "hotel reservation count not reduced by deletion; retained metadata allowlisted/redacted, no client request ID prose/hash/response/trace/conversation/secret; pruned no later than7d"
+    },
+    {
+      "id": "retention_lifecycle",
+      "ac": [
+        "AC3"
+      ],
+      "input": "start/restart cleanup, running maintenance tick, controlled expiry+metadata prune",
+      "expected": "due sessions/content removed and redacted metadata pruned; task cancels/joins on shutdown; expose operational limits honestly"
+    },
+    {
+      "id": "browser_delete",
+      "ac": [
+        "AC1",
+        "AC2"
+      ],
+      "input": "actual desktop/mobile local UI sends to actual API/PG using labeled offline provider; two independent tabs; delete one",
+      "expected": "truthful pending; success clears transcript/brief/results/language/media/copy/token; no automatic new session/resend; other tab can continue"
+    },
+    {
+      "id": "browser_failure",
+      "ac": [
+        "AC1",
+        "AC2"
+      ],
+      "input": "DELETE invalid auth/5xx/unknown transport outcome",
+      "expected": "no false success; explicit retry possible with same scope; late replies fenced and sensitive UI never revived"
+    }
+  ],
+  "gates": [
+    "focused PostgreSQL + affected regressions",
+    "Ruff source/changed tests with baseline comparison when applicable",
+    "compileall",
+    "web contracts/lint/typecheck/configured build",
+    "fresh independent fixed-candidate Q",
+    "authorized owner PR merge into existing sprint-5-canonical-brief"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "replay_label": "OFFLINE REPLAY OF SAVED API RESPONSE; not the original live browser capture",
+  "capture_file": "/private/tmp/staylead-s8-live-turn1-database.json",
+  "route_intercepts": [
+    {
+      "method": "GET",
+      "path": "/health"
+    },
+    {
+      "method": "GET",
+      "path": "/hotels/lotus-pilot-demo"
+    },
+    {
+      "method": "POST",
+      "path": "/sessions"
+    },
+    {
+      "method": "POST",
+      "path": "/sessions/8e2530cf-3ca2-4ea7-ac2c-5b7c692275c4/messages"
+    }
+  ],
+  "checks": {
+    "localGuideVisible": true,
+    "chineseTitle": true,
+    "garden": true,
+    "restaurant": true,
+    "unknownHours": true,
+    "englishGenericFallbackSignal": false
+  },
+  "dom_text": "StayLead · Hospitality\n\nSample hotel information\n\nLotus Demo\n\nAI-generated answer\n\nTrip details\n\nDates not set\n\nadults not set · 0 children\n\nTrip details version 1\n\n请用中文推荐酒店附近的餐厅和景点短名单。我更喜欢安静、自然和轻松的节奏，每个地点每人最多150000越南盾。请解释适合的原因、取舍和需要核实的信息，不需要订房或完整行程。\n\nTrip update receipt · version 1\n周边推荐\nRiverside Garden\n\nattraction · ATT-02\n\n偏好匹配\n\n适合的原因: 自然, 安静\n\n游览时长: 45\n\n营业时间信息: 待核实事项\n\n请向场所确认当前营业时间。\n\n0 VND / 每人\n\nLotus Noodle\n\ndining · DIN-01\n\n偏好匹配\n\n适合的原因: 安静\n\n游览时长: 45\n\n100,000 VND / 每人\n\nCraft Museum\n\nattraction · ATT-01\n\n偏好匹配\n\n适合的原因: 偏好匹配\n\n游览时长: 90\n\n120,000 VND / 每人\n\n待核实事项 (1)\n来源记录 (1)\n\n技术试点合成信息\n\nYour question\nSend\n\nYour conversation stays in this browser tab and starts fresh when reloaded."
+}

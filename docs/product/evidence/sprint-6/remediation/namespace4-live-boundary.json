@@ -1,0 +1,40 @@
+{
+  "at_utc": "2026-10-26T04:05:40.256883+00:00",
+  "authority": "Hieu explicit approval8additional plus unused10 transferred fromclosednamespace3",
+  "candidate_commit": "f52e74c96593130a8e2541b977daa014e9a3bd8e",
+  "tree": "1c0b1d414218d1fc723aeb22d8fe7696f44436db",
+  "product_fingerprint": "c2eebe245608c34261f3cdb805997f6819cc4c7a80518195d23c7dccc7a61f31",
+  "harness_sha256": {
+    "resumed_acceptance_runtime.py": "7c5f72975a2071780aae205994fc1766c84031ffc38e3c5998c09609327e7e52",
+    "resumed-live-browser.mjs": "7d1d807ba24d6b6c80f87f9900610e3d2f6827766803d3a1e5f15c986686d383",
+    "operator-resume-routing.mjs": "dde4f275842d3aaed7f85f351f2db980697afa0e57b063d9dd552acacc8dd6dc",
+    "safe-answer-trace.mjs": "6290d39a425c8e50947bf1e7ced0fa37bfe773f77d9fe2d050cb4a64c42551cc"
+  },
+  "matrix_sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07",
+  "requested_model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "actual_served_model": "unreported",
+  "max_guest_turns": 9,
+  "max_provider_requests": 18,
+  "max_calls_per_http_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_token_postcheck": 700,
+  "native_hard_output_token_cap_verified": false,
+  "automatic_retries": false,
+  "operator_answer_only_resume": "explicit C command only; same global18 cap; separate persistent receipt reservation",
+  "historic_run_counters": "immutable:1semantic turn,2provider requests; not reused/reset",
+  "synthetic_capture": "opt-in,64KiB limit,private0600; never published raw",
+  "prelive_review": "Qready9e8 product; latercommit adds only passingPGtimezoneconsumerproof",
+  "configuration": "isolated local synthetic DB/newuniqueguest session; rebuilt productionweb; no deployment",
+  "run_id": "s6-codex-20261026-remediation-4",
+  "prior_actual_provider_requests": {
+    "original": 2,
+    "namespace1": 4,
+    "namespace2": 6,
+    "namespace3": 8
+  },
+  "fixed_candidate_sequence": true,
+  "transferred_existing_request_slots": 10,
+  "newly_approved_request_slots": 8
+}

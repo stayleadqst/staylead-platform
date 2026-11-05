@@ -1,0 +1,50 @@
+{
+  "at_utc": "2026-10-26T04:43:42.568604+00:00",
+  "candidate_commit": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
+  "product_fingerprint": "0fe907c46071fa596a8df57f292ff33621ae6d79f31b93f602292153a9d24769",
+  "coordinator_checks": {
+    "backend_contracts_and_architecture": {
+      "passed": 82,
+      "failed": 0
+    },
+    "postgres_language_consumer_API": {
+      "passed": 4,
+      "failed": 0,
+      "provider": "offline fake; isolated test DB"
+    },
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "diff_check": "PASS"
+  },
+  "independent_reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "focused_backend_tests": 77,
+    "blocking_findings": 0,
+    "closed_findings": [
+      "clarification punctuation/order preservation",
+      "no-year clarification brief dependency/version"
+    ],
+    "negative_probes": [
+      "decimal12.13",
+      "clock12:13",
+      "reordered/canonicalfullISOdate",
+      "invented13/14",
+      "year2027",
+      "absent pendingfield",
+      "defaultneutralcallback absent",
+      "preparation typedclarification forbidden"
+    ],
+    "max64char_tag_instruction_chars": 2995
+  },
+  "reused_checks": {
+    "runtime_namespace": 16,
+    "diagnostic_helper": 14,
+    "web_contracts": 36,
+    "web_state": 15,
+    "web_lint_typecheck_build": "PASS; source unchanged",
+    "production_browser_recovery": "PASS with API mocked; not actual-model acceptance"
+  },
+  "live_acceptance": "PENDING explicit new allowance; namespace4 exhausted18/18; no namespace5 calls or initialization",
+  "screenshots": "local only per explicit Hieu instruction"
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "request_id": "03a60cfc-3ea6-4a47-8b6a-0a2191780aa6",
+    "session_id": "77480943-2026-4c2c-9b9d-65b993329288",
+    "hotel_id": "HTL-CITY01",
+    "expected_version": 0,
+    "status": "completed",
+    "response": {
+      "request_id": "03a60cfc-3ea6-4a47-8b6a-0a2191780aa6",
+      "status": "partial_success",
+      "error": {
+        "code": "invalid_model_output",
+        "message": "The model returned an invalid answer."
+      },
+      "guest_brief": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "pending_fields": []
+      },
+      "brief_receipt": {
+        "request_id": "03a60cfc-3ea6-4a47-8b6a-0a2191780aa6",
+        "status": "partial_success",
+        "brief_version_before": 0,
+        "brief_version_after": 1,
+        "applied_delta": {
+          "dates": {
+            "check_in": "2026-12-10",
+            "check_out": "2026-12-13",
+            "nights": 3
+          },
+          "party": {
+            "adults": 2
+          }
+        },
+        "source_refs": [
+          {
+            "source_utterance_id": "f54ce452-8e60-4e94-a89a-de9cabd923f3",
+            "request_id": "03a60cfc-3ea6-4a47-8b6a-0a2191780aa6",
+            "fields": [
+              "dates.check_in",
+              "dates.check_out",
+              "party.adults"
+            ]
+          }
+        ],
+        "answer_status": "failed",
+        "brief_version_used": 1
+      },
+      "applied_delta": {
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2
+        }
+      },
+      "answer_status": "failed",
+      "language_preference": {
+        "language_tag": "vi",
+        "source": "explicit",
+        "revision": 1
+      },
+      "presentation": {
+        "language_tag": "vi",
+        "direction": "ltr",
+        "preference_revision": 1,
+        "labels": {
+          "send": "Send",
+          "sending": "Sending…",
+          "copy": "Copy",
+          "copied": "Copied",
+          "copy_failed": "Could not copy",
+          "retry_answer": "Retry answer",
+          "check_status": "Check status",
+          "brief": "Trip details",
+          "stay": "Stay",
+          "nights": "nights",
+          "adults": "adults",
+          "children": "children",
+          "age": "age",
+          "unknown": "Unknown",
+          "pending_age": "What is the child's age?",
+          "updated": "Updated",
+          "partial_success": "Trip details saved; answer pending",
+          "stale_answer": "This answer may be out of date",
+          "ai_notice": "AI-generated answer",
+          "synthetic_notice": "Sample hotel information"
+        },
+        "labels_fallback": true,
+        "freshness": "current",
+        "receipt_id": "03a60cfc-3ea6-4a47-8b6a-0a2191780aa6"
+      },
+      "answer_eligibility": "pending"
+    },
+    "error_code": null
+  }
+]

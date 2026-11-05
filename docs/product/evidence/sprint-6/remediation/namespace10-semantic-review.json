@@ -1,0 +1,512 @@
+{
+  "classification": "independent actual semantic evidence review; synthetic software acceptance",
+  "reviewed_at_utc": "2026-10-26T07:34:27.022Z",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "provider_calls": 0,
+    "application_HTTP_calls": 0,
+    "server_starts": 0,
+    "product_edits": 0
+  },
+  "run_id": "s6-codex-20261026-remediation-10",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "candidate_commit": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "candidate_tree": "77da592271da3e3cb01ab32bde72468a20b2b461",
+  "published_equivalent_source_commit": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+  "product_aggregate_sha256": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "independent_product_binding": {
+    "manifest_files_rehashed": 220,
+    "mismatches": [],
+    "result": "PASS"
+  },
+  "verdict": "PASS: all nine pinned cases on one unchanged candidate and session, with actual production desktop browser rendering and exact copy; independent scoped PostgreSQL state confirmed",
+  "full_matrix_pass": true,
+  "executed_turns": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "not_executed_turns": [],
+  "findings": [],
+  "case_scope": "All nine are actual API+production desktop UI+clipboard observations. No diagnostic-only case, repaired raw output, answer-only resume or mixed-candidate substitution is counted.",
+  "cases": [
+    {
+      "turn": 1,
+      "language": "vi",
+      "brief_version": 1,
+      "detail": "Mixed hotel question and explicit stay edit. Buffet breakfast at Bến Gió, floor1, 06:30-09:30 Asia/Ho_Chi_Minh; ISO dates10–13 December2026, nights3 and adults2 correct.",
+      "supported_hotel_claims": 1,
+      "hotel_facts": [
+        "F-HTL-CITY01-040"
+      ],
+      "guest_claims": 4,
+      "question_channels": [],
+      "labels": "Vietnamese labels preserve approved meanings, including sample hotel information.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 2,
+      "language": "en",
+      "brief_version": 2,
+      "detail": "Adds exactly one child with age null; preserves dates/adults. Explicitly asks the child's age and invents no age or child charge. Same new child is used in later turns.",
+      "supported_hotel_claims": 0,
+      "hotel_facts": [],
+      "guest_claims": 5,
+      "question_channels": [
+        "unknowns: What is the child's age?"
+      ],
+      "labels": "Approved canonical English UI labels shown; empty generated label_bundle is intentional because no English keys are requested.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 3,
+      "language": "fr",
+      "brief_version": 3,
+      "detail": "Sets the same child's age to7 and checkout to2026-12-14/nights4. Check-in/adults preserved and pending age cleared; French summary is useful and accurate.",
+      "supported_hotel_claims": 0,
+      "hotel_facts": [],
+      "guest_claims": 6,
+      "question_channels": [],
+      "labels": "French label meanings preserved.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 4,
+      "language": "ja",
+      "brief_version": 3,
+      "detail": "Contextual breakfast question resolved to the same buffet/place/floor/time/timezone source. No guest edit, no receipt, no new pending field, and no numeric false rejection.",
+      "supported_hotel_claims": 1,
+      "hotel_facts": [
+        "F-HTL-CITY01-040"
+      ],
+      "guest_claims": 0,
+      "question_channels": [],
+      "labels": "Japanese label meanings preserved.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 5,
+      "language": "zh",
+      "brief_version": 3,
+      "detail": "Correctly states free guest-area Wi-Fi and network name/password available at the front desk. Brief remains unchanged with no pending field.",
+      "supported_hotel_claims": 2,
+      "hotel_facts": [
+        "F-HTL-CITY01-021"
+      ],
+      "guest_claims": 0,
+      "question_channels": [],
+      "labels": "Chinese label meanings preserved.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 6,
+      "language": "ar",
+      "brief_version": 3,
+      "detail": "Covered parking, reference capacity40,100000 VND per vehicle/night and no reservation correct. Exact supplied URL is own-cited to the sample URL source and explicitly synthetic/nonfunctional in the same Arabic claim. No internal URL leakage. RTL current display and exact copy verified.",
+      "supported_hotel_claims": 2,
+      "hotel_facts": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "guest_claims": 0,
+      "question_channels": [],
+      "labels": "Arabic label meanings preserved, including synthetic hotel-information notice.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 7,
+      "language": "hi",
+      "brief_version": 4,
+      "detail": "Asks whether checkout is12 or13 December2026 in Hindi, exact typed options12/13. Stored checkout14/nights4 remains unchanged with only dates.check_out pending; same child7 retained. No committed pending-checkout claim.",
+      "supported_hotel_claims": 0,
+      "hotel_facts": [],
+      "guest_claims": 5,
+      "question_channels": [
+        "guest_clarification: dates.check_out, options ['12','13']; rendered/API unknowns contains this required question"
+      ],
+      "labels": "Hindi label meanings preserved.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 8,
+      "language": "ko",
+      "brief_version": 5,
+      "detail": "Explicit checkout2026-12-15 accepted and acknowledged in Korean; nights5, pending[] and same child7. No re-clarification, no unrelated FAQ, and no false hotel-information unknown.",
+      "supported_hotel_claims": 0,
+      "hotel_facts": [],
+      "guest_claims": 1,
+      "question_channels": [],
+      "labels": "Korean label meanings preserved.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    {
+      "turn": 9,
+      "language": "ko",
+      "brief_version": 5,
+      "detail": "Nonfactual Korean courtesy '감사합니다.' delivered. Existing explicit Korean preference revision8 and all brief state remain unchanged; no new mutation or receipt.",
+      "supported_hotel_claims": 0,
+      "hotel_facts": [],
+      "guest_claims": 0,
+      "question_channels": [],
+      "labels": "Existing complete Korean label bundle reused; generated label_bundle empty.",
+      "verdict": "PASS",
+      "state_intent": "PASS",
+      "source_number_guard_outcome": "PASS",
+      "current_exact_copy": "PASS",
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    }
+  ],
+  "question_and_conflict_review": {
+    "supported": "Six supported hotel claims total across T1/T4/T5/T6, each with its own correct source; all requested facts delivered.",
+    "unknown": "T2 asks a genuinely missing child age. T7 uses the typed pending-date clarification and renders it through the API unknowns/question channel. These are guest-state questions, not claims that hotel knowledge is missing.",
+    "unsupported_hotel_unknowns_observed": 0,
+    "conflicts_observed": 0,
+    "expected_conflicts": 0,
+    "false_rejections_observed": 0,
+    "safe_portion_salvage_used": false,
+    "all_guest_claim_own_refs_equal_top_level_declaration": true,
+    "limitations": "This run supplies no positive live conflict case and no proof of universal model/guard correctness. Historical negative fixtures and failed runs retain their original status."
+  },
+  "labels_review": {
+    "result": "PASS for actual requested label meanings",
+    "generated_bundles_reviewed": [
+      "vi",
+      "fr",
+      "ja",
+      "zh",
+      "ar",
+      "hi",
+      "ko"
+    ],
+    "approved_English_policy_observed": true,
+    "sample_notice_meaning_preserved_all_languages": true,
+    "scope": "All20 approved label keys reviewed in private final captures where requested; actual English and reused Korean presentations checked in screenshots. Existing disclosed English fixed chrome remains outside the localized-key scope."
+  },
+  "final_database_observation": {
+    "observed_at_utc": "2026-10-26T07:31:22.755766+00:00",
+    "scope": "independent read-only local PostgreSQL SELECTs; exact namespace10 T9 request hash; synthetic hotel verified",
+    "request_id_sha256": "2383ed864dd43cf7",
+    "session_id_sha256": "5f003495b1ce88d3",
+    "scoped_request_count": 9,
+    "requests": [
+      {
+        "request_id_sha256": "eab83e4efc5f31b1",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "3458b9a15c5a582f",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "5140e84cd819d4e6",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "301a0ccd9c72ba91",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "4e215e3492bbf60d",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "d2f1a8115514617c",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "4566f96e18b0f580",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "e38df1234b651125",
+        "status": "completed",
+        "error_code": null
+      },
+      {
+        "request_id_sha256": "2383ed864dd43cf7",
+        "status": "completed",
+        "error_code": null
+      }
+    ],
+    "brief_version": 5,
+    "dates": {
+      "check_in": "2026-12-10",
+      "check_out": "2026-12-15",
+      "nights": 5
+    },
+    "party": {
+      "adults": 2,
+      "children": [
+        {
+          "member_id_sha256": "3e5a6b74927caeda",
+          "age": 7
+        }
+      ]
+    },
+    "pending_fields": [],
+    "language_preference": {
+      "language_tag": "ko",
+      "source": "explicit",
+      "revision": 8
+    },
+    "receipts": [
+      {
+        "request_id_sha256": "eab83e4efc5f31b1",
+        "status": "applied",
+        "brief_version_before": 0,
+        "brief_version_after": 1,
+        "answer_status": "completed",
+        "brief_version_used": 1,
+        "turn_intents": [
+          "hotel_information",
+          "guest_edit"
+        ],
+        "authorized_targets": [
+          "dates.check_in",
+          "dates.check_out",
+          "party.adults"
+        ]
+      },
+      {
+        "request_id_sha256": "3458b9a15c5a582f",
+        "status": "partial_success",
+        "brief_version_before": 1,
+        "brief_version_after": 2,
+        "answer_status": "completed",
+        "brief_version_used": 2,
+        "turn_intents": [
+          "guest_edit"
+        ],
+        "authorized_targets": [
+          "party.children"
+        ]
+      },
+      {
+        "request_id_sha256": "5140e84cd819d4e6",
+        "status": "applied",
+        "brief_version_before": 2,
+        "brief_version_after": 3,
+        "answer_status": "completed",
+        "brief_version_used": 3,
+        "turn_intents": [
+          "guest_edit"
+        ],
+        "authorized_targets": [
+          "dates.check_out",
+          "party.children.<same-child>.age"
+        ]
+      },
+      {
+        "request_id_sha256": "4566f96e18b0f580",
+        "status": "clarification",
+        "brief_version_before": 3,
+        "brief_version_after": 4,
+        "answer_status": "completed",
+        "brief_version_used": 4,
+        "turn_intents": [
+          "guest_edit"
+        ],
+        "authorized_targets": [
+          "dates.check_out"
+        ]
+      },
+      {
+        "request_id_sha256": "e38df1234b651125",
+        "status": "applied",
+        "brief_version_before": 4,
+        "brief_version_after": 5,
+        "answer_status": "completed",
+        "brief_version_used": 5,
+        "turn_intents": [
+          "guest_edit"
+        ],
+        "authorized_targets": [
+          "dates.check_out"
+        ]
+      }
+    ],
+    "reviewer_provider_calls": 0,
+    "mutations": 0
+  },
+  "visual_review": {
+    "files_checked": [
+      "remediation-10-live-run/turn-screenshots/turn-01.png",
+      "remediation-10-live-run/turn-screenshots/turn-02.png",
+      "remediation-10-live-run/turn-screenshots/turn-03.png",
+      "remediation-10-live-run/turn-screenshots/turn-04.png",
+      "remediation-10-live-run/turn-screenshots/turn-05.png",
+      "remediation-10-live-run/turn-screenshots/turn-06.png",
+      "remediation-10-live-run/turn-screenshots/turn-07.png",
+      "remediation-10-live-run/turn-screenshots/turn-08.png",
+      "remediation-10-live-run/turn-screenshots/turn-09.png",
+      "remediation-10-live-run/final-desktop.png",
+      "remediation-10-live-run/final-mobile.png"
+    ],
+    "desktop_result": "PASS: current answers/scripts are readable without observed horizontal clipping or overlapping controls; Arabic RTL answer, numbers and URL are readable. T5's own PNG is scrolled above its answer; that answer is visible intact in the following T6 PNG and exact DOM/copy observation.",
+    "mobile_result": "Observed final mobile shell, brief and scrollable older Hindi history fit the viewport. Its scroll position does not show the final Korean answer; no claim of all-nine mobile answer layout or mobile clipboard verification is made.",
+    "screenshots_local_only": true,
+    "mobile_scroll_position_is_acceptance_blocker": false,
+    "historical_mobile_evidence": "Previously accepted production mobile CJK/RTL/Devanagari/copy evidence is reusable separately; not recounted as new namespace10 execution."
+  },
+  "bounds": {
+    "guest_turns": 9,
+    "provider_requests": 18,
+    "calls_per_turn": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "max_guest_turns": 9,
+    "max_provider_requests": 18,
+    "max_calls_per_turn": 2,
+    "automatic_retries": 0,
+    "explicit_answer_only_resumes": 0,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "max_provider_latency_ms": 9401.1,
+    "max_HTTP_latency_ms": 15584.5,
+    "max_reported_output_tokens": 422,
+    "max_final_instructions_chars": 2817,
+    "native_response_schema_present_all_18_requests": true,
+    "observed_preparation_path": "low-overlap fact-selection schema on all9; high-overlap path remains separately covered by offline review",
+    "preparation_schema_sha256": "1d394f0a546f0999a1fa61599a7809888242e6d5629e0b632edabf6824d003f0",
+    "requested_model": "gpt-6-luna",
+    "requested_reasoning_effort": "low",
+    "actual_served_model": "unreported",
+    "reported_input_tokens": 161126,
+    "reported_output_tokens": 3546,
+    "billing": "unavailable",
+    "native_pre_generation_hard_token_cap": "unverified; reported outputs all below700",
+    "authorized_for_live_calls_at_final_review": false,
+    "unused_request_capacity": 0,
+    "future_calls_authorized_by_review": false,
+    "prior_actual_requests_preserved": 97,
+    "approved_increment": 1,
+    "transferred_unused": 17,
+    "cumulative_actual_requests": 115,
+    "external_browser_requests": 0,
+    "external_measurement_scope": "Browser-context requests only; provider/server external network activity not measured."
+  },
+  "evidence_binding": [
+    {
+      "path": "docs/product/evidence/sprint-6/live-cases.json",
+      "sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/namespace10-candidate-manifest.json",
+      "sha256": "536e1c5f226a4861fa94feb2453497649c2130e59a3fd8763b5cd9e5a5247b3e"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/remediation-10-live-run/observations.jsonl",
+      "sha256": "ed407634f7ff1deb71b51b2009607865038fd38639308fdd57105c15b898cd72"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/remediation-10-live-run/run-result.json",
+      "sha256": "5deecd850b7df3d7638a7fb7e84fd8344fcc995f29c8a00370af325ffd366e6a"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/namespace10-runtime-events.jsonl",
+      "sha256": "4f136c8cfa72c29c7620e9c841e99fcde4f5dbb8cf8e7a494ec3766d02e710b0"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/namespace10-run-state-closed.json",
+      "sha256": "1ebf8edc5643492a6c9062a43fc0dbe2ffc7ada7188a0e05e1833161e0ab0bc3"
+    }
+  ],
+  "private_capture_review": "Synthetic output01–18 inspected read-only in private namespace10 capture directory. Current-turn preparation authorization/intents, final own refs, typed clarification/courtesy, labels and source claims reviewed; no raw private bodies or identifiers copied into this artifact.",
+  "limitations": [
+    "PASS applies to this fixed-candidate pinned nine-case run, not arbitrary future language inputs or all product workflows.",
+    "HTTP200/fully_validated were corroborated by independent semantic/state/copy/visual review rather than treated as sufficient alone.",
+    "Historical failures remain failures; no counter resets or budget entitlement created by this review.",
+    "Only this review JSON was written by reviewer; no live provider calls, app HTTP calls or product edits."
+  ]
+}

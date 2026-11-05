@@ -1,0 +1,24 @@
+{
+  "candidate": "2f10af812124797418420a32b35536d8d3a17042",
+  "at_utc": "2026-10-26T03:45:35.706104+00:00",
+  "coordinator_direct_checks": {
+    "backend_contracts": {
+      "passed": 42,
+      "failed": 0,
+      "command": "apps/api/.venv/bin/python -m pytest tests/contracts/test_grounded_qa.py tests/contracts/test_sprint6_validation_diagnostics.py tests/contracts/test_sprint6_language.py -q"
+    },
+    "postgresql_regressions": {
+      "passed": 10,
+      "failed": 0,
+      "warning": "existing Starlette/httpx deprecation",
+      "command": "pytest tests/integration/test_sprint5_consumer_postgres.py tests/integration/test_sprint6_language_postgres.py tests/integration/test_sprint6_language_consumer_postgres.py -q"
+    },
+    "runtime_boundary_tests": 15,
+    "trace_allowlist_tests": 2,
+    "ruff": "PASS",
+    "compileall": "PASS"
+  },
+  "reused_checks": "unchanged web productionbuild,36contracts,15state,lint,typecheck,actual mocked productionbrowser recoveryproof; no webcode changed after9929c33",
+  "actual_model_acceptance": "not rerun on this candidate; priornamespace2failedT2 and ispreserved",
+  "unsafe_claim_policy": "numeric-only committedguestclaim omission, strictownrefs, no refaugmentation; malformed/schema/source/hotel/URL/preparation failuresremainfatal; no meaningfulsurvivorsstillreject; trace safe_portion/rejectedcount"
+}

@@ -1,0 +1,34 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-8",
+  "run_namespace": "remediation-8",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 6,
+  "request_id_sha256": "1b3fe0c212acdb35",
+  "question_sha256": "4fef0046c32240dcdb2c71e85e7aaf3b12119b78626cc99c2a725439f170e77b",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 502,
+  "response": {
+    "error": {
+      "code": "unsupported_output",
+      "retryable": false
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-8",
+    "codex_requests": 12,
+    "guest_turns": 6,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "database_preflight": {
+    "hotel_scope_verified": true,
+    "synthetic_hotel_verified": true,
+    "persisted_guest_request_count": 5,
+    "expected_prior_guest_turns": 5
+  },
+  "status": "completed"
+}

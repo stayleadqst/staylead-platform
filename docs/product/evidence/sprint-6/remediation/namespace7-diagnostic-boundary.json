@@ -1,0 +1,16 @@
+{
+  "namespace": "remediation-7",
+  "diagnostic_turns": [
+    9
+  ],
+  "UI_or_copy_claim": false,
+  "product_candidate": "536b90d",
+  "product_sha256": "27e0806342f3cfda2cc5e1862f971bcb0a543b891e7280a4eb93ab9acaa06589",
+  "helper_sha256": "2e5865ac8e1f1fb223c6d267029e4630c002b786d1b783f99e2fc9ce410ff533",
+  "anchor_turn": 8,
+  "transition_requests": 16,
+  "transition_turns": 8,
+  "review": "Q20helpertests and read-onlyPG preflight; root verified productfingerprint beforeT9",
+  "no_automatic_retry": true,
+  "screenshot_policy": "local only"
+}

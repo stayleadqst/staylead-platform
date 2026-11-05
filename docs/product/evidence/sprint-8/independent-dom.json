@@ -1,0 +1,7 @@
+{
+  "classification": "Actual Chromium synthetic setContent DOM, no navigation/API/model",
+  "result": "PASS",
+  "current_turn_count": 1,
+  "old_card_cannot_satisfy_wait": true,
+  "current_text": "Current French card"
+}

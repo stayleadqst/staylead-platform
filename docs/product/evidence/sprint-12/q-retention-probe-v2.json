@@ -1,0 +1,23 @@
+{
+  "rows_at_delete_completion": {
+    "guest_sessions": 0,
+    "guest_language_preferences": 0,
+    "guest_requests": 0
+  },
+  "delete_status": 204,
+  "late_http_status": 401,
+  "provider_calls": 1,
+  "rows_after_late_completion": {
+    "guest_sessions": 0,
+    "guest_language_preferences": 0,
+    "guest_requests": 0,
+    "guest_messages": 0,
+    "guest_briefs": 0
+  },
+  "late_language_row": null,
+  "repeat_delete_status": 204,
+  "later_purge_count": 0,
+  "language_rows_after_8day_cleanup": 0,
+  "pins_before_match": true,
+  "pins_after_match": true
+}

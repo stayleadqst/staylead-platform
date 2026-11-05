@@ -1,0 +1,49 @@
+{
+  "status": "new narrow regression in pre-M4 candidate-key restriction",
+  "valid_label_keys": [
+    "claim.party_fit",
+    "question.rate_basis"
+  ],
+  "preM4_allowed_keys": [
+    "claim.party_fit",
+    "question.room"
+  ],
+  "postM4_needed_keys": [
+    "claim.party_fit",
+    "question.rate_basis"
+  ],
+  "observed_questions": [
+    {
+      "field": "room_advice",
+      "reason": "Could you confirm whether this rate is per room per night?",
+      "locale": "en",
+      "locale_fallback": true,
+      "presentation_key": "question.rate_basis"
+    },
+    {
+      "field": "room_advice",
+      "reason": "Could you confirm whether this rate is per room per night?",
+      "locale": "en",
+      "locale_fallback": true,
+      "presentation_key": "question.rate_basis"
+    }
+  ],
+  "counterfactual_without_premature_rejection": [
+    {
+      "field": "room_advice",
+      "reason": "Veuillez confirmer le tarif par chambre et par nuit.",
+      "locale": "fr",
+      "locale_fallback": false,
+      "presentation_key": "question.rate_basis"
+    },
+    {
+      "field": "room_advice",
+      "reason": "Veuillez confirmer le tarif par chambre et par nuit.",
+      "locale": "fr",
+      "locale_fallback": false,
+      "presentation_key": "question.rate_basis"
+    }
+  ],
+  "source_hash": "d67067fe3fb536c8c431da37776266e8fc4058fc8a9238cde0954f346c9cfec4",
+  "no_calls_or_DB": true
+}

@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-10-29T01:41:45.353137+00:00",
+  "source_fingerprint": "4f74ba27d4daccfe2e320c7d6c5506b13aaec5fbc2d8761fdf8005a1bba6a5f8",
+  "test_fingerprint": "04d6cd7d2646ae537a782d725b732e835fa51ad66bde433b2db774d25e67e273",
+  "backend": {
+    "passed": 195,
+    "warnings": 1,
+    "seconds": 16.33,
+    "warning": "Existing Starlette httpx deprecation",
+    "log_sha256": "b76e74756dbd0775d1d33acfdf3d4727000a8ec3c23183a4c335b68550c9be58",
+    "scope": "B10 runtime/grounded/architecture/admission/trace, B09/B08 contracts, S1/S4/S5/S6/S7 consumer/persistence/security regressions"
+  },
+  "web": {
+    "contracts_passed": 48,
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "build_env": {
+      "NEXT_PUBLIC_STAYLEAD_DOMAIN": "hospitality",
+      "NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION": "2"
+    },
+    "log_sha256": "e82894d38ddc52ca6249f4c3af6554cfc5bb069cc2f98bcc3c7a78dc170f3e43",
+    "configured_build_log_sha256": "2b7a94a82cc413dbd44c531ec361d459f292f60761017f618b55691b55a32654"
+  },
+  "ruff": {
+    "relevant_source_and_new_changed_tests": "PASS",
+    "four_unchanged_import_blocks": "BASELINE I001; see ruff-baseline-comparison.json"
+  },
+  "compileall": "PASS",
+  "diff_check": "PASS",
+  "manual_ci_dispatches": 0,
+  "live_product_inference_calls": 0,
+  "functional_reviewed_source_fingerprint": "ed8138c868ad9d28e8248dc6252fe4df25cd1bb04e0f0984085e8a45f75a9d11",
+  "delivery_delta": "Q PASS: one EOF blank line removed only; other 223 source and all 60 test files unchanged. All current files match manifest; functional observations carry over without retest."
+}

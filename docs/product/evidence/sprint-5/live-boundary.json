@@ -1,0 +1,10 @@
+{
+  "started_at_utc": "2026-10-23T10:37:41.360097+00:00",
+  "guest_turn_limit": 4,
+  "provider_call_limit": 8,
+  "automatic_paid_retries": 0,
+  "calls_consumed_before_start": 0,
+  "candidate_fingerprint": "743c25d3bb9b66a1a234b32503cc2ce583778e50db36d65f955fcbe639b2d7ba",
+  "expectations_sha256": "9eaac0e1eea0762063e4a44e3865b701d54fc4c298dae4f2d0feec51cfb801bd",
+  "fault_controls_cleared": true
+}

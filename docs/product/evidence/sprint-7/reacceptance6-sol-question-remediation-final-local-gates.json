@@ -1,0 +1,16 @@
+{
+  "candidate_sha256": "dd0cc68883904259776be49d21bb961146a393f39150edc76823e01388719bab",
+  "source_pins": 237,
+  "root_gate": {
+    "contracts_architecture_api": "292 PASS",
+    "warnings": "3 known deprecations",
+    "isolated_pg": "16 PASS,1 known deprecation",
+    "ruff": "PASS full src/tests/runtime",
+    "compile": "PASS src/runtime",
+    "diff": "PASS"
+  },
+  "builder": "88 room-advice tests/Ruff/compile/NodeSyntax/diffPASS",
+  "fixed_review_finding": "Known-access metadata preserved in missing-party/processing-limit earlyreturns, generic access derivation after these earlyreturns; actual missing-adults/status retained",
+  "frontend_reused": "53pins unchanged,40tests/lint/typecheck/buildPASS",
+  "actual_after_fix": "NOT RUN; R6sealed1/2/lifetime52 unused1/2closed"
+}

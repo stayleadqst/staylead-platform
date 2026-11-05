@@ -1,0 +1,15 @@
+{
+  "run_id": "s6-codex-20261026-remediation-6",
+  "max_codex_requests": 18,
+  "codex_requests": 18,
+  "max_guest_turns": 9,
+  "guest_turns": 9,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 0,
+  "answer_only_receipt_hashes": [],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": true,
+  "authority": "Hieu approved increment4 plus transfer14 into max18 on e9424bc; prior cumulative42 preserved; screenshots local",
+  "created_at_utc": "2026-10-26T05:28:24Z"
+}

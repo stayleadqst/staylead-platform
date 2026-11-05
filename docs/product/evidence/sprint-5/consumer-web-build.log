@@ -1,0 +1,8 @@
+$ NEXT_PUBLIC_STAYLEAD_DOMAIN=hospitality NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION=1 npm --prefix apps/web run build
+> @staylead/platform-web@0.1.0 build
+> next build
+✓ Compiled successfully
+✓ TypeScript finished
+✓ Static pages generated (3/3)
+Routes: /, /_not-found, /api/guest/[...path], /hotels/[hotelSlug]/chat
+Exit status: 0

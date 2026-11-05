@@ -1,0 +1,15 @@
+{
+  "run_id": "s6-codex-20261026-remediation-3",
+  "max_codex_requests": 18,
+  "codex_requests": 8,
+  "max_guest_turns": 9,
+  "guest_turns": 4,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 0,
+  "answer_only_receipt_hashes": [],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": true,
+  "authority": "hieu-explicit-six-extra-plus-transferred-unused-twelve",
+  "created_at_utc": "2026-10-26T03:54:19Z"
+}

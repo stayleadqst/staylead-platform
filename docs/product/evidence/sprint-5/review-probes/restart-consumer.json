@@ -1,0 +1,9 @@
+{
+  "restart_read_from_storage": true,
+  "origin_outside_context": true,
+  "stable_member_preserved": true,
+  "brief_version_after_five_faqs": 1,
+  "foreign_receipt_http": 404,
+  "foreign_provider_calls": 0,
+  "consumer_trace_calls": 2
+}

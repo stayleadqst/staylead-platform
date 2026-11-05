@@ -1,0 +1,14 @@
+{
+  "verdict": "Supplemental PASS; prior integrated review remains applicable to promoted final candidate",
+  "candidate_sha256": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "previous_review_sha256": "bc54280dbed1536aecd05fc418cf5dcfff44eca4556b680e48cf6ed7825788fe",
+  "235_paths_same_and_current_hashes_match": true,
+  "candidate_digest_verified": true,
+  "unchanged_application_fixture_config": true,
+  "unchanged_matrix_oracle": true,
+  "delta": "Exactly17testimportfiles plus tools/evals/sprint7_browser.mjs",
+  "reviewed_driver_delta": "City3newbutton waits enabled to avoid transientbusyfalsefailure; EN/VI/ZH/JAbookingboundaryphrases exactlymatchregisteredrendererlabels. Existingpositiveoptions/selection/currentness/budget/9turn18requestbounds unchanged. Node syntaxPASS.",
+  "test_delta_evidence": "Reused coordinator/builderASTproof:16identicalAST;1importorder-onlywithnonimportASTandimportmultisetidentical. No independentbroadtestreview repeated. RootreportedS5PGmodule10PASS/42PGPASS/212offlinePASS/webchecksPASS.",
+  "ruff_evidence": "All checks passed!",
+  "limitations": "NoQDB/model/liveinit. Actual9turnsemanticacceptance remains required; priorreviewlimitations retained."
+}

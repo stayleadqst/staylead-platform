@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-10-29T03:14:50.684147+00:00",
+  "candidate_product": "candidate-v2.json product unchanged through v3/testimportcorrection; newQ12-3pending",
+  "web_pins": "web-validation-final.json unchanged",
+  "scope": "actual mobile390x844 browser→productionNext13542→API18542→privatePG55442; providerdeterministicoffline,0realmodelcalls",
+  "cases": [
+    {
+      "id": "mobile_delete_known_failure_retry",
+      "status": "PASS",
+      "injection": "testfactoryS12_DELETE_FAIL_ONCE=1 throwsone503beforeactualdelete; explicitlysynthetic",
+      "observed": "UI saysserverdidnotdelete, no false-success, contentclearedlocally, composerdisabled, Retrydeletion only; DBstill1session2messages1contentresponse. Explicitretry204thenDB0session0message0contentresponse1redactedquota; noautonewsession",
+      "screenshots": [
+        "browser-mobile-delete-error.png",
+        "browser-mobile-deleted.png"
+      ]
+    },
+    {
+      "id": "mobile_inflight_delete",
+      "status": "PASS",
+      "control": "offlineprovider sleeps4s when question contains slow; UI observedSending thenexplicitDELETE",
+      "observed": "after8s UI stillconfirmeddeleted/noCopy/disabledcomposer; no latecontentrestoration",
+      "screenshot": "browser-mobile-inflight-deleted.png"
+    },
+    {
+      "id": "mobile_client_expiry_timer",
+      "status": "PASS",
+      "control": "separatelocalAPIfactoryoverrideSESSION_TTL20s; not24hrealwait and no productdefaultchange",
+      "observed": "FAQandCopyvisible beforetimer; afterexpiry UIexpired/cleared/noCopy/disabledcomposer/explicitnewchat withno additionalguestaction",
+      "screenshots": [
+        "browser-mobile-before-timer.png",
+        "browser-mobile-timer-expired.png"
+      ]
+    }
+  ],
+  "db_post_timer": {
+    "sessions": 0,
+    "messages": 0,
+    "briefs": 0,
+    "language": 0,
+    "receipts": 0,
+    "utterances": 0,
+    "room_results": 0,
+    "room_selections": 0,
+    "content_responses": 0
+  },
+  "limits": "No actualmodel/hotel/deployment claims; no newroommediacontent seededbybrowser; derivedinventorycoveredbackendPGtests/Q. One failedobservationSQLusedwrongroomtablename; correctedafterverifyingTable.name; notproductfailure. Tempviewportmustresetandtabsclosebeforehandoff."
+}

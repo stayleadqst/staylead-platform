@@ -1,0 +1,24 @@
+{
+  "kind": "coordinator-independent-acceptance-expectations",
+  "recorded_before_candidate": true,
+  "sprint": 10,
+  "backlog": "https://github.com/stayleadqst/staylead-platform/issues/29",
+  "authority": "Hieu 2026-10-28 product execution; no new live inference",
+  "source_levels": {
+    "properties": "existing authored synthetic hotel packs",
+    "contact_hours": "test-only server configuration; never actual hotel approval",
+    "provider": "controlled fault/answer double for new deterministic paths",
+    "reused_real_model": "Sprint2 CITY partial/conflict, unchanged semantic path only"
+  },
+  "cases": [
+    {"id":"AC1-partial", "input":"Breakfast location and unsupported helipad", "expected":"Supported fixture breakfast remains; helipad explicitly needs confirmation; evidence is current and selected-property only; no whole-answer refusal"},
+    {"id":"AC1-conflict", "input":"Supported fact plus conflicting source field", "expected":"Supported part remains with conflict and concrete confirmation step; no silent selection of conflicting value"},
+    {"id":"AC2-property", "input":"Guest chooses human contact for CITY then BEACH", "expected":"Each gets only configured contact/hours of its server-resolved property; approved booking URL may coexist; neither request sends any message"},
+    {"id":"AC2-missing", "input":"Property has no contact or hours", "expected":"Contact/hours remain unknown; booking URL never masquerades as staff contact; no deadline or acknowledgement invented"},
+    {"id":"AC2-untrusted", "input":"Hostile markup/contact/hours config and foreign model text", "expected":"Unsafe/control/oversized fields absent or rendered literally; no active injected HTML or unauthorized links; model/source cannot override property configuration"},
+    {"id":"AC3-timeout", "input":"Offline provider exceeds test request deadline", "expected":"Website shows deterministic safe failure; no successful assistant answer fabricated; no automatic provider/website retry; authoritative state/uncertain-outcome semantics preserved"},
+    {"id":"AC3-locale", "input":"Known static locale and unsupported locale during outage", "expected":"Known reviewed static/cached resource used without model; unsupported locale clearly labels English fallback; RTL layout remains usable"},
+    {"id":"AC3-continue", "input":"Guest wishes to continue information after fault", "expected":"Existing request status recovery is honest and explicit; after terminal failure is known, guest may ask a new information question and receive supported answer; no indefinite retry loop"}
+  ],
+  "not_claimed": ["new actual-model semantics", "real hotel/source/stakeholder acceptance", "deployment", "uniform quality across all languages"]
+}

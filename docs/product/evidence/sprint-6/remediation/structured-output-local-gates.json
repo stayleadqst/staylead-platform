@@ -1,0 +1,50 @@
+{
+  "at_utc": "2026-10-26T04:59:08.352215+00:00",
+  "candidate_commit": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
+  "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca",
+  "product_fingerprint": "70498d890019fcf62ac6580e545b7c8e16360357500a725149c49a984997512a",
+  "coordinator": {
+    "contracts_and_architecture": 99,
+    "postgres_API_language_consumer": 4,
+    "runtime_tests": 17,
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "diff_check": "PASS"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "prior_focused_contracts": 84,
+    "runtime_tests": 17,
+    "additional_Foundry_compatibility_regression": "PASS",
+    "Ajv_schema_cases": {
+      "reject": [
+        "label_only",
+        "refs_only",
+        "whitespace_unknown",
+        "missing_label",
+        "extra_label"
+      ],
+      "accept": [
+        "combined_hotel_guest",
+        "valid_unknown",
+        "typed_clarification",
+        "typed_acknowledgement"
+      ]
+    },
+    "blocking_findings": 0,
+    "closed_findings": [
+      "Foundry global envelope instruction regression",
+      "telemetry inference wrongly labeled observed result"
+    ]
+  },
+  "max_label_schema": {
+    "JSON_bytes": 22888,
+    "object_properties": 223,
+    "object_depth": 3,
+    "property_enum_string_chars": 2210
+  },
+  "actual_CLI_schema_compatibility": "not yet measured; requires authorized real-model acceptance",
+  "new_namespace_allowance": "increment4 plus transfer14 requested, not yet approved",
+  "screenshots": "all local only"
+}

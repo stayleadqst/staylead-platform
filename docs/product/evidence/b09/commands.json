@@ -1,0 +1,105 @@
+{
+  "inherited_targeted": {
+    "cwd": "apps/api",
+    "environment": {
+      "STAYLEAD_TEST_DATABASE_URL": "private B09 verify DB on loopback55430",
+      "STAYLEAD_S8_B_DATABASE_URL": "same private verify DB"
+    },
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "../../tests/integration/test_sprint5_consumer_postgres.py::test_mixed_edit_commits_before_answer_and_brief_remains_available_after_history_window",
+      "../../tests/integration/test_sprint5_consumer_postgres.py::test_postcommit_failure_replays_same_id_and_resumes_without_resubmitting_edit",
+      "../../tests/integration/test_sprint7_room_advice_postgres.py::test_result_snapshot_is_idempotent_persisted_and_selection_is_versioned",
+      "../../tests/integration/test_sprint7_room_advice_postgres.py::test_messages_commits_two_adult_room_advice_selects_and_recalculates",
+      "../../tests/integration/test_sprint7_room_advice_postgres.py::test_messages_routes_booking_request_to_trusted_channel",
+      "../../tests/integration/test_sprint8_operator_api.py::test_guest_preference_commit_reaches_shortlist_and_later_edit_preserves_hard_need",
+      "../../tests/integration/test_sprint8_operator_api.py::test_operator_import_preview_activate_refresh_revoke_delete_controls_guest_visibility",
+      "-q"
+    ],
+    "selected_node_ids": 7,
+    "expanded_tests": 8,
+    "passed": 8,
+    "elapsed_seconds_reported_by_pytest": 3.04,
+    "log": "workspace validation/b09-20261028/inherited-targeted-gates.log"
+  },
+  "b09_focused": {
+    "cwd": "apps/api",
+    "environment": {
+      "STAYLEAD_TEST_DATABASE_URL": "private B09 test DB on loopback55430"
+    },
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "../../tests/contracts/test_b09_security_contracts.py",
+      "../../tests/integration/test_b09_security_api.py",
+      "-q"
+    ],
+    "passed": 11,
+    "elapsed_seconds_reported_by_pytest": 1.16,
+    "log": "workspace validation/b09-20261028/final-b09-tests.log"
+  },
+  "canonical_static": {
+    "cwd": "apps/api",
+    "ruff": [
+      ".venv/bin/ruff",
+      "check",
+      "--config",
+      "pyproject.toml",
+      "src",
+      "../../tests"
+    ],
+    "status": "PASS"
+  },
+  "compileall": {
+    "cwd": "repo",
+    "argv": [
+      "apps/api/.venv/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "apps/api/src",
+      "tests"
+    ],
+    "status": "PASS"
+  },
+  "node_syntax": {
+    "cwd": "repo",
+    "argv": [
+      "node",
+      "--check",
+      "tests/e2e/hospitality/b09-security.mjs"
+    ],
+    "status": "PASS"
+  },
+  "web": {
+    "cwd": "apps/web",
+    "commands": [
+      "npm run test:contracts",
+      "npm run lint",
+      "npm run typecheck",
+      "NEXT_PUBLIC_STAYLEAD_DOMAIN=hospitality NEXT_PUBLIC_STAYLEAD_GUEST_CONTRACT_VERSION=1 STAYLEAD_API_BASE_URL=http://127.0.0.1:18530 npm run build"
+    ],
+    "status": "PASS"
+  },
+  "browser": {
+    "cwd": "repo",
+    "argv": [
+      "node",
+      "tests/e2e/hospitality/b09-security.mjs"
+    ],
+    "environment": {
+      "B09_PLAYWRIGHT_MODULE_ROOT": "configured local bundled node_modules path; not hardcoded in harness",
+      "B09_WEB_ORIGIN": "http://127.0.0.1:13530",
+      "B09_BROWSER_ARTIFACT_DIR": "private workspace output dir"
+    },
+    "modes": [
+      "default",
+      "html-refusal-only"
+    ],
+    "real_model_calls": 0
+  },
+  "note": "Retrospective exact command record from executed tool calls, not a new test run. No secrets or bearer tokens."
+}

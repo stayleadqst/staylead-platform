@@ -1,0 +1,15 @@
+{
+  "candidate_sha256": "5c7f04dd27aa0dcb2a0c479aa1dc5fa84cd225f3985cc21a43ea67abb32e83df",
+  "case6": "HTTP200/two calls; M2 party/guardian/sharing/dates/both hardaccessrequirements correct. AC2/6 FAIL: model no candidate, server asks known guest requirements again instead of explaining unknown hotel accessibility/capability verification. No falsefit/availability claim.",
+  "case7": "HTTP502 firstrequest provider_invalid_response output exceeded configured700tokens; payload/exactcountnotretained, no call2. ReadonlyDB confirms noage8/relaxation/languageupdate: brief1child7/twohardneeds/guardian+sharingtrue/languagevi remains.",
+  "global_guest_turns": 5,
+  "global_requests": 8,
+  "lifetime_sprint7_attempts": 25,
+  "state_status": "halted",
+  "state_sha256": "3a13f0901ee644420382d6b57ddcb0b2ac68a6ebf8c2acaa6ee3e7f991121843",
+  "runtime_and_browser": "stopped",
+  "remaining_original_cases": "No independent unattempted cases: City2 and Family5 dependencyBlocked; all others attempted and preserved",
+  "B07": "Done, independently accepted",
+  "C01_Sprint7": "Blocked; no fullAC/merge/deploy",
+  "next": "Bounded offline explanation/compact-output repair; independent review/local gates and concrete publication before any request for new manual reacceptance allowance"
+}

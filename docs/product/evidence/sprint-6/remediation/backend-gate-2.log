@@ -1,0 +1,2 @@
+$ apps/api/.venv/bin/ruff check apps/api/src tests/contracts/test_grounded_qa.py tests/contracts/test_sprint6_validation_diagnostics.py
+All checks passed!

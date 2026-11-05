@@ -1,0 +1,15 @@
+{
+  "run_id": "s6-codex-20261026-remediation-9",
+  "actual_requests": 1,
+  "cumulative_requests": 97,
+  "unused_reserved": 17,
+  "automatic_retries": 0,
+  "resumes": 0,
+  "product_unchanged": true,
+  "full_matrix_pass": false,
+  "failure": "authorization.op emitted full operation object rather than required enum string",
+  "observed_proposal_semantics": "dates/adults/quotes/intents correct but structurally invalid; not applied",
+  "M2_or_preference_commit": false,
+  "provider_calls_after_blocker": 0,
+  "next_action": "Native preparation wire schema; offline replay/probes then review before live use"
+}

@@ -1,0 +1,15 @@
+{
+  "base": "9ec415b6c32bdfb89c43ac1ff62a393f599677d4",
+  "base_tree": "a97469e6d6d383e722a57a890df16fa2616012fb",
+  "branch": "sprint-16-b04-constraints",
+  "pins": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "49aeda5230ea7bf67e368db8a5dde792bf7e5f240aa77269b0e2572ae8ea5233",
+    "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py": "f6752be1e3a1c461ce3110855c5136d57f8167fc0e0f45a210ee467966815d24",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": "414b2b5f5bc18b79439dd65e4fa6814f2e2a7334c4e3c37ecb81d92de72c03b5",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py": "f9b0dc66df06e02b0549219f500226b3d906c0f818c81fca079fda630dbe5dce",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/room_advice.py": "c0f3187d3538b775e5bb95c3c6a129985ae31dbf1fa0a4371f07ef46e6111f60",
+    "tests/sprint16_constraints/test_budget_contract.py": "ed80be0f60c93e119b4445cf0fd147c265e900d9e3f6b3dc48a65b327aa4f1d8"
+  },
+  "fingerprint": "3e7359afb2435341641d8a09295f5d2ef9c0230e9c3d02aa2757a62575b709f5",
+  "definition": "SHA256 of compact sorted JSON path\u2192SHA256 map, six product/test files; evidence-only documents excluded"
+}

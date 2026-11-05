@@ -1,0 +1,40 @@
+{
+  "namespace": "remediation-10",
+  "source_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "source_published": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+  "product_unchanged": true,
+  "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "provider_requests": 18,
+  "guest_turns": 9,
+  "cumulative_requests": 115,
+  "prior_requests": 97,
+  "transferred_unused": 17,
+  "approved_increment": 1,
+  "automatic_retries": 0,
+  "explicit_resumes": 0,
+  "max_provider_latency_ms": 9401.1,
+  "max_HTTP_latency_ms": 15584.5,
+  "max_reported_output_tokens": 422,
+  "reported_namespace10_usage_sums": {
+    "input_tokens": 161126,
+    "output_tokens": 3546,
+    "total_tokens": null
+  },
+  "total_billing": "unavailable",
+  "actual_served_model": "unreported",
+  "agent_tokens_cache": "unavailable",
+  "native_pregeneration_hard_cap": "unverified",
+  "driver_checks_passed": true,
+  "independent_semantic_verdict": "PASS",
+  "live_disabled": true,
+  "services": "browser/API/web stopped; sharedPG preserved",
+  "browser_external_requests": 0,
+  "browser_external_measurement_scope": "browser context only; provider/server network not measured",
+  "limitations": [
+    "Initial sandbox denied listen/Chrome before0calls; bootstrap metadata preserved, no request counter reset.",
+    "Reported usage is provider telemetry, not measured billing.",
+    "Historical failed runs preserved and not relabeled PASS."
+  ],
+  "full_matrix_pass": true,
+  "review_path": "namespace10-semantic-review.json"
+}

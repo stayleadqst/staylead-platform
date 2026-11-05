@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
+
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies import guest_chat as guest_chat_module
 from staylead_platform.composition.dependencies.guest_chat import _media_reference
@@ -72,7 +73,12 @@ def test_hotel_lookup_is_data_driven_and_unknown_slug_is_clear(monkeypatch) -> N
     client = make_client(monkeypatch)
     assert client.get("/v1/guest/hotels/fourth-hotel").json() == {
         "hotel_id": "HTL-FOUR", "hotel_slug": "fourth-hotel",
-        "public_config": {"name": "Fourth Hotel"}, "config_version": "1",
+        "public_config": {
+            "name": "Fourth Hotel",
+            "booking_channel": {
+                "destination_url": None, "contact": None, "destination_kind": "configured",
+            },
+        }, "config_version": "1",
         "guest_contract_version": "1",
     }
     unknown = client.get("/v1/guest/hotels/not-imported")
@@ -115,12 +121,17 @@ def test_freshness_uses_saved_request_and_rejects_client_supplied_evidence(monke
     monkeypatch.setattr(guest_chat_module, "get_completed_response", lambda *args, **kwargs: {
         "freshness": {"eligible": False, "status": "stale"},
     })
+    # Freshness now also compares the saved answer's language-preference revision.
+    # Keep this API contract test isolated from persistence just like its saved-answer fixture.
+    monkeypatch.setattr(guest_chat_module, "get_language_preference", lambda *args, **kwargs: None)
     client = make_client(monkeypatch)
     path = f"/v1/guest/sessions/{SESSION_ID}/freshness"
     headers = {"Authorization": f"Bearer {token()}"}
     stale = client.post(path, headers=headers, json={"request_id": "turn-1"})
     forged = client.post(path, headers=headers, json={"request_id": "turn-1", "evidence": []})
-    assert stale.status_code == 200 and stale.json() == {"status": "stale"}
+    assert stale.status_code == 200 and stale.json() == {
+        "status": "stale", "answer_eligibility": "stale",
+    }
     assert forged.status_code == 422
 
 

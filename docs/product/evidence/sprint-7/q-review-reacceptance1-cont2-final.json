@@ -1,0 +1,63 @@
+{
+  "verdict": "PASS scopedv2readiness ONLY unchangedfreshPine6-7; fullC01/SprintDoDstillBLOCKED",
+  "candidate_sha256": "5c7f04dd27aa0dcb2a0c479aa1dc5fa84cd225f3985cc21a43ea67abb32e83df",
+  "all237_before": 237,
+  "all237_after": 237,
+  "digest_verified": true,
+  "v2_delta_from_v1": [
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/room_advice.py",
+    "tests/contracts/test_room_advice.py"
+  ],
+  "source_matrix_oracle_authority_verified": {
+    "matrix": "d48d28c04b23f0ea7151a3e24c6f5556169bdfdd2a7a0caca0ed7d01e338ec50",
+    "oracle": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+    "exactcasesunchanged": true,
+    "actualcontinuationauthoritymatch": true
+  },
+  "parent": {
+    "run_id": "s7-room-advice-20261026-reacceptance1-cont1",
+    "status": "halted",
+    "counters": [
+      3,
+      5
+    ],
+    "sha256": "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75",
+    "oldclosedprior": [
+      "completed",
+      9,
+      16
+    ],
+    "oldclosedpriorhash": "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd",
+    "lifetimebeforecontinuation": 22
+  },
+  "mapping": [
+    {
+      "global_budget_turn": 4,
+      "approved_case_turn": 6
+    },
+    {
+      "global_budget_turn": 5,
+      "approved_case_turn": 7
+    }
+  ],
+  "limits": "Sameglobal7/14;seed3/5;max2newturns4requests;enforceend5/9,unused2guest5requestsnotrepurposed;2calls25s45s700gpt6luna-low",
+  "known_numeric_path_finding": "RESOLVED inactual mixed roomcall2 instructions; v1findingpreserved q-review-reacceptance1-cont2-initial.json",
+  "producer_consumer_proofs": [
+    "BothPinecanonicalM2producerbriefspassactualcurrentbrowserfunctions; missinghardconflictoptionrejects; browserhashmatchesfinalpin",
+    "ActualomittedadultconsentAPIcapturefails exactpairhelper; correctedpairpasses; extrasreject. Pineguardusesexactadult-childpair; no Familyrepairactualclaim",
+    "Actualmixed _validate_room_advice_hotel_answer withstructuredrate3800000 rejectsoriginal3,800,000 andacceptsspellings-onlycorrectednativeanswer; q-review-reacceptance1-cont2-consumer-probe.json",
+    "Finalactualpreparation_instructions(include_hotel_answer=True) nowincludesexactnumericcopyrule;2focusedtestsPASS",
+    "Fourpreviouscont2runtimeTestClient/matrix/ingressinitializer testsPASS reused, unchangedruntime/harnesshash; newfullsource/case/oracle verifier executed",
+    "Actualparenthash/mappingguards executed; fresh0/0/wrongparent/mapping/guest6/requests10reject"
+  ],
+  "unchanged_validation": [
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py",
+    "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py",
+    "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py"
+  ],
+  "reported_root_gates": "263backendPASS3knownwarnings; canonicalRuffcompileDiffPASS; unchangedNodecontrols syntax/smoke reused; priorPG/frontendproofs unchanged",
+  "scope_honesty": "No retryfailedCity1/Family3/4, no amendedCity2/Family5, no DB/historyrepair. Familyage7didcommitbeforeanswerfailed; Family5skippedbecauseadultconsentgap. B07priorPASSreused.",
+  "remaining_acceptance_gap": "EvenPine6/7PASS cannotcompleteC01: Citycouple→edit/comparison/staleselection and fullFamilychain stillBlocked. ActualnewPineresultsneeded; no offline-to-actualPASSconversion.",
+  "effects": "Qno actualprovider/API/DBwrites/state/configinit"
+}

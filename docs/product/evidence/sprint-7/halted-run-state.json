@@ -1,0 +1,20 @@
+{
+  "authority": "Latest human request explicitly executes Sprint 7 per current backlog with full AC and project limits. Coordinator interprets this as scope authorization for its single planned fresh nine-turn/maximum18-request acceptance batch. This is not a separate numeric approval reply, not authority from backlog creation, not Sprint6 allowance reuse, and not authorization for a further batch. Stop at first blocking failure; no automatic retries.",
+  "authorized_for_live_calls": true,
+  "candidate_sha256": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "codex_requests": 1,
+  "codex_requests_reserved_at_unix": 1793066829.412757,
+  "guest_turns": 1,
+  "guest_turns_reserved_at_unix": 1793066829.278077,
+  "last_start_attempt_unix": 1793066640.6962,
+  "matrix_sha256": "5b45991c2ebdc69aadd04b0d0c77ed617cd652302c58559598f55a14637e60c6",
+  "max_calls_per_turn": 2,
+  "max_codex_requests": 18,
+  "max_guest_turns": 9,
+  "reserved_guest_turn_budget": 9,
+  "reserved_request_budget": 18,
+  "run_id": "s7-room-advice-20261026-batch1",
+  "start_attempts": 1,
+  "status": "halted",
+  "stop_reason": "blocking_http_or_no_provider_call"
+}

@@ -112,7 +112,7 @@ loaded into serving knowledge.
 ### Complete local hotel packs (Sprint 3)
 
 Pack schema v1 supports a single new synthetic hotel, approved facts and authored PNG/MP4/VTT evidence.
-Apply database schema v4 explicitly, then run the trusted CLI with an allowlisted parent directory:
+Apply database schema v5 explicitly, then run the trusted CLI with an allowlisted parent directory:
 
 ```sh
 cd apps/api
@@ -138,7 +138,7 @@ for exact evidence, versions and remaining limitations.
 
 ### Source lifecycle (Sprint 4)
 
-After explicit schema v4 migration, a separate trusted local CLI can refresh, revoke or delete
+After explicit schema v5 migration, a separate trusted local CLI can refresh, revoke or delete
 one existing source. Read its current CAS tokens first:
 
 ```sh

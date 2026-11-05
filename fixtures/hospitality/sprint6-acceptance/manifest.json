@@ -1,0 +1,14 @@
+{
+  "fixture_id": "staylead-sprint6-authored-url-acceptance-v1",
+  "classification": "synthetic acceptance-only overlay",
+  "hotel_id": "HTL-CITY01",
+  "synthetic": true,
+  "real_hotel_or_operator_approval": false,
+  "source_id": "SRC-HTL-CITY01-S6-URL",
+  "fact_id": "F-HTL-CITY01-S6-URL-001",
+  "url": "https://sprint6.example.invalid/HTL-CITY01/info",
+  "url_functional": false,
+  "external_network_calls": false,
+  "valid_from": "2026-10-01",
+  "valid_to": "2027-09-30"
+}

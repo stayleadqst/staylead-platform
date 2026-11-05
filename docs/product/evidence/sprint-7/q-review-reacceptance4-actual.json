@@ -1,0 +1,118 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance4",
+  "candidate_sha256": "221027b1a44ce2bcffd136d4bfa2dd9a5c6a2fa3ba4220e53945172613e85c14",
+  "verdict": "ACTUAL_FAIL; C01/Sprint7 remains blocked",
+  "turns": [
+    {
+      "turn": 1,
+      "http_status": 200,
+      "response_sha256": "95da645df994aeee849e7618a1dfad62e909fb4c2e42ab20753a70d0163494e8",
+      "verdict": "FAIL_NO_SEMANTIC_RECEIPT",
+      "native_protocol": "Call1 typed current-quoted edits for oneadult/child7/guardian/sharing/dates/hardaccess correct, but adds unrequested clarify(room_requirements.hard_bed_types) solely from permissive large-bed wording. Native call2 asks canonical hard_accessibility_needs field, so new question-field closure is not the failure.",
+      "M2": "Actual brief/state1 persisted child5f325598-a550-45f2-8bac-0d0f760f495c, correct known facts, plus pending hard_bed_types. Current quote existence passes existing guards but does not establish necessity of a hard physical bed type.",
+      "M4": "Any pending room requirement takes early return with no known_hard_accessibility_needs marker, rendering saved access question as generic VI room restatement. No options/cost/accessfit falsely certified.",
+      "source": "Ten source refs current and approved, owner/version/hash/generation match immutable oracle and readonlyDB.",
+      "db_evidence": "q-review-reacceptance4-turn-01-db-readonly.json",
+      "db_verified": "Enforced transaction_read_only=on; onecompletedrequest/result, brief/state1, twomessages, noselection, no Q writes",
+      "output_tokens": [
+        481,
+        33
+      ]
+    },
+    {
+      "turn": 2,
+      "verdict": "BLOCKED_DEPENDENCY_NOT_ATTEMPTED",
+      "reason": "Stop-first-failure; prior actual brief contains unrequested pendinghardbedtype. Original nextutterance clears accessneeds/changesage/language but does not authorize repairing that unrelated pending field. No amendment, fake history or automatic retry."
+    }
+  ],
+  "findings": [
+    {
+      "id": "Q-R4-1",
+      "severity": "P1",
+      "ac": [
+        "AC1",
+        "AC2",
+        "AC6",
+        "AC7"
+      ],
+      "problem": "Permissive bed-sharing wording is promoted into an unnecessary hard physical bed-type clarification, mutating M2 pending state and blocking useful source-grounded advice.",
+      "locus": "domains/hospitality/prompts/grounded_qa.py:32–46; schemas/preparation_output.py clarify operation; existing canonical clarify path",
+      "smallest_direction": "Preserve permission/preference/hard requirement distinction for clarification as well as set operations; exercise exact actual quote and near-field typed clarification contract, keeping quote/ID guards and no phrase parser."
+    },
+    {
+      "id": "Q-R4-2",
+      "severity": "P2",
+      "ac": [
+        "AC2",
+        "AC6"
+      ],
+      "problem": "Known nonpending access requirements are presented as unknown guest requirements when an unrelated room field is pending.",
+      "locus": "domains/hospitality/recommendations/rooms.py:677–694",
+      "causal_proof": "q-review-reacceptance4-causal-probe-results.json reproduces exact pending path→genericquestion; identical saved factual data without that unrequested pendingfield→correctknownaccesshotelverification.",
+      "smallest_direction": "Preserve trusted known/nonpending-access marker on the early pending-requirement result branch too; do not assert capability fit or infer missing guest needs."
+    }
+  ],
+  "browser": {
+    "report_failure": {
+      "name": "Error",
+      "message": "Pine turn 1 did not retain known requirements and give the Vietnamese hotel-verification step"
+    },
+    "semantic_reviews": [],
+    "selection": "not reached",
+    "French": "not attempted",
+    "mobile": "final mobile check not reached; previous accepted frontend/B07 coverage reused"
+  },
+  "state_latest_verified": {
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "maximum": [
+      2,
+      4
+    ],
+    "state_sha256": "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c",
+    "stop_reason": "blocking_semantic_pine1_unrequested_hard_bed_pending_and_generic_access_question",
+    "lifetime_requests": 46,
+    "note": "Sealed halted state hash independently read and matches root stop receipt; root reports API/browser both stopped, unused1guest/2requests CLOSED."
+  },
+  "bounds": {
+    "completed_provider_calls": 2,
+    "all_output_lte700": true,
+    "all_provider_latency_lte25000ms": true,
+    "HTTP": [
+      {
+        "status": 200,
+        "latency_ms": 12700.2
+      }
+    ],
+    "no_retry_observed": true
+  },
+  "source_pins": "q-review-reacceptance4-actual-pins.json:237 snapshot and repo match reviewed221027b1",
+  "AC_matrix": {
+    "AC1": "FAIL unnecessary hardbed pending; accepted City/Family facts retained as coverage",
+    "AC2": "FAIL only ask consequentialmissing; current source checks PASS",
+    "AC3": "Accepted offline+City/Family assignment/policy coverage reused; no false access fit this turn",
+    "AC4": "Accepted independent/math+City/Family coverage reused; Pine relaxed cost not reached",
+    "AC5": "Accepted City comparison/currentselection/stale409/reselection reused; Pine selection missing",
+    "AC6": "FAIL generic requirement restatement hides useful hotel verification; no soldout/liveavailability claim",
+    "AC7": "FAIL unnecessary pendingstate; original Pine ageedit/clear recheck not attempted",
+    "AC8": "Chinese/mixed City/Family and B07 reused; required PineFrench checkedadvice/currentselection remains missing"
+  },
+  "accepted_reuse": [
+    "q-review-reacceptance3-actual.json: City1→2 PASS including actual stale409/reselection; R3Pine4 remains historicalFAIL",
+    "q-review-reacceptance2-cont1-actual.json: Family3→4→5 actualPASS",
+    "q-review-cont6-actual.json: B07AC1–3 actualPASS"
+  ],
+  "limitations": [
+    "Actual failed Pine1 is preserved, no counterfactual asserted actualPASS",
+    "Original clear-field native fix remains reviewed offline but was not exercised by live Pine2",
+    "No Q provider/model/API/DB write; all DB observations enforcedreadonly",
+    "No further model turn or retry authorized after firstblockingfailure; remaining slots must not be silently repurposed"
+  ],
+  "root_stop_receipt": "reacceptance4-stop-receipt.json",
+  "next_inference_judgment": {
+    "recommendation": "Do not default to another prompt-only trial on the identical low inference profile after repeated semantic misclassification at this permission/requirement boundary. Review/publish bounded fixes first; a separately human-approved stronger inference profile is a reasonable concrete proposal.",
+    "uncertainty": "Observed failures are not a controlled profile comparison; no evidence-based guarantee a stronger profile fixes them. Do not automatically change model/effort/budget or run extra calls.",
+    "remaining_actual_scope": "Only fresh linked original Pine two-turn chain after appropriate new authorization; accepted City/Family/B07 need no repeat."
+  }
+}

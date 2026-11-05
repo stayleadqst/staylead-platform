@@ -1,0 +1,10 @@
+{
+  "run_id": "s5-codex-90-20261023",
+  "max_codex_requests": 8,
+  "codex_requests": 8,
+  "semantic_guest_turns": 4,
+  "answer_only_resumes": 0,
+  "prior_grok_attempts": 8,
+  "authority": "Hieu explicitly requested backend consume Codex/ChatGPT instead of Grok; four sequential semantic turns, max2calls/turn, no automatic retries; previous Grok cap unchanged.",
+  "created_at_utc": "2026-10-23T13:10:47.616982+00:00"
+}

@@ -1,0 +1,106 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance2",
+  "candidate_sha256": "c9829ff3c8ea2a9f5aee3e6b8ab3f4b4d21f74dc95134cd10966ad7c4b58ec86",
+  "turns": [
+    {
+      "turn": 1,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "6e8f7113c1bdbb712d0fa161aaa54440867de188f1c684fea830394a1fed5c62",
+      "facts": [
+        "Native exactcurrentquotes/guest_edit patch;2adults/3n dates/hard6mVND/explicitcouple sharing; no inferred maxrooms/hardbedtype",
+        "Checked STD two adults share actualqueen with consent; alloccupancy/bed/consent checks pass;1.8m×3=5.4m complete reference roomcost",
+        "ZH nonfallback checked rationale entails fit/beds/price; UI displays same result and unknown availability",
+        "UIselection+GETlatest exactresult/version/option; zero additional requests",
+        "EnforcedreadonlyDB confirms state/brief1,completedrequest1,result1,messages2,exactselection,current source/hash/gen"
+      ],
+      "limitations": [
+        "Single checked option allowed; no multiple-option comparison/ranking evidence inferred. Generic core label fallback and rawcatalog breakdown label are not domain-rationale fallback."
+      ],
+      "db_evidence": "q-review-reacceptance2-turn-01-db-readonly.json",
+      "provider_output_tokens": [
+        375,
+        214
+      ],
+      "cumulative_counters": [
+        1,
+        2
+      ]
+    },
+    {
+      "turn": 2,
+      "verdict": "FAIL_PRODUCT_SEMANTICS",
+      "severity": "P1",
+      "response_sha256": "b9f4babfefd37b59fa3a3ac9003ea456570caa9bb1daf1166ab0e995e6dce04f",
+      "native_call1": "Explicit false adultpair bedsharing correct, but invented hard_bed_types twin from broad arrangement two separate beds; no exact bedtype requested. Current quote valid and guard protocol not bypassed.",
+      "native_call2": "CITY-TWN two distinct catalogsingle surfaces correct, resulting M4 conflict against invented hardtwin requirement.",
+      "API": "HTTP200 completed; M2brief2/state2 committed before dependent result2conflict/nooptions. Source bindings current/correct; unknown availability preserved.",
+      "readonly_DB": "2completedrequests,2results,4messages; prior standard selection retained exactresult1/version1, not rebound; newselection absent.",
+      "cause_proof": "Pure exactM4 replay reproducesconflict; removing ONLY unrequestedhardtype in memory yieldsready5.85m with falseconsent/twodistinctsurfaces/allchecksPASS.",
+      "UI": "Driver correctly failed missingpositivecase2 before evidence/selection/staleUI assertions; no PASS2receipt/no case3. No claimactualstaleUI tested.",
+      "counters": [
+        2,
+        4
+      ],
+      "provider_output_tokens": [
+        253,
+        187
+      ],
+      "db_evidence": "q-review-reacceptance2-turn-02-db-readonly.json",
+      "cause_evidence": "q-review-reacceptance2-city2-actual-cause.json"
+    }
+  ],
+  "overall": "HALTED_FIRST_BLOCKING_FAILURE; fullC01/SprintDoD BLOCKED",
+  "sealed_state": {
+    "run_id": "s7-room-advice-20261027-reacceptance2",
+    "status": "halted",
+    "guest_turns": 2,
+    "codex_requests": 4,
+    "sha256": "4f18e653499684919c083856474068bb3d2a1b6bedb5c3b6d2ab6204dd8c9feb",
+    "lifetime_requests": 29,
+    "stop_reason": "blocking_semantic_city2_invented_exact_bed_type"
+  },
+  "AC_matrix_at_halt": {
+    "AC1": "FAIL turn2 invents exacthardbedtype; turn1 contexts/consentcorrect. Family/Pine notattempted.",
+    "AC2": "Current selected Citysources/hashes/generation PASS subset. Fullmissingage/access clarification matrix pending.",
+    "AC3": "City1checkedfit PASS; turn2checkerhonestlyrejectstypedconflict but requestedfeasiblearrangementnotreturned; Family/Pinepending.",
+    "AC4": "City1actual5.4mPASS; correctedcounterfactual5.85mofflineonly, notactualPASS; Familyunknownmandatoryfees/age12budget pending.",
+    "AC5": "City1fit/price/currentselectionPASS subset; oneoption,no multi-optioncomparisonclaim. City2usefulupdatedoption/selectionBlocked.",
+    "AC6": "FAIL usefulcause relativeactualrequest: genericroomruleconflict arisesfrominventedconstraint, no usefulfeasibleupdatedoption. AvailabilityunknownPASS.",
+    "AC7": "M2commitbeforecall2+samecitysession/fieldpreservationPASSsubset; currentresult2 and oldselectionnotrebound verifiedDB. Actualoldcardstale/selectionrejectionnotexecuted. Family/Pineedits pending.",
+    "AC8": "Actualweb/API/model ChineseCity1+selectionPASSsubset. City2coupledUIjourneyfailed; FrenchPinepending; priorB07pilotPASSreused."
+  },
+  "continuation_scope": {
+    "judgment": "ALLOWED_WITHIN_EXISTING_EXPLICIT7/14_SCOPE_AFTER_FIX_AND_FROZEN_READINESS; no new approval requested by Q",
+    "original_unattempted_case_ids": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "fresh_sessions": [
+      "fresh-beach",
+      "fresh-pine"
+    ],
+    "parent_seed": [
+      2,
+      4
+    ],
+    "maximum_new": [
+      5,
+      10
+    ],
+    "maximum_global_end": [
+      7,
+      14
+    ],
+    "invariants": [
+      "Exactoriginal5utterances/cases/oracle unchanged",
+      "NoCity2retry/amendedCityscript/state repair",
+      "Noadditionalallowance/automaticretry",
+      "Stopped firstblockingfailure preserved; unusedslots are not a newbudget",
+      "FullCitycoupledacceptancegap remainsBlocked even if independentfivepass"
+    ]
+  },
+  "effects": "Q read-only synthetic captures/SELECT+SHOW under transaction_read_only=on; pureofflinecounterfactual only; no API/provider/model/DB writes or root semantic receipts by Q."
+}

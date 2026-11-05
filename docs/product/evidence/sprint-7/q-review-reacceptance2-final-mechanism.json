@@ -1,0 +1,74 @@
+{
+  "verdict": "PASS_SCOPED_OFFLINE_MECHANISM_REVIEW",
+  "candidate_sha256": "d7ca88db6c1251a7dc9ff64acdf9d6624731b5865a46d322f28f55dde3b5e35a",
+  "manifest": "candidate-manifest-reacceptance2-final-mechanism.json",
+  "authorization": "OFFLINE_ONLY; no new execution/allowance or actualPASS",
+  "findings": [],
+  "scope": "Seven changed mechanism files from actual4797d219; prior Cityarrangement/exacttype review reused. Unchanged controls/M4/persistence/frontend not re-audited.",
+  "verified": [
+    "Both FactSelection and high-overlap grounded preparation native factories accept a neutral GuestBriefSnapshot; orchestrator supplies current brief at all three call sites. Platform has no Hospitality import.",
+    "Native sharing member enum is nonempty: canonical adult1..30 (existing SetAdults bound) plus existing trusted child IDs. Static no-brief schema retains adults only; does not guess child-1.",
+    "Contextual native schema excludes captured child-1, unknown UUID and adult31; saved child UUID positive; adult30 remains allowed for earlier explicit SetAdults samepatch. Final current-member guard remains necessary.",
+    "New-child consent uses existing inline add_child guardian/sharing fields, assigning a server UUID. No alias parser/ID-repair heuristic/allocator or count-bound increase.",
+    "Exact actual capture still parses static Pydantic wire but is rejected by contextual native enum; canonicalM2 validator bytes unchanged and stillrejects badID. Counterfactual inline operation validates and records guardian/true pair/date/hardneeds.",
+    "Only validate_guest_brief_proposal ValueError is translated to ConversationFailure invalid_model_output. Existing handler maps502; programming/storage paths outside this call remain generic; actual priorHTTP500 unchanged.",
+    "8 targeted tests PASS covering static/contextual schema, savedUUID/newchild inline, actual low/high producer schema attachment and unchanged quote/intent guards.",
+    "All237 repository hashes before/after plus237 immutable snapshot hashes and digest match; no source mutation byQ."
+  ],
+  "real_consumer_evidence_reused": {
+    "owner": "Root/B executed in isolated staylead_sprint7 with fake provider; Q inspected source regression",
+    "test": "test_unknown_new_child_sharing_id_fails_as_model_output_without_brief_mutation",
+    "reported_result": "FastAPI HTTP502 invalid_model_output; brief0/nochild/noreceipt; supplied native schema excludeschild-1. Full277contracts/architecture/API and15room/languagePG PASS, Ruff/compile/diff PASS.",
+    "independence_limit": "Q did not rerun PostgreSQL or mutate a database; own execution was pure contract/schema/producer tests."
+  },
+  "accepted_evidence_reuse": {
+    "Family3_5": "Actual PASS remains valid: unchanged canonical/M4/math/persistence; exact actual sharing IDs still admitted by new contextual native schema. No need repeat.",
+    "B07": "Prior actual technicalpilot AC1–3 PASS unchanged; booking/config/UI untouched, no repeatbooking turn.",
+    "City": "Prior actual City2 FAIL remains; arrangement/exacttype descriptions reviewed but modeladherence not established.",
+    "Pine": "Prior actual Pine6 FAIL remains; noM2/results/messages/selection, inferredlanguagepreference1persisted. No false no-state claim; original7notattempted/dependencyBlocked."
+  },
+  "future_manual_proposal": {
+    "file": "reacceptance3-cases-proposed.json",
+    "verdict": "MINIMAL_SUFFICIENT_REMAINING_CHAIN_SCOPE; PROPOSAL_ONLY",
+    "exact_previous_case_ids": [
+      1,
+      2,
+      6,
+      7
+    ],
+    "renumbered_turns": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "delta": "Exact full case objects unchanged except turn renumber and approved_previous_turn metadata.",
+    "budget": [
+      4,
+      8
+    ],
+    "provider": "gpt-6-luna/low;2calls/turn25sprovider45sturn700output,noauto retry,firstblockingfailurestop",
+    "authorized_for_live_calls": false,
+    "reason_for_fresh_City": "Existing actualCitybrief2contains inventedhardtype; cannotrollback/repairhistory. Originaledit needs fresh initialcontext and selected result.",
+    "reason_for_fresh_Pine": "FailedPine6never saved child/date/guardian/access context; originalrelaxation/French7 requires new initial6.",
+    "remaining_assertions": "CityChinese fit/price then distinctsurfaces/currentselect→oldstale/reselection; Pineknownrequirements→hotelverification then samechildage8/authorizedaccessclear/Frenchcheckedlabels/currentselection. No forced multipleoptions/optimizer or guessed IDs.",
+    "reuse": "Family3–5 and B07 accepted evidence retained; no extra repair turn or repeated7case matrix.",
+    "prior_closed": "Actual6/11 sealed9a7b,lifetime36,unused1guest3requestsclosed; no reset/reallocation.",
+    "public_copy_identical": true
+  },
+  "public_scope_check": "Current report accurately says Sprintnotcomplete/B07Done/C01+97+98Blocked; actualFamilyPASS/City2+Pine6FAIL/Pine7dependencyBlocked; no falsely upgraded actualpass or no-state claim. FinalQreview-in-progress row can now be updated to this scopedofflinePASS. Proposal remains unauthorized.",
+  "probe_limitations": [
+    "Full external JSONSchema validation package is not installed; Q directly checked new native enum constraint plus existing native/flat-schema tests. No package installed/newframework.",
+    "Native contextual restriction is intentionally stronger than static Pydantic parsing; no identical-constraints claim.",
+    "No actual model reliability/700behavior guarantee inferred from offline fixes.",
+    "No provider/API/DB calls or writes byQ; historical captures/states unchanged."
+  ],
+  "evidence": [
+    "q-review-reacceptance2-final-mechanism-before-hashes.json",
+    "q-review-reacceptance2-final-mechanism-probe.py",
+    "q-review-reacceptance2-final-mechanism-probe.json",
+    "q-review-reacceptance2-family-reuse-check.json",
+    "q-review-reacceptance2-cont1-actual.json",
+    "q-review-reacceptance2-bedtype-fix.json"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "reviewer": "Q gpt-6.1-sol/high",
+  "verdict": "PASS scoped offline repair/readiness; repaired-candidate actual model UNVERIFIED",
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "product_files": 275,
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "harness_files": 4,
+  "manifest_mismatches": [],
+  "oracle": {
+    "path": "/private/tmp/staylead-s8-q-oracle-v2.json",
+    "sha256": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+    "authorized_for_live_calls": false
+  },
+  "original_batch": {
+    "run_id": "s8-local-guide-20261028-acceptance",
+    "status": "HALTED1guest/2requests, unused3/6CLOSED; no receipt/resume/reclassification",
+    "oracle_sha256": "f2a1b9561f18f6a2b265ed592f2f81fceef7fd71ac99d091d3612d40fc9fa874",
+    "sealed_state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+    "diagnosis": "Q overly exact Chinese literal caused harness false-negative; independent actual read-only M2/domain/source data correct. Separate traced S8 generic-core-label omission is real and now repaired offline.",
+    "diagnosis_report": "/private/tmp/staylead-s8-q-actual-diagnosis-1.json"
+  },
+  "repair_review": {
+    "B": "Known reviewed zh/fr/ar/vi/ja/en use existing core20 request and reviewed domain fallback; no40key output, cap/call/cache/validation change. Unknown tags remain accepted with unchanged dynamic-domain20 behavior. No domain imports into platform or NLP shortcut.",
+    "A": "Fresh reacceptance1 namespace rejects closed namespace; per-turn0600 response/render/counters/screenshot saved before semantic oracle with content hash + compact index; API errors/timeouts preserve attempt, screenshot failure blocks, unchanged exact-question/hard-needs/semantic-receipt gates.",
+    "oracle_v2": "Invariant raw-fixture venue names only; exact facts/prices/bases/duration/sponsor/source/status/M2/unknowns retained; actual localized unknown values must render; manual Q assesses language meaning and known-locale core fallback=false. No synonym whitelist."
+  },
+  "independent_checks": [
+    {
+      "test": "B contracts and actual isolated-Q-DB API coldcache zh/fr/ar two-call path",
+      "result": "PASS6",
+      "evidence": "/private/tmp/staylead-s8-q-core-label-fix.log"
+    },
+    {
+      "test": "Actual Ajv native committed schema for repaired core20 routing and guide-only result",
+      "result": "PASS3locales",
+      "evidence": "/private/tmp/staylead-s8-q-core-label-native.json"
+    },
+    {
+      "test": "Offline helper/oracle replay of saved actual response; synonym accepted, omitted unknown and wrongprice rejected",
+      "result": "PASS",
+      "evidence": "/private/tmp/staylead-s8-q-oracle-v2-probe.json",
+      "classification": "Saved actual response + explicitly labeled posthoc M6 replay; not new/repaired model acceptance"
+    },
+    {
+      "test": "Evidence-before-failed-oracle preservation and closed-namespace rejection",
+      "result": "PASS2",
+      "evidence": "/private/tmp/staylead-s8-q-controls-repair-focused.log"
+    },
+    {
+      "test": "Read-only view of posthoc actual M6-component replay image/DOM",
+      "result": "PASS evidence/diagnosis",
+      "evidence": "/private/tmp/staylead-s8-live-turn1-offline-replay.json",
+      "details": "Original Chinese needed unknown rendered correctly, English generic shell visible; replay separately labeled, zero upstream/provider calls per coordinator."
+    }
+  ],
+  "reused_verification": "C121repair-relevant and15harness PASS; canonical Ruff/compile/JSsyntax/diff PASS. Web source unchanged, prior checks reused. Unchanged guide/auth/lifecycle/closure/suitability/domain facts and regressions retain prior independent evidence.",
+  "scope_limit": "Approved pilot zh/fr/ar plus reviewed label locales verified offline. Unreviewed locale dynamic domain/core fallback behavior unchanged; no all-locale shell localization, full parent26, real hotel/OIDC/deploy claim.",
+  "remaining_acceptance": "Fresh NEW4turn/max8request Sol/low proposal, original four input hashes unchanged, Chinese A/French B/Arabic C/French Cedit. Two calls25s each45s whole turn,700postcheck limitation remains acknowledged limitation; no retry/fallback, stopfirstfailure. Requires new explicit human allowance; no unused-slot transfer or live initialization now.",
+  "next_review": "Read each per-turn evidence_path/hash plus screenshot and exact M2/source/counters; independent Q verdict and root semantic agreement before any receipt/advancement; finalturn also reviewed before completion seal.",
+  "Q_inference_calls": 0,
+  "Q_candidate_edits": 0,
+  "usage_tokens": "unavailable"
+}

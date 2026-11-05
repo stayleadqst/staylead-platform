@@ -1,0 +1,70 @@
+{
+  "verdict": "FAIL case4 AC1 retention plus browser harness; age clarification itself valid",
+  "candidate": "8055d6b8a108b1e5f09366442c751a05f60a1cc78fde30732f3f2ef544d4854c",
+  "actual_turn": 4,
+  "status": 200,
+  "brief_version": 1,
+  "findings": [
+    {
+      "id": "Q-C4",
+      "severity": "P1",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+      "line": 396,
+      "title": "New-child explicit sharing refusal is unrepresentable through existing false flag",
+      "actual_evidence": "NativeM1 omitted explicit guardian/adult-sharing/separate-child-sleeping clauses; committed M2/receipt lacks all these facts. M4 asks only consequential age and no unsafefit, but same-requirements context is lost.",
+      "independent_protocol_repro": "add_child guardian_adult_index1/share_bed_with_guardianFalse is schema-valid yet _patch_target_fields omits bed_sharing and commit stores no refusal. Generated stable childID unavailable to samecall set_bed_sharing.",
+      "impact": "C01 AC1 known requirements/provenance retention fails even though clarification and safety gating are valid.",
+      "smallest_fix": "Preserve explicit newchild separate-surface requirement against wholeparty using a typed persisted fact and checked constraints; retain false pair refusal, independent guardian authorization, adultpair consent, no inferredrelationships."
+    },
+    {
+      "id": "Q-H1",
+      "severity": "P1",
+      "file": "tools/evals/sprint7_browser.mjs",
+      "line": 298,
+      "title": "Unconditional first-option selection crashes on valid empty case4 clarification",
+      "reproducer": "Real case4 returns options[]/needs_clarification; turnNo4 branch reads room.options[0].option_id and throws TypeError.",
+      "impact": "Stops useful actual run for a valid clarification; API scratch smoke did not test browser empty-option branch.",
+      "smallest_fix": "Select only a present eligible current option; defer selection to later positive-advice turn and assert its actual persisted identity/zero provider consumption."
+    }
+  ],
+  "verified_passes": [
+    "Case4 dates2n/adults2/one stable child ageunknown/pending age committed once.",
+    "Age question is consequential and no falsefit/price/availability claim is made; 10refs satisfy pinned current source guard.",
+    "All2 actual calls <=700tokens and25sprovider; HTTPturn10.878s<45s.",
+    "Read-only DB confirms Beach1request/2messages/1receipt/1result/0selection, state1; Citystate3 unchanged."
+  ],
+  "actual_counters": {
+    "status": "halted",
+    "guest_turns": 4,
+    "codex_requests": 8,
+    "max_guest_turns": 9,
+    "max_codex_requests": 18
+  },
+  "sealed_state_sha256": "fbe2c58d550679f2d8ada281bd4213b0bbdb18d8bda3964e65c8ce00e39d80bf",
+  "new_calls": [
+    {
+      "turn": 4,
+      "call": 1,
+      "output_tokens": 393,
+      "latency_ms": 7439.7
+    },
+    {
+      "turn": 4,
+      "call": 2,
+      "output_tokens": 52,
+      "latency_ms": 3250.1
+    }
+  ],
+  "physical_model_calls_total": 9,
+  "parent_cont1_hash_still_matches": true,
+  "evidence": {
+    "browser_report": "/private/tmp/staylead-s7-browser-s7-room-advice-20261026-batch2-cont2/browser-report.json",
+    "native_captures": "/private/tmp/staylead-s7-s7-room-advice-20261026-batch2-cont2-captures",
+    "readonly_db": "q-review-cont2-actual-db-readonly.json",
+    "false_protocol_probe": "q-review-cont2-refusal-probe.json"
+  },
+  "next_case5_authorization_judgment": "Current same requirements/dates may explicitly reconfirm prior stated requirements; history resolves this current reference. Use currentquote/provenance/existingchildID, do not repair on replay or use history alone to invent newedit. Clarify unresolved adultidentity if needed; preserve known guardian/separatesurface requirements.",
+  "not_observed": "Cases5–9 remain unattempted; originalCity2/3 and currentcase4 failures preserved, not actualfixed PASS. No fullnine-turn or fullAC PASS.",
+  "review_limitation_acknowledged": "Q prior targeted review missed the browser unconditional case4 selection; independently passed API-only scratch smoke did not cover this UI branch.",
+  "reviewer_effects": "No provider calls, no actualDBwrites or productedits; enforced readonly DB observations and in-memory protocolprobe only."
+}

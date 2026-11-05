@@ -1,0 +1,21 @@
+{
+  "run_id": "s6-codex-20261026-remediation-2",
+  "max_codex_requests": 18,
+  "codex_requests": 6,
+  "max_guest_turns": 9,
+  "guest_turns": 2,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 1,
+  "answer_only_receipt_hashes": [
+    "aac10279547c034b4d7401e5da96e3fd37c3c8a3708b027484b804ecd533a314"
+  ],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": false,
+  "authority": "hieu-explicit-additional-one-batch-18-requests",
+  "created_at_utc": "2026-10-26T03:34:52Z",
+  "closed_at_utc": "2026-10-26T03:54:19.440918+00:00",
+  "closure_reason": "Hieu explicitly approved transferring unused12 plus additional6 to one fresh18request namespace3 batch",
+  "unused_requests_transferred": 12,
+  "transfer_destination": "s6-codex-20261026-remediation-3"
+}

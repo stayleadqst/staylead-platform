@@ -1,0 +1,20 @@
+{
+  "brief": {
+    "http": 502,
+    "error": "brief_version_conflict",
+    "current_brief_version": 2,
+    "historical_receipt_version": 1,
+    "answer_published": false,
+    "provider_calls": 2,
+    "replay_extra_calls": 0
+  },
+  "source": {
+    "http": 502,
+    "error": "stale_source",
+    "current_brief_version": 1,
+    "historical_receipt_version": 1,
+    "answer_published": false,
+    "provider_calls": 2,
+    "replay_extra_calls": 0
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "candidate_v3_fingerprint": "1b9717bb977274467d8329f7c502e3daa6ebccd4cae6a2e0ae2e20776a937416",
+  "build_id": "hPiQFBQXrGEUo6xs_Aydx",
+  "ui_origin": "http://127.0.0.1:13545",
+  "api_origin": "http://127.0.0.1:18545",
+  "database": "staylead_s17_b05_initial",
+  "provider": "deterministic offline S17 B05; no live LLM or product inference",
+  "ui_runs": [
+    {
+      "purpose": "preserved-original-failing-run",
+      "tab": "155029712",
+      "result": "Original pre-fix immediate post-confirm state showed the old Selected option without stale marker/disabled AX state. Preserved; no further use after product repair."
+    },
+    {
+      "purpose": "fresh-postfix-AC2-reproduction plus AC1 set/clear/lower budget",
+      "tab": "155029715",
+      "actions": [
+        "confirmed baseline 2 adults, dates 2026-12-10 to 2026-12-14; selected synthetic CITY-TWN option; live availability stated unknown",
+        "confirmed child age 5, explicit step_free, soft preferred city view, hard VND 15,000,000 stay_total budget with breakfast/taxes",
+        "immediate same-focus post-confirm observation: old result says “This suggestion is out of date. Ask again for an updated recommendation.” and AX marks Selected option disabled; no focus/pageshow refresh or extra turn occurred before observation",
+        "new M4 output had no checked option and stated access need is recorded but no checked option confirms it; guest is asked to verify with hotel",
+        "clear-view review showed city view → Not set; after confirm receipt reported only View preferences: Not set",
+        "lower-budget review showed only 15,000,000 → 12,000,000; after confirm receipt reported only Room budget amount: 12000000"
+      ],
+      "evidence": "AX states captured in CUA transcript. Immediate post-fix screenshot emitted; later viewport screenshots show prior stale result and disabled selected action. No screenshot file persisted."
+    },
+    {
+      "purpose": "separate tentative/cancel run",
+      "tab": "155029718",
+      "actions": [
+        "started fresh session in same DB, confirmed baseline 2 adults and dates (version 1)",
+        "submitted the child/access/view/budget proposal but cancelled instead of confirming",
+        "UI stated “Changes were not saved.”; current trip details remained version 1, 2 adults, 0 children; no room requirements were saved"
+      ]
+    }
+  ],
+  "retention_evidence": {
+    "provider_calls_total": 15,
+    "provider_observations_sha256": "e4e50f1a6912464f591a97c38beb264d9a3f47deabba66701421687e32c05cc1",
+    "post_clearview_committed_brief": "call 10 M4 projection: adults 2; child ages [5]; dates preserved; budget 15,000,000 VND, stay_total, hard, breakfast/taxes; hard access step_free; preferred_views absent.",
+    "post_lower_budget_committed_brief": "call 12 M4 projection: adults 2; child ages [5]; dates preserved; budget 12,000,000 VND, currency VND, basis stay_total, strength hard, inclusions breakfast/taxes; hard access step_free; preferred_views absent.",
+    "cancelled_edit": "provider call 15 was only the pending edit proposal. After cancellation, no commit or subsequent M4 call was made; UI remained version 1 with no child."
+  },
+  "preservation": "No session/database reset, reseed, source edit after final source freeze, or old S16 resource use."
+}

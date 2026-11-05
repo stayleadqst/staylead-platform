@@ -1,0 +1,30 @@
+Sprint 5 backend focused verification
+Date: 2026-10-23
+Database: isolated local UTF-8 PostgreSQL 18 test database (connection string omitted)
+
+Command:
+  apps/api/.venv/bin/python -m pytest tests/integration/test_sprint5_brief_postgres.py -q
+Result:
+  7 passed in 0.35s
+
+Coverage includes schema 4 to 5 preservation, atomic brief/source/receipt persistence,
+same-ID replay, lost apply acknowledgement recovery, CAS/concurrent edits, cancellation
+rollback, scoped reads, stale brief-dependent replay, and transactionally hydrated partial
+failure responses with flattened current brief and source-linked receipt.
+
+Focused clarification and partial-date recovery regressions:
+  apps/api/.venv/bin/python -m pytest tests/contracts/test_guest_brief.py tests/contracts/test_grounded_qa.py -q
+  28 passed in 0.14s
+  apps/api/.venv/bin/python -m pytest tests/integration/test_sprint5_brief_postgres.py -q
+  8 passed in 0.44s
+  Ruff and compileall passed for the backend package and changed Hospitality schema/prompt.
+
+Pinned reviewer probe:
+  PYTHONPATH=apps/api/src apps/api/.venv/bin/python docs/product/evidence/sprint-5/review-probes/pending_recovery.py
+  Confirmed adults/member pending resolution; one-sided check-in retained with only checkout pending
+  and null nights; unrelated pending child age remained untouched.
+
+Unknown apply outcome recovery:
+  Same-ID replay with a changed durable receipt returns partial_success without model work.
+  A successful scoped lookup proving no receipt or an unchanged receipt returns deterministic
+  `brief_apply_no_effect`; the terminal request is not reset or recomputed.

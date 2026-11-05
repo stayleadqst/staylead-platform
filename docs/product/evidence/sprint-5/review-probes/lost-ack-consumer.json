@@ -1,0 +1,11 @@
+{
+  "initial_http": 503,
+  "initial_error": {
+    "code": "storage_unavailable",
+    "message": "Request storage is unavailable.",
+    "retryable": true
+  },
+  "child_count_after_lost_ack": 1,
+  "raw_new_id_retry_http": 200,
+  "child_count_after_ui_new_id_retry": 2
+}

@@ -1,0 +1,22 @@
+{
+  "candidate_sha256": "fcdd4a2f2ea0247deb873db638879ce579c74b23d703037190a0487e4f1d877c",
+  "backend": {
+    "passed": 259,
+    "log_sha256": "191f2e5f226272e31d87d01d4b752c63dbb8e2b9272ee9c2f6e2f8bcdd1b76ff"
+  },
+  "focused_harness": {
+    "passed": 24,
+    "actual_ingress_scope_negative": "400beforeanyreservation/provider",
+    "exactnextpositive": "1fakecall",
+    "matrix_binding_negative": "no config/stateinitialized"
+  },
+  "ruff": "PASS canonical apps/api/pyproject.toml",
+  "compile": "PASS",
+  "Node_syntax": "PASS",
+  "diff": "PASS",
+  "postgres": "reuse31PASS; allbusinesssourcesunchangedfromb91ea362",
+  "frontend": "reuse40contracts/lint/typecheck/buildPASS; prior53pinnedfilesunchanged",
+  "product_source_diff": [],
+  "live_model_calls": 0,
+  "prior_allocation": "immutable9/16,17lifetime; newallowance0/0 notinitialized"
+}

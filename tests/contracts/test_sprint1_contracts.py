@@ -1,6 +1,7 @@
 import json
 
 from pydantic import BaseModel
+
 from staylead_platform.platform.contracts.state import (
     DomainValidator,
     ExpectedVersion,

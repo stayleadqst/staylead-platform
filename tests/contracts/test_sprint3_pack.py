@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+
 from staylead_platform.domains.hospitality.registration import pack_schema
 from staylead_platform.domains.hospitality.registration.pack_schema import (
     PackValidationError,

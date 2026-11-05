@@ -1,0 +1,15 @@
+{
+  "run_id": "s6-codex-20261026-remediation-5",
+  "max_codex_requests": 18,
+  "codex_requests": 4,
+  "max_guest_turns": 9,
+  "guest_turns": 2,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 0,
+  "answer_only_receipt_hashes": [],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": true,
+  "authority": "Hieu explicit new max18 requests approved after reviewed b9abb91; prior cumulative38 preserved; screenshots local only",
+  "created_at_utc": "2026-10-26T04:47:14Z"
+}

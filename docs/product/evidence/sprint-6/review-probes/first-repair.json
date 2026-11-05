@@ -1,0 +1,28 @@
+{
+  "candidate": "14b484a41bdd93e47dc4ddcb605d2f900f6e3adf",
+  "provider_calls": 0,
+  "backend_focused_tests": 28,
+  "web_presentation_tests": 3,
+  "date_probes": [
+    {
+      "source": "06:30",
+      "answer": "30:06",
+      "observed": "rejected"
+    },
+    {
+      "source": "2026-12-10",
+      "answer": "2026-10-12",
+      "observed": "rejected"
+    },
+    {
+      "source": "10/12/2026",
+      "answer": "12/10/2026",
+      "observed": "accepted"
+    },
+    {
+      "source": "10-12-2026",
+      "answer": "12-10-2026",
+      "observed": "accepted"
+    }
+  ]
+}

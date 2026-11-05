@@ -1,0 +1,38 @@
+{
+  "status": "read-only verification after runtime start rejection; no workaround execution",
+  "candidate_sha256": "9a4833b8b69108fb3fdfbf7f8ca6e8f72e5d6c305036c71f7597d1004afc1512",
+  "run_state": "authorized",
+  "guest_turns": 0,
+  "codex_requests": 0,
+  "fresh_database_guest_state_counts": {
+    "guest_sessions": 0,
+    "guest_requests": 0,
+    "guest_messages": 0,
+    "guest_briefs": 0,
+    "guest_brief_receipts": 0
+  },
+  "properties": [
+    {
+      "hotel_id": "HTL-BEACH02",
+      "slug": "lagoon-family-demo",
+      "public_config_synthetic": true,
+      "name": "Lagoon Family Demo"
+    },
+    {
+      "hotel_id": "HTL-CITY01",
+      "slug": "harbor-city-demo",
+      "public_config_synthetic": true,
+      "name": "Harbor City Demo"
+    },
+    {
+      "hotel_id": "HTL-RETREAT03",
+      "slug": "pine-ridge-demo",
+      "public_config_synthetic": true,
+      "name": "Pine Ridge Demo"
+    }
+  ],
+  "pinned_utterances": "Exactly9 authored synthetic acceptance utterances in already reviewed matrix; example email guest@example.com is an authored test literal, no real guest identity",
+  "intended_destination": "Existing Codex CLI authenticated model provider, configured gpt-6-luna/low; no Grok or new external destination",
+  "secrets": "Private config/signing secret excluded from model request input; credentials only through existing provider authentication",
+  "counter_note": "Process launch denied before runtime/model request, same initialized namespace preserved"
+}

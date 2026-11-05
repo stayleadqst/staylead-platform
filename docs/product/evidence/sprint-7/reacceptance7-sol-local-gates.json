@@ -1,0 +1,10 @@
+{
+  "candidate_sha256": "2bf9fd824b4ff4930407d6af5702b4ba1f59758ff6752d1ab54c8ef4127fd4d5",
+  "source_pins": 237,
+  "controls_delta_files": 3,
+  "root_gate": "23harness/APItests,Rufffullsrc/tests/runtime,compilePASS;3existingwarnings",
+  "builder_gate": "21harnesstests,Ruff,NodeSyntax,diffPASS",
+  "reused_product": "dd0cc688:292contracts/architecture/API,16isolatedPG,RuffcompileDiff,QscopedPASS",
+  "reused_frontend": "53pinsunchanged;40tests/lint/typecheck/buildPASS",
+  "live_requests": 0
+}

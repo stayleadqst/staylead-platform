@@ -1,0 +1,48 @@
+{
+  "candidate_commit": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "mode": "mocked-production-browser-focused-ac",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "L3-AC2",
+      "status": "pass",
+      "assertions": [
+        "composer serializes delayed turns",
+        "older preference revision did not replace current RTL preference",
+        "historical answer lang/dir retained",
+        "older-revision current answer not copy eligible",
+        "brief direction follows current preference"
+      ],
+      "message_requests": 3,
+      "translation_like_requests": 0
+    },
+    {
+      "id": "L3-AC4-cached-labels",
+      "status": "pass",
+      "assertions": [
+        "last validated locale labels survive HTTP 502",
+        "visible provider failure",
+        "no false success",
+        "no translation or extra API request"
+      ],
+      "message_requests": 2
+    },
+    {
+      "id": "L3-AC4-disclosed-English-fallback",
+      "status": "pass",
+      "assertions": [
+        "English fallback explicitly disclosed",
+        "provider failure visible",
+        "no false success",
+        "no translation or extra API request"
+      ],
+      "message_requests": 1
+    }
+  ],
+  "browser_external_origins": [],
+  "screenshot_files_created": false,
+  "model_or_backend_calls": 0,
+  "limitations": [
+    "Provider failure and delayed/stale preference responses were intercepted fixtures; no backend/provider was contacted."
+  ]
+}

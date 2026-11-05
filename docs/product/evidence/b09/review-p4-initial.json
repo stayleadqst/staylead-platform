@@ -1,0 +1,37 @@
+{
+  "candidate": "1e1d507633b26ef3c739e438ba3a18ec36879477b1049fafaf9bee49ac3115e1",
+  "reviewer": "/root/q_b09",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "verdict": "NO_FULL_AC_PASS",
+  "finding": {
+    "priority": "P1",
+    "path": "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+    "line": 202,
+    "related_lines": [
+      220,
+      246,
+      596
+    ],
+    "problem": "Quote membership is treated as edit authorization, while operation and target intent are derived from the provider proposal. An in-memory direct validator probe accepted an informational question as authority to clear committed allergy/accessibility needs.",
+    "evidence_limit": "Validator probe only; persistent API reproducer is next.",
+    "affected_ac": "B09-AC2"
+  },
+  "verification": {
+    "candidate_files_hashed": 223,
+    "artifacts_hashed": 15,
+    "independent_selected_checks_passed": 3,
+    "postgres_checks_initial_sandbox_failure": 2,
+    "postgres_checks_scoped_retry_passed": 2,
+    "candidate_edits": 0,
+    "product_model_calls": 0
+  },
+  "runtime_issue": "Initial response flagged; one factual report-only recovery succeeded, no model switch or further test scenarios.",
+  "scope_clarification": {
+    "verdict": "Hard-relaxation-only is insufficient",
+    "required_boundary": "All actual chat/model-proposed M2 data/pending changes require trusted exact-delta confirmation; no extra confirmation for noop/replay/reads.",
+    "reason": "Same provider-derived authorization applies dates, party, budget and other M2 fields.",
+    "evidence": "Same Q assessment from existing reviewed code; no additional commands or scenarios.",
+    "regressions": "S5 mixed/recovery, S7 room party/date, S8 preference edits, B09 authorized-edit partial failure retain downstream assertions with explicit confirmation setup."
+  }
+}

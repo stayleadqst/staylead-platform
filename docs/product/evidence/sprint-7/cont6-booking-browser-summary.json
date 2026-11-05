@@ -1,0 +1,53 @@
+{
+  "run_id": "s7-room-advice-20261026-batch2-cont6",
+  "started_at": "2026-10-27T05:06:11.643Z",
+  "candidate_sha256": "b91ea362974beea443a8051d8ce313bc9af89aeb25a73c8c7a6b16ff36287f6b",
+  "live_cases_sha256": "e6397fadeb1a6d13974c2febc7bc484733f802e1e9f04cdb9fc6cbd8f0108e37",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "browser": "chromium",
+  "live": true,
+  "mock_api": false,
+  "inherited_parent_counters": {
+    "guest_turns": 8,
+    "codex_requests": 14
+  },
+  "scope": {
+    "first_new_turn": 9,
+    "last_new_turn": 9,
+    "max_new_turns": 1,
+    "max_new_requests": 2,
+    "inherited_parent_counters": {
+      "guest_turns": 8,
+      "codex_requests": 14
+    },
+    "claim": "original case 9 booking intent only; no French advice or prior-selection preservation claim"
+  },
+  "turns": [
+    {
+      "turn": 9,
+      "case_id": "retreat-9",
+      "status": 200,
+      "booking_request_recognized": true,
+      "response_room_advice_omitted": true,
+      "trusted_booking_anchor": true,
+      "language": "en",
+      "provider_calls": 2
+    }
+  ],
+  "payload_captures": [
+    "api-turn-09.json"
+  ],
+  "failure": null,
+  "mobile_layout": {
+    "viewport": 390,
+    "body": 390,
+    "no_horizontal_overflow": true
+  },
+  "counters": {
+    "guest_turns": 9,
+    "codex_requests": 16,
+    "max_guest_turns": 9,
+    "max_codex_requests": 18
+  },
+  "completed_at": "2026-10-27T05:06:25.394Z"
+}

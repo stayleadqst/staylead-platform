@@ -1,0 +1,321 @@
+{
+  "classification": "independent semantic evidence review; synthetic software acceptance",
+  "run_id": "s6-codex-20261026-remediation-8",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "candidate_commit": "f697edb23af5f6d5aeffdbd79d0240ce790e9f5d",
+  "candidate_tree": "1ff27e8d820e1b525c5b1bee920d5b9b575948eb",
+  "product_aggregate_sha256": "bb25884839fd596de63c27df3a8e99df2ed4f545357d8c8b91a2b127f2f3b0b9",
+  "product_stability": "coordinator reports fixed fingerprint throughout this namespace before subsequent remediation",
+  "verdict": "FAIL: presentation label drift, spurious FAQ mutation, Arabic URL delimiter false rejection, inherited pending state, and irrelevant T8 unknown; API-only coverage for turns 5-9",
+  "full_matrix_pass": false,
+  "browser_evidence_turns": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "api_diagnostic_only_turns": [
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "cases": [
+    {
+      "turn": 1,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "Vietnamese; buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cites 040. Canonical 2026-12-10 to 2026-12-13, 3 nights, 2 adults."
+    },
+    {
+      "turn": 2,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "presentation_label_meaning": "FAIL",
+      "detail": "English/brief 2 preserves dates/adults, adds one child with null age/pending, and explicitly asks age. The synthetic-content banner instead says Example link; not functional although the turn contains no link; this is label meaning drift."
+    },
+    {
+      "turn": 3,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "French/brief 3; same child hash 4cdb919c4b3c5006 now age 7; checkout 2026-12-14, 4 nights, original check-in/adults preserved, pending cleared."
+    },
+    {
+      "turn": 4,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "FAIL_SPURIOUS_MUTATION",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040 correctly. Pure FAQ preparation wrongly emits clarify party.children.member, adding an unrelated pending field and changing brief 3 to 4. Its own reason says no age/presence modification was requested. Driver correctly stops on state mismatch."
+    },
+    {
+      "turn": 5,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS",
+      "observed_state_preservation": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Chinese free guest-area Wi-Fi and desk credentials cite 021. Unexpected member pending and brief 4 remain; expected clean brief 3 is not achieved."
+    },
+    {
+      "turn": 6,
+      "scope": "API diagnostic failure only",
+      "answer_semantics": "FAIL_NO_DELIVERED_ANSWER",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "HTTP 502 unsupported_output. Captured Arabic parking values are correct and the URL has its own citation, but a following Arabic comma is captured as part of the URL and falsely rejected. Raw prose says nonfunctional but omits explicit synthetic/sample qualification; that qualifier appears only in the global notice label, so the complete link-specific requirement was not demonstrated."
+    },
+    {
+      "turn": 7,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS",
+      "current_turn_state_effect": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Hindi asks 12 or 13 December 2026, preserves checkout 14 and same child age 7, and correctly adds checkout pending. Actual brief 5 also retains unrelated member pending; expected brief 4 with only checkout pending is not achieved."
+    },
+    {
+      "turn": 8,
+      "scope": "API diagnostic only",
+      "core_date_resolution": "PASS",
+      "answer_semantics": "DEGRADED_IRRELEVANT_UNKNOWN",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Korean correctly commits checkout 2026-12-15 and 5 nights, preserving original check-in/adults/child age 7 and clearing checkout pending. Actual brief 6 still has member pending. The answer then adds an unsolicited misleading statement that accommodation information has no checkout date despite the canonical date just stated."
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS_FOR_COURTESY",
+      "observed_state_preservation": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Korean courtesy preserves explicit Korean revision 8 and actual brief 6, checkout 15/nights 5/same child age 7, with inherited member pending unchanged. This does not meet the clean final brief 5 target."
+    }
+  ],
+  "findings": [
+    {
+      "id": "T2_SYNTHETIC_NOTICE_DRIFT",
+      "severity": "P2",
+      "evidence": [
+        "remediation-8-live-run/turn-screenshots/turn-02.png (local only)",
+        "private output-04 label_bundle.synthetic_notice"
+      ],
+      "detail": "Global synthetic-content notice is mistranslated as an example-link/nonfunctional notice on a turn without a URL. Plain-label validation and fully_validated trace do not establish label meaning."
+    },
+    {
+      "id": "T4_UNAUTHORIZED_CLARIFICATION",
+      "severity": "P1",
+      "evidence": [
+        "remediation-8-live-run/observations.jsonl turn 4",
+        "private preparation output-07",
+        "embedded final_database_observation selected T4 receipt"
+      ],
+      "detail": "Current Japanese question requests breakfast information only. Preparation adds child-member pending despite a reason explicitly stating no modification is requested. This mutates canonical brief 3 to 4 and contaminates later pending/version targets."
+    },
+    {
+      "id": "T6_ARABIC_URL_DELIMITER",
+      "severity": "P2",
+      "evidence": [
+        "namespace8-diagnostic-api-turn-06.json",
+        "private final output-12",
+        "independent offline _validate_supported_literals replay"
+      ],
+      "detail": "The approved exact URL followed by Arabic comma U+060C is tokenized with that comma; ASCII-only trailing punctuation handling raises unsupported_url. Inserting only whitespace before the comma makes the same claim pass. No guard was weakened or source edited by reviewer."
+    },
+    {
+      "id": "T6_LINK_QUALIFICATION_NOT_PROVEN",
+      "severity": "P2",
+      "evidence": [
+        "private final output-12",
+        "pinned live-cases.json turn 6"
+      ],
+      "detail": "Raw Arabic URL paragraph says nonfunctional but does not identify the link as synthetic/sample. A global experimental-link notice is not the required link-prose qualification; no answer was delivered in any event."
+    },
+    {
+      "id": "T8_IRRELEVANT_UNKNOWN",
+      "severity": "P2",
+      "evidence": [
+        "namespace8-diagnostic-api-turn-08.json"
+      ],
+      "detail": "The core explicit pending-date resolution now works in this observed case, but an unsolicited unknown about missing accommodation checkout information is irrelevant and misleading after the saved date was stated."
+    }
+  ],
+  "observed_brief_versions": [
+    1,
+    2,
+    3,
+    4,
+    4,
+    null,
+    5,
+    6,
+    6
+  ],
+  "expected_brief_versions": [
+    1,
+    2,
+    3,
+    3,
+    3,
+    3,
+    4,
+    5,
+    5
+  ],
+  "observed_preference_revisions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    null,
+    7,
+    8,
+    8
+  ],
+  "expected_preference_revisions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8
+  ],
+  "final_database_observation": {
+    "observed_at_utc": "2026-10-26T06:19:35.178838+00:00",
+    "classification": "independent read-only local PostgreSQL SELECTs; exact T9 request fingerprint; synthetic hotel verified",
+    "session_id_sha256": "c4c9980525bbd6ca",
+    "scoped_request_count": 9,
+    "brief_version": 6,
+    "dates": {
+      "check_in": "2026-12-10",
+      "check_out": "2026-12-15",
+      "nights": 5
+    },
+    "party": {
+      "adults": 2,
+      "children": [
+        {
+          "member_id_sha256": "4cdb919c4b3c5006",
+          "age": 7
+        }
+      ]
+    },
+    "pending_fields": [
+      "party.children.member"
+    ],
+    "language_preference": {
+      "language_tag": "ko",
+      "source": "explicit",
+      "revision": 8
+    },
+    "selected_requests": [
+      {
+        "status": "completed",
+        "error_code": null,
+        "request_id_sha256": "c5f7545ff8786da9"
+      },
+      {
+        "status": "error",
+        "error_code": "unsupported_output",
+        "request_id_sha256": "1b3fe0c212acdb35"
+      },
+      {
+        "status": "completed",
+        "error_code": null,
+        "request_id_sha256": "fd1e94da28a35414"
+      },
+      {
+        "status": "completed",
+        "error_code": null,
+        "request_id_sha256": "1ef6ae68113898f4"
+      }
+    ],
+    "selected_receipts": [
+      {
+        "request_id_sha256": "c5f7545ff8786da9",
+        "status": "clarification",
+        "brief_version_before": 3,
+        "brief_version_after": 4,
+        "answer_status": "completed",
+        "brief_version_used": 4
+      },
+      {
+        "request_id_sha256": "fd1e94da28a35414",
+        "status": "applied",
+        "brief_version_before": 5,
+        "brief_version_after": 6,
+        "answer_status": "completed",
+        "brief_version_used": 6
+      }
+    ],
+    "selected_receipts_absent": [
+      "1b3fe0c212acdb35",
+      "1ef6ae68113898f4"
+    ],
+    "provider_calls": 0,
+    "mutations": 0
+  },
+  "bounds": {
+    "guest_turns": 9,
+    "provider_requests": 18,
+    "provider_requests_per_turn": 2,
+    "answer_only_resumes": 0,
+    "automatic_retries": false,
+    "max_provider_latency_ms": 16411.0,
+    "max_http_latency_ms": 28985.9,
+    "max_reported_output_tokens_per_call": 463,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "allowance_closed": true
+  },
+  "visual_review": {
+    "files_checked": [
+      "remediation-8-live-run/turn-screenshots/turn-01.png",
+      "remediation-8-live-run/turn-screenshots/turn-02.png",
+      "remediation-8-live-run/turn-screenshots/turn-03.png",
+      "remediation-8-live-run/turn-screenshots/turn-04.png"
+    ],
+    "result": "VI/EN/FR/JA text and controls are readable, wrap within the displayed desktop layout, and show no overlapping or clipped current answer. T2 notice has a semantic label defect; T4 summary visibly shows the erroneous pending state. No Arabic/Hindi/Korean browser screenshots exist for this namespace.",
+    "screenshots_local_only": true
+  },
+  "network_scope": "Browser driver reports zero external browser-context requests through T4. CLI provider traffic is outside that browser measurement; diagnostic helper sends one explicit localhost POST per selected case.",
+  "limitations": [
+    "No browser/copy/layout evidence for turns 5-9.",
+    "T6 generic error returns no state snapshot; null state is not a state pass.",
+    "Correct later date resolution does not remove unrelated inherited member pending or restore expected version sequence.",
+    "Fully_validated is a guard result, not proof of correct mutation intent, label translation, or relevance.",
+    "Historical namespace7 failure remains unchanged.",
+    "No future live allowance is implied."
+  ],
+  "sources": [
+    "live-cases.json",
+    "namespace8-candidate-manifest.json",
+    "remediation-8-live-run/observations.jsonl",
+    "remediation-8-live-run/run-result.json",
+    "namespace8-diagnostic-api-turn-05.json",
+    "namespace8-diagnostic-api-turn-06.json",
+    "namespace8-diagnostic-api-turn-07.json",
+    "namespace8-diagnostic-api-turn-08.json",
+    "namespace8-diagnostic-api-turn-09.json",
+    "private namespace8 runtime events and captured outputs 04/07/12 (not copied into this report)",
+    "embedded independent local PostgreSQL final observation"
+  ],
+  "reviewer_execution": "read-only source/evidence/image review, offline exact URL guard probe, and scoped local PostgreSQL SELECTs; no provider/model calls, app HTTP calls, server starts, or product edits"
+}

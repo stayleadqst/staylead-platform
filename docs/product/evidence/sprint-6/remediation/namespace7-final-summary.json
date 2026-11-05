@@ -1,0 +1,28 @@
+{
+  "run_id": "s6-codex-20261026-remediation-7",
+  "provider_requests": 18,
+  "semantic_turns": 9,
+  "cumulative_provider_requests": 78,
+  "resumes": 0,
+  "automatic_retries": 0,
+  "product_unchanged": true,
+  "product_fingerprint": "27e0806342f3cfda2cc5e1862f971bcb0a543b891e7280a4eb93ab9acaa06589",
+  "UI_turns": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "API_diagnostic_turns": [
+    9
+  ],
+  "full_matrix_pass": false,
+  "failed_turns": [
+    8
+  ],
+  "next_action": "Fix current explicit pending-date resolution classification, then actual acceptance needs separate allowance"
+}

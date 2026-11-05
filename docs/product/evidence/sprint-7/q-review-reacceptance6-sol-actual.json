@@ -1,0 +1,106 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+  "verdict": "ACTUAL_FAIL C01-AC2; fullC01/Sprint7 remainsBlocked",
+  "turns": [
+    {
+      "turn": 1,
+      "http_status": 200,
+      "body_sha256": "a2b293fe1b610c4c7562f362162a1511d1bdc3df3dde40c4909a0f06e6903d24",
+      "verdict": "FAIL_NO_SEMANTIC_RECEIPT",
+      "M2_subresult": "Correctoneadult/childcc846faa-f7ae-49aa-ae95-810dd33dcf27age7/explicitguardian+sharing/dates2n/bothhardaccess; pending[]; no inventedbudget/type/roomlimit.",
+      "checked_result": "needsclarification,nooptions/currentresult; correctVIknown-accesshotelverification plus unsupportedgenericroom_advice question",
+      "visible_failure": "Tôi nên áp dụng yêu cầu phòng nào? askswhichrequirements toapply althoughM2alreadyhasexact nonpending requirements. Unknownhotelcapability is alreadycovered byspecificverification question. Genericquestion is not justified by missingguestdata/sourceconflict/explicitconstraintadjustment.",
+      "protocol": "Nativecall2 questions=[room_requirements.hard_accessibility_needs,room_advice]; both canonicalvocabularykeys parse. Vocabulary/typedquote validity does not establish questionnecessity.",
+      "readonly_evidence": "q-review-reacceptance6-sol-turn-01-db-readonly.json",
+      "readonly_verified": "transaction_read_only=on; brief/state1,onecompletedrequest/result,twomessages,noselection; API/DBmatch,10sourceowner/version/hash/gen approvedcurrent",
+      "output_tokens": [
+        449,
+        40
+      ]
+    },
+    {
+      "turn": 2,
+      "verdict": "NOT_ATTEMPTED_STOP_FIRST_FAILURE",
+      "note": "M2context itselfisvalid, unlikeR4unrequestedpending; rootstoppedatsemanticFAIL and closedunused1guest2requests. No fictitiousdependencycorruption or repair claimed."
+    }
+  ],
+  "finding": {
+    "id": "Q-R6-AC2",
+    "severity": "P1",
+    "ac": [
+      "AC2",
+      "AC6"
+    ],
+    "locus": "domains/hospitality/recommendations/rooms.py:639–642 canonicaldraftquestioncopy and698–708 nooptionresult; localization subsequently renders question.room",
+    "cause": "Modelquestionhints released without code-checkingwhether typed currentstate/checkedresult establishes missing consequentialfield. Currentcorrectknownaccess marker doesnotfilter extraneousmodelquestion.",
+    "reproducer": "Exact actualdraft→M4 reproduces bothquestions; offline removingonlymodel genericroom_advice leavescorrect specificVIverification andunchangedstatus/source/knownstate.",
+    "causal_evidence": "q-review-reacceptance6-sol-causal-probe-results.json",
+    "bounded_direction": "Treat modelquestionhints as proposals; validate consequentialnecessity from canonicalM2pending/currentfields andcheckedM4reasons before rendering. Preserve genuinepending/age/budget/sourceconflict/rate questions. No NLparser/generalentailmentengine, unconditionalgenericdeletion or modelretry."
+  },
+  "source_math_safety": "All10returnedrefsapprovedcurrentoracle/DB. No falsefit/accesspass/availability/roomprice released. No actualcostestimate because nooptions.",
+  "browser_gate": "Machineallowed resultcontainingcorrectspecificVIquestion; independentsemanticgate caught extraunjustifiedquestion beforemarker01/nextguest. No marker01 or02. Rootstoppedbrowser ratherthanrecordingmachinePASSasfullacceptance.",
+  "final_state": {
+    "status": "halted",
+    "counts": [
+      1,
+      2
+    ],
+    "maxima": [
+      2,
+      4
+    ],
+    "state_sha256": "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27",
+    "lifetime_requests": 52,
+    "unused_guest_request_slots": [
+      1,
+      2
+    ],
+    "unused_closed": true,
+    "root_stop_receipt": "reacceptance6-sol-stop-receipt.json",
+    "root_reports": "API62558/PID12783 SIGTERM exit143; browser35519/PID13138 required SIGKILL after TERM, exit137. No nextturn/modelcall; stopped. Later rootconfirmation corrects incomplete initial SIGTERM-only process description; sealed state hash unchanged."
+  },
+  "bounds": {
+    "model": "gpt-6.1-sol",
+    "effort": "low",
+    "requests": 2,
+    "outputs": [
+      449,
+      40
+    ],
+    "provider_latencies_ms": [
+      9251.2,
+      5096.4
+    ],
+    "http": [
+      {
+        "status": 200,
+        "latency_ms": 14533.9
+      }
+    ],
+    "all_within700_25s_45s": true,
+    "no_retry_observed": true
+  },
+  "pins": "q-review-reacceptance6-sol-actual-pins.json:237immutablecandidate snapshot+repo stillmatchbeforefix",
+  "AC_matrix": {
+    "AC1": "CurrentPineM2facts/authorizationPASS; acceptedCity/Familycontextcoverage retained.",
+    "AC2": "FAIL onlyaskmissingconsequentialinformation; genericroom_advice question hasno support in currentM2/checkedresult. SourcecurrentnesschecksPASS.",
+    "AC3": "No unsafeoption/accessfitreleased; acceptedCity/Family/offlinepolicycoverage reusable. CorrectedPineage8proposalnotattempted.",
+    "AC4": "No Pinecostreleased; acceptedCity/Family+independentmath/unknownfees evidence reused.",
+    "AC5": "AcceptedCitycomparison/currentselection/stale409/reselection retained; PineFrenchoption/currentselection remainsmissing.",
+    "AC6": "Specificknown-needs/hotelverificationcorrect; unsupportedextraquestionmisstatesmissingguestrequirements. No soldout/liveavailabilityfabrication.",
+    "AC7": "Correctbriefcommit/currentversionpersisted; edit/clear/dependentPine2outputnotattempted. AcceptedCity/Family/offlinereplayproofs unchanged.",
+    "AC8": "AcceptedChinese/mixedCity/Family/B07retained; PineFrenchcheckedUIselection stillnotcompleted, sofullAC8blocked."
+  },
+  "reuse": [
+    "q-review-reacceptance3-actual.json acceptedCity1→2",
+    "q-review-reacceptance2-cont1-actual.json acceptedFamily3→5",
+    "q-review-cont6-actual.json acceptedB07AC1–3",
+    "q-review-reacceptance5-sol-actual.json retainsR5Pine1PASS andR5Pine2FAIL; no retroactivechange"
+  ],
+  "limitations": [
+    "R5indexpromptfixnotexercisedbyR6Pine2modelbecause stoppedatturn1; offlineproofremainsvalid, notactualPASS.",
+    "Q no provider/API/actualDBwrites. Rawcaptureslocalonly; enforcedreadonlyobservation.",
+    "No newallowance/counterreset/inference authorized bythisreview; priorfailuresremainimmutable."
+  ]
+}

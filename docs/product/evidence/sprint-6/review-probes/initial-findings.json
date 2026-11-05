@@ -1,0 +1,15 @@
+{
+  "candidate": "d3bfe54b525dd605e33127d3c8968b7deb9a0ba0",
+  "provider_calls": 0,
+  "numeric_guard_observed": [
+    {"source":"06:30","answer":"30:06","source_forms":["06","30"],"answer_forms":["06","30"],"observed":"accepted","expected":"reject"},
+    {"source":"2026-12-10","answer":"2026-10-12","source_forms":["10","12","2026"],"answer_forms":["10","12","2026"],"observed":"accepted","expected":"reject"},
+    {"source":"15.50","answer":"1550","observed":"rejected","expected":"reject"}
+  ],
+  "direction_observed": [
+    {"tag":"ar","server":"rtl","client":"rtl"},
+    {"tag":"az-Arab","server":"rtl","client":"ltr"},
+    {"tag":"en-Hebr","server":"rtl","client":"ltr"}
+  ],
+  "resume_preference_conflict_evidence":"immutable source inspection; no actual model output claimed"
+}

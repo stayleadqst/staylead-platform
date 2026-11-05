@@ -1,0 +1,18 @@
+{
+  "format": "staylead-hospitality-local-guide",
+  "schema_version": 1,
+  "pack_id": "staylead-hospitality-local-guide-v1",
+  "pack_version": "1.0",
+  "synthetic": true,
+  "checked_at": "2026-10-28",
+  "hotel": {
+    "hotel_id": "HTL-S8-DEMO",
+    "slug": "lotus-pilot-demo",
+    "config_version": "s8-local-guide-v1",
+    "name": "Lotus Pilot Demo",
+    "address": "Synthetic district, Ho Chi Minh City, Vietnam",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "currency": "VND"
+  },
+  "files": ["sources.json", "venues.json", "providers.json", "routes.json"]
+}

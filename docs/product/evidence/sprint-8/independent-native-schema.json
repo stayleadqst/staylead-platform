@@ -1,0 +1,74 @@
+{
+  "result": "PASS",
+  "actual_Ajv_native_JSON_schema": true,
+  "no_provider": true,
+  "cases": [
+    {
+      "intents": [
+        "local_guide"
+      ],
+      "refs": [],
+      "expected_accept": true,
+      "actual_accept": true
+    },
+    {
+      "intents": [
+        "local_guide",
+        "guest_edit"
+      ],
+      "refs": [
+        "party.children.count"
+      ],
+      "expected_accept": true,
+      "actual_accept": true
+    },
+    {
+      "intents": [
+        "guest_state"
+      ],
+      "refs": [
+        "party.adults"
+      ],
+      "expected_accept": false,
+      "actual_accept": false
+    },
+    {
+      "intents": [
+        "local_guide",
+        "guest_state"
+      ],
+      "refs": [
+        "party.adults"
+      ],
+      "expected_accept": false,
+      "actual_accept": false
+    },
+    {
+      "intents": [
+        "local_guide",
+        "hotel_information"
+      ],
+      "refs": [],
+      "expected_accept": false,
+      "actual_accept": false
+    },
+    {
+      "intents": [
+        "local_guide",
+        "courtesy"
+      ],
+      "refs": [],
+      "expected_accept": false,
+      "actual_accept": false
+    },
+    {
+      "intents": [
+        "local_guide",
+        "room_advice"
+      ],
+      "refs": [],
+      "expected_accept": false,
+      "actual_accept": false
+    }
+  ]
+}

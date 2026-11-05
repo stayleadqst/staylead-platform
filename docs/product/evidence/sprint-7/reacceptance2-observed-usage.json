@@ -1,0 +1,91 @@
+{
+  "scope": "NEW manual reacceptance2 including technical continuation; prior25requests excluded",
+  "guest_turns": 6,
+  "reserved_requests": 11,
+  "completed_responses_with_usage": 11,
+  "observed_input_tokens": 140042,
+  "observed_output_tokens": 3363,
+  "requests": [
+    {
+      "turn": 1,
+      "call": 1,
+      "input_tokens": 12445,
+      "output_tokens": 375,
+      "total_tokens": null
+    },
+    {
+      "turn": 1,
+      "call": 2,
+      "input_tokens": 11616,
+      "output_tokens": 214,
+      "total_tokens": null
+    },
+    {
+      "turn": 2,
+      "call": 1,
+      "input_tokens": 12568,
+      "output_tokens": 253,
+      "total_tokens": null
+    },
+    {
+      "turn": 2,
+      "call": 2,
+      "input_tokens": 11594,
+      "output_tokens": 187,
+      "total_tokens": null
+    },
+    {
+      "turn": 3,
+      "call": 1,
+      "input_tokens": 12647,
+      "output_tokens": 430,
+      "total_tokens": null
+    },
+    {
+      "turn": 3,
+      "call": 2,
+      "input_tokens": 11818,
+      "output_tokens": 55,
+      "total_tokens": null
+    },
+    {
+      "turn": 4,
+      "call": 1,
+      "input_tokens": 12723,
+      "output_tokens": 265,
+      "total_tokens": null
+    },
+    {
+      "turn": 4,
+      "call": 2,
+      "input_tokens": 17314,
+      "output_tokens": 397,
+      "total_tokens": null
+    },
+    {
+      "turn": 5,
+      "call": 1,
+      "input_tokens": 12794,
+      "output_tokens": 440,
+      "total_tokens": null
+    },
+    {
+      "turn": 5,
+      "call": 2,
+      "input_tokens": 11804,
+      "output_tokens": 303,
+      "total_tokens": null
+    },
+    {
+      "turn": 6,
+      "call": 1,
+      "input_tokens": 12719,
+      "output_tokens": 444,
+      "total_tokens": null
+    }
+  ],
+  "lifetime_requests": 36,
+  "agent_tokens": "unavailable",
+  "billing_amount": "unavailable",
+  "usage_limitation": "Adapter-reported usage only; not a billing claim. Semantic failures still count."
+}

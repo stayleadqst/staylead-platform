@@ -1,0 +1,7 @@
+{
+  "failure": "sandbox denied localhost listen/health and Chrome launch before any guest submission",
+  "provider_requests": 0,
+  "guest_turns": 0,
+  "resolution": "explicitly authorized local acceptance restarted with sandbox escalation; no counters reset",
+  "automatic_provider_retry": false
+}

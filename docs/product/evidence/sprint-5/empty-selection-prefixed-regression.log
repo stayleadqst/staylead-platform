@@ -1,0 +1,53 @@
+Evidence formatting: trailing whitespace trimmed; original failure assertions preserved.
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_answer_only_empty_fact_selection_clears_preliminary_retrieval_and_omits_patch_grammar _
+
+    def test_answer_only_empty_fact_selection_clears_preliminary_retrieval_and_omits_patch_grammar() -> None:
+        provider = FakeProvider(selection_ids=[], answer={
+            "supported_claims": [],
+            "unknowns": ["That detail is not recorded."],
+            "conflicts": [],
+        })
+        preliminary_fact = KnowledgeRetriever._wire(MemoryFacts().facts[0])
+        retriever = KnowledgeRetriever(MemoryFacts())
+        retriever.retrieve = lambda hotel_id, question, context, timeout_seconds=None: RetrievalResult(
+            hotel_id=hotel_id,
+            facts=(preliminary_fact,),
+            conflicts=(),
+            query_terms=1,
+            term_coverage=0.0,
+            candidate_index=({
+                "fact_id": preliminary_fact["fact_id"],
+                "subject": preliminary_fact["subject"],
+                "topic": preliminary_fact["topic"],
+                "field": preliminary_fact["field"],
+            },),
+        )  # type: ignore[method-assign]
+        brief = GuestBriefSnapshot(2, {
+            "dates": {"check_in": None, "check_out": None, "nights": None},
+            "party": {"adults": 2, "children": []},
+        })
+
+        answer = asyncio.run(build(provider, retriever=retriever).answer_committed_turn(
+            hotel_id="HTL-CITY01", question="何時に朝食を食べられますか？", history=[], brief=brief,
+        ))
+
+        assert answer.calls == 2
+        selection_payload = json.loads(provider.calls[0].input_text)
+        assert selection_payload["candidate_index"], "the test must begin with preliminary retrieved facts"
+        assert provider.calls[0].instructions == COMMITTED_FACT_SELECTION_INSTRUCTIONS
+        assert selection_payload["guest_brief_patch_enabled"] is False
+        assert "guest_patch" not in provider.calls[0].instructions
+        assert "set_dates" not in provider.calls[0].instructions
+        answer_payload = json.loads(provider.calls[1].input_text)
+>       assert answer_payload["facts"] == []
+E       AssertionError: assert [{'conditions...firmed', ...}] == []
+E
+E         Left contains one more item: {'conditions': {'timezone': 'Asia/Ho_Chi_Minh'}, 'fact_id': 'F-HTL-CITY01-040', 'field': 'breakfast', 'status': 'confirmed', ...}
+E         Use -v to get more diff
+
+tests/contracts/test_grounded_qa.py:153: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contracts/test_grounded_qa.py::test_answer_only_empty_fact_selection_clears_preliminary_retrieval_and_omits_patch_grammar
+1 failed in 0.12s

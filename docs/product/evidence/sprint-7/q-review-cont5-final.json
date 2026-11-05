@@ -1,0 +1,80 @@
+{
+  "verdict": "PASS scoped code/harness readiness for amended independent8 then9 only; no actual acceptance PASS",
+  "candidate_sha256": "93b38c3012e267fe1e415fe101c811932e62abac2eb0d4704fbc28fd5b44ffdc",
+  "source_hashes_before": 237,
+  "source_hashes_after": 237,
+  "candidate_digest_verified": true,
+  "matrix_sha256": "e6397fadeb1a6d13974c2febc7bc484733f802e1e9f04cdb9fc6cbd8f0108e37",
+  "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+  "authority_parent_verified": {
+    "run_id": "s7-room-advice-20261026-batch2-cont4",
+    "guest_turns": 7,
+    "codex_requests": 12,
+    "status": "halted",
+    "state_sha256": "73375c5c34e1d839d2f2bcc671974cb40f013a77298757828d304ed63b663b43"
+  },
+  "resolved": [
+    "Q-C5 budget question priority",
+    "Q-C6 presentation CAS budget key",
+    "Q-H3 actual nightly oracle math",
+    "Q-H4 optional pure-booking response plus exact GET latest result identity"
+  ],
+  "independent_checks": {
+    "actual_driver_math": "all3 pinned nightly rates x2 pass; wrongsubtotal rejects",
+    "actual_driver_booking": "omitted room_advice passes; wrong latest resultID/clearedselection reject",
+    "no_browser_API_provider": true
+  },
+  "budget_priority_and_CAS": [
+    {
+      "unknowns": [
+        "rate_basis"
+      ],
+      "budget_question": {
+        "field": "room_requirements.budget_strength",
+        "reason": "Ce budget est-il une limite stricte ou un objectif ?",
+        "locale": "fr",
+        "locale_fallback": false,
+        "presentation_key": "question.budget_strength"
+      },
+      "CAS_validation": "reaches DB sentinel; bad key/decision rejected"
+    },
+    {
+      "unknowns": [
+        "rate_validity_window"
+      ],
+      "budget_question": {
+        "field": "room_requirements.budget_strength",
+        "reason": "Ce budget est-il une limite stricte ou un objectif ?",
+        "locale": "fr",
+        "locale_fallback": false,
+        "presentation_key": "question.budget_strength"
+      },
+      "CAS_validation": "reaches DB sentinel; bad key/decision rejected"
+    },
+    {
+      "unknowns": [
+        "rate_basis",
+        "rate_validity_window"
+      ],
+      "budget_question": {
+        "field": "room_requirements.budget_strength",
+        "reason": "Ce budget est-il une limite stricte ou un objectif ?",
+        "locale": "fr",
+        "locale_fallback": false,
+        "presentation_key": "question.budget_strength"
+      },
+      "CAS_validation": "reaches DB sentinel; bad key/decision rejected"
+    }
+  ],
+  "targeted_tests": "6 passed,76 deselected; no PG mutation by Q",
+  "reused_proofs": [
+    "q-review-cont5-atomic-probes.json: native/Pydantic quote parity, pure canonical derivation, forged/missing/mixed/parallel metadata rejected, originalcase7 still rejected",
+    "Prior executed consumer/replay/source/currentness/selection proofs; root final252backend31PG/canonicalRuffcompileDiff reported PASS; frontend53 hashes unchanged"
+  ],
+  "scope_limitations": [
+    "Amended8 starts a fresh Pine session and preserves original8 as amendment metadata. It cannot establish original7 hard access or original7to8 relaxation/childID continuity.",
+    "HistoricalCity2/3/Beach4/5 and case6 guardian/budget intent defects remain unverified with actual corrected model output.",
+    "No new provider calls or actual DB mutations; actual8/9 semantic verdict deferred until captures."
+  ],
+  "extra_v2_guard_failure_preserved": "q-review-cont5-v2-recheck.json: browser-only concurrent identity fix stopped v2 pin verification"
+}

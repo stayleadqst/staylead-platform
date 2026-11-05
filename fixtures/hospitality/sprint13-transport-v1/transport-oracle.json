@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "independent_expected": [
+    {
+      "case": "four-passenger-seats-five-passengers",
+      "provider_id": "TR-01",
+      "required": 5,
+      "available": 4,
+      "fit_status": "not_fit"
+    },
+    {
+      "case": "three-passengers-per-person-total",
+      "provider_id": "TR-02",
+      "passenger_count": 3,
+      "amount": 45000,
+      "basis": "per_person_one_way",
+      "expected_total_amount": 135000,
+      "currency": "VND"
+    }
+  ],
+  "price_units": "integer VND major units (dong)",
+  "contact": "https://example.com/synthetic/providers/tr-01"
+}

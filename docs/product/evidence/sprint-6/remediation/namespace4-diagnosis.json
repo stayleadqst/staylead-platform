@@ -1,0 +1,12 @@
+{
+  "candidate": "f52e74c96593130a8e2541b977daa014e9a3bd8e",
+  "semantic_turns": 6,
+  "provider_requests": 12,
+  "automatic_retries": 0,
+  "operator_resumes": 0,
+  "T1_to_T5": "delivered current answers/state/exactcopy; TZpresent; JapaneseandChinesePASS",
+  "T6": "FAILdelivery: selectoromitsapprovedexactURLfact001,ArabicclaimcopiesURLbutcites046/077only; strictURLbindingrejectionjustified",
+  "T7_to_T9": "notexecuted",
+  "decision": "preserveexactURLsupportfromapprovedM1preliminaryretrieval;donotrepairfinalclaimrefsorweakenURLguard;stopinferenceuntilfixreview",
+  "at_utc": "2026-10-26T04:09:57.367360+00:00"
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "candidate_sha256": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+  "status": "halted",
+  "guest_turns": 1,
+  "codex_requests": 2,
+  "state_sha256": "4a238a18eb8a8b1e904f8e3b5188fb06a1974128d3a85e7121651b00b59c5b27",
+  "lifetime_requests": 52,
+  "unused_guest_slots": 1,
+  "unused_request_slots": 2,
+  "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+  "actual_outcome": {
+    "pine1": "FAIL AC2 unnecessary generic room_advice question despite all relevant saved nonpending requirements",
+    "pine2": "Blocked dependency/notattempted"
+  },
+  "runners": "API62558 SIGTERM exit143; browser35519 SIGTERM then exact ownedPID13138 SIGKILL exit137; no marker01/turn2/retry"
+}

@@ -1,0 +1,15 @@
+{
+  "candidate_sha256": "390daa4c53acc70b3dcb2b26676a065e8226a38261dd705c8d2b739d796cbbee",
+  "actual": "FAIL; not full C01 acceptance",
+  "case3": "HTTP200/two requests; child guardian/separatebed and age clarification preserved; explicit adult sharing consent omitted",
+  "case4": "HTTP502 after two requests: M2 age7 committed brief1→2, same child/guardian/separatebed retained; missing adult consent persists. Partial_success receipt answerfailed unsupported_output unsupported number; no new result, prior brief1 result now stale.",
+  "case5_to_7": "case5 dependencyBlocked; original freshPine6–7 unattempted and independent",
+  "global_guest_turns": 3,
+  "global_requests": 5,
+  "lifetime_sprint7_attempts": 22,
+  "state_status": "halted",
+  "state_sha256": "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75",
+  "runtime_and_browser": "stopped",
+  "chronology": "Driver missed case3 sharing omission and advanced to case4 before Q warning reached coordinator. Both in-flight requests counted. Browser interruption report is not a complete semantic verdict.",
+  "next": "Offline product and missing-driver-check repair; Q readonly diagnosis; no failedcase retry or allowance reset"
+}

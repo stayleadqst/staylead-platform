@@ -1,0 +1,18 @@
+{
+  "run_id": "s6-codex-20261026-remediation-10",
+  "max_codex_requests": 18,
+  "codex_requests": 18,
+  "max_guest_turns": 9,
+  "guest_turns": 9,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 0,
+  "answer_only_receipt_hashes": [],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": false,
+  "authority": "Hieu explicit reply call_2aa3f2e773904272acb715f65dcd729a: increment1 plus transfer17; prior97 preserved; reviewed b666454; unchanged limits; stop first blocker",
+  "created_at_utc": "2026-10-26T07:26:40Z",
+  "close_reason": "Completed nine-turn fixed-candidate run; maximum18 exhausted; awaiting independent verdict",
+  "unused_requests_reserved": 0,
+  "allowance_transferred": false
+}

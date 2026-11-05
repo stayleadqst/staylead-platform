@@ -1,0 +1,51 @@
+{
+  "method": "connected GitHub Git-data API; CLI push lacked noninteractive credential",
+  "branch": "sprint-6-multilingual",
+  "pull_request": "https://github.com/stayleadqst/staylead-platform/pull/96",
+  "base": "sprint-5-canonical-brief",
+  "base_sha": "d5d824125867d008f004300899f408aa75245e04",
+  "published_implementation_evidence_head": "dd958a4e34d7127e368e3a2fc113ea31070ac99f",
+  "published_tree": "06c2c34a1bf694c2c55e9f1b897859ae6ba0c345",
+  "local_head": "b3e77edd99ee212147edac7dff4ae2cccb735f42",
+  "all_published_trees_equal_local": true,
+  "commit_mapping": [
+    {
+      "local": "d3bfe54b525dd605e33127d3c8968b7deb9a0ba0",
+      "published": "fc4fc12cd6f856c5225ca7e79a17a1603f5e635e",
+      "tree": "8ac11872e8549971886b19660337a3b5176ce21d"
+    },
+    {
+      "local": "60dab3c5cbad95fa95bcbecb5a83653c5dd9d112",
+      "published": "96a97b7c8312b7d6bc2002a4e8eb0e0c5dc2634e",
+      "tree": "c960a745c7fae25ed9d6050316aa364072e8070a"
+    },
+    {
+      "local": "14b484a41bdd93e47dc4ddcb605d2f900f6e3adf",
+      "published": "f7cd104f2f4aaabebb4b5e0a832df9bdeff90ea1",
+      "tree": "46e39644b028cb90361bb10a66ddf27a1ec521e3"
+    },
+    {
+      "local": "d5561c2f9641de833a9d8624dfbc97c471521a20",
+      "published": "ad9bc9dcb2728b51e243df5835c74eeaa39f7364",
+      "tree": "cc5ee1624b6bf28f5b5f2e197fe798bdd4dc1509"
+    },
+    {
+      "local": "e66647a24d5c81b60b3496a74ef7f4217c85a4c4",
+      "published": "ebb0ae942ca4bc658902c32be8f3806d1eb290ea",
+      "tree": "e6d1a9284374b6cd87bd212e770620b21936ddd4"
+    },
+    {
+      "local": "5ac41db7646c49d2fc2acce5387781f4fa67ee9e",
+      "published": "b7f488759428b7705095136a2341b82c6a0af5c4",
+      "tree": "70d31d88b360abac8843a0511330acad8ae68e27"
+    },
+    {
+      "local": "b3e77edd99ee212147edac7dff4ae2cccb735f42",
+      "published": "dd958a4e34d7127e368e3a2fc113ea31070ac99f",
+      "tree": "06c2c34a1bf694c2c55e9f1b897859ae6ba0c345"
+    }
+  ],
+  "product_fingerprint": "55a4ab00e0d75cb850585d6ac2ce71b9f2c1f50687e936ce4ed15029376a16cc",
+  "delivery": "draft PR; Blocked shared model DoD; not merged/deployed",
+  "note": "GitHub API authorship/timestamps produce different commit IDs. Tree equality preserves all reviewed file bytes; subsequent publication-note-only commit is recorded on #94."
+}

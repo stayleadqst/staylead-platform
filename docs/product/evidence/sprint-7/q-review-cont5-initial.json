@@ -1,0 +1,42 @@
+{
+  "verdict": "initial changes required; candidate533fda provisional invalidated; await finalpin",
+  "scope": "Atomicinlinequote protocol + newbudgetguard + cont5independentamended8/booking9 only",
+  "passes": [
+    "Both FactSelection/HospitalityGroundedAnswer rejectmissing/forgedquote/parallelmetadata/missingeditintent; purecanonicalmetadata repeatedwithoutmutation; quoteexcludedM2.",
+    "Originalbadcase7stillrejected; newwirederivedmetadata doesnotacceptoldparallelformat.",
+    "Amended8honestlyrestatesfreshcurrentrequirements after7nocommit and preservesoriginal8inmetadata; cannotestablishoriginal7access/7\u21928edit/ageIDcontinuity."
+  ],
+  "known_findings": [
+    {
+      "id": "Q-C5",
+      "severity": "P2",
+      "summary": "Budgetstrength question overridden by globalratebasis unknown priority",
+      "evidence": "q-review-cont5-budget-question-probe.json",
+      "status": "RootassignedA; priorityfixreportedfrozen, finalrecheckpending"
+    },
+    {
+      "id": "Q-C6",
+      "severity": "P1",
+      "summary": "Newbudgetquestion presentationkey rejected by persistenceCAS normalizer",
+      "evidence": "q-review-cont5-budget-presentation-probe.json",
+      "status": "Rootnotified; finalrepair/recheckpending"
+    },
+    {
+      "id": "Q-H3",
+      "severity": "P1",
+      "summary": "Driver expectedNightlyRates incorrectly uses2nighttotals against actualnightlyoracle",
+      "evidence": "Currentbrowserexpected4.4/5/8.2m vs actualpinnedcont1oracle2.2/2.5/4.1m",
+      "status": "RootassignedB; executedactualoraclefixturepending"
+    },
+    {
+      "id": "Q-H4",
+      "severity": "P1",
+      "summary": "Driverrequiresroom_advicefieldonvalidpurebookingresponse; productlegitimatelyomitsit",
+      "evidence": "guest_chat onlysetsroom_advice_responseinside room_advice_requested; booking_requestonlyreturn hasnofield. GETlatestcorrectauthority forselectedcurrentresult.",
+      "status": "RootassignedB; optionalresponse+requiredGETlatestfixturepending"
+    }
+  ],
+  "independent_security_proof": "q-review-cont5-atomic-probes.json",
+  "targeted_tests": "3passed59deselected inline/budgetfocused beforepriorityfix",
+  "effects": "No provider calls, actualDBwrites or productedits."
+}

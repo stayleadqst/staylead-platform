@@ -1,0 +1,18 @@
+{
+  "candidate_base": "7a4c46b3472ed139e6c6d12e3ceefad8341afd56",
+  "product_artifact": "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+  "product_artifact_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+  "ast_sha256": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7",
+  "cwd": "/private/tmp/staylead-s19-canonical",
+  "python": "3.14.7",
+  "executable": "existing workspace API venv Python 3.14.7",
+  "pythonpath": "candidate apps/api/src",
+  "module_origins": {
+    "staylead_platform": "candidate apps/api/src/staylead_platform/__init__.py",
+    "guest_brief": "candidate apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+    "guest_chat": "candidate apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+    "store": "candidate apps/api/src/staylead_platform/infrastructure/persistence/store.py"
+  },
+  "database": "fresh private PostgreSQL 18 test-only database; private Unix socket; inet_server_addr null; no TCP listener; connection URL intentionally omitted from repo evidence",
+  "provider": "deterministic offline provider tests; no live model call"
+}

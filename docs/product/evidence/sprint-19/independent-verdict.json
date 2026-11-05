@@ -1,0 +1,111 @@
+{
+  "scope_ref": "B03 #20 full AC1-3 / U1 DoD v2.2; Sprint19 #121",
+  "phase": "FRESH_INDEPENDENT_REVIEW",
+  "outcome": "PASS_FULL_B03_AC1_3_DOD_V2_2",
+  "ready": true,
+  "ready_to_merge": true,
+  "reviewer": "/root/q_b03_final",
+  "requested_model": "gpt-6.1-sol",
+  "requested_effort": "high",
+  "actual_model_effort_tokens_cost": "unavailable",
+  "started_at_utc": "2026-11-05T02:12:20Z",
+  "candidate_refs": {
+    "repo": "/private/tmp/staylead-s19-canonical",
+    "base": "7a4c46b3472ed139e6c6d12e3ceefad8341afd56",
+    "base_tree": "3548641d08a6e251b3edc02f230a2ef11259244d",
+    "branch": "sprint-19-b03-full-acceptance",
+    "fingerprint": "ad304cb047b7a6813dd0219452ce09ba4c4acf3f5a7af02e867fe0a3c586592a",
+    "files": {
+      "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+      "docs/product/SPRINT_19_ACCEPTANCE.md": "5eed8304ff908adb6a03177fa005e31be74bb525be8eba06f6f4ce145743ab80",
+      "docs/product/evidence/sprint-19/b03-current-evidence.json": "2a52d462a34e279cc631fadb0b73ccb880227f577432f2a695073d8613663d8e",
+      "docs/product/evidence/sprint-19/relevant-ruff-baseline.json": "405c4548b3a64cd4bd698a0eb14dcaef1848cfecbc94d0899f2bbb0199299260",
+      "docs/product/evidence/sprint-19/source-import-origin.json": "90a5292c6ac31e23139d9153fd059eb0c913a5b4c4e9812ec439e85c45b2868a"
+    }
+  },
+  "ac": {
+    "AC1": "PASS with current contracts/PG consumer plus version-qualified S5/S6 semantic observations",
+    "AC2": "PASS current date/missing-age/schema/scope/CAS/atomic evidence",
+    "AC3": "PASS current persisted next consumer/replay/history plus qualified historical semantic/two-session evidence"
+  },
+  "dod": {
+    "1": "PASS_PINNED_TYPES_SEPARATED",
+    "2": "PASS_REUSED_S17_POSTFIX_ACTUAL_UI_PLUS_CURRENT_PG",
+    "3": "PASS_INDEPENDENT_ORACLES",
+    "4": "PASS_RELEVANT_GUARDS",
+    "5": "PASS_AC_DOES_NOT_REQUIRE_NEW_LIVE_RUN_HISTORICAL_REAL_MODEL_QUALIFIED",
+    "6": "PASS_VALID_EXACT_ARTIFACT_REUSE",
+    "7": "PASS_FRESH_Q",
+    "8": "PASS_EVIDENCE_TYPES_LIMITED",
+    "9": "PASS_TECHNICAL_HANDOFF_C_OWNS_DELIVERY_STATUS",
+    "10": "NOT_APPLICABLE"
+  },
+  "independent_checks": {
+    "frozen_files": 5,
+    "frozen_files_match": 5,
+    "source_test_config_fixture_pins": 13,
+    "source_test_config_fixture_pins_match": 13,
+    "preserved_s17_direct_files": 156,
+    "preserved_s17_byte_identical": 155,
+    "only_remaining_file_ast_identical": true,
+    "exact_one_blank_line_vs_base": true,
+    "raw_log_hashes_verified": 3,
+    "no_extra_test_lint_model_browser_service_run": true
+  },
+  "evidence_refs": [
+    "REVIEW.md",
+    "independent-pin-verification.json",
+    "../candidate.json",
+    "../GitHub-planning-snapshot.json",
+    "../github-umbrella.json",
+    "../counters.json",
+    "../a/operation-ledger.json",
+    "/private/tmp/staylead-s19-canonical/docs/product/SPRINT_19_ACCEPTANCE.md",
+    "/private/tmp/staylead-s19-canonical/docs/product/evidence/sprint-19/b03-current-evidence.json",
+    "../GitHub-dependency-readback.json"
+  ],
+  "changed_records": [
+    "q/REVIEW.md",
+    "q/VERDICT.json",
+    "q/independent-pin-verification.json"
+  ],
+  "open_failures": [],
+  "actionable_findings": [],
+  "counters_used": {
+    "Q_product_repairs": 0,
+    "Q_live_calls": 0,
+    "Q_test_lint_reruns": 0,
+    "B03_format_round_total": "1/3 preserved",
+    "source_writes_total": 3,
+    "Ruff_preartifact_attempts": 4,
+    "Ruff_postartifact_attempts": 1,
+    "Ruff_total_recorded_attempts": 5,
+    "no_counter_reset": true,
+    "inherited_caps_unchanged": true
+  },
+  "limits": [
+    "26 current focused PASS/0SKIP; later8contracts overlap, not34unique",
+    "Exact final artifact was tested/linted before restore; no fresh check after final reapply; reuse by matching SHA and identical AST",
+    "S19 offline provider doubles, real private PG; no live model evidence",
+    "S17 postfix actual UI/API/processor proof reused via direct source/config compatibility; not fresh S19 UI/build",
+    "S5/S6 real-model observations remain historical and served-model identity unavailable",
+    "No full #17/#19 closure, no automatic closure from #84",
+    "No publication/merge/CI/deployment/Review/Retro completion claimed by Q",
+    "No distinct empirical test of a valid date range paired with a conflicting guest-stated nights count; deterministic canonical nights derives from endpoints, and current conflict/ambiguous-date/missing-age cases support AC2 without claiming that unrun utterance PASS"
+  ],
+  "checkpoint_ref": "q/VERDICT.json",
+  "next_action": "C publication/owner PR merge after corresponding-content readback; actual #20 disposition and scheduled Sprint Review/Retro",
+  "wait_condition": null,
+  "resources": "Q created no runtime services/browser/DB; existing S19 PG pid/socket absent/data preserved",
+  "leases": "RELEASED",
+  "deadline_utc": "2026-11-05T02:55:00Z",
+  "completed_at_utc": "2026-11-05T02:17:18.235225+00:00",
+  "pins_verified_after_review": {
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": true,
+    "docs/product/SPRINT_19_ACCEPTANCE.md": true,
+    "docs/product/evidence/sprint-19/b03-current-evidence.json": true,
+    "docs/product/evidence/sprint-19/relevant-ruff-baseline.json": true,
+    "docs/product/evidence/sprint-19/source-import-origin.json": true
+  },
+  "resources_released": true
+}

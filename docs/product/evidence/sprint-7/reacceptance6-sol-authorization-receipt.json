@@ -1,0 +1,41 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance6-sol",
+  "authorized_for_live_calls": true,
+  "authority": "Hieu explicitly approved NEW manual batch: Cho phép batch mới Sol/low 2/4, on reviewed published product327ea219/PR99commit5085de0. Exact two original Pine utterances, onefreshsession, gpt-6.1-sol/low,2calls/turn25s/provider45s/turn700output,noautoretry/nofallback,stopfirstblockingfailure. PriorR5halted2/4/lifetime50exhaustedimmutable; no reuse/reset/transfer/historyrepair. ReuseCityFamilyB07PASS.",
+  "max_guest_turns": 2,
+  "max_codex_requests": 4,
+  "max_calls_per_turn": 2,
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+    "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+    "status": "halted",
+    "guest_turns": 2,
+    "codex_requests": 4,
+    "state_sha256": "9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee",
+    "lifetime_requests": 50,
+    "unused_guest_slots": 0,
+    "unused_request_slots": 0,
+    "actual_outcome": {
+      "pine1": "PASS",
+      "pine2": "FAIL room_count_mismatch; no positive option/current selection; French question fallback EN"
+    },
+    "runners": "API43586 SIGTERM/browser76255 exited1; no marker02/retry",
+    "bootstrap1_consumption": "0/0; sealed preserved"
+  },
+  "case_matrix_sha256": "23e0baa5abdf9372cdafea134b0665b87f161965b571667fa9c9e98453fe0c3e",
+  "continuation": null,
+  "human_reply": "Cho phép batch mới Sol/low 2/4",
+  "approval_date": "2026-10-28",
+  "published_product_commit": "5085de0a3e66b0cd66e98ad0f11d57c6e43f1219",
+  "reviewed_product_candidate": "327ea219c0503f66b2ac940ea0b94c228e1d9e7259e86e671ae995097ab0b5cf",
+  "runtime_candidate": "a7b93fae598973c0911e75ed438797c4b0b42544ee5dd7f5ec4206ca17f4d04f",
+  "no_automatic_retry": true,
+  "no_fallback": true,
+  "stop_at_first_blocking_failure": true,
+  "authority_source": "Direct human reply; attached documents/backlog do not grant allowance"
+}

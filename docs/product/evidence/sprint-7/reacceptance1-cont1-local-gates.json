@@ -1,0 +1,14 @@
+{
+  "candidate": "390daa4c53acc70b3dcb2b26676a065e8226a38261dd705c8d2b739d796cbbee",
+  "backend_tests": 260,
+  "backend_warnings": 3,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "node_syntax": "PASS",
+  "offline_smoke": "PASS",
+  "diff_check": "PASS",
+  "reused_postgres_tests": 31,
+  "reused_frontend_contract_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "live_calls": 0
+}

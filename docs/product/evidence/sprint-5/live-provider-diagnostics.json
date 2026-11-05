@@ -1,0 +1,11 @@
+{
+  "operation": "read-only GET models; no inference",
+  "credential_retrieval_succeeded": true,
+  "http_status": 200,
+  "elapsed_seconds": 4.256,
+  "configured_deployment_listed": false,
+  "deployment_state": "Succeeded",
+  "deployment_model": "grok-4-1-fast-reasoning",
+  "deployment_version": "1",
+  "interpretation": "Management/model-list access works; model-list does not prove deployment alias routing or inference readiness. Inference timeout cause remains unknown."
+}

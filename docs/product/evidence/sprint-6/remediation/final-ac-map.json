@@ -1,0 +1,318 @@
+{
+  "candidate_product_source_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "candidate_published_source": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+  "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "status": "PASS_DELIVERED",
+  "rows": [
+    {
+      "story": 91,
+      "ac": "L1-AC1",
+      "expected": "Open language tags; explicit preference is scoped/authoritative",
+      "observed": "Actual vi/en/fr/ja/zh/ar/hi/ko revisions1–8; session scope/idempotency/CAS covered offline",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "tests/contracts/test_sprint6_language.py",
+        "tests/integration/test_sprint6_language_postgres.py",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 91,
+      "ac": "L1-AC2",
+      "expected": "Short/mixed retains context or clarifies",
+      "observed": "T9 courtesy retains Korean/revision8; restart and mixed-input regressions pass",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "tests/integration/test_sprint6_language_consumer_postgres.py",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 91,
+      "ac": "L1-AC3",
+      "expected": "Language-only changes preserve brief/members/pending",
+      "observed": "T4–6 brief3 unchanged and same child7; T9 brief5 unchanged; language-only PG no brief mutation",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "tests/integration/test_sprint6_language_consumer_postgres.py"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 91,
+      "ac": "L1-AC4",
+      "expected": "Postcommit failure/replay/resume/late output cannot reapply edits or overwrite newer locale; historical output remains historical",
+      "observed": "S5/S6 PG recovery/replay persists scope/intents and applies edit once; production mocked recovery preserves historical answers; final UI assertions separately attributed",
+      "evidence": [
+        "tests/integration/test_sprint6_language_consumer_postgres.py",
+        "tests/integration/test_sprint5_consumer_postgres.py",
+        "docs/product/evidence/sprint-6/remediation/consumer-recovery-browser.log",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 91,
+      "ac": "L1-AC5",
+      "expected": "Persisted preference survives restart; revision increments once",
+      "observed": "Recreated app reads committed preference in PG tests; actual explicit changes1–8 and T9 unchanged",
+      "evidence": [
+        "tests/integration/test_sprint6_language_consumer_postgres.py",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 92,
+      "ac": "L2-AC1",
+      "expected": "Cross-language/contextual answers use correct property source per supported part, missing evidence is unknown",
+      "observed": "Actual JA040/ZH021/AR046+URL001 independently reviewed; six hotel claims, no unsupported hotel unknowns",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "tests/contracts/test_grounded_qa.py",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 92,
+      "ac": "L2-AC2",
+      "expected": "Reject injected/unapproved/revoked/expired/foreign/conflicting evidence",
+      "observed": "Relevant source authority/lifecycle and grounded negative regressions pass; adversarial cases are offline, not claimed live",
+      "evidence": [
+        "tests/contracts/test_sprint3_pack.py",
+        "tests/integration/test_sprint4_lifecycle_postgres.py",
+        "tests/contracts/test_grounded_qa.py",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 92,
+      "ac": "L2-AC3",
+      "expected": "Equivalent Unicode decimal values accepted; unequal values/date-time/IDs/URL changes rejected",
+      "observed": "Equal/unequal digit and punctuation/date/time guards pass; actual numeric values and approved URL independently correct",
+      "evidence": [
+        "tests/contracts/test_sprint6_language.py",
+        "tests/contracts/test_grounded_qa.py",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 92,
+      "ac": "L2-AC4",
+      "expected": "Compare pinned lexical baseline and actual semantic output with per-case usefulness/rejection/unknown/conflict/latency/calls",
+      "observed": "Nine-case comparison preserves lexical coverage separately; actual18calls, independent useful answers, zero unsupported hotel unknown/conflict/false rejection",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-case-comparison.json",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/codex-retrieval-baseline-current-matrix.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 93,
+      "ac": "L3-AC1",
+      "expected": "Latin/CJK/RTL/Devanagari/mixed input and display on desktop/mobile without clipping or reversed tokens",
+      "observed": "Actual9desktop answers/copy and scripts reviewed; earlier mobile six-script prefix and targeted RTL proof reused; finalmobile screenshot scroll limitation disclosed",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/browser-presentation-final.log",
+        "docs/product/evidence/sprint-6/browser-rtl-script-corrected.log"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 93,
+      "ac": "L3-AC2",
+      "expected": "Scoped labels/direction update without brief reset; historical bubbles and newer locale resist old output",
+      "observed": "Focused mocked production browser: serialized composer; Arabicrev2 preserved after delayed Englishrev1; main/briefRTL stays current; historical en/ltr and ar/rtl bubbles retained; old revision answer not copy eligible",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/consumer-final-ac-browser.log"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 93,
+      "ac": "L3-AC3",
+      "expected": "Bounded finite/plain-text labels validated/cached atomically in same response; no extra translation call",
+      "observed": "Atomic cache/fallback/unsafe bundle contracts pass; NS10 missing labels in existing two calls only, canonical English labels reused",
+      "evidence": [
+        "apps/web/tests/presentation.test.mjs",
+        "tests/contracts/test_sprint6_language.py",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 93,
+      "ac": "L3-AC4",
+      "expected": "Provider outage uses cached labels or disclosed English fallback, no false success/model translation",
+      "observed": "Focused mocked production browser502: last validated Chinese labels retained; fresh Japanese session explicitly discloses English fallback; provider error visible/no false success/no translation or extra message calls",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/consumer-final-ac-browser.log",
+        "apps/web/tests/presentation.test.mjs"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 74,
+      "ac": "B12a-AC1",
+      "expected": "Clipboard plain text exactly preserves Unicode/names/numbers/mixed direction; desktop/mobile",
+      "observed": "Actual9desktop exact-copy passes; six-script mobile/keyboard/clipboard prefix completed before unrelated race harness failure; no terminal full-suite claim",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/browser-presentation-final.log"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 74,
+      "ac": "B12a-AC2",
+      "expected": "Success/failure/unsupported copy reports true outcome and selection fallback; no model calls",
+      "observed": "Browser denied/unsupported/keyboard prefix and clipboard function tests cover deterministic outcomes",
+      "evidence": [
+        "docs/product/evidence/sprint-6/browser-presentation-final.log",
+        "apps/web/tests/presentation.test.mjs"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 74,
+      "ac": "B12a-AC3",
+      "expected": "Session/hotel changes or pending cannot copy old output or make provider calls",
+      "observed": "Race-only three assertions and state contracts pass; all9actualcopy counters unchanged",
+      "evidence": [
+        "docs/product/evidence/sprint-6/browser-races-identity-final.log",
+        "apps/web/tests/chat-state.test.mjs",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 74,
+      "ac": "B12a-AC4",
+      "expected": "Only current eligible scoped answer can copy; stale/late/pending fail safely",
+      "observed": "Race gate covers old/pending/stale/scope/late guards; actual9eligible/current exact copy passes. Extra skipped-mode race log fields are not evidence",
+      "evidence": [
+        "docs/product/evidence/sprint-6/browser-races-identity-final.log",
+        "apps/web/tests/chat-state.test.mjs",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 95,
+      "ac": "R1-AC1",
+      "expected": "Concrete pinned failure diagnostics/reproducer without secrets; unrecovered historical bodies disclosed",
+      "observed": "NS9 op-object failure reproduced offline; private capture controls reject/accept. Earliest failed raw bodies are not retrospectively diagnosed",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace9-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-review.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 95,
+      "ac": "R1-AC2",
+      "expected": "Bounded correction preserves strict core/source/state/numeric/URL validation; labels fallback atomically",
+      "observed": "Native prep schema rejects malformed op; committed-only prep channels blocked; optional labels fallback; no new AI call, automatic retry, or guard relaxation",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-review.json",
+        "tests/contracts/test_sprint6_language.py",
+        "tests/contracts/test_hospitality_preparation_output.py"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 95,
+      "ac": "R1-AC3",
+      "expected": "Postcommit recovery preserves preference/brief/receipt without duplicate patch or stale locale",
+      "observed": "S5/S6 PostgreSQL and mocked production consumer-recovery evidence reused; NS10 itself had no recovery retries",
+      "evidence": [
+        "tests/integration/test_sprint6_language_consumer_postgres.py",
+        "tests/integration/test_sprint5_consumer_postgres.py",
+        "docs/product/evidence/sprint-6/remediation/consumer-recovery-browser.log",
+        "docs/product/evidence/sprint-6/remediation/current-turn-local-gates.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 95,
+      "ac": "R1-AC4",
+      "expected": "Authorized fixed nine-turn actual VI→EN→FR→JA→ZH→AR→HI→KO→mixed with independent semantics",
+      "observed": "NS10 reviewedPASS unchanged220files,9UIturns/18requests,readonlyPG expected final state",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/evidence/sprint-6/remediation/namespace10-final-summary.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 95,
+      "ac": "R1-AC5",
+      "expected": "Local gates/review/ACmap and delivery complete before dependent story closure",
+      "observed": "Reviewed acceptance/code/text published at1333eb2 and fetched/equal-tree verified before all6scopedissues closed completed; receipt records transitions; parent/epic/milestone preserved",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+        "docs/product/SPRINT_6_ACCEPTANCE.md",
+        "docs/product/evidence/sprint-6/remediation/final-delivery-receipt.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 94,
+      "ac": "C-AC1",
+      "expected": "Contracts/leases/handoffs and9turn18request plan recorded, copy ownership unique",
+      "observed": "Abackend/Bconsumer/Qindependent/Cintegration assignments and pinned matrix recorded",
+      "evidence": [
+        "docs/product/evidence/sprint-6/remediation/execution.md",
+        "docs/product/evidence/sprint-6/live-cases.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 94,
+      "ac": "C-AC2",
+      "expected": "Track owner/impact/rootcause/targetedrepair/review, preserve bounds",
+      "observed": "Existing95 remainedcurrentSprint; NS8/9 failures kept; explicit transfer17+increment1; source review and no retry NS10. Prior convergence failure acknowledged, not erased",
+      "evidence": [
+        "AGENTS.md",
+        "docs/product/evidence/sprint-6/remediation/namespace9-stop-decision.json",
+        "docs/product/evidence/sprint-6/remediation/namespace9-run-state-transferred.json",
+        "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json",
+        "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json"
+      ],
+      "status": "PASS"
+    },
+    {
+      "story": 94,
+      "ac": "C-AC3",
+      "expected": "Final AC evidence/versions/usage/failures and delivery status accurately reported; parent scope preserved",
+      "observed": "Reviewed acceptance/code/text published at1333eb2 and fetched/equal-tree verified before all6scopedissues closed completed; receipt records transitions; parent/epic/milestone preserved",
+      "evidence": [
+        "docs/product/SPRINT_6_ACCEPTANCE.md",
+        "docs/product/evidence/sprint-6/remediation/publication.json",
+        "docs/product/evidence/sprint-6/remediation/final-delivery-receipt.json"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "verification_notes": [
+    "Source hashes for unchanged product independently rechecked by Q.",
+    "Historical mobile-prefix evidence completed its assertions before later race setup failure; no full-suite PASS inferred.",
+    "Race-only log only establishes its three executed race assertions, not skipped mobile/clipboard fields.",
+    "Historical failures/counters remain immutable; no screenshot bytes or private secrets published."
+  ],
+  "delivery_sequence": "Final reviewed evidence package is published and fetched/equal-tree verified before six scoped GitHub issues are closed; external receipt records final head and transitions.",
+  "delivery_receipt": "final-delivery-receipt.json"
+}

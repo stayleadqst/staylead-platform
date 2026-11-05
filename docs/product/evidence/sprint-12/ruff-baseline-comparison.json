@@ -1,0 +1,62 @@
+{
+  "configured_exit": 1,
+  "scope": [
+    "apps/api/src/staylead_platform/composition/configuration/settings.py",
+    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+    "apps/api/src/staylead_platform/entrypoints/app.py",
+    "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+    "apps/api/src/staylead_platform/infrastructure/persistence/retention_cli.py",
+    "apps/api/src/staylead_platform/platform/guest_context/sessions/signing.py",
+    "apps/api/src/staylead_platform/platform/guest_context/sessions/retention.py",
+    "tests/integration/test_b11_retention_postgres.py"
+  ],
+  "findings": [
+    {
+      "file": "apps/api/src/staylead_platform/composition/configuration/settings.py",
+      "code": "I001",
+      "line": 3
+    },
+    {
+      "file": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+      "code": "I001",
+      "line": 3
+    },
+    {
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "code": "I001",
+      "line": 3
+    }
+  ],
+  "baseline_comparison": [
+    {
+      "path": "apps/api/src/staylead_platform/composition/configuration/settings.py",
+      "base_and_candidate_fix_lines_equal": true,
+      "base_fix_lines": [
+        "-"
+      ],
+      "candidate_fix_lines": [
+        "-"
+      ]
+    },
+    {
+      "path": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py",
+      "base_and_candidate_fix_lines_equal": true,
+      "base_fix_lines": [
+        "-"
+      ],
+      "candidate_fix_lines": [
+        "-"
+      ]
+    },
+    {
+      "path": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "base_and_candidate_fix_lines_equal": true,
+      "base_fix_lines": [
+        "-"
+      ],
+      "candidate_fix_lines": [
+        "-"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "verdict": "PASS_READY_FOR_BOOTSTRAP2_SAME_HUMAN_APPROVED_SOL_LOW_PINE2_4_ALLOCATION",
+  "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "scope": "Only provider approved-profileallowlist + realbuild_provider/CLIarguments regression since0a controlsreview; exact2filedelta/237pins/digest match before+after, no other product/control change",
+  "pins_evidence": "q-review-reacceptance5-sol-bootstrap2-pins.json",
+  "independent_profile_probe": "q-review-reacceptance5-sol-bootstrap2-profile-probe.json: realbuild_provider Settings→CodexCLIProvider Sol/low andLuna/low construct, exactCLI model/lowargs, unapprovedmodels/effortsreject, defaultLunaunchanged; no subprocess/generate/API/DB call",
+  "focused_test": "test_codex_cli_accepts_only_the_luna_and_sol_low_profiles:1PASS",
+  "prior_readiness_error": "Original0a readiness missed unchanged Luna-only providerconstructor allowlist. Its bootstrap failed before anyrequest; q-review-reacceptance5-sol-bootstrap-diagnosis.json preserved. Do not call originalstartupPASS.",
+  "recovery_controls": {
+    "receipt": "reacceptance5-sol-bootstrap-recovery.json",
+    "old_state_sha256": "0c41c6dbc7b55279e28376f5f890075ff8eaf806ec878b4059e233ab710f9f68",
+    "old_config_sha256": "dbb452a7b7c9d7d8c79a64d99611f3b4d0eafcca3e94ce478dd4ed5058938eff",
+    "old_status": "halted",
+    "old_counts": [
+      0,
+      0
+    ],
+    "new_separate_filenames": true,
+    "new_config_state_absent_at_review": true,
+    "same_runID_and_human_authority_and_2_4_caps": true,
+    "same_cases_oracle_full_R4closed_receipt": true,
+    "no_extra_allowance_or_paid_retry_or_fallback": true
+  },
+  "reused_valid_control_proofs": [
+    "q-review-reacceptance5-sol-final.json (allunchangedcontrolsemantics andactualprivateinputs; initialstartupclaimsuperseded)",
+    "q-review-reacceptance5-sol-bootstrap-results.json (actualprivatebootstrappositive+negative)",
+    "q-review-reacceptance5-sol-semantic-gate-results.json (actualfsrootreceipt/identity/bodyhash unsafefile/timeoutnegatives)",
+    "q-review-reacceptance5-sol-producer-results.json (actualcanonicalM2/M4→driverpositive+negative)"
+  ],
+  "root_gate_receipt": "reacceptance5-sol-bootstrap2-local-gates.json:35provider+harness+APItestsPASS, canonicalwholeRuff/compilePASS,3knownwarnings. No unrelatedproductreaudit.",
+  "actual_status": "NOT_YET_PASS: no actualguest/providerrequest consumed. Root soleactivator/rootsemanticmarkerwriter; actualPine2 acceptance+source/math/UI/readonlyDB stillrequired.",
+  "no_Q_inference_or_actualDB_write": true
+}

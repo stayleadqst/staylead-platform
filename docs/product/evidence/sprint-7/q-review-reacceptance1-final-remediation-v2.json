@@ -1,0 +1,42 @@
+{
+  "candidate_sha256": "3df06f98b30cf46043d6ea742375d4e82cd7a14fa3f97553b40b672f7b6b45a5",
+  "manifest": "candidate-manifest-reacceptance1-final-remediation-v2.json",
+  "verdict": "PASS_SCOPED_OFFLINE_CODE_REVIEW",
+  "authorized_for_live_calls": false,
+  "initial_findings_preserved": "q-review-reacceptance1-final-remediation-initial.json",
+  "resolution": {
+    "Q-FINAL-A1": "PASS: exact original Pine6 selected10 facts + native question + original brief now produce checked key and known-needs marker; serialized VI→FR payload executes complete update_room_advice_presentation with scripted connection; same result ID/version, six expected statements. Persistence accepts trusted stored key, keeps marker in checked decision; no domain import/policy duplication.",
+    "Q-FINAL-A2": "PASS: absent needs or pending existing needs produce generic question.room, omit known-needs marker, do not claim recorded; French generic projection works."
+  },
+  "independent_evidence": {
+    "pins": "237/237 before, after probe, and after targeted tests; digest matches pinned candidate.",
+    "actual_capture": "Original10 source references preserved exactly in serialized new-renderer output. Historical actual API response unchanged.",
+    "CAS_negatives": [
+      "forged arbitrary question key rejected",
+      "downgraded key rejected",
+      "changed checked marker rejected",
+      "changed question field rejected",
+      "forged matching caller expected/new decision rejected against stored generic row"
+    ],
+    "presentation": "Valid French label accepted; missing, unrelated, numeric, wrong-placeholder labels fall back to EN.",
+    "patch_guards": "38 targeted test cases pass: compact typed age8+explicit hard-access clear preserves dates/guardian/sharing/stable childID; exact quote/intent/target and native null-placeholder checks retained.",
+    "proposal": "New proposal contains exactly original7 case objects/utterances; only metadata changed, candidate matches v2, authorized_for_live_calls false."
+  },
+  "commands": [
+    "PYTHONPATH=apps/api/src apps/api/.venv/bin/python /Users/ccvn/Documents/project/Staylead/validation/sprint-7-execution-20261026/q-review-final-remediation-v2-probe.py",
+    "pytest scoped selection test_room_advice.py/test_grounded_qa.py:35passed133deselected",
+    "pytest exact authorization/guest_edit/native-null tests:3passed"
+  ],
+  "reported_root_gates": "274 backend +14 S7/S6 language PostgreSQL tests, canonical Ruff/compile/diff PASS; reused as reported receipts, not independently rerun by Q.",
+  "limitations": [
+    "Scripted CAS connection is not PostgreSQL; currentness guard stubbed only in this probe. Root/B real PostgreSQL regression evidence separately covers persistence.",
+    "No provider/API calls, no actual database access/writes, no live activation.",
+    "Original Pine6 actual FAIL and Pine7 output-token-limit failure remain preserved.",
+    "Compact prompt guidance is an unverified hypothesis for model700 compliance; no model reliability/actual acceptance PASS inferred.",
+    "C01/Sprint DoD remains Blocked; B07 earlier actual pilot PASS reused; proposed new7/14 run requires separate human authorization."
+  ],
+  "evidence": [
+    "q-review-final-remediation-v2-probe.py",
+    "q-review-final-remediation-v2-probe-results.json"
+  ]
+}

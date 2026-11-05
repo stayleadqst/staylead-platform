@@ -1,0 +1,204 @@
+
+> @staylead/platform-web@0.1.0 test:contracts
+> node --experimental-strip-types --test ../../tests/contracts/f06_domain_binding.test.mjs tests/api-client.test.mjs tests/chat-state.test.mjs tests/guest-brief-format.test.mjs tests/media-format.test.mjs tests/proxy-url.test.mjs
+
+TAP version 13
+# (node:97836) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97836) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/composition/domain_registry.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: a target selects its own landing, theme, content, renderer and API binding
+ok 1 - a target selects its own landing, theme, content, renderer and API binding
+  ---
+  duration_ms: 4.635291
+  ...
+# Subtest: unknown profiles and domain/contract/API mismatches fail without fallback
+ok 2 - unknown profiles and domain/contract/API mismatches fail without fallback
+  ---
+  duration_ms: 1.081917
+  ...
+# (node:97837) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97837) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/api/client.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: session creation verifies real target metadata before sending hotel data
+ok 3 - session creation verifies real target metadata before sending hotel data
+  ---
+  duration_ms: 18.406042
+  ...
+# Subtest: direct hotel lookup is data-driven and unknown hotels surface the backend error
+ok 4 - direct hotel lookup is data-driven and unknown hotels surface the backend error
+  ---
+  duration_ms: 0.47175
+  ...
+# Subtest: binary media fetch uses authenticated same-origin route and returns bytes as Blob
+ok 5 - binary media fetch uses authenticated same-origin route and returns bytes as Blob
+  ---
+  duration_ms: 1.373667
+  ...
+# Subtest: message client forwards bearer and preserves the API response shape
+ok 6 - message client forwards bearer and preserves the API response shape
+  ---
+  duration_ms: 0.415417
+  ...
+# Subtest: freshness check sends only the scoped evidence bindings
+ok 7 - freshness check sends only the scoped evidence bindings
+  ---
+  duration_ms: 0.38325
+  ...
+# Subtest: proxy gateway failures and lost responses are unknown outcomes
+ok 8 - proxy gateway failures and lost responses are unknown outcomes
+  ---
+  duration_ms: 0.342709
+  ...
+# Subtest: typed provider failures are known API rejections
+ok 9 - typed provider failures are known API rejections
+  ---
+  duration_ms: 0.242583
+  ...
+# Subtest: answer-only resume sends the applied receipt reference without replaying the guest edit
+ok 10 - answer-only resume sends the applied receipt reference without replaying the guest edit
+  ---
+  duration_ms: 0.958584
+  ...
+# Subtest: partial-success errors preserve the committed receipt for explicit answer resume
+ok 11 - partial-success errors preserve the committed receipt for explicit answer resume
+  ---
+  duration_ms: 0.57025
+  ...
+# (node:97838) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97838) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/chat/chat-state.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: ambiguous network outcomes and pending requests keep their request ID
+ok 12 - ambiguous network outcomes and pending requests keep their request ID
+  ---
+  duration_ms: 0.574
+  ...
+# Subtest: a confirmed terminal request failure offers a new request only on explicit retry
+ok 13 - a confirmed terminal request failure offers a new request only on explicit retry
+  ---
+  duration_ms: 0.062584
+  ...
+# Subtest: stale sources require a guest initiated turn and never auto-retry
+ok 14 - stale sources require a guest initiated turn and never auto-retry
+  ---
+  duration_ms: 0.099166
+  ...
+# Subtest: known retryable provider failures use a new ID because the backend marked the request failed
+ok 15 - known retryable provider failures use a new ID because the backend marked the request failed
+  ---
+  duration_ms: 0.073416
+  ...
+# Subtest: a committed partial result never offers resubmitting the original edit under a new ID
+ok 16 - a committed partial result never offers resubmitting the original edit under a new ID
+  ---
+  duration_ms: 0.132417
+  ...
+# Subtest: uncertain brief-apply completion stays on the same request until scoped recovery resolves it
+ok 17 - uncertain brief-apply completion stays on the same request until scoped recovery resolves it
+  ---
+  duration_ms: 0.060792
+  ...
+# Subtest: an unresolved same-ID retry blocks the composer until resolved or a new chat starts
+ok 18 - an unresolved same-ID retry blocks the composer until resolved or a new chat starts
+  ---
+  duration_ms: 0.13325
+  ...
+# Subtest: a contract mismatch has a clear deterministic error and no transient retry
+ok 19 - a contract mismatch has a clear deterministic error and no transient retry
+  ---
+  duration_ms: 0.066584
+  ...
+# Subtest: an unknown hotel link explains that the hotel has not been registered
+ok 20 - an unknown hotel link explains that the hotel has not been registered
+  ---
+  duration_ms: 0.274083
+  ...
+# Subtest: provider authentication failure does not trigger guest session renewal
+ok 21 - provider authentication failure does not trigger guest session renewal
+  ---
+  duration_ms: 0.349917
+  ...
+# Subtest: an expired guest session asks for an explicit new session
+ok 22 - an expired guest session asks for an explicit new session
+  ---
+  duration_ms: 0.107083
+  ...
+# Subtest: the request lock rejects a second in-flight send and releases on completion
+ok 23 - the request lock rejects a second in-flight send and releases on completion
+  ---
+  duration_ms: 0.051708
+  ...
+# Subtest: hotel changes reject late session creation responses
+ok 24 - hotel changes reject late session creation responses
+  ---
+  duration_ms: 0.336208
+  ...
+# Subtest: requests require a session and stale response generations are rejected
+ok 25 - requests require a session and stale response generations are rejected
+  ---
+  duration_ms: 0.039584
+  ...
+# (node:97839) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97839) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/domains/hospitality/registration/brief-format.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: checkout-only receipt reports only changed fields and never implies a missing check-in
+ok 26 - checkout-only receipt reports only changed fields and never implies a missing check-in
+  ---
+  duration_ms: 5.892042
+  ...
+# Subtest: receipt date wording includes both dates only when both were changed
+ok 27 - receipt date wording includes both dates only when both were changed
+  ---
+  duration_ms: 0.1195
+  ...
+# (node:97840) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97840) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/chat/media-format.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: clip references retain fractional seconds and exact minute boundaries
+ok 28 - clip references retain fractional seconds and exact minute boundaries
+  ---
+  duration_ms: 6.548417
+  ...
+# (node:97841) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:97841) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/src/shared/api/proxy-url.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /Users/ccvn/Documents/project/Staylead/github/staylead-platform/apps/web/package.json.
+# Subtest: root API base keeps the configured upstream host
+ok 29 - root API base keeps the configured upstream host
+  ---
+  duration_ms: 1.573958
+  ...
+# Subtest: path-prefixed API base appends only the allowlisted backend path
+ok 30 - path-prefixed API base appends only the allowlisted backend path
+  ---
+  duration_ms: 0.142625
+  ...
+# Subtest: leading double slashes remain a path and cannot replace the configured host
+ok 31 - leading double slashes remain a path and cannot replace the configured host
+  ---
+  duration_ms: 0.067375
+  ...
+# Subtest: upstream query parameters stay separate from the media path
+ok 32 - upstream query parameters stay separate from the media path
+  ---
+  duration_ms: 0.17625
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 179.474166

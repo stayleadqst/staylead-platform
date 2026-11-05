@@ -1,0 +1,48 @@
+{
+  "candidate_sha256": "c9829ff3c8ea2a9f5aee3e6b8ab3f4b4d21f74dc95134cd10966ad7c4b58ec86",
+  "verdict": "PASS_READINESS_FOR_EXPLICITLY_AUTHORIZED_SINGLE_7TURN_14REQUEST_RUN",
+  "run_id": "s7-room-advice-20261027-reacceptance2",
+  "scope": "Four-harness-file delta only; product3df06f98 offline PASS reused; no new product audit.",
+  "resolved_v1_finding": "City2 actual checkBrief now accepts false exact adultpair sharing+no hardbedtype, OR retained true sharing+canonical single/twin. Actual distinct-surface checks remain; unresolved true/nohardtype rejects.",
+  "pins": {
+    "repository": 237,
+    "snapshot": 237,
+    "all_match": true,
+    "digest_match": true,
+    "before_after_runtime_input_validation_match": true,
+    "final_after_probes_match": true,
+    "matrix_sha256": "3150ff212d669186f7e8c3099ff4afb99015049ddc6cd81f9e4d3911927a085d",
+    "oracle_sha256": "4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84",
+    "authority": "Actual private regular0600 matching3150 cases/caps/newrun and old receipt.",
+    "prior_state": "Actual halted5/8 bytes match3a13; lifetime25 receipt, unused2/6closed.",
+    "initial_state": "Not initialized at final review; fresh0/0 verified by control tests; no prior counters seeded."
+  },
+  "executed_evidence": [
+    "All7 canonicalM2+M4 real checked-domain producers passed actual browser checkBrief/checkRoom/per-case assertion branches, including unknown-child nooptions and legitimate unknown-fee partial cases.",
+    "City2 canonical true/single and false/no-hardtype positive; unresolved true/empty negative; same assigned sleeping surface negative.",
+    "Missing Family adultconsent, Pine6 generic question, unknownfees falsely complete, hard-conflict option negatives rejected before advancing.",
+    "Actual semantic wait function with real file IO: valid exactrun/candidate/turn/pass/APIresponsebodyhash advances; wrong identity/verdict/body, symlink,0644,missingtimeout reject; no reserve/provider/API operations whilewaiting.",
+    "Actual runtime._verify_candidate_inputs against final manifest/current237source/cases/oracle/oldsealedstate passed.",
+    "10 targeted runtime/control tests passed including fakeTestClient arbitraryinput400 zeroreserve/provider and exactnext fakecall, cap/failedattempt/one-shot, matrixmismatchnoinit, priorreceipt.",
+    "2 focused v2 browser/semanticreceipt tests passed; overlaps with prior focused set, counts not summed."
+  ],
+  "semantic_gate": "Placed after rawAPI/evidencecapture, machinechecks/UIselection/stalechecks, before next loop submission. Root writes receipt only after independent Q actualsemantic PASS, using response capture.body_sha256; not file-byte hash.",
+  "actual_review_plan": "q-review-reacceptance2-cases.json retained; sourceID alone not entailment, Q checks Chinese comparison/currentconstraints/feeunknowns/minorage+guardian/sharing/French semantic content perturn. Root controls receipts and halt.",
+  "reported_root_gates": "27 focused harness/API, canonical Ruff/compile/Node/offline-smoke/diff PASS; reuse unchanged274 backend/14PG/40frontend53pins; do not sum overlaps.",
+  "effects": "No actual API/provider/DB calls or writes; offline inprocess TestClient/fakeprovider tests only; no config/state initialization by Q.",
+  "limitations": [
+    "Readiness is not actual acceptance PASS. Original failures/states/counters stay immutable.",
+    "Fresh exact7 once, cap14,max2/turn25s45s700Luna/low, stopfirstblockingfailure,no automaticretry.",
+    "Compact prompt700/modelreliability unverified until actual observed; fullC01/SprintDoD remains pending.",
+    "B07 previously accepted technical pilot evidence reused; no new booking turn."
+  ],
+  "evidence": [
+    "q-review-reacceptance2-initial.json",
+    "q-review-reacceptance2-cases.json",
+    "q-review-reacceptance2-producer.py",
+    "q-review-reacceptance2-producer-results.json",
+    "q-review-reacceptance2-semantic-gate-v2.mjs",
+    "q-review-reacceptance2-semantic-gate-v2-results.json",
+    "q-review-reacceptance2-final-pins.json"
+  ]
+}

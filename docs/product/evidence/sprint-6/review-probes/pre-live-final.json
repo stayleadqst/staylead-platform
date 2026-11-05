@@ -1,0 +1,12 @@
+{
+  "candidate": "d5561c2f9641de833a9d8624dfbc97c471521a20",
+  "tree": "cc5ee1624b6bf28f5b5f2e197fe798bdd4dc1509",
+  "provider_calls": 0,
+  "direct_guard_probes": 10,
+  "all_expected_outcomes": true,
+  "focused_language_tests": 4,
+  "finding1": "closed",
+  "finding2": "code_closed_browser_confirmation_owned_by_coordinator",
+  "finding3": "closed",
+  "verdict": "ready_for_authorized_live_batch_pending_focused_browser_record"
+}

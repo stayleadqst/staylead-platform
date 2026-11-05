@@ -1,0 +1,111 @@
+{
+  "scope_ref": "https://github.com/stayleadqst/staylead-platform/issues/34",
+  "phase": "independent_Q_delta_v2",
+  "outcome": "PRODUCT_DELTA_PASS_FINAL_EVIDENCE_PENDING",
+  "candidate_refs": {
+    "base": "be3f738aa7ba7231b3ff556dbb8bbcf29f9c71bf",
+    "manifest": "docs/product/evidence/sprint-12/candidate-v2.json",
+    "fingerprint": "625699cda708dd6e3536e4930c4a98aca45b9a551a3ec690696a230d17f72307",
+    "file_count": 213,
+    "pins_before_after_scoped_probes_match": true
+  },
+  "policy": "pilot-retention-24h-ops7d-v1",
+  "runtime": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "high",
+    "actual_model": "unavailable",
+    "actual_effort": "unavailable",
+    "permission_readonly": "instruction only; enforcement unavailable"
+  },
+  "findings": [
+    {
+      "id": "Q12-1",
+      "priority": "P1",
+      "blocking": true,
+      "title": "Prevent language preference recreation after deletion",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1907,
+      "related_consumer": "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py:1204",
+      "requirement": "B11 AC1/AC3 and approved content+derived deletion policy",
+      "cause": "commit_language_preference locks only its own optional row, never the live owning session. A delayed preparation can insert a fresh preference after DELETE has removed the session. Cleanup only traverses extant sessions, so the orphan survives.",
+      "repro": "Private PG + actual HTTP: pause deterministic provider in preparation, DELETE own session (204), release provider declaring explicit_language_tag=fr. Session and preference counts at delete completion are0; late request504 creates1 language row linked to deleted SID. Explicit purge at now+8days leaves1 row.",
+      "evidence": [
+        "q-retention-probe.py",
+        "q-retention-probe.json",
+        "q-retention-probe-escalated.log"
+      ],
+      "disposition": "CLOSED on v2 by independent original reproducer recheck"
+    },
+    {
+      "id": "Q12-2",
+      "priority": "P2",
+      "blocking": true,
+      "title": "Serialize cleanup before copying quota reservations",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1211,
+      "related_paths": [
+        "delete_guest_session:1286",
+        "purge_expired_sessions:1312"
+      ],
+      "requirement": "B11 AC2/AC3 and unchanged B10 quota accounting",
+      "cause": "Both cleanup paths select without exclusive session claim; concurrent cleanup transactions may copy the same recent reservation into two random redacted rows. Idempotent deletion changes hotel admission count.",
+      "repro": "One reserved request; two actual delete_guest_session calls in concurrent threads. SQLAlchemy after_cursor_execute barrier only schedules both recent SELECTs before DELETE. Both calls returnTrue, session count0, retained quota count2. Explicit delete can overlap scheduled cleanup after phase1 expiry.",
+      "evidence": [
+        "q-double-delete-probe.py",
+        "q-double-delete-probe.json",
+        "q-double-delete-probe.log"
+      ],
+      "disposition": "CLOSED on v2 by independent original reproducer recheck"
+    }
+  ],
+  "verified": [
+    "All213 manifest pins matched before and after independent probes; no candidate edits",
+    "Read full tracked API/web diff from base plus new retention modules/test; inventoried all session-bearing persistence tables and consumer gates",
+    "Official B11 and planning#110 fetched; allAC1–3 retained; only B11 core",
+    "Independent lifecycle probe: expired startup session/content erased; future session/content present at startup then erased at nearest expiry; unrelated live session retained;1 named retentiontask inside lifespan and0 aftershutdown",
+    "Frontend source review: deletion/expiry advances generation, aborts scoped operations, removes displayed state, leaves explicit retry handle for ambiguous deletion, no automatic renewal/resend",
+    "Existing broad gate evidence reused rather than rerun: C198passed6skipped then dedicatedS8sixpassed; B54contracts/lint/typecheck/configuredbuild; A5focusedPG; limitations not independently reexecuted"
+  ],
+  "evidence_refs": [
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-retention-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-double-delete-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lifecycle-probe.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lifecycle-probe-final.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-retention-probe-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-retention-probe-v2.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-double-delete-probe-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-double-delete-probe-v2.log",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lockorder-v2.json",
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-lockorder-v2.log"
+  ],
+  "changed_records": [
+    "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-delta-v2.json"
+  ],
+  "open_failures": [],
+  "counters_used": {
+    "product_repairs": 0,
+    "live_inference": 0,
+    "private_pg_probe_runs": 4,
+    "sandbox_denied_before_pg": 1,
+    "q_lifecycle_fixture_timing_correction": 1,
+    "inherited_counters": "preserved; not reset or consumed by Q",
+    "note": "first lifecycle run established startup/shutdown only because future clock elapsed during setup; final controlled future expiry corrected in own probe, no candidate repair",
+    "private_pg_probe_runs_delta": 3
+  },
+  "checkpoint_ref": "/Users/ccvn/Documents/project/Staylead/validation/sprint-12-20261029/q-delta-v2.json",
+  "next_action": "Await C final test-only pin/gates and v2 browser evidence; confirm exact test delta and produce full-AC technical verdict",
+  "wait_condition": "C finalcandidate/evidence",
+  "limits": [
+    "Independent technical review is not stakeholder acceptance",
+    "No live model/deployment/CI action",
+    "Actual browser evidence pending C; cannot claim browser PASS from source review"
+  ],
+  "delta_verification": {
+    "Q12-1": "Actual privatePG/HTTP DELETE204, release delayed explicitFrench preparation→401, no preference/content/requests/session; repeatDELETE204; +8days noorphan",
+    "Q12-2": "Concurrent cleanup with original timing barrier adapted to permit expectedserialization→1quota row,1recent read; no hang",
+    "lockorder": "Complete request paused after request rowlock; DELETE expiry stage completes; releasing latecompletion→ScopeError and DELETEtrue, no surviving session/content/request and no hangingthread",
+    "scheduler_race": "Concurrent duepurge+DELETE→exactly1quota reservation,0sessions,1recentread, no hangingthread",
+    "browser_evidence_reviewed": "v1 C desktop actual UI/API/PG+twotabs isolation; deletion and serverexpiry screenshots viewed; mobile390 expiry screenshot viewed; frontend unchanged so evidence reusable for unchanged paths",
+    "final_gates": "v2 C root204PASS1FAIL known newfixture globalpurgecount expectation, productprobe unaffected; C-reserved test-only correction pending. No broad rerun byQ"
+  }
+}

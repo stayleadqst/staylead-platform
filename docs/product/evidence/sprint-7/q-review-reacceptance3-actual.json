@@ -1,0 +1,241 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance3",
+  "candidate_sha256": "345a71417443a90f51410ecad93bbced5effc1f248a7077ab492a9c1b8e34123",
+  "overall": "ACTUAL_FAIL: C01/Sprint7 completion remains blocked by Pine4 authorized relaxation and French checked-advice journey",
+  "reuse": [
+    "AcceptedFamily3–5 actual chain on4797d219 with unchangedcanonical/M4/native-compatibleIDs",
+    "B07 earlieractualtechnicalpilotPASS"
+  ],
+  "turns": [
+    {
+      "turn": 1,
+      "approved_previous_turn": 1,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "7fe6fdf380ced1b34969b9b3399045b5fffbe740f9751e34a3f984d0d2aace2b",
+      "counters": [
+        1,
+        2
+      ],
+      "output_tokens": [
+        503,
+        439
+      ],
+      "verified": [
+        "Exactcurrentquote,2adults,explicitsharing,3n/hard6mVND,no invented physicaltype/maxrooms",
+        "STDqueen share5.4m vs TWNsingles5.85m two comparablecheckedoptions; correct1.8m/1.95m×3sourceprices,unknownavailability",
+        "Chinesecheckednonfallbackfit/bed/price rationale visible; M4removed unsupportedpreferencetradeoff ratherthaninventingpreference/ranking",
+        "UIexactresult9c6becc9-f5f5-4b6a-a58a-262231c9f0bd/v1/option-1selected0additionalprovider",
+        "ReadonlyDBstate/brief1,1completedrequest/result,2messages,exactselection;4refowner/version/hash/genapproved"
+      ],
+      "db_evidence": "q-review-reacceptance3-turn-01-db-readonly.json"
+    },
+    {
+      "turn": 2,
+      "approved_previous_turn": 2,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "0c23129359802ed9e92e637e5c51ecb194ba98a80bacfb757ffb36d1ded28fa8",
+      "counters": [
+        2,
+        4
+      ],
+      "output_tokens": [
+        580,
+        216
+      ],
+      "verified": [
+        "Explicitno-sharing/hard6.5mVND+unchangeddates/count; no invented physicaltype/roomlimit",
+        "TWNdistinctsinglebed0/1,all2once;1.95m×3=5.85mcomplete,correctcurrentrefs/unknownavailability",
+        "ChinesecheckedrationaleandUIcorrect; oldcardstale/disabled+oldselectionPOST409 assertionsexecuted beforeevidence/gate; nofailurefile",
+        "UInewexactresultae72df59-2588-49a1-8a4f-f933cbd02d72/v2/option-1selected; GETlatest+readonlyDBsame currentidentity; nooldrebind,0provider selection",
+        "ReadonlyDBstate/brief2,2completedrequests/results,4messages,exactnewselection;2refsboundtoversion/hash/gen"
+      ],
+      "note": "Final browser report confirms stale_replay_status409 and zero provider selection calls, followed by v2 selection.",
+      "db_evidence": "q-review-reacceptance3-turn-02-db-readonly.json"
+    },
+    {
+      "turn": 3,
+      "approved_previous_turn": 6,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "e1015ef1ff1c16041d2cf77d3311e1bdd73ff6425b03f2728633bb54fa414ca7",
+      "counters": [
+        3,
+        6
+      ],
+      "verified": [
+        "Current explicit dates/one adult/child age7/guardian and sharing permission saved with stable server child UUID; no invented ID",
+        "Both hard access needs retained without pending-field fabrication or automatic relaxation",
+        "No options falsely certified; Vietnamese question.accessibility_confirmation explains known requirements await hotel verification, not guest restatement or inferred age-only cause",
+        "Ten current source bindings match approved owners/version/hash/generation; reference availability remains unknown",
+        "Enforced read-only DB brief/state1, one completed request/result, two messages, no selection; API/result identities match"
+      ],
+      "child_id": "c735eb36-a032-4b63-aa89-7e66b59930c2",
+      "db_evidence": "q-review-reacceptance3-turn-03-db-readonly.json"
+    },
+    {
+      "turn": 4,
+      "approved_previous_turn": 7,
+      "verdict": "FAIL_DO_NOT_ADVANCE",
+      "response_sha256": "90329d014920d5ccf54919b242713fd416b6f41a34fa936235c5a7aa51a9aabc",
+      "http_status": 200,
+      "counters": [
+        4,
+        8
+      ],
+      "output_tokens": [
+        653,
+        75
+      ],
+      "verified": [
+        "Same existing child UUID updated age7→8; guardian/sharing/dates preserved",
+        "Explicit removal of BOTH access needs mis-extracted: retained wheelchair-accessible bathroom; clear_fields instead named ten unrelated absent fields",
+        "Read-only DB confirms wrong retained need committed in brief/state2, two completed requests/results, four messages and no selection",
+        "Native call2 accessibility_confirmation field maps to generic English fallback despite French explicit language and French accessibility label; no French checked option/rationale or current selection",
+        "All 10 references current and pinned; model code does not falsely assert access fit or availability"
+      ],
+      "db_evidence": "q-review-reacceptance3-turn-04-db-readonly.json",
+      "findings": [
+        {
+          "id": "Q-R3-1",
+          "severity": "P1",
+          "ac": [
+            "AC1",
+            "AC6",
+            "AC7"
+          ],
+          "problem": "Guest-authorized clearing of both hard access requirements is not faithfully committed.",
+          "evidence": "turn-04-call-01.json, turn-04-api.json, read-only DB",
+          "locus": "domains/hospitality/prompts/grounded_qa.py:54 and schemas/preparation_output.py:105–116 (typed extraction/clear contract; no claim deterministic M4 caused it)",
+          "smallest_remediation_direction": "Make explicit field removal representation unambiguous near native/Pydantic schema and exercise actual original quote → typed clear → M2 → M4. Preserve quote authorization and no language parser; do not clear unrelated fields."
+        },
+        {
+          "id": "Q-R3-2",
+          "severity": "P1",
+          "ac": [
+            "AC2",
+            "AC6",
+            "AC8"
+          ],
+          "problem": "Noncanonical model question field is accepted and rendered as unrelated generic English question, discarding supplied French label.",
+          "locus": "domains/hospitality/schemas/room_advice.py:55,121; recommendations/rooms.py:637,106–134",
+          "evidence": "call2 field accessibility_confirmation + question.accessibility_confirmation French label; API question.generic/en/fallbacktrue",
+          "smallest_remediation_direction": "Constrain canonical question-field vocabulary at native/parser boundary or derive a justified server-known canonical question. Do not add ad-hoc aliases or a translator call."
+        }
+      ]
+    }
+  ],
+  "browser_final": {
+    "failure": {
+      "name": "Error",
+      "message": "Pine turn 4 did not clear the explicitly relaxed access requirements"
+    },
+    "successful_machine_turns": [
+      1,
+      2,
+      3
+    ],
+    "semantic_markers": [
+      1,
+      2,
+      3
+    ],
+    "stale_selection_rejection": 409,
+    "selection_model_calls": 0,
+    "pine4_selection": "not reached",
+    "final_mobile_check": "not reached in this failed run; previously accepted frontend/B07 evidence remains valid"
+  },
+  "final_state": {
+    "status": "halted",
+    "guest_turns": 4,
+    "codex_requests": 8,
+    "maxima": [
+      4,
+      8
+    ],
+    "sha256": "e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b",
+    "stop_reason": "blocking_semantic_pine4_access_relaxation_not_applied",
+    "lifetime_requests": 44,
+    "no_remaining_calls_authorized": true
+  },
+  "bounds": {
+    "provider_completed": 8,
+    "all_output_tokens_lte700": true,
+    "all_provider_latency_lte25000ms": true,
+    "http_completed": [
+      {
+        "turn": 1,
+        "latency_ms": 20893.2,
+        "status": 200
+      },
+      {
+        "turn": 2,
+        "latency_ms": 19733.3,
+        "status": 200
+      },
+      {
+        "turn": 3,
+        "latency_ms": 16124.3,
+        "status": 200
+      },
+      {
+        "turn": 4,
+        "latency_ms": 15996.7,
+        "status": 200
+      }
+    ],
+    "no_automatic_retry_observed": true
+  },
+  "ac_matrix": [
+    {
+      "ac": 1,
+      "verdict": "FAIL remaining Pine4",
+      "proof": "City1/2 and accepted Family3–5 preserve authorized context; Pine3 correct. Pine4 retains an explicitly removed requirement."
+    },
+    {
+      "ac": 2,
+      "verdict": "PASS source/currentness coverage; affected clarification FAIL",
+      "proof": "All four actual source bindings match approved hotel/version/hash/generation; reused expired/revoked/conflict/offline negatives. Pine4 generic question is not useful current-language clarification."
+    },
+    {
+      "ac": 3,
+      "verdict": "PASS checked-assignment coverage; Pine relaxed result missing",
+      "proof": "City queen sharing/twin distinct surfaces and accepted Family own-bed/guardian/age checks; no falsely certified access; independent cot/bunk/group/conflict cases reused."
+    },
+    {
+      "ac": 4,
+      "verdict": "PASS existing actual+independent coverage",
+      "proof": "City5.4m/5.85m; accepted Family5.2m and7.6m base, unknown mandatory charges/null total, budget strength question; currency/basis/night-window negative proofs reused. Pine age8 priced proposal not reached."
+    },
+    {
+      "ac": 5,
+      "verdict": "PASS City comparison/selection and versioned edit",
+      "proof": "Two comparable City types/prices; current UI selection→stale409→new current selection persisted without provider. No fabricated global optimum. Pine selection missing."
+    },
+    {
+      "ac": 6,
+      "verdict": "FAIL remaining Pine4 consent/adjustment chain",
+      "proof": "Pine3 known hard-needs/hotel verification correct and availability unknown. Pine4 consent to drop both needs not reflected."
+    },
+    {
+      "ac": 7,
+      "verdict": "FAIL remaining Pine4 authorized edit correctness",
+      "proof": "City stale/versioned selection passes; accepted Family stable child edits and offline replay/failure/currentness proofs reused. Pine4 stable child age correct but wrong hard-needs state."
+    },
+    {
+      "ac": 8,
+      "verdict": "FAIL remaining Pine4 French checked advice/selection",
+      "proof": "Actual Chinese/mixed City and accepted Family/B07 consumer journeys pass. French requested but question becomes generic English fallback and no checked option/selection."
+    }
+  ],
+  "reused_evidence": [
+    "q-review-reacceptance2-cont1-actual.json (Family3–5)",
+    "q-review-cont6-actual.json (B07 AC1–3 accepted)",
+    "q-review-reacceptance2-final-mechanism.json (offline product review)",
+    "q-review-reacceptance3-final.json (control readiness)"
+  ],
+  "limitations": [
+    "Synthetic technical pilot only; no real inventory/hotel/price/booking claim",
+    "Historical failures retained; no retroactive PASS or original model retry",
+    "No Q model/API/DB writes; all four DB evidence transactions explicitly read-only",
+    "No additional execution authorized; any future linked Pine reacceptance requires separate human approval after offline fix"
+  ]
+}

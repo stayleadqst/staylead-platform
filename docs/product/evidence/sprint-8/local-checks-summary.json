@@ -1,0 +1,44 @@
+{
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "repair_checks": {
+    "root_composition_contracts_postgres_language_architecture": "121 PASS, one upstream Starlette/httpx deprecation warning; repair-root-tests.log",
+    "root_acceptance_controls": "15 PASS; repair-root-harness.log",
+    "builder_core_labels": "12 PASS; repair-b-core-labels-tests.log",
+    "static": "canonical whole API/tests/runtime Ruff, compileall, node --check bothJS, git diff --check PASS"
+  },
+  "reuse": {
+    "baseline_backend": "263 relevant PASS plus final99 affected native/orchestration (overlap), original independent review; unchanged domain/lifecycle/auth consumer evidence retained",
+    "web": "43contracts/lint/typecheck/productionbuild PASS from original; all web sources unchanged by repair, no rerun",
+    "operator": "G1-G4 and actual operator browser evidence unchanged"
+  },
+  "live": {
+    "latest_batch": "COMPLETED_SEALED4turns/8requests independentlyQ/rootPASS",
+    "state_sha256": "bf05af652f3c796af218b45b804470221e115b0a597ff9bb20271d123478d8b7",
+    "aggregate_tokens_latest_batch": {
+      "input": 95864,
+      "output": 3396,
+      "per_call": "unavailable"
+    },
+    "call_latencies_ms": [
+      12753,
+      8997,
+      13911,
+      8270,
+      12529,
+      9659,
+      10519,
+      6482
+    ],
+    "original_batch": "HALTED1/2 immutable unused3/6CLOSED; priorfailure preserved",
+    "sprint8_total_actual_requests": 10,
+    "retries": 0,
+    "further_inference_authorized": false
+  },
+  "usage": {
+    "coding_tokens": "unavailable",
+    "coding_retries": "unavailable",
+    "active_agent_hours": "unavailable",
+    "forecast": "15–27 active agent-hours, uncalibrated, not measured actual or deadline"
+  }
+}

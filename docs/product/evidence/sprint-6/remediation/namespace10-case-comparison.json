@@ -1,0 +1,665 @@
+{
+  "namespace": "remediation-10",
+  "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "provider_requests": 18,
+  "cumulative_provider_requests": 115,
+  "full_matrix_pass": true,
+  "baseline_method": "Pinned original-query lexical candidate coverage is retrieval evidence, not answer correctness. Actual semantic verdict belongs to independent Q.",
+  "baseline_path": "../codex-retrieval-baseline-current-matrix.json",
+  "baseline_matrix_sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07",
+  "cases": [
+    {
+      "turn": 1,
+      "expected": "VI buffet/location/floor/time/timezone040,dates10→13,nights3,adults2",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "observed_answer": "Bữa sáng tự chọn được phục vụ tại Bến Gió, tầng 1, từ 06:30-09:30. (Asia/Ho_Chi_Minh) [F-HTL-CITY01-040]\nNgày nhận phòng: 2026-12-10.\nNgày trả phòng: 2026-12-13.\n3 đêm.\n2 người lớn.",
+      "observed_state": {
+        "brief_version": 1,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "vi",
+        "source": "explicit",
+        "revision": 1
+      },
+      "presentation": {
+        "language_tag": "vi",
+        "direction": "ltr",
+        "preference_revision": 1,
+        "freshness": "current",
+        "receipt_id_sha256": "eab83e4efc5f31b1",
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        9401.1,
+        6059.8
+      ],
+      "reported_input_tokens": [
+        10090,
+        8003
+      ],
+      "reported_output_tokens": [
+        266,
+        363
+      ],
+      "http_status": 200,
+      "http_latency_ms": 15584.5,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Mixed hotel question and explicit stay edit. Buffet breakfast at Bến Gió, floor1, 06:30-09:30 Asia/Ho_Chi_Minh; ISO dates10–13 December2026, nights3 and adults2 correct.",
+      "supported_hotel_claims": 1,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Vietnamese labels preserve approved meanings, including sample hotel information."
+    },
+    {
+      "turn": 2,
+      "expected": "EN addonechild,agepending,askage,preserve dates/adults",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "observed_answer": "Check-in: 2026-12-10.\nCheck-out: 2026-12-13.\n3 nights.\n2 adults.\n1 child; age not provided.\nWhat is the child's age?",
+      "observed_state": {
+        "brief_version": 2,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": null
+            }
+          ]
+        },
+        "pending_fields": [
+          "party.children.082943c5-61ab-486b-84f3-fbd3475f7f09.age"
+        ]
+      },
+      "preference": {
+        "language_tag": "en",
+        "source": "explicit",
+        "revision": 2
+      },
+      "presentation": {
+        "language_tag": "en",
+        "direction": "ltr",
+        "preference_revision": 2,
+        "freshness": "current",
+        "receipt_id_sha256": "3458b9a15c5a582f",
+        "labels_fallback": false
+      },
+      "unknowns": [
+        "What is the child's age?"
+      ],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4854.5,
+        5631.7
+      ],
+      "reported_input_tokens": [
+        10106,
+        6796
+      ],
+      "reported_output_tokens": [
+        104,
+        167
+      ],
+      "http_status": 200,
+      "http_latency_ms": 10533.1,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Adds exactly one child with age null; preserves dates/adults. Explicitly asks the child's age and invents no age or child charge. Same new child is used in later turns.",
+      "supported_hotel_claims": 0,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [
+        "unknowns: What is the child's age?"
+      ],
+      "presentation_labels": "Approved canonical English UI labels shown; empty generated label_bundle is intentional because no English keys are requested."
+    },
+    {
+      "turn": 3,
+      "expected": "FR samechildage7,checkout14,nights4,clearagepending",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "observed_answer": "Arrivée : 2026-12-10.\nDépart : 2026-12-14.\n4 nuits.\n2 adultes.\n1 enfant.\nÂge de l’enfant : 7 ans.",
+      "observed_state": {
+        "brief_version": 3,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "fr",
+        "source": "explicit",
+        "revision": 3
+      },
+      "presentation": {
+        "language_tag": "fr",
+        "direction": "ltr",
+        "preference_revision": 3,
+        "freshness": "current",
+        "receipt_id_sha256": "5140e84cd819d4e6",
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6935.7,
+        6805.4
+      ],
+      "reported_input_tokens": [
+        10257,
+        7002
+      ],
+      "reported_output_tokens": [
+        206,
+        380
+      ],
+      "http_status": 200,
+      "http_latency_ms": 13824.5,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Sets the same child's age to7 and checkout to2026-12-14/nights4. Check-in/adults preserved and pending age cleared; French summary is useful and accurate.",
+      "supported_hotel_claims": 0,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "French label meanings preserved."
+    },
+    {
+      "turn": 4,
+      "expected": "JA contextualbreakfast040; no briefmutation",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "observed_answer": "朝食はビュッフェ形式で、ベンジオ（1階）にて06:30-09:30に提供されます。（Asia/Ho_Chi_Minh） [F-HTL-CITY01-040]",
+      "observed_state": {
+        "brief_version": 3,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "ja",
+        "source": "explicit",
+        "revision": 4
+      },
+      "presentation": {
+        "language_tag": "ja",
+        "direction": "ltr",
+        "preference_revision": 4,
+        "freshness": "current",
+        "receipt_id_sha256": null,
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        3571.6,
+        6459.8
+      ],
+      "reported_input_tokens": [
+        10164,
+        8549
+      ],
+      "reported_output_tokens": [
+        59,
+        271
+      ],
+      "http_status": 200,
+      "http_latency_ms": 10111.7,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Contextual breakfast question resolved to the same buffet/place/floor/time/timezone source. No guest edit, no receipt, no new pending field, and no numeric false rejection.",
+      "supported_hotel_claims": 1,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Japanese label meanings preserved."
+    },
+    {
+      "turn": 5,
+      "expected": "ZH WiFi021; no briefmutation",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "observed_answer": "客房区提供免费 Wi-Fi。 [F-HTL-CITY01-021]\n网络名称和密码可在前台获取。 [F-HTL-CITY01-021]",
+      "observed_state": {
+        "brief_version": 3,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "zh",
+        "source": "explicit",
+        "revision": 5
+      },
+      "presentation": {
+        "language_tag": "zh",
+        "direction": "ltr",
+        "preference_revision": 5,
+        "freshness": "current",
+        "receipt_id_sha256": null,
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        3609.0,
+        8819.3
+      ],
+      "reported_input_tokens": [
+        10172,
+        8570
+      ],
+      "reported_output_tokens": [
+        69,
+        237
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12488.3,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Correctly states free guest-area Wi-Fi and network name/password available at the front desk. Brief remains unchanged with no pending field.",
+      "supported_hotel_claims": 2,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Chinese label meanings preserved."
+    },
+    {
+      "turn": 6,
+      "expected": "AR parking40/100000VND/noadvancebooking046,exact synthetic nonfunctionalURL001,RTL",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": 0.5,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "observed_answer": "مواقف السيارات مغطاة، وبسعة مرجعية تبلغ 40 موقفًا. الرسوم 100000 VND لكل مركبة في الليلة، ولا يمكن حجز موقف مسبقًا. [F-HTL-CITY01-046]\nرابط معلومات القبول هو https://sprint6.example.invalid/HTL-CITY01/info؛ وهو رابط اصطناعي غير وظيفي. [F-HTL-CITY01-S6-URL-001]",
+      "observed_state": {
+        "brief_version": 3,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "ar",
+        "source": "explicit",
+        "revision": 6
+      },
+      "presentation": {
+        "language_tag": "ar",
+        "direction": "rtl",
+        "preference_revision": 6,
+        "freshness": "current",
+        "receipt_id_sha256": null,
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5401.9,
+        7959.4
+      ],
+      "reported_input_tokens": [
+        10180,
+        8557
+      ],
+      "reported_output_tokens": [
+        59,
+        333
+      ],
+      "http_status": 200,
+      "http_latency_ms": 13426.9,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Covered parking, reference capacity40,100000 VND per vehicle/night and no reservation correct. Exact supplied URL is own-cited to the sample URL source and explicitly synthetic/nonfunctional in the same Arabic claim. No internal URL leakage. RTL current display and exact copy verified.",
+      "supported_hotel_claims": 2,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Arabic label meanings preserved, including synthetic hotel-information notice."
+    },
+    {
+      "turn": 7,
+      "expected": "HI ask12or13Dec2026,keepcheckout14,pendingcheckout",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "observed_answer": "आगमन: 2026-12-10।\n4 रातें।\n2 वयस्क।\n1 बच्चा।\nबच्चे की उम्र: 7 वर्ष।\nआपकी चेक-आउट तारीख 12 दिसंबर 2026 है या 13 दिसंबर 2026?",
+      "observed_state": {
+        "brief_version": 4,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-14",
+          "nights": 4
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": [
+          "dates.check_out"
+        ]
+      },
+      "preference": {
+        "language_tag": "hi",
+        "source": "explicit",
+        "revision": 7
+      },
+      "presentation": {
+        "language_tag": "hi",
+        "direction": "ltr",
+        "preference_revision": 7,
+        "freshness": "current",
+        "receipt_id_sha256": "4566f96e18b0f580",
+        "labels_fallback": false
+      },
+      "unknowns": [
+        "आपकी चेक-आउट तारीख 12 दिसंबर 2026 है या 13 दिसंबर 2026?"
+      ],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4696.2,
+        7115.6
+      ],
+      "reported_input_tokens": [
+        10233,
+        8013
+      ],
+      "reported_output_tokens": [
+        125,
+        422
+      ],
+      "http_status": 200,
+      "http_latency_ms": 11866.7,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Asks whether checkout is12 or13 December2026 in Hindi, exact typed options12/13. Stored checkout14/nights4 remains unchanged with only dates.check_out pending; same child7 retained. No committed pending-checkout claim.",
+      "supported_hotel_claims": 0,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [
+        "guest_clarification: dates.check_out, options ['12','13']; rendered/API unknowns contains this required question"
+      ],
+      "presentation_labels": "Hindi label meanings preserved."
+    },
+    {
+      "turn": 8,
+      "expected": "KO checkout15/nights5,pendingclear,samechild7",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "observed_answer": "체크아웃: 2026-12-15",
+      "observed_state": {
+        "brief_version": 5,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-15",
+          "nights": 5
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "ko",
+        "source": "explicit",
+        "revision": 8
+      },
+      "presentation": {
+        "language_tag": "ko",
+        "direction": "ltr",
+        "preference_revision": 8,
+        "freshness": "current",
+        "receipt_id_sha256": "e38df1234b651125",
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6930.1,
+        5052.2
+      ],
+      "reported_input_tokens": [
+        10267,
+        7039
+      ],
+      "reported_output_tokens": [
+        119,
+        245
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12054.4,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Explicit checkout2026-12-15 accepted and acknowledged in Korean; nights5, pending[] and same child7. No re-clarification, no unrelated FAQ, and no false hotel-information unknown.",
+      "supported_hotel_claims": 0,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Korean label meanings preserved."
+    },
+    {
+      "turn": 9,
+      "expected": "Shortmixed keepsKO/revision8/brief5",
+      "scope": "actual production browser/API/current rendered answer/exact clipboard/local desktop screenshot",
+      "baseline_lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "observed_answer": "감사합니다.",
+      "observed_state": {
+        "brief_version": 5,
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-15",
+          "nights": 5
+        },
+        "party": {
+          "adults": 2,
+          "children": [
+            {
+              "member_id_sha256": "3e5a6b74927caeda",
+              "age": 7
+            }
+          ]
+        },
+        "pending_fields": []
+      },
+      "preference": {
+        "language_tag": "ko",
+        "source": "explicit",
+        "revision": 8
+      },
+      "presentation": {
+        "language_tag": "ko",
+        "direction": "ltr",
+        "preference_revision": 8,
+        "freshness": "current",
+        "receipt_id_sha256": null,
+        "labels_fallback": false
+      },
+      "unknowns": [],
+      "independent_semantic_verdict": "PASS",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5650.4,
+        5482.1
+      ],
+      "reported_input_tokens": [
+        10130,
+        6998
+      ],
+      "reported_output_tokens": [
+        49,
+        72
+      ],
+      "http_status": 200,
+      "http_latency_ms": 11168.7,
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      },
+      "usefulness": "Nonfactual Korean courtesy '감사합니다.' delivered. Existing explicit Korean preference revision8 and all brief state remain unchanged; no new mutation or receipt.",
+      "supported_hotel_claims": 0,
+      "unsupported_hotel_unknowns": [],
+      "conflicts": [],
+      "false_rejection_observed": false,
+      "question_channels": [],
+      "presentation_labels": "Existing complete Korean label bundle reused; generated label_bundle empty."
+    }
+  ],
+  "limitations": [
+    "Nine actual cases are scoped synthetic software acceptance, not all-language/production/real-hotel proof.",
+    "Conflict/revocation/no-evidence/unequal numeric negatives use separate offline evidence; no adversarial live run.",
+    "No full tokens/billing/actual served model inferred from reported usage.",
+    "Copy actual matrix was desktop; earlier mobile browser evidence remains separately attributed."
+  ],
+  "independent_review": "namespace10-semantic-review.json"
+}

@@ -1,0 +1,204 @@
+[
+  {
+    "venue_id": "DIN-01",
+    "kind": "dining",
+    "name": "Lotus Noodle",
+    "categories": [
+      "quiet",
+      "budget"
+    ],
+    "location": {
+      "label": "Synthetic riverside district"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "price": {
+      "amount": 100000,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "step_free_entry_supported",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "confirmed",
+      "text": "Synthetic daily hours 10:00-20:00"
+    },
+    "closed": false,
+    "closed_reason": null,
+    "sponsored": false,
+    "sponsor_label": null,
+    "duration_minutes": 45,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/dining/DIN-01"
+  },
+  {
+    "venue_id": "DIN-02",
+    "kind": "dining",
+    "name": "River Table",
+    "categories": [
+      "culture",
+      "social"
+    ],
+    "location": {
+      "label": "Synthetic riverfront"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "price": {
+      "amount": 300000,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "unknown",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "confirmed",
+      "text": "Synthetic checked hours 11:00-21:00"
+    },
+    "closed": false,
+    "closed_reason": null,
+    "sponsored": true,
+    "sponsor_label": "Sponsored listing",
+    "duration_minutes": 75,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/dining/DIN-02"
+  },
+  {
+    "venue_id": "DIN-02",
+    "field": "hours",
+    "value": {
+      "status": "confirmed",
+      "text": "Synthetic checked hours 11:00-21:00"
+    },
+    "source_id": "S8-GUIDE-SECONDARY",
+    "section": "venues/dining/DIN-02/hours"
+  },
+  {
+    "venue_id": "DIN-03",
+    "kind": "dining",
+    "name": "Night Grill",
+    "categories": [
+      "social"
+    ],
+    "location": {
+      "label": "Synthetic night market district"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "price": {
+      "amount": 220000,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "unknown",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "unknown",
+      "text": null
+    },
+    "closed": true,
+    "closed_reason": "Explicitly closed in synthetic record",
+    "sponsored": false,
+    "sponsor_label": null,
+    "duration_minutes": 60,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/dining/DIN-03"
+  },
+  {
+    "venue_id": "ATT-01",
+    "kind": "attraction",
+    "name": "Craft Museum",
+    "categories": [
+      "culture",
+      "indoor"
+    ],
+    "location": {
+      "label": "Synthetic craft quarter"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "duration_minutes": 90,
+    "price": {
+      "amount": 120000,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "step_free_entry_supported",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "confirmed",
+      "text": "Synthetic daily hours 09:00-17:00"
+    },
+    "closed": false,
+    "sponsored": false,
+    "sponsor_label": null,
+    "closed_reason": null,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/attractions/ATT-01"
+  },
+  {
+    "venue_id": "ATT-02",
+    "kind": "attraction",
+    "name": "Riverside Garden",
+    "categories": [
+      "nature",
+      "quiet"
+    ],
+    "location": {
+      "label": "Synthetic riverside"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "duration_minutes": 45,
+    "price": {
+      "amount": 0,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "unknown",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "unknown",
+      "text": null
+    },
+    "closed": false,
+    "sponsored": false,
+    "sponsor_label": null,
+    "closed_reason": null,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/attractions/ATT-02"
+  },
+  {
+    "venue_id": "ATT-03",
+    "kind": "attraction",
+    "name": "Old Fort",
+    "categories": [
+      "culture",
+      "history"
+    ],
+    "location": {
+      "label": "Synthetic old quarter"
+    },
+    "timezone": "Asia/Ho_Chi_Minh",
+    "duration_minutes": 120,
+    "price": {
+      "amount": 80000,
+      "currency": "VND",
+      "basis": "per_person"
+    },
+    "accessibility": "unknown",
+    "allergy_suitability": "unknown",
+    "child_safety": "unknown",
+    "hours": {
+      "status": "confirmed",
+      "text": "Synthetic hours 08:00-16:00"
+    },
+    "closed": false,
+    "sponsored": false,
+    "sponsor_label": null,
+    "closed_reason": null,
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "venues/attractions/ATT-03",
+    "valid_to": "2026-10-01"
+  }
+]

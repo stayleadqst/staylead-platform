@@ -1,0 +1,46 @@
+{
+  "source_kind": "synthetic authored hotel facts; real model only for opt-in acceptance",
+  "prepared_before_observations": true,
+  "live_turn_limit": 4,
+  "provider_call_limit": 8,
+  "automatic_paid_retries": 0,
+  "turns": [
+    {
+      "id": "capture_dates_adults_faq",
+      "question": "Ăn sáng mấy giờ? Chúng tôi có 2 người lớn, nhận phòng ngày 10 tháng 12 năm 2026 và trả phòng ngày 13 tháng 12 năm 2026.",
+      "expected": {"check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3, "adults": 2, "children": 0},
+      "semantic": "FAQ breakfast claim must match actual approved selected hotel facts. Dates and members come from guest brief, never hotel citations."
+    },
+    {
+      "id": "add_child_missing_age",
+      "question": "Thêm một trẻ em đi cùng, tôi chưa cung cấp tuổi của bé.",
+      "expected": {"check_in": "2026-12-10", "check_out": "2026-12-13", "nights": 3, "adults": 2, "children": 1, "child_age": null, "missing_age_pending": true},
+      "semantic": "Keep dates/adults, create one stable child ID, ask for missing age without inventing it."
+    },
+    {
+      "id": "supply_age_correct_checkout",
+      "question": "Bé đó 7 tuổi. Sửa ngày trả phòng thành 14 tháng 12 năm 2026, giữ nguyên ngày nhận phòng và 2 người lớn.",
+      "expected": {"check_in": "2026-12-10", "check_out": "2026-12-14", "nights": 4, "adults": 2, "children": 1, "child_age": 7, "same_child_id": true},
+      "semantic": "Update existing child's age and checkout only; no duplicate child. Nights calculated by code."
+    },
+    {
+      "id": "remove_child_mixed_faq",
+      "question": "Bỏ trẻ đó khỏi chuyến đi, chỉ còn 2 người lớn và giữ nguyên ngày ở. Không thêm bất kỳ trẻ nào khác. Ăn sáng mấy giờ?",
+      "expected": {"check_in": "2026-12-10", "check_out": "2026-12-14", "nights": 4, "adults": 2, "children": 0},
+      "semantic": "Apply removal and answer grounded breakfast FAQ in one turn; use persisted brief, preserve dates. Explicit negation must not be misread as an add-child command. This wording was fixed before any live call; fake fixture parsing is not semantic acceptance."
+    }
+  ],
+  "offline_required": [
+    "relative/ambiguous dates and nights conflict do not erase confirmed values",
+    "negation/paraphrase does not invent positive edits",
+    "scoped persistence survives transcript window and application restart",
+    "same expected-version edits do not lose updates or duplicate member",
+    "atomic rollback keeps brief, receipt, delta and durable utterance reference consistent",
+    "add child then answer fails; same-ID replay makes zero calls and no mutation; answer-only resume does not add child twice",
+    "completed dependent answer at briefv1 becomes stale after editv2; historical receipt unchanged; no automatic model call",
+    "pure FAQ is not invalidated solely by unrelated brief edits",
+    "in-flight brief/source change rejects outdated completion; late browser response cannot overwrite current brief",
+    "S4 source generation, approval, expiry and media freshness guards remain effective"
+  ],
+  "usage": "Record provider-reported usage, preserve failures, unknown metrics remain unavailable. Four turns and eight calls are acceptance-run bounds, not an Azure billing cap."
+}

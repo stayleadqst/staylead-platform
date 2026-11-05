@@ -1,0 +1,20 @@
+{
+  "namespace": "remediation-8",
+  "diagnostic_turns": [
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "UI_or_copy_claim": false,
+  "product_candidate": "95fcf27",
+  "product_fingerprint": "bb25884839fd596de63c27df3a8e99df2ed4f545357d8c8b91a2b127f2f3b0b9",
+  "helper_sha256": "b2c62a482269d34e517bea6ed8b8f0821b0e84944b565af998cf67388b6c85d9",
+  "anchor_turn": 4,
+  "transition_requests": 8,
+  "transition_turns": 4,
+  "review": "Q22helpertests and scopedDBcount/fingerprint preflight; root product fingerprint stayed fixed through18calls",
+  "automatic_retry": false,
+  "screenshot_policy": "local only"
+}

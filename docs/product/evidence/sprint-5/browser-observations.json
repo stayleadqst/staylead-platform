@@ -1,0 +1,47 @@
+{
+  "candidate_fingerprint": "743c25d3bb9b66a1a234b32503cc2ce583778e50db36d65f955fcbe639b2d7ba",
+  "provider": "offline-fake",
+  "desktop_capture": {
+    "dates": [
+      "2026-12-10",
+      "2026-12-13"
+    ],
+    "nights": 3,
+    "adults": 2,
+    "children": 0
+  },
+  "postapply_failure_resume": {
+    "children": 1,
+    "age": null,
+    "brief_version_after_resume": 2,
+    "raw_new_id_retry_visible": false
+  },
+  "correction": {
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-14",
+    "nights": 4,
+    "child_age": 7,
+    "receipt_text": "Check-out changed to 2026-12-14. Stay length is 4 nights. Updated a child's age to 7."
+  },
+  "mobile": {
+    "viewport_width": 390,
+    "document_width": 390,
+    "children_after_removal": 0,
+    "adults": 2,
+    "nights": 4
+  },
+  "hidden_completed_response": {
+    "internal_status": 200,
+    "delivered_status": 503,
+    "first_provider_calls": 2,
+    "same_id_replay_status": 200,
+    "replay_provider_calls": 0,
+    "child_count": 1
+  },
+  "late_response_after_hotel_navigation": {
+    "hotel": "Lagoon Family Demo",
+    "old_brief_present": false,
+    "old_breakfast_present": false
+  },
+  "semantic_acceptance": "fake outcomes are not real-model acceptance"
+}

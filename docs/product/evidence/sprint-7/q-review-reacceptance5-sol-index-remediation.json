@@ -1,0 +1,59 @@
+{
+  "verdict": "OFFLINE_SCOPED_CODE_REVIEW_PASS; no remaining intervention in two-file index guidance delta",
+  "candidate_sha256": "327ea219c0503f66b2ac940ea0b94c228e1d9e7259e86e671ae995097ab0b5cf",
+  "pins": {
+    "count": 237,
+    "digest_match": true,
+    "exact_two_file_delta": [
+      "apps/api/src/staylead_platform/domains/hospitality/prompts/room_advice.py",
+      "tests/contracts/test_room_advice.py"
+    ],
+    "before_after_repo_snapshot_match": true,
+    "evidence": "q-review-reacceptance5-sol-index-pins.json"
+  },
+  "change": "Producer instructions explicitly require rooms contiguous0..n-1 and bed instances0..n-1 expanded in supplied source order/count, with actualqueen count1 onlyinstance0. No validator/schema/M4/coercion/reindex/outputrepair change.",
+  "independent_probes": [
+    {
+      "evidence": "q-review-reacceptance5-sol-index-probe-results.json",
+      "result": "Original actual one-basednative still staticallyparses but strictM4rejects roomcountmismatch; correctingonlyroom0 reveals invalidbed1; offlinecorrectingboth0 retains originalFrenchclaimlabels and gives partialGARDEN2.5m/night×2=5mknownbase,unknownchildfees/nulltotal. Not actualmodelPASS."
+    },
+    {
+      "evidence": "q-review-reacceptance5-sol-index-boundary-probe-results.json",
+      "result": "IndependentactualfixturemixedSTD+TWNroom0,1/expandedbeds0,1 accepted; roomgap0,2,bedindexatcount2,wrongbedtype,duplicatesinglesurface reject withoutrepair."
+    },
+    {
+      "tests": "Newprompt/strictsingle-room-bed/mixedroom-contiguous regressiontests",
+      "result": "3 passed"
+    }
+  ],
+  "root_local_gates": "reacceptance5-sol-index-remediation-local-gates.json:284contracts/architecture/API,16isolatedPG PASS withknownwarnings; canonicalRuff/compile/diffPASS. Unchangedfrontend53pins/40tests+lint/typecheck/build reuse; do notsumoverlap.",
+  "actual_status": "NOT ACTUAL PASS: R5turn1PASS/turn2FAIL remainsimmutable,sealed2/4SHA9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee,lifetime50. No new modelcall/API/DBwrite or state repair. Prompt improvement is hypothesis only until actualreacceptance.",
+  "future_proposal": {
+    "file": "reacceptance6-sol-cases-proposed.json",
+    "scope_verdict": "PASS as proposal only",
+    "authorized_for_live_calls": false,
+    "exact_two_case_objects_vs_actual_approved_R5_matrix": true,
+    "model_effort": "gpt-6.1-sol/low",
+    "maxima": [
+      2,
+      4
+    ],
+    "unchanged_limits": [
+      2,
+      25,
+      45,
+      700
+    ],
+    "no_retries_or_fallback": true,
+    "fresh_one_Pine_session_nohistoryrepair": true,
+    "accepted_reuse": "CityR3/FamilyR2/B07; retain R5Pine1PASS as coverage. FreshrepeatonlytoestablishlinkedoriginalPine2context.",
+    "prior_state_path": "/private/tmp/staylead-s7-reacceptance5-sol-bootstrap2-state.json",
+    "prior_state_note": "Must bind exhaustedactualbootstrap2 2/4 SHA9441, not older same-runID bootstrap1 0/0 state. Both remainpreserved.",
+    "new_execution": "Requires separate humanapproval after reviewedpublication; no allowance transferred from exhaustedR5."
+  },
+  "limitations": [
+    "No measured guarantee that more explicit indices prevent future modelerror; offline source-informed positive does not replace actualFrenchUI/currentselection.",
+    "Original errors/fallbacks remainhistorical evidence; no retroactivePASS.",
+    "Q evidence-only; no provider/model/API/actualDB mutation."
+  ]
+}

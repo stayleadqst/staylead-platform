@@ -1,0 +1,28 @@
+{
+  "verdict": "PASS scoped cont6 readiness: unchanged original9 ONLY in fresh Pine session; no actualacceptancePASS",
+  "candidate_sha256": "b91ea362974beea443a8051d8ce313bc9af89aeb25a73c8c7a6b16ff36287f6b",
+  "hashes_before": 237,
+  "hashes_after": 237,
+  "manifest_digest_verified": true,
+  "delta_from_v1": [
+    "tests/contracts/test_sprint7_acceptance_harness.py",
+    "tools/evals/sprint7_browser.mjs"
+  ],
+  "authority_parent": {
+    "run_id": "s7-room-advice-20261026-batch2-cont5",
+    "status": "halted",
+    "guest_turns": 8,
+    "codex_requests": 14,
+    "hash": "9066ab842f0905d6f3bce771816a275be779c1595a1ba60c1c23dee8e96d59a6"
+  },
+  "case_oracle_hashes_verified": true,
+  "startup_consumer_proof": "PASS actual session producer shape/currentdriverguard; wrong/missingID reject",
+  "changed_fixture_test": ".                                                                        [100%]\n1 passed in 0.15s",
+  "other_checks_reused_from_withdrawn_v1": "Only startuphotel_slug guard wasinvalid. Bookingintentresponseflag, exacttrustedconfigURL, English/synthetic/externalconfirmation/safeanchor, untouchedcase9, one-turn/two-request tracechecks and native/quote/security proofs remainvalid. Actualmodelintentmustbereadfromcapturelater.",
+  "v1_withdrawal_preserved": "q-review-cont6-final.json",
+  "localization_product_review": "q-review-cont6-localization-final.json scopedPASS; actualFrench8remainsFAIL",
+  "reported_root_gates": "255backend/31PGPASS; final20harness/Node/canonicalRuffDiffPASS, reusedunchangedproduct/53frontendpins",
+  "scope": "Seed8/14; onlyone freshcase9 and max2newrequests =>global9/15..16. No replay8/selection/tokenreconstruction/DBrepair or Frenchclaim. No extraallowance.",
+  "remaining": "B07actualverdictpending9; C01coupledfamily/City/Pine/Frenchjourneys missing; seven-turn/max14proposalrequiresnewapproval.",
+  "effects": "No actualprovider/API/browser/DBwrites byQ; open_session proof usedin-processrepositorymocks only."
+}

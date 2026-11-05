@@ -1,0 +1,29 @@
+{
+  "verdict": "AUTHORIZED sameallowance technicalcontinuation ONLY freshPineoriginalapprovedcases6-7 afterofflinefix/gates/pin; readinessnotyetreviewed",
+  "parent": {
+    "run_id": "s7-room-advice-20261026-reacceptance1-cont1",
+    "status": "halted",
+    "global_counters": [
+      3,
+      5
+    ],
+    "sha256": "91368ee5d096c544bdfa1c8b2dda8b004f85b1d46f745abfd0d3042e50338e75",
+    "lifetime_requests": 22
+  },
+  "mapping": [
+    {
+      "global_budget_turn": 4,
+      "approved_case_turn": 6
+    },
+    {
+      "global_budget_turn": 5,
+      "approved_case_turn": 7
+    }
+  ],
+  "bounds": "Max2newturns4requests,endglobalatmost5/9 withinoriginal7/14; leftoversnotnewallowance/reset/repurposedretries",
+  "skip_decision": "Case5M2dependencyexists(age7committed) but Familyexplicitadultconsentgap remains; case5doesnotexplicitlyrepairadultsharing andcannotestablishfullFamilychain. SkipasdependencyBlocked/usefulnessdecision; do not falselyclaimcase4noM2. No case3/4retry/DBrepair/tokenreconstruction.",
+  "independence": "Pine6freshsession fullcurrentcontext then7samechildexplicitrelaxation/French; no Family/Cityhistoryneeded. Exactapprovedutterancesunchanged.",
+  "acceptance_gap": "EvenPine2PASScannotcompleteC01/SprintDoD; Citycoupleedit andFamilychain remainBlocked. B07priorPASSreused.",
+  "controls_to_review": "Immutableparent3/5hash+exactcase6-7→budget4-5 map; same7/14limits,subsetmaxend5/9, noextraevent/capturemisattribution; firstfailurehalt; source/case/oraclepins; no autoretries.",
+  "effects": "Assessmentonly; no Qstateinit/calls/DBwrites."
+}

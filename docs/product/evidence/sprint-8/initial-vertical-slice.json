@@ -1,0 +1,59 @@
+{
+  "unauthenticated": {
+    "status": 401
+  },
+  "wrong_property": {
+    "status": 403
+  },
+  "guest_facts_before_activation": 0,
+  "activate_0": {
+    "status": 200,
+    "body": {
+      "status": "applied",
+      "hotel_id": "HTL-S8-DEMO",
+      "source_id": "S8-GUIDE-PRIMARY",
+      "generation": 2,
+      "source_version": "1.0",
+      "source_hash": "4a73e6c7642da15eafb8002637bcfbac8449638cb9c2d1fe916194713555e684",
+      "last_success_at": "2026-10-28T03:45:02.429703+00:00"
+    }
+  },
+  "activate_1": {
+    "status": 200,
+    "body": {
+      "status": "applied",
+      "hotel_id": "HTL-S8-DEMO",
+      "source_id": "S8-GUIDE-SECONDARY",
+      "generation": 3,
+      "source_version": "1.0",
+      "source_hash": "110db7cd3f097847ad2bbf476f88e5375896f1fa104f56a24f14d1513ced5c69",
+      "last_success_at": "2026-10-28T03:45:02.455470+00:00"
+    }
+  },
+  "preview": {
+    "status": 200,
+    "state": "active",
+    "venues": 6,
+    "providers": 2,
+    "routes": 4,
+    "conflicts": 1,
+    "generation": 3
+  },
+  "guest_facts_after_activation": 114,
+  "expired_guest_fact_count": 0,
+  "model_calls": 0,
+  "assertions": {
+    "unauthenticated401": true,
+    "wrongproperty403": true,
+    "staged_not_guest_visible": true,
+    "activated_guest_visible": true,
+    "expired_excluded": true
+  },
+  "classification": "exploratory offline integration on unfrozen working tree; not final AC acceptance",
+  "baseline": "12122f7d012c0617670438de5419efdc3d7729ab",
+  "path": "FastAPI create_app \u2192 protected operator routes \u2192 actual local-guide connector \u2192 existing M1 PostgreSQL tables \u2192 PostgresKnowledgeFactRepository",
+  "provider": "disabled",
+  "inference_calls": 0,
+  "candidate_pin": "not frozen; rerun relevant final checks on reviewed candidate",
+  "warning": "upstream Starlette/httpx TestClient deprecation; no test assertion failure"
+}

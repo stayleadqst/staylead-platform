@@ -1,0 +1,16 @@
+{
+  "run_id": "s6-codex-20261026-remediation-7",
+  "max_codex_requests": 18,
+  "codex_requests": 18,
+  "max_guest_turns": 9,
+  "guest_turns": 9,
+  "max_calls_per_turn": 2,
+  "max_answer_only_resumes": 18,
+  "answer_only_resumes": 0,
+  "answer_only_receipt_hashes": [],
+  "prior_grok_attempts": 8,
+  "authorized_for_live_calls": false,
+  "authority": "Hieu explicit reply call_c2dbc79a82a04380933affcf6363ff15: new maximum18 requests; cumulative60 preserved",
+  "created_at_utc": "2026-10-26T05:50:28Z",
+  "closed_reason": "18/18requests exhausted; T8 state/answer failure; T9 API diagnostic only; no further allowance"
+}

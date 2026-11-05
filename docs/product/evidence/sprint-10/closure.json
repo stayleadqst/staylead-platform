@@ -1,0 +1,33 @@
+{
+  "sprint": 10,
+  "recorded_at": "2026-10-28T22:48:45.861972+00:00",
+  "scope": "closure only after fixed deadline",
+  "story": 29,
+  "product_pr": 106,
+  "product_head": "a3b61990501b0164c0dc79bf506dd47801aa8a5e",
+  "merged": "c333bc49c84aa57844e465aee5d0139c6baec2fa",
+  "tree": "42f32bbcd2c706c0882dcce4c0d09b3ce0acc024",
+  "merge_compare_files": [],
+  "source_pin": "025039c370c565ce0fb2fe8214e76a84b18a5e15477591618b4d1451168ab498",
+  "review": {
+    "status": "COMPLETE",
+    "actual_start": "2026-10-28T16:47:52+07:00",
+    "actual_end": "2026-10-28T16:53:39+07:00",
+    "goal": "ACHIEVED technical local/synthetic"
+  },
+  "retro": {
+    "status": "COMPLETE_LATE",
+    "actual_recorded_at": "2026-10-29T05:48:45.862450+07:00",
+    "scheduled": "2026-10-28T16:55:00+07:00"
+  },
+  "fixed_ends_at": "2026-10-28T17:00:00+07:00",
+  "outcome_at_deadline": "B08 merged/Done, Review complete, Retro missed",
+  "resources": "STOPPED; B/Q completed; leases closed",
+  "counters": {
+    "harness_repairs": 4,
+    "authorized_cap": 4,
+    "product_p1_repairs": 1,
+    "new_live_inference": 0
+  },
+  "next_sprint_plan": "not made in this session"
+}

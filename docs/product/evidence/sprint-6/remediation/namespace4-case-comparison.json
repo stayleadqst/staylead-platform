@@ -1,0 +1,214 @@
+{
+  "artifact": "namespace4-case-comparison",
+  "run_namespace": "remediation-4",
+  "historical_product_candidate": "f52e74c96593130a8e2541b977daa014e9a3bd8e",
+  "scope": "Read-only per-case comparison for pinned T1-T6; no provider calls or raw private output copied.",
+  "baseline": {
+    "source": "docs/product/evidence/sprint-6/codex-retrieval-baseline-current-matrix.json",
+    "method": "Original-query lexical retrieval on read-only PostgreSQL; zero LLM/provider calls.",
+    "fact_id_policy": "Evidence names are semantic aliases; raw public fact IDs omitted.",
+    "interpretation": "Coverage measures expected-fact presence in lexical preliminary candidates, not answer correctness or semantic-selector performance.",
+    "turn_1_to_6": {
+      "1": {
+        "evidence": [
+          "breakfast_fact"
+        ],
+        "coverage": 1.0
+      },
+      "2": {
+        "evidence": [],
+        "coverage": null
+      },
+      "3": {
+        "evidence": [],
+        "coverage": null
+      },
+      "4": {
+        "evidence": [
+          "breakfast_fact"
+        ],
+        "coverage": 1.0
+      },
+      "5": {
+        "evidence": [
+          "wifi_fact"
+        ],
+        "coverage": 1.0
+      },
+      "6": {
+        "evidence": [
+          "parking_policy_fact",
+          "approved_exact_url_fact"
+        ],
+        "coverage": 0.5
+      }
+    }
+  },
+  "observed": {
+    "source": "docs/product/evidence/sprint-6/remediation/remediation-4-live-run/observations.jsonl and namespace4 diagnosis/runtime events.",
+    "turn_1_to_6": {
+      "1": {
+        "evidence": [
+          "breakfast_fact"
+        ],
+        "outcome": "delivered",
+        "quality": "Useful, correct breakfast response plus saved-stay details; constraints met.",
+        "unknowns": "none surfaced",
+        "usefulness": "useful",
+        "correctness": "meets observed target",
+        "false_rejection": false,
+        "language_tag": "vi",
+        "preference_revision": 1,
+        "brief_version": 1,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          5066.8,
+          6209.6
+        ],
+        "http_latency_ms": 11405,
+        "http_status": 200,
+        "clipboard": "copied",
+        "clipboard_matches_rendered": true
+      },
+      "2": {
+        "evidence": [],
+        "outcome": "delivered",
+        "quality": "Preserved stay/adult state, recorded one child with age pending, and asked the targeted age question.",
+        "unknowns": "relevant child-age clarification",
+        "usefulness": "useful",
+        "correctness": "meets observed target",
+        "false_rejection": false,
+        "language_tag": "en",
+        "preference_revision": 2,
+        "brief_version": 2,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          3429.4,
+          9669.9
+        ],
+        "http_latency_ms": 13156.6,
+        "http_status": 200,
+        "clipboard": "copied",
+        "clipboard_matches_rendered": true
+      },
+      "3": {
+        "evidence": [],
+        "outcome": "delivered",
+        "quality": "Confirmed the revised stay and retained the same child and age; added a generic follow-up question beyond the state-change target.",
+        "unknowns": "generic follow-up question; no unresolved hotel fact surfaced",
+        "usefulness": "useful state confirmation; extra follow-up was unnecessary",
+        "correctness": "state target met",
+        "false_rejection": false,
+        "language_tag": "fr",
+        "preference_revision": 3,
+        "brief_version": 3,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          4745.1,
+          6339.8
+        ],
+        "http_latency_ms": 11419.3,
+        "http_status": 200,
+        "clipboard": "copied",
+        "clipboard_matches_rendered": true
+      },
+      "4": {
+        "evidence": [
+          "breakfast_fact"
+        ],
+        "outcome": "delivered",
+        "quality": "Japanese breakfast answer included the expected hours and deterministic timezone label; brief unchanged.",
+        "unknowns": "none surfaced",
+        "usefulness": "useful",
+        "correctness": "meets observed target",
+        "false_rejection": false,
+        "language_tag": "ja",
+        "preference_revision": 4,
+        "brief_version": 3,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          4780.7,
+          9454.8
+        ],
+        "http_latency_ms": 14502.4,
+        "http_status": 200,
+        "clipboard": "copied",
+        "clipboard_matches_rendered": true
+      },
+      "5": {
+        "evidence": [
+          "wifi_fact"
+        ],
+        "outcome": "delivered",
+        "quality": "Chinese answer covered guest-area Wi-Fi and where credentials are obtained; brief unchanged.",
+        "unknowns": "none surfaced",
+        "usefulness": "useful",
+        "correctness": "meets observed target",
+        "false_rejection": false,
+        "language_tag": "zh",
+        "preference_revision": 5,
+        "brief_version": 3,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          5646.5,
+          5266.2
+        ],
+        "http_latency_ms": 11062.4,
+        "http_status": 200,
+        "clipboard": "copied",
+        "clipboard_matches_rendered": true
+      },
+      "6": {
+        "evidence": [
+          "parking_policy_fact",
+          "reservation_policy_fact"
+        ],
+        "outcome": "rejected_http_502",
+        "quality": "The reviewed private generation contained the expected parking terms but attached the exact approved URL to parking/reservation references, not to its own URL source. No answer was delivered.",
+        "unknowns": "not available because response was rejected",
+        "usefulness": "no guest-facing answer",
+        "correctness": "URL claim was unsupported under per-claim binding; rejection was justified, not a false rejection",
+        "false_rejection": false,
+        "language_tag": null,
+        "preference_revision": null,
+        "brief_version": null,
+        "conflicts": "not separately surfaced in the retained browser observation",
+        "provider_calls": 2,
+        "provider_call_latency_ms": [
+          4056.8,
+          6071.3
+        ],
+        "http_latency_ms": 10246.9,
+        "http_status": 502,
+        "clipboard": "not_checked",
+        "clipboard_matches_rendered": false,
+        "selector_fact_result": "semantic selector included parking/reservation facts but omitted the approved exact-URL fact; semantic completeness was therefore partial",
+        "expected_preference_and_brief_state": "Arabic preference revision 6 and unchanged brief v3 were expected; neither appeared in the failed response"
+      }
+    }
+  },
+  "quality_dimensions": {
+    "unknowns": "Reported from retained browser observation where available; T6 rejected before a guest answer.",
+    "conflicts": "Conflict lists were not separately surfaced in retained browser observations, so conflict quality is unmeasured.",
+    "latency": "Provider-call and HTTP latencies are included only where recorded; token totals/model identity are not inferred.",
+    "false_rejection": "T6 is classified as a justified strict URL-binding rejection. Its retrieval omission made the generated URL claim ungrounded; the guard correctly rejected that claim."
+  },
+  "overall": {
+    "delivered_turns": 5,
+    "rejected_turns": 1,
+    "t1_t5_assessment": "Answers/state changes met the pinned semantic targets; clipboard matched rendered text for all five delivered turns.",
+    "t6_assessment": "Not a successful case. Expected parking and URL evidence were not both available to the final claim: preliminary lexical baseline contained the URL fact but missed the parking fact; semantic selection recovered parking-related facts but dropped URL evidence; final output cited no URL fact. Strict per-claim validation appropriately returned unsupported_output/HTTP 502.",
+    "unmeasured": [
+      "native-speaker fluency",
+      "conflict quality",
+      "T6 guest-visible usefulness",
+      "T7-T9",
+      "provider total-token counts"
+    ]
+  }
+}

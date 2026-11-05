@@ -1,0 +1,40 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "authorized_for_live_calls": true,
+  "human_reply": "Cho phép Sol/low 2/4",
+  "approval_date": "2026-10-28",
+  "approved_reviewed_product_candidate": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+  "published_pr_commit": "ac951807f5050f6f637fceb0bc14242b30ae04fc",
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "max_guest_turns": 2,
+  "max_codex_requests": 4,
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "case_matrix_sha256": "607a92dcb433bf463150648e9cad548e0b7b47a78932d1d8f5ca1cd38ea625eb",
+  "prior_allocation": {
+    "run_id": "s7-room-advice-20261027-reacceptance4",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 2,
+    "state_sha256": "16e5d987eff565d2b23a373b02057e682f1ab7c72742e0010d0c9baa46c5062c",
+    "lifetime_requests": 46,
+    "unused_guest_slots": 1,
+    "unused_request_slots": 2,
+    "unused_slots": "closed; dependent originalturn2 notattempted; no retry/reset/reallocation",
+    "actual_outcome": {
+      "pine1": "FAIL unrequested hardbedtype clarification; generic VI access question",
+      "pine2": "Blocked dependency/notattempted"
+    },
+    "runners": "API45685/browser9067 stopped; no retry"
+  },
+  "continuation": null,
+  "no_automatic_retry": true,
+  "no_fallback": true,
+  "stop_at_first_blocking_failure": true,
+  "source_of_authority": "Direct human reply, not an attached document or backlog",
+  "consumption": "Actual2/4 exhausted; no further inference authorized",
+  "bootstrap1": "Pre-inference0/0 failed; separate sealed original files; fixed bootstrap2 linked under sameallocation"
+}

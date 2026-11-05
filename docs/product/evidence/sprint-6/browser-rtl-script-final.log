@@ -1,0 +1,8 @@
+file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/docs/product/evidence/sprint-6/browser-presentation.mjs:232
+    for (const languageCase of [languageCase]) {
+                                ^
+
+ReferenceError: Cannot access 'languageCase' before initialization
+    at file:///Users/ccvn/Documents/project/Staylead/github/staylead-platform/docs/product/evidence/sprint-6/browser-presentation.mjs:232:33
+
+Node.js v22.14.0

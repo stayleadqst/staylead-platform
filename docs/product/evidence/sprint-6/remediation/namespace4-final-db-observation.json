@@ -1,0 +1,74 @@
+{
+  "classification": "read-only PG snapshot after NS4 diagnostic T9; no UI/copy claim",
+  "run_id": "s6-codex-20261026-remediation-4",
+  "session_id_sha256": "4e742bd668f8257a",
+  "brief_version": 5,
+  "dates": {
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-15",
+    "nights": 5
+  },
+  "party": {
+    "adults": 2,
+    "children": [
+      {
+        "member_id_sha256": "c63c9445cf9de165",
+        "age": 7
+      }
+    ]
+  },
+  "pending_fields": [],
+  "language_preference": {
+    "language_tag": "ko",
+    "source": "explicit",
+    "revision": 8
+  },
+  "request_count": 9,
+  "requests": [
+    {
+      "request_id_sha256": "eef9c85997ca159a",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "244c908d102e46b5",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "ae98729f66f619e3",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "8cb091e4ffbf5976",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "8b637faf84f8de20",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "60afbfcd8762c7fa",
+      "status": "error",
+      "error_code": "unsupported_output"
+    },
+    {
+      "request_id_sha256": "9f768cb0112e7bf0",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "0e55e793d225eca1",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id_sha256": "0fdadf88feccfa8c",
+      "status": "error",
+      "error_code": "invalid_model_output"
+    }
+  ]
+}

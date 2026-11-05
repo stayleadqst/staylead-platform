@@ -1,0 +1,38 @@
+{
+  "run_id": "s6-codex-20261026-remediation-6",
+  "provider_requests": 18,
+  "semantic_turns": 9,
+  "automatic_retries": 0,
+  "explicit_resumes": 0,
+  "cumulative_provider_requests": 60,
+  "product_unchanged": true,
+  "product_fingerprint": "70498d890019fcf62ac6580e545b7c8e16360357500a725149c49a984997512a",
+  "UI_turns": [
+    1,
+    2
+  ],
+  "API_diagnostic_turns": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "content_state_pass": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9
+  ],
+  "failed_answer_turns": [
+    2,
+    7
+  ],
+  "full_matrix_pass": false,
+  "next_action": "Fixpendingrefschema/runtime exclusion and exactchoiceenum; thenfullfixedcandidateUI/copyacceptance requiresnewexplicitallowance."
+}

@@ -1,0 +1,56 @@
+{
+  "candidate_sha256": "24f0eaf1bad1620d64f71cf85cad32b0b04bb6ed20f0db467378ccd487bd7984",
+  "verdict": "CHANGES_REQUIRED_OFFLINE",
+  "authorized_for_live_calls": false,
+  "scope": "Five-file remediation delta from5c7; product/source read-only; no provider/API/DB calls or writes.",
+  "pins": {
+    "before": 237,
+    "after": 237,
+    "all_match": true,
+    "candidate_digest_verified": true,
+    "note": "Verified before builder repair lease; immutable manifest/snapshot retained."
+  },
+  "findings": [
+    {
+      "id": "Q-FINAL-A1",
+      "severity": "P1",
+      "file": "apps/api/src/staylead_platform/infrastructure/persistence/store.py",
+      "line": 1389,
+      "problem": "New accessibility_confirmation question key is rejected by presentation CAS, which still derives question.room.",
+      "reproducer": "Exact original Pine6 selected10 facts and brief -> recommend -> valid French relocalize -> update_room_advice_presentation with NoDB sentinel. Raises invalid presentation key before DB boundary.",
+      "impact": "Language-only change of this checked result cannot persist; AC7/8 regression.",
+      "smallest_fix": "Align persistence-derived key with trusted checked known-needs marker; retain rejection of forged metadata/business changes; regression legacy/current result relocalization."
+    },
+    {
+      "id": "Q-FINAL-A2",
+      "severity": "P2",
+      "file": "apps/api/src/staylead_platform/domains/hospitality/recommendations/rooms.py",
+      "line": 122,
+      "problem": "Unconditional hard_accessibility_needs field mapping says needs recorded even when no saved needs exist.",
+      "reproducer": "recommend with party1, empty room_requirements, draft question hard_accessibility_needs; also pending hard_accessibility_needs. Both emit recorded/confirmation text.",
+      "impact": "AC2/6 truthful clarification regression in reachable no-options branch.",
+      "smallest_fix": "Use checked saved known-needs marker for new key/text; otherwise generic clarification, including openlocale projection."
+    }
+  ],
+  "passed": [
+    "Actual Pine6 selected10 fact replay gives useful VI hotel-confirmation step; all original10 source refs preserved exactly; JSON serialization succeeds.",
+    "Independent valid French new-key label works; absent/unrelated/numeric/placeholder labels fall back.",
+    "29 targeted existing/new tests passed, including compact age-only/access-clear canonical patch preserving dates/guardian/share/childID.",
+    "New reacceptance2 proposal cases exactly equal all7 original case objects; only top metadata differs; authorized_for_live_calls false."
+  ],
+  "limitations": [
+    "Original actual Pine6 FAIL remains; Pine7 token-cap failure remains.",
+    "Compact prompt is an unverified reliability hypothesis, not measured700 compliance.",
+    "Initial general probe used all pure Pine fixture facts; separate exact-capture proof restricts to original selected10 and confirms exact references.",
+    "No new actual allowance, calls, activation, or fullAC/SprintDoD PASS."
+  ],
+  "evidence": [
+    "q-review-final-remediation-probe.py",
+    "q-review-final-remediation-probe-results.json",
+    "q-review-final-remediation-exact-capture.json"
+  ],
+  "commands": [
+    "PYTHONPATH=apps/api/src apps/api/.venv/bin/python validation-absolute-path/q-review-final-remediation-probe.py",
+    "pytest targeted test_room_advice/test_grounded_qa selection:29passed135deselected"
+  ]
+}

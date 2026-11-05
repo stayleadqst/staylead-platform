@@ -1,0 +1,74 @@
+{
+  "story": 30,
+  "baseline": "d304238a1cb2b427650e03a2de81af92aa6ae255",
+  "reviewer": "/root/q_b09",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "frozen_before_acceptance_results": true,
+  "method": "Independent source/contracts/raw-fixture review; no implementation edits, tests, services or product model calls.",
+  "cases": [
+    {
+      "id": "Q1",
+      "ac": "B09-AC1",
+      "scope": "Message/freshness/room read/select/media auth and scope",
+      "expected": "Missing/tampered/expired token401; A token/B route403; signed claims with foreign DB property or expired DB session401. Zero provider/capability execution, no foreign data or protected state mutation."
+    },
+    {
+      "id": "Q2",
+      "ac": "B09-AC1",
+      "scope": "Request replay, receipt, result and selection binding",
+      "expected": "Own identical replay returns cached result with zero additional calls/commits; changed body409. Foreign/fabricated receipt404 before model; foreign/fabricated result/option404; stale versions/sources409 and selection unchanged. Guessing foreign request ID never exposes its result."
+    },
+    {
+      "id": "Q3",
+      "ac": "B09-AC1",
+      "scope": "Forged evidence/results",
+      "expected": "Foreign/invented/internal fact IDs, nonexistent brief refs, changed source versions/hashes and fabricated room/guide IDs/numbers cannot become grounded current output or selection. Only consumed provider calls counted. If an authorized edit already committed before answer rejection, preserve that legitimate receipt and expose partial failure, never forged success or fictitious rollback."
+    },
+    {
+      "id": "Q4",
+      "ac": "B09-AC2",
+      "scope": "Guest/source/tool-result injection",
+      "expected": "Separate producer texts request scope escalation, clearing hard needs, replacing approved booking link, secret theft and HTML/script. Source/tool content grants no authority. Server preserves permissions, approved links, authoritative constraints and secret isolation; browser renders safely. Use state/counters, not blanket non200 assumptions."
+    },
+    {
+      "id": "Q5",
+      "ac": "B09-AC2",
+      "scope": "Invented/malformed/unauthorized action proposals",
+      "expected": "Unknown intent/tool/op, malformed args, extra scope/SQL/HTTP/payment/send, invalid authorization quote or target rejects before affected dispatch/commit. Audit failure records allowed; no unauthorized brief/result/source/operator mutation. No provider retry/fallback."
+    },
+    {
+      "id": "Q6",
+      "ac": "B09-AC3",
+      "scope": "Allowed FAQ/edit/replay/room/guide/booking positives",
+      "expected": "Same-property FAQ needs no planning. Valid brief edit increments once and preserves hard needs; replay no extra call/commit. Current room select zero model calls. Guide respects hard suitability unknowns/closure/sponsor constraints. Booking uses exact server-configured .example destination and creates no booking/payment/send. Pin exact provider/capability counts per real test route."
+    },
+    {
+      "id": "Q7",
+      "ac": "B09-AC3",
+      "scope": "Actual producer-consumer and operator boundary",
+      "expected": "Direct HTTP and isolated PG observations plus actual browser positives/refusals. Guest operator credential401, wrong property403, read-only write403 before service effect; authorized operator positive. Capture DB/state/provider/capability/UI outcomes and retain every fix reproducer."
+    }
+  ],
+  "specific_raw_fixture_expectations": [
+    "CITY check-in15:00–23:00/check-out11:00 with currentSTAY1.0 citation; internalF-HTL-CITY01-037/038 never retrieved as guest facts.",
+    "Guide hard peanut/step-free/wheelchair needs remain authoritative; DIN-01 allergy unknown, DIN-02 sponsored/hour conflict, DIN-03 closed."
+  ],
+  "limitations": "Controlled proposals verify server mechanisms, not semantic resistance of every real model. No new live calls authorized. No enforced per-agent filesystem sandbox claimed.",
+  "tokens": "unavailable",
+  "confirmation_repair_expectations": {
+    "reviewer": "/root/q_b09; gpt-6.1-sol/high",
+    "frozen_before_repaired_assertions_review": true,
+    "cases": [
+      "Every actual model-proposed brief data/pending change requires exact validated-delta review; noops/reads remain allowed.",
+      "HMAC binds purpose/session/property/expected version/expiry/exact delta; tamper/foreign/wrong purpose/expiry cannot authorize commit.",
+      "No M2 proposal commit or dependent M4/M5 execution before consent; existing authoritative state/results preserved.",
+      "Explicit guest confirm has its own idempotency identity and authorizes only displayed changes; invalid confirmation has no forbidden effects.",
+      "Cancel discards displayed proposal with no commit or automatic capability continuation; delayed UI callback must not submit confirmation. Later deliberate authenticated valid-token POST is fresh consent; no irreversible token revocation or rollback requirement.",
+      "Confirm commits M2 before M4/M5 and M6; original utterance/provenance/intent retained; no second preparation.",
+      "Proposal/confirmation replay avoids duplicate mutation/capability; stale version rejects; lost acknowledgment reconciles durable outcome; truthful partial/resume/freshness semantics preserved.",
+      "Contract2 compatibility checked before use; mismatch fails safely with no silent commit/planning/unconfirmed-current presentation."
+    ],
+    "execution": "None during expectation freeze; no repaired candidate inspection."
+  }
+}

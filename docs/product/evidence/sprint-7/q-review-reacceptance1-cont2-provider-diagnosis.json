@@ -1,0 +1,8 @@
+{
+  "case7_exact_cause": "Provider completed enough for adapter to inspect output usage, then rejected because usage.output_tokens exceeded request.max_output_tokens (configured700).",
+  "evidence": "Preserved APIerror body exact unique message; infrastructure/codex_provider.py generate output-token guard after _read_event_metadata. Runtime provider_failed recordsProviderError.",
+  "known": "HTTP502 provider_invalid_response, one reservedrequest,10545.5ms,no nativecapture,no call2.",
+  "unknown": "Exactoutputtoken count and responsepayload unavailable: wrapper captures onlysuccessful GenerationResult; adapter temporaryresponse/stdout/stderrunretained.",
+  "not_claimed": "No claim external/network/schema/timeout failure; no privateCLIhistoryscan needed because body identifies token-limit rejection.",
+  "no_retry": "No more independent approvedcases; no inference repeated."
+}

@@ -1,0 +1,32 @@
+{
+  "verdict": "PASS_SCOPED_OFFLINE_DOMAIN_CHANGE",
+  "source_hashes": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "237687475bcc6e1c3a6fc64ed9eeb77753db3d21d8efe3f7e59b08b048a257f9",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": "ab5827c9665cdca3f51deb2a89c61732022af9eb31dfd94aae66a524654b88ce",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py": "161f098f53b7a50df0aa03c8a775740c1d3e78a3380f24ce81212153534f3c90",
+    "tests/contracts/test_room_advice.py": "9e1bb14e07aade507fa9d02f58f0f2e9ef98b282114467c4cc42ce78ccf56bc8"
+  },
+  "scope": "Four frozen domain/test files only; controls mutable and excluded.",
+  "findings": [],
+  "verified": [
+    "Prompt instructs two identified adults separate surfaces via explicit false bedsharing; never infer single/twin hard physicaltype from arrangement alone.",
+    "One shared adjacent field description in Pydantic and both native preparation schemas says arrangement is not exacttype.",
+    "After stripping descriptions, both native schemas and Pydantic requirement schema identical to reviewed c982 snapshot: enums/nullability/bounds/required fields unchanged.",
+    "All guest_brief module validation/authorization/canonical patch function ASTs identical. No parser/alias/allocator changes.",
+    "5 targeted tests pass: separation counterfactual, native/Pydantic intent/schema parity, exactcurrentquote/guest_edit authorization, nullplaceholder preservation.",
+    "Exact actual native2+selectedM1facts+savedbrief pure replay remains conflict with hard twin/singleinventory; removing only invented hardtype in memory while retainingfalseconsent/twodistinctassignments gives ready5.85m/allchecksPASS.",
+    "All four hashes match before and after probes/tests."
+  ],
+  "limitations": [
+    "Guidance/schema descriptions do not deterministically reject an unrequested but valid enum; the original nativecapture is protocol-valid and semantically wrong. Do not claim originalcapture nowrejects or modelreliabilityproved.",
+    "No City2 actualretry or currentM2 repair; historicalCity2actualFAIL/fullCitycoupledAC gap remains.",
+    "No provider/API/DB calls or writes; allcounterfactuals in memory.",
+    "Continuation readiness pending full frozen control/candidate pin; only independent originalFamily3–5/Pine6–7 remain within same7/14 seed2/4."
+  ],
+  "evidence": [
+    "q-review-reacceptance2-bedtype-schema-probe.json",
+    "q-review-reacceptance2-bedtype-capture-recheck.py",
+    "q-review-reacceptance2-bedtype-capture-recheck.json",
+    "q-review-reacceptance2-actual.json"
+  ]
+}

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ApiError, checkGuestFreshness, createGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
+import { ApiError, checkGuestFreshness, confirmGuestBriefEdit, createGuestSession, deleteGuestSession, fetchGuestMedia, getGuestHotel, sendGuestMessage } from "../src/shared/api/client.ts";
 
 const target = {
   domain: "hospitality",
-  guestContractVersion: "1",
+  guestContractVersion: "2",
   apiBasePath: "/api/guest",
 };
 
@@ -14,7 +14,7 @@ test("session creation verifies real target metadata before sending hotel data",
   const calls = [];
   globalThis.fetch = async (url, init) => {
     calls.push({ url, init });
-    return Response.json({ status: "ok", domain: "another-domain", guest_contract_version: "1" });
+    return Response.json({ status: "ok", domain: "hospitality", guest_contract_version: "1" });
   };
 
   try {
@@ -36,13 +36,101 @@ test("direct hotel lookup is data-driven and unknown hotels surface the backend 
   globalThis.fetch = async (url, init) => {
     calls.push({ url, init });
     return Response.json({ hotel_id: "HTL-FOUR", hotel_slug: "new-hotel", public_config: {},
-      config_version: "1", guest_contract_version: "1" });
+      config_version: "1", guest_contract_version: "2" });
   };
   try {
     assert.equal((await getGuestHotel({ hotelSlug: "new-hotel", target })).hotel_id, "HTL-FOUR");
     assert.equal(calls[0].url, "/api/guest/hotels/new-hotel");
     globalThis.fetch = async () => Response.json({ error: { code: "hotel_unavailable", message: "This hotel is not available." } }, { status: 404 });
     await assert.rejects(getGuestHotel({ hotelSlug: "unknown", target }), (error) => error instanceof ApiError && error.status === 404);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("brief confirmation uses a separate scoped action request", async () => {
+  const originalFetch = globalThis.fetch;
+  let call;
+  const response = { request_id: "confirm-1", status: "completed", answer: "Updated." };
+  globalThis.fetch = async (url, init) => {
+    call = { url, init };
+    return Response.json(response);
+  };
+  try {
+    assert.deepEqual(await confirmGuestBriefEdit({
+      sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token",
+      requestId: "confirm-1", confirmationToken: "signed-challenge", target,
+    }), response);
+    assert.equal(call.url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc/brief-confirmations");
+    assert.equal(call.init.headers.authorization, "Bearer guest-token");
+    assert.deepEqual(JSON.parse(call.init.body), { request_id: "confirm-1", confirmation_token: "signed-challenge" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("session deletion sends only the current bearer-scoped DELETE and requires a 204 confirmation", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url, init });
+    return new Response(null, { status: 204 });
+  };
+  try {
+    assert.equal(await deleteGuestSession({
+      sessionId: "12345678-1234-4234-8234-123456789abc",
+      accessToken: "guest-token",
+      target,
+    }), undefined);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "/api/guest/sessions/12345678-1234-4234-8234-123456789abc");
+    assert.equal(calls[0].init.method, "DELETE");
+    assert.equal(calls[0].init.headers.authorization, "Bearer guest-token");
+    assert.equal(calls[0].init.body, undefined);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("session deletion reports denied and ambiguous outcomes without claiming success", async () => {
+  const originalFetch = globalThis.fetch;
+  const args = { sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token", target };
+  try {
+    globalThis.fetch = async () => Response.json({ error: {
+      code: "invalid_session", message: "This session cannot be deleted.", retryable: false,
+    } }, { status: 401 });
+    await assert.rejects(deleteGuestSession(args), (error) => error instanceof ApiError
+      && error.status === 401 && error.code === "invalid_session" && error.outcome === "rejected");
+
+    globalThis.fetch = async () => Response.json({ status: "deleted" }, { status: 200 });
+    await assert.rejects(deleteGuestSession(args), (error) => error instanceof ApiError
+      && error.code === "invalid_delete_response" && error.outcome === "unknown");
+
+    globalThis.fetch = async () => { throw new TypeError("connection closed"); };
+    await assert.rejects(deleteGuestSession(args), (error) => error instanceof ApiError
+      && error.code === "network_outcome_unknown" && error.outcome === "unknown");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("session-scoped client requests honor the caller abort signal", async () => {
+  const originalFetch = globalThis.fetch;
+  const controller = new AbortController();
+  let requestSignal;
+  globalThis.fetch = async (_url, init) => new Promise((_resolve, reject) => {
+    requestSignal = init.signal;
+    requestSignal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")), { once: true });
+  });
+  try {
+    const pending = sendGuestMessage({
+      sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token",
+      requestId: "turn-abort", question: "Breakfast?", target, signal: controller.signal,
+    });
+    controller.abort();
+    await assert.rejects(pending, (error) => error instanceof ApiError
+      && error.code === "network_outcome_unknown" && error.outcome === "unknown");
+    assert.equal(requestSignal.aborted, true);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -84,6 +172,10 @@ test("message client forwards bearer and preserves the API response shape", asyn
     config_version: "1",
     state_version: 1,
     source_generation: 1,
+    language_preference: { language_tag: "zh-Hant", source: "explicit", revision: 3 },
+    presentation: { language_tag: "zh-Hant", direction: "ltr", preference_revision: 3,
+      labels: { send: "发送", copy: "复制" }, freshness: "current", receipt_id: "receipt-3" },
+    answer_eligibility: "current",
   };
   globalThis.fetch = async (url, init) => {
     call = { url, init };
@@ -164,6 +256,46 @@ test("typed provider failures are known API rejections", async () => {
         accessToken: "guest-token", requestId: "turn-1", question: "When is breakfast?", target,
       }),
       (error) => error instanceof ApiError && error.outcome === "rejected" && error.code === "provider_auth",
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("answer-only resume sends the applied receipt reference without replaying the guest edit", async () => {
+  const originalFetch = globalThis.fetch;
+  let call;
+  globalThis.fetch = async (url, init) => {
+    call = { url, init };
+    return Response.json({ request_id: "resume-1", status: "completed", answer: "Breakfast is served." });
+  };
+  try {
+    await sendGuestMessage({
+      sessionId: "12345678-1234-4234-8234-123456789abc",
+      accessToken: "guest-token", requestId: "resume-1", answerOnlyReceiptId: "original-1", target,
+    });
+    assert.deepEqual(JSON.parse(call.init.body), { request_id: "resume-1", answer_only_receipt_id: "original-1" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("partial-success errors preserve the committed receipt for explicit answer resume", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({
+    request_id: "turn-1", status: "partial_success",
+    error: { code: "provider_timeout", message: "answer failed" },
+    guest_brief: { brief_version: 1, dates: {}, party: {}, pending_fields: [] },
+    brief_receipt: { request_id: "turn-1", status: "partial_success", brief_version_before: 0,
+      brief_version_after: 1, applied_delta: {}, source_refs: [], answer_status: "failed", brief_version_used: 1 },
+    applied_delta: {}, answer_status: "failed",
+  }, { status: 502 });
+  try {
+    await assert.rejects(
+      sendGuestMessage({ sessionId: "12345678-1234-4234-8234-123456789abc", accessToken: "guest-token",
+        requestId: "turn-1", question: "Add a child and ask about breakfast", target }),
+      (error) => error instanceof ApiError && error.partialResult?.status === "partial_success"
+        && error.partialResult.brief_receipt.request_id === "turn-1",
     );
   } finally {
     globalThis.fetch = originalFetch;

@@ -1,0 +1,30 @@
+[
+  {
+    "provider_id": "TR-01",
+    "name": "Lotus Shuttle",
+    "seats_excluding_driver": 3,
+    "luggage_capacity": 2,
+    "child_seat": "unknown",
+    "access": "unknown",
+    "conditions": [
+      "Synthetic record only"
+    ],
+    "availability": "unknown",
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "transport/providers/TR-01"
+  },
+  {
+    "provider_id": "TR-02",
+    "name": "River Taxi",
+    "seats_excluding_driver": 6,
+    "luggage_capacity": "unknown",
+    "child_seat": "supported",
+    "access": "unsupported",
+    "conditions": [
+      "Synthetic record only"
+    ],
+    "availability": "unknown",
+    "source_id": "S8-GUIDE-PRIMARY",
+    "section": "transport/providers/TR-02"
+  }
+]

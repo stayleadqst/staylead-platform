@@ -1,0 +1,35 @@
+{
+  "at_utc": "2026-10-26T03:34:52.571587+00:00",
+  "authority": "Hieu explicit answer: Cho ph\u00e9p th\u00eam m\u1ed9t batch t\u1ed1i \u0111a 18 requests",
+  "candidate_commit": "9929c33a77eb1354e8468b5130d2b36df12e919e",
+  "tree": "ecdcde712379330852bea2bad95beb461cf0dd60",
+  "product_fingerprint": "1aa652e2e3ebe6703b4509c2c188010633154b0000b73b035f311c6b870de198",
+  "harness_sha256": {
+    "resumed_acceptance_runtime.py": "5484e5d8114dced77277f1d5b5178bb7eff8d7ff41536cfc6cee47cdac95feb9",
+    "resumed-live-browser.mjs": "306efd00d48b61eeaf0f2446948787c5537f2d0127d1008e4bb8bebdc2134de1",
+    "operator-resume-routing.mjs": "dde4f275842d3aaed7f85f351f2db980697afa0e57b063d9dd552acacc8dd6dc"
+  },
+  "matrix_sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07",
+  "requested_model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "actual_served_model": "unreported",
+  "max_guest_turns": 9,
+  "max_provider_requests": 18,
+  "max_calls_per_http_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_token_postcheck": 700,
+  "native_hard_output_token_cap_verified": false,
+  "automatic_retries": false,
+  "operator_answer_only_resume": "explicit C command only; same global18 cap; separate persistent receipt reservation",
+  "historic_run_counters": "immutable:1semantic turn,2provider requests; not reused/reset",
+  "synthetic_capture": "opt-in,64KiB limit,private0600; never published raw",
+  "prelive_review": "fresh independent Q ready on9929c33, no remaining blocking finding",
+  "configuration": "isolated local synthetic DB/newuniqueguest session; rebuilt productionweb; no deployment",
+  "run_id": "s6-codex-20261026-remediation-2",
+  "prior_actual_provider_requests": {
+    "original": 2,
+    "resumed_diagnosis": 4
+  },
+  "fixed_candidate_sequence": true
+}

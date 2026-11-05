@@ -1,0 +1,48 @@
+{
+  "candidate_sha256": "e0557ed01976b885d27a079b2b94595157aa69c939bf38031d7d8c2d62007e25",
+  "preserved235snapshot_hashes_match": true,
+  "verdict": "Actual turn1 API/domain/protocol observations PASS; browserbatch STOPPED by evidencedharnesscontractmismatch, notwronghotel. Fullactualjourney remainsunverified.",
+  "root_cause": {
+    "file": "tools/evals/sprint7_browser.mjs",
+    "line": 185,
+    "condition": "source.hotel_id===room.hotel_id",
+    "actual_contract": "A_source returnsflat per-fact source refs without hotel_id; public_room_advice_response keepsrawpayloadrefs. Approved sourcehotel exists in trustedrecord/sourcecatalog and is independentlyCITY.",
+    "minimal_fix": "Validate flatrefs using pinnedsourceOwner hotel lookup; if an embeddedhotel_id exists itmustmatch. Retain version/hash/generation/fact ownership checks; or explicitlyenrichAPIrefs fromtrustedrecord underreview."
+  },
+  "source_reference_checks": [
+    {
+      "source_id": "SRC-HTL-CITY01-CATALOG",
+      "public_hotel_id_present": false,
+      "old_assertion": false,
+      "independent_source_owner_correct": true,
+      "matches_trusted_record": true
+    },
+    {
+      "source_id": "SRC-HTL-CITY01-CATALOG",
+      "public_hotel_id_present": false,
+      "old_assertion": false,
+      "independent_source_owner_correct": true,
+      "matches_trusted_record": true
+    }
+  ],
+  "model_semantics_turn1": {
+    "patch": "ExactdatesNov10..13,adults1,hardstay6mVND; no inferredmax_rooms;guest_edit+room_advice;4exactbudgetauthorizationpaths",
+    "room": "CITY-STD onequeen adult1 exactonce;occupancy/bedpass",
+    "money": "1800000VND/night ×3=5400000VND complete reference only;no hallucinatedextra/discountrationale",
+    "language": "Vietnamese checkedrationales;availabilityunknown",
+    "model_requested_charges_confirmation": "Servercorrectlyomitted unsupportedunknown-chargeclaim forsolo adult"
+  },
+  "database_read_only_proof": "q-review-batch2-source-diagnosis.json:completedrequest;brief1/receipt1/result1/messages2/selection0/sessionstate1; sourceCITYapprovedv1.0generation1",
+  "provider_usage_from_savedtrace": {
+    "input_tokens": 22810,
+    "output_tokens": 690,
+    "total_tokens": null
+  },
+  "counts": "Batch2 firstguestturn/twoCodexrequests; no furtherQcalls or statechange. Rootstoppedruntime.",
+  "review_correction": "Prior targetedharnessreadiness review missed this unconditionalhotel_id assertion againsttheflat publicAPIcontract. That readinessclaim is narrowed bythisactualfailure; no fullbatchPASS claimed.",
+  "limitations": [
+    "Turn2–9/selection/edit/Chinesecomparison/bookingactualnotobserved",
+    "NoQmodel/provider/DBmutations",
+    "InitialreadonlySQLreferencedwrongcolumnsource_version;failedreadonlytransactionrolledback; correctedtoverifiedversioncolumn, no statechange."
+  ]
+}

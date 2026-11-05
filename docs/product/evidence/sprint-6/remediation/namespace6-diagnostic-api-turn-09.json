@@ -1,0 +1,63 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "run_namespace": "remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 9,
+  "request_id_sha256": "b976828af2c9a87f",
+  "question_sha256": "a7f983e32665b8ab175c8c1b358fad7b45ce95f551c3ff9ae90107bfac8de9c9",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "천만에요!",
+    "answer_eligibility": "current",
+    "unknowns": [],
+    "evidence": [],
+    "language_preference": {
+      "language_tag": "ko",
+      "source": "explicit",
+      "revision": 8
+    },
+    "presentation": {
+      "language_tag": "ko",
+      "direction": "ltr",
+      "preference_revision": 8,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 5,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-15",
+        "nights": 5
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "c1b76c837825a446"
+          }
+        ]
+      },
+      "pending_fields": []
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-6",
+    "codex_requests": 18,
+    "guest_turns": 9,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "status": "completed"
+}

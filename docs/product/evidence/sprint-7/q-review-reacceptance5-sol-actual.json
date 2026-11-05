@@ -1,0 +1,173 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+  "overall": "ACTUAL_FAIL; C01/Sprint7 remains blocked by invalid room/bed instance indices and missing French positive advice/current selection",
+  "bootstrap_provenance": "Original0a attempt sealedHALTED0/0, providerconstructorfailure; fixedff bootstrap2 same approved2/4allocation, no modelretry",
+  "turns": [
+    {
+      "turn": 1,
+      "verdict": "PASS_FOR_ADVANCE",
+      "body_sha256": "450f0fed040af48248bdf0a39679ce6f92c7bb61f8ba452f34b7171d2c606fe3",
+      "output_tokens": [
+        484,
+        85
+      ],
+      "verified": [
+        "Exact currentquotedadult1/child7/explicitguardian/sharetrue/dates2n/bothhardaccess; no budget/physicaltype/roomlimit/pending fabrication",
+        "No option falsely certified; source capability uncertainty remains; correct VI hotelverificationnotguest-restatement with knownaccesskey/nonfallback visible",
+        "Current10source owner/version/hash/generation match independentoracle andreadonlyDB",
+        "Enforcedreadonly DB state/brief1,onecompletedrequest/result,twomessages,noselection; exactcurrentAPIresult"
+      ],
+      "child_id": "62756124-e0df-4c01-8120-500dc1cb858b",
+      "db_evidence": "q-review-reacceptance5-sol-turn-01-db-readonly.json"
+    },
+    {
+      "turn": 2,
+      "verdict": "FAIL_NO_SEMANTIC_RECEIPT",
+      "http_status": 200,
+      "body_sha256": "ec570b87137f9548f39c259a706d65a0884030b1b72015e3d223df9d98c5476d",
+      "output_tokens": [
+        511,
+        330
+      ],
+      "M2_edit_verdict": "PASS: samechildUUID62756124-e0df-4c01-8120-500dc1cb858b age7→8, clear-onlyhardaccess exactcurrentquote, guardian/sharing/datespreserved,pending[],no inventedbudget/type/roomlimit",
+      "candidate_verdict": "FAIL: single PINE-GARDEN has room_index1 and assigns bothpeople room_index1/bed_index1; actualcanonical roomindex0 and onlyqueenbedinstance0",
+      "M4": "Strictguard correctlyrejects roomindexconvention first as room_count_mismatch, no unsafe optionreleased. Rootresponse unsupported/currentv2,noselection.",
+      "French": "Native Frenchclaimlabels present, but checked rejection needs room_rule_conflict question label not supplied; APItruthfullyflags ENfallback, so Frenchpositivejourney fails",
+      "readonly": "DBstate/brief2,two completedrequests/results,fourmessages,noselection; correcteditedbrief matchesAPI; Garden approvedcurrent source/hash/version/generation matchesoracle",
+      "db_evidence": "q-review-reacceptance5-sol-turn-02-db-readonly.json",
+      "causal_evidence": "q-review-reacceptance5-sol-causal-probe-results.json: exactoriginal→unsupportedroom_count_mismatch; offline roomindex0only→bedconfigurationconflict; bothofflineindices0→FrenchpartialGarden5mknown2nbase,unknownfees/nulltotal. These are not actualrepair or modelPASS."
+    }
+  ],
+  "reuse": [
+    "AcceptedCityR3two-turncomparison/edit/currentselection/stale409/reselection",
+    "AcceptedFamilyR2three-turnage/sharing/guardian/budget/unknownfees",
+    "B07acceptedactualtrustedbooking9"
+  ],
+  "findings": [
+    {
+      "id": "Q-R5-1",
+      "severity": "P1",
+      "problem": "Model produces one-based room/bed instance references despite zero-based server contract, blocking useful verified option.",
+      "locus": "domains/hospitality/prompts/room_advice.py:6–10; schemas/room_advice.py room_index/bed_index fields; deterministic reject recommendations/rooms.py:754–757,840–843",
+      "reproducer": "Exact native turn02call02 oneGarden room with roomindex1/bedindex1; original staticparseraccepts,butM4 rejects.",
+      "smallest_direction": "Explicit producer contract for contiguous zero-based room indices and zero-based expanded bed-instance indices; preserve strictvalidators/no automaticreindexing/coercion. Test bothfailurelayers and validsource-specificassignments."
+    }
+  ],
+  "cause_distinctions": [
+    "Unlike R3, authorized clear and agechange were faithfullycommitted before dependentcall2.",
+    "Unlike R4, no unrequested hardbed requirement/pending field was created; Pine1knownaccessverificationpasses.",
+    "Currentfailure is roomcandidate serialization/reference error, not absent hotelroom/age/access/price evidence.",
+    "No actualpriceestimate released on failedPine2; Garden5m/feesunknown result is OFFLINE index-corrected counterfactual only.",
+    "No claim of statistical or causal modelqualityimprovement from changingprofile; bothmodels/candidates/history differ."
+  ],
+  "browser": {
+    "failure": {
+      "name": "Error",
+      "message": "turn 2 did not produce a useful positive candidate set"
+    },
+    "semantic_reviews": [
+      {
+        "turn": 1,
+        "verdict": "pass",
+        "response_sha256": "450f0fed040af48248bdf0a39679ce6f92c7bb61f8ba452f34b7171d2c606fe3"
+      }
+    ],
+    "marker01_only": true,
+    "marker02_absent": true,
+    "selection": "not reached; DBselectionempty",
+    "mobile_final": "not reached infailedrun; acceptedfrontend/B07evidence remainsreusable"
+  },
+  "final_state": {
+    "status": "halted",
+    "counts": [
+      2,
+      4
+    ],
+    "maxima": [
+      2,
+      4
+    ],
+    "sha256": "9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee",
+    "stop_reason": "Pine2 blocking actual proposal room_index=1 for one room causes room_count_mismatch; no useful option/current selection; French fallback question EN. Allocation exhausted2/4; no retries.",
+    "lifetime_requests": 50,
+    "unused_slots": [
+      0,
+      0
+    ],
+    "stop_receipt": "reacceptance5-sol-stop-receipt.json",
+    "runners": "Rootreports API43586exit143/browser76255exit1 stopped",
+    "no_retry_or_remaining_allocation": true
+  },
+  "bounds": {
+    "provider_requests": 4,
+    "model_effort": [
+      [
+        "gpt-6.1-sol",
+        "low"
+      ],
+      [
+        "gpt-6.1-sol",
+        "low"
+      ],
+      [
+        "gpt-6.1-sol",
+        "low"
+      ],
+      [
+        "gpt-6.1-sol",
+        "low"
+      ]
+    ],
+    "outputs": [
+      484,
+      85,
+      511,
+      330
+    ],
+    "latencies_ms": [
+      10790.1,
+      7529.9,
+      11501.2,
+      8808.9
+    ],
+    "all_outputs_lte700": true,
+    "all_provider_calls_lte25000ms": true,
+    "http": [
+      {
+        "turn": 1,
+        "status": 200,
+        "latency_ms": 18951.8
+      },
+      {
+        "turn": 2,
+        "status": 200,
+        "latency_ms": 20735.0
+      }
+    ],
+    "no_auto_retry_observed": true
+  },
+  "actual_source_pins": "q-review-reacceptance5-sol-actual-pins.json: all237 immutable snapshot and repo source hashes stillmatched at verification",
+  "AC_matrix": {
+    "AC1": "PASS representedactualcontextcoverage: City/Familyreuse +currentPine1knownneeds andPine2correctquote/age/guardian/share/clear edits.",
+    "AC2": "Currentapprovedhotel/sourcebindings/knownneedsverificationPASS; no sourcefabrication. Failedcandidateoutcome still prevents fulljourney.",
+    "AC3": "StrictchecksafePASS; positive age8Pinecheckedassignment missing because generatedindicesinvalid. C01notfullyaccepted.",
+    "AC4": "Independent/math +acceptedCity/Familyknownbase/unknownfeecoverage reused; actualPine2 costnotreleased. OfflinecorrectedGarden5mbase/nulltotalonly.",
+    "AC5": "AcceptedCitycomparativeprice/currentselection/stale409/reselection reused; PineFrenchoption/currentselection missing.",
+    "AC6": "Pine1truthfulhotelverification/unknownavailabilityPASS. Pine2unsupportedproposal reportedconflictwithconfirmedroomrule; underlyingcause is serialization/indexing. Do not reinterpretasguestneeds/hotelinventoryfailure.",
+    "AC7": "CurrentPineM2edits correctlycommitbeforedependentresult; samechild/fields/currentversionsPASS. UsefulupdatedPineproposal/currentselectionmissing; historicalCity/family/offlinereplayproofs reused.",
+    "AC8": "AcceptedChinese/mixedCity/Family/B07reusevalid; currentPineFrenchcheckedrationale/card/selection notcompleted, so fullAC8 remainsFAIL."
+  },
+  "minimal_future_proposal": {
+    "status": "PROPOSAL ONLY; requires NEWmanualallowance afterreviewedfixpublication",
+    "scope": "FreshonePinesession, exactsame two originalutterances, same Sol/low2guest/max4requests,2calls25s45s700,noretry/nofallback.",
+    "why_two": "Preserve original linked7→8/currentclear/French flow withoutauthreconstruction/actualbriefrollback/historyrepair; acceptedCity/Family/B07 need no repeat.",
+    "reuse": "CurrentPine1semanticPASS may be retained as acceptedcoverage; repeatonlytoestablish newfresh linkedPine2context, not to erasefailure."
+  },
+  "limitations": [
+    "All original captures, failedcurrentresult andcorrectM2v2 remain preserved; no DBrepair/modelretry.",
+    "Q used enforcedREADONLYtransactions only; no provider/model/API/DB writes.",
+    "Boot1providerconstructorfailure had0/0consumption and is not a modelattempt; fixedbootstrap2actual4requests accounted.",
+    "FullC01/Sprint7 NOT Done; no newpaidallowance consumed/proposedwithoutfuturehumanapproval."
+  ]
+}

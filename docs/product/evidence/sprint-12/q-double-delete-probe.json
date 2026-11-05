@@ -1,0 +1,15 @@
+{
+  "same_original_reservations": 1,
+  "concurrent_deletes": [
+    {
+      "deleted": true
+    },
+    {
+      "deleted": true
+    }
+  ],
+  "synchronized_recent_reads": 2,
+  "retained_quota_rows": 2,
+  "remaining_sessions": 0,
+  "workers_alive": 0
+}

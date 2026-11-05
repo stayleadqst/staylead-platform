@@ -1,0 +1,24 @@
+{
+  "verdict": "PASS r1 independent preflight",
+  "run_id": "s8-local-guide-20261028-reacceptance1",
+  "metadata_deltas_only": [
+    "authorized_for_live_calls",
+    "run_id"
+  ],
+  "candidate_sha256": "71dbcf11b07cba4259d3a0f052316499cd156ce38c9ab470acf50cafe3bec855",
+  "harness_sha256": "257513597e9121239410b52cdc5f5aeb772add96e8947a155b730b9c567983b0",
+  "case_sha256": "ce03aca2afb5313aef71c25bd8986a66c915233a950f1a9859022b363fe73ce1",
+  "oracle_sha256": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+  "fresh_state": "authorized0/0/0, sessions{}",
+  "snapshot": "HTL-S8-DEMO gen3 both1.0 approved exact oracle hashes",
+  "old_halted_state_sha256": "9919789c262844aa5cfe9a381f98bdfbb9a1705c5a1c2d8c4acd9fe76fcd66b4",
+  "native_output_limit": "No native guarantee;700 postcheck limitation remains acknowledged",
+  "artifact_hashes": {
+    "cases": "ce03aca2afb5313aef71c25bd8986a66c915233a950f1a9859022b363fe73ce1",
+    "config": "a0476d10f2e8b0d5579886364e9bb51fb03365a3f1b2565793e1929bbdcc95c0",
+    "state": "a87bb16fc2b24e3e758527b04bb3c01832191b8374bc7d92a1c55af1ab990081",
+    "oracle": "25d92789b1d5065a8c41573d91e1a0934436b045e96d10595b673aa319471030",
+    "source-preflight": "d26a9aa33d7b8f3e017a8f0ab75718ac4b196886bdb65c0eba328957fb753292"
+  },
+  "Q_actions": "Read only; no API/model/DB calls and no actual batch-state writes"
+}

@@ -1,0 +1,16 @@
+{
+  "artifact": "codex_acceptance_runtime.py",
+  "verification": "offline harness and middleware probe",
+  "results": {
+    "py_compile": "passed",
+    "ruff": "passed",
+    "diff_check": "passed",
+    "codex_composition_binding": "passed; selected gpt-6-luna/low through build_provider(settings)",
+    "message_response_logging": "passed; completed response and guest brief recorded in the sanitized message event",
+    "secret_redaction": "passed; authorization, access token, and database URL values absent from events",
+    "provider_invocation": "none",
+    "external_services_started": "none",
+    "run_state": "temporary probe state only; coordinator-owned codex-run-state.json unchanged"
+  },
+  "note": "Starlette emitted a deprecation warning about its current httpx TestClient integration; the offline probe completed successfully."
+}

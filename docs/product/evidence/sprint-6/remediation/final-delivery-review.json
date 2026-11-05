@@ -1,0 +1,121 @@
+{
+  "classification": "independent final requirements/evidence readiness review; publication and issue transitions are external follow-through",
+  "reviewed_at_utc": "2026-10-26T07:40:38.418919+00:00",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "provider_calls": 0,
+    "application_HTTP_calls": 0,
+    "server_starts": 0,
+    "product_edits": 0,
+    "commits": 0
+  },
+  "candidate_product_source_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "candidate_published_source": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+  "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "verdict": "READY_FOR_FINAL_PUBLICATION_AND_SCOPED_ISSUE_CLOSURE",
+  "requirements_ready": true,
+  "all_25_delivery_requirements_completed": false,
+  "findings": [],
+  "ac_map_review": {
+    "rows": 25,
+    "unique_story_ac_pairs": 25,
+    "requirement_rows_pass": 23,
+    "delivery_rows_ready_but_not_complete": [
+      {
+        "story": 95,
+        "ac": "R1-AC5",
+        "status": "READY_FOR_FINAL_PUBLICATION"
+      },
+      {
+        "story": 94,
+        "ac": "C-AC3",
+        "status": "READY_FOR_FINAL_PUBLICATION"
+      }
+    ],
+    "unsupported_closure_claims_found": false,
+    "result": "All product/verification requirements have evidence; two delivery rows await the coordinator external receipt."
+  },
+  "product_and_native_source_review": {
+    "result": "PASS_REUSED",
+    "source_binding": "All220 manifest-listed files rehashed independently without mismatch during NS10 review and again after focused browser evidence was added.",
+    "native_preparation": "Prior independent Ajv low/high positive-negative and strict-schema bounds, captured NS9 reject/control, mocked Codex/Foundry transport, committed-only null channel parity and empty-provisional rejection retained.",
+    "scope": "No unchanged product suites rerun for this final delivery review."
+  },
+  "actual_acceptance": {
+    "result": "PASS_REUSED_INDEPENDENT_NS10_REVIEW",
+    "run_id": "s6-codex-20261026-remediation-10",
+    "actual_cases": 9,
+    "actual_desktop_UI_and_exact_copy_cases": 9,
+    "provider_requests": 18,
+    "automatic_retries": 0,
+    "answer_only_resumes": 0,
+    "prior_actual_requests_preserved": 97,
+    "cumulative_actual_requests": 115,
+    "scoped_PostgreSQL": "Nine completed requests, brief5/checkin2026-12-10/checkout2026-12-15/nights5/adults2/samechild7/pending[]/Korean explicit revision8; correct five receipts.",
+    "semantics": "All state/intent/source/numeric/label checks pass. T2 missing-age and T7 typed checkout questions are distinct from unsupported hotel unknowns; zero false rejection observed.",
+    "visual_limit": "All nine desktop turn images plus finaldesktop/mobile inspected. Final mobile scroll position shows older history, so no claim of every NS10 answer being verified on mobile; previously accepted mobile evidence remains separately attributed."
+  },
+  "focused_UI_proof": {
+    "mode": "mocked-production-browser-focused-ac",
+    "execution_result": "Builder recorded PASS; independent source/assertions/JSON/log review PASS, node --check PASS. No browser rerun by this reviewer.",
+    "L3-AC2": "Explicit delayed-response releases, serialized composer, newer Arabic revision2 main/header language+RTL, historical English/Arabic answer lang+dir, stale old-English revision1 answer and disabled copy are asserted. Actual NS10 separately establishes no brief reset across language changes.",
+    "L3-AC4": "Separate cached Chinese labels plus502 and fresh Japanese preference/no-cache disclosed-English fallback plus502 paths assert visible error, no false successful answer, exact intercepted message counts and no extra translation/API path.",
+    "intercepted_message_counts": [
+      3,
+      2,
+      1
+    ],
+    "backend_model_calls": 0,
+    "external_browser_origins": [],
+    "screenshot_files_created": false,
+    "limitation": "Delayed/outage responses are intercepted production-web fixtures, not additional live backend/provider acceptance."
+  },
+  "remaining_external_actions": [
+    "Coordinator commits and publishes final code/text evidence within the authorized owner branch scope; screenshots and private captures remain local.",
+    "Coordinator fetches and verifies expected remote/tree equality, recording a concrete publication receipt.",
+    "Coordinator closes only the six authorized scoped sprint issues after publication and records each transition.",
+    "Coordinator final status receipt completes R1-AC5 and C-AC3; this review does not claim those future transitions occurred."
+  ],
+  "scope_preserved": "No deployment, main/baseline merge, parent-scope closure, budget increase or new provider call authorized by this review.",
+  "evidence_binding_at_review": [
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/final-ac-map.json",
+      "sha256": "4c25fcaba3ca03918d9780deb4bc4aa1b43f0fbecb8aae519df54d670f5f62e5"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/consumer-final-ac-browser.mjs",
+      "sha256": "6c3eebef9a24c3c4072e339d0e5f1df08b1def8ce22d97d1ef70e7914d027c02"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/consumer-final-ac-browser.json",
+      "sha256": "1d7f10523f098aefb39c24a346bbb7ccebd15cf8872056b1d5c1004d795180f6"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/consumer-final-ac-browser.log",
+      "sha256": "eab01029b4ba158f1be709e58632890c5246d403c397da4f7352a2eb5e3444f7"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/native-preparation-review.json",
+      "sha256": "4903d153cc36fa3b8943dd9d4ef4c207f61c2d704cdf1e9b6b0dd806bbe959c6"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/native-preparation-local-gates.json",
+      "sha256": "93b59e9eabc2b1fab96aa20a94b8f51febe3554768171fd25ca564a9a9ccc88f"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/namespace10-candidate-manifest.json",
+      "sha256": "536e1c5f226a4861fa94feb2453497649c2130e59a3fd8763b5cd9e5a5247b3e"
+    },
+    {
+      "path": "docs/product/evidence/sprint-6/remediation/namespace10-semantic-review.json",
+      "sha256": "271c55a9959989e799f8b60496477183dcba07ce8518e6f57d3f0aeec310b997"
+    }
+  ],
+  "limitations": [
+    "This readiness verdict reuses completed proportional reviews and checks; it is not a fresh broad audit.",
+    "Actual served model/billing and provider/server network activity remain unreported or unmeasured as recorded in namespace10 evidence.",
+    "Historical failed runs remain unchanged. Live allowance is closed at115 cumulative actual requests.",
+    "Publication equality and issue closure require the coordinator external receipt; no circular requirement for this artifact to know its own future commit SHA."
+  ]
+}

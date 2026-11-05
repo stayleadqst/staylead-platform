@@ -1,0 +1,171 @@
+{
+  "state": "scoped_sprint6_delivered_done",
+  "repository": "stayleadqst/staylead-platform",
+  "branch": "sprint-6-multilingual",
+  "previous_published_head": "e7e4bbdad86aea81d5a288f5bfbd1589d32a0852",
+  "prepared_source": {
+    "sha": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+    "tree": "77da592271da3e3cb01ab32bde72468a20b2b461"
+  },
+  "reviewed_product_local": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "mappings": [
+    {
+      "local": "b3f06bf",
+      "published": "8f9ce98da9fb3014ccd82a5782ff83e713bdd2e0",
+      "tree": "01628656be17efcc40cd8b2f66c2160bf4a8360b"
+    },
+    {
+      "local": "adc6bb3",
+      "published": "5bcb0ababd26cd6f250a1a68a75cfebd6b391147",
+      "tree": "8f625d6123aea7c1120b4115fc69a62478669295"
+    },
+    {
+      "local": "70b4641",
+      "published": "8b39563bee587d76e245293e9bf8f8bbf599596a",
+      "tree": "274c2e0e11b2da2deb17e27f47af2c1c91317eb4"
+    },
+    {
+      "local": "7ed3fc6",
+      "published": "cf15768690308660c05c18be7c2dc793f5f34042",
+      "tree": "c5ed29d8132b905b425f6df5ba26c75bc60c2b53"
+    },
+    {
+      "local": "e05ae3d",
+      "published": "b2e9558683eccdc7045e5c7fc55ba8840566725d",
+      "tree": "ab9c4c4ff2d69d3359f4c427be1d4759cbbff617"
+    },
+    {
+      "local": "9929c33",
+      "published": "e337be9c304bf78c328a6f2867fac0620181c176",
+      "tree": "ecdcde712379330852bea2bad95beb461cf0dd60"
+    },
+    {
+      "local": "2f10af8",
+      "published": "f429e1b4fe626d6fbeeecc8d6196439cb583c03b",
+      "tree": "368b3cf5478507f092b040645caca757b588bac7"
+    },
+    {
+      "local": "a9338e0",
+      "published": "3993e89a14653ca96f12d67e162e7518052676f7",
+      "tree": "b917c1a8610fcf82081a9f894b19620b922eb904"
+    },
+    {
+      "local": "9e8e16b",
+      "published": "8db5176beabfd8e09b9c3ea0e1ee35ddde403ac9",
+      "tree": "5535ec69c4db2750e6b6812af6da11478735346e"
+    },
+    {
+      "local": "f52e74c",
+      "published": "6e5cfa6b292c4d2ec960e5cfd37cc302218de5ef",
+      "tree": "1c0b1d414218d1fc723aeb22d8fe7696f44436db"
+    },
+    {
+      "local_sha": "559a3d295fadb230ce84e6e0a61ac2533077eee2",
+      "remote_sha": "725b46e449b634e5151153e0bdc303688ce1ccb9",
+      "tree": "f7b29eff74e9b3d495e1d14ea6713eaf735a6b4e"
+    },
+    {
+      "local_sha": "0227b9b",
+      "remote_sha": "8479b8eaeca4f437577afa5596e4c05bbe7bbc65",
+      "tree": "d62789acc400e8b082844aa399f516406b406923"
+    },
+    {
+      "local_sha": "d87e674",
+      "remote_sha": "d2b73d703ea71529d91bb2433f262990a1c77f5b",
+      "tree": "903a40e629b67f87628a3959a0de50bf927a9af8"
+    },
+    {
+      "local_sha": "749ff48",
+      "remote_sha": "91104bb9e0f1326791dd3d94845df6b2d6f49e4c",
+      "tree": "34e0166907389ba8795b21d31c4256e5592bcc0d",
+      "local_unpublished_image_commit": "a6b7e08",
+      "note": "Remote parent is d87 equivalent; a6b7 image commit never created/referenced in remote chain. Screenshot bytes excluded."
+    },
+    {
+      "local_sha": "b9abb9105ff59a7faa96ec1ebe87e76a592fa79a",
+      "remote_sha": "746fdcbc72cc01ec2aa9447545fa6dbc728b2115",
+      "tree": "90c69d158f37dec47b72a521706d11095c303715"
+    },
+    {
+      "local_sha": "1bcb8a1",
+      "remote_sha": "10d96aba46b5a012a9c3cf8e73e29b93c0b345aa",
+      "tree": "314361400f72a3b6c876a71b3708650edfdd1b09"
+    },
+    {
+      "local_sha": "e9424bc37b2c466768e3de4669f87c4ccd13a485",
+      "remote_sha": "f4d9407794e3c96f1ddebb2ca80095c3c05962ac",
+      "tree": "d46623d3687a7a673019ae77056f31ce3316f7ca"
+    },
+    {
+      "local_sha": "a23dc9e",
+      "remote_sha": "fca86724c4446d82974d939fb17792dda2177a13",
+      "tree": "0dce4745f8db4e6b98c35eb5e20cae23c902bf9e"
+    },
+    {
+      "local_sha": "536b90d",
+      "remote_sha": "f2281f0ea7cbf3a587d89d910793abe361b3dd21",
+      "tree": "863dd21cbf6ee7882e87be2dc8e48a5a8caf5218"
+    },
+    {
+      "local_sha": "a059046",
+      "remote_sha": "26438b518dc97d3ff0a035a033b9bbdad32e0b28",
+      "tree": "958daf9f5299c19afac7eaba893c549f36a79f2e"
+    },
+    {
+      "local_sha": "b6095da",
+      "remote_sha": "3ee92cfe8b2eb2605aa011ab3d84ff1409f79a38",
+      "tree": "45a27cd19cb8b84e85d72779ca3689784f9307dd"
+    },
+    {
+      "local_sha": "95fcf27",
+      "remote_sha": "e461efd19ba035ee6d628537254fa0e5d32d3f27",
+      "tree": "8a65022be8c64ad791c216bada7d3c024948f7d5"
+    },
+    {
+      "local_sha": "af4b42f",
+      "remote_sha": "84f0c744d3d9d694098ceb6debad593c691449bd",
+      "tree": "4d9ba6ba456305e0e3c4a15a8137cf107bb24e1e"
+    },
+    {
+      "local_sha": "b666454",
+      "remote_sha": "eb8be575489bab9b4aa23e1b9e00726b91311d4e",
+      "tree": "77da592271da3e3cb01ab32bde72468a20b2b461"
+    }
+  ],
+  "budget": {
+    "cumulative_actual": 78,
+    "namespace6_used": 18,
+    "namespace7_used": 18,
+    "namespace7_authorized_for_live_calls": false,
+    "namespace8_max18_requested": true,
+    "namespace8_approved": false
+  },
+  "screenshots": "27local only; no image bytes in publication tree/history",
+  "note": "Prepublication snapshot; final text commit/equal-tree receipt recorded outside Git. Not merged/deployed.",
+  "cumulative_actual_requests": 115,
+  "NS9_used": 1,
+  "NS9_unused_reserved": 0,
+  "allowance_transferred": true,
+  "screenshots_local_only": 43,
+  "full_matrix_pass": true,
+  "NS9_transferred_requests": 17,
+  "NS10_requests": 18,
+  "NS10_turns": 9,
+  "NS10_live_disabled": true,
+  "remaining_allowance": 0,
+  "final_requirements_review": "final-delivery-review.json",
+  "acceptance_published_head": "1333eb2c911f69d5dbc2cad1ba411a8629cb5ec8",
+  "acceptance_published_tree": "6b6cbe9cadabbdb31f589c5b5900909a30400c86",
+  "acceptance_equal_tree_fetch_verified": true,
+  "completed_issues": [
+    91,
+    92,
+    93,
+    74,
+    95,
+    94
+  ],
+  "final_delivery_receipt": "final-delivery-receipt.json",
+  "remaining_scoped_blockers": [],
+  "final_AC_rows_PASS": 25
+}

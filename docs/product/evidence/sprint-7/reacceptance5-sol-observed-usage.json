@@ -1,0 +1,52 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "requests": 4,
+  "guest_turns": 2,
+  "lifetime_requests": 50,
+  "input_tokens": 50775,
+  "output_tokens": 1410,
+  "per_request": [
+    {
+      "turn": 1,
+      "call": 1,
+      "input_tokens": 12970,
+      "output_tokens": 484,
+      "latency_ms": 10790.1
+    },
+    {
+      "turn": 1,
+      "call": 2,
+      "input_tokens": 11954,
+      "output_tokens": 85,
+      "latency_ms": 7529.9
+    },
+    {
+      "turn": 2,
+      "call": 1,
+      "input_tokens": 13366,
+      "output_tokens": 511,
+      "latency_ms": 11501.2
+    },
+    {
+      "turn": 2,
+      "call": 2,
+      "input_tokens": 12485,
+      "output_tokens": 330,
+      "latency_ms": 8808.9
+    }
+  ],
+  "http_turn_latencies_ms": [
+    18951.8,
+    20735.0
+  ],
+  "all_provider_within_25s": true,
+  "all_turns_within_45s": true,
+  "all_requests_within_700_output_tokens": true,
+  "automatic_retries": 0,
+  "fallbacks": 0,
+  "billing_and_agent_tokens": "unavailable",
+  "bootstrap1_requests": 0
+}

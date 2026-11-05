@@ -1,0 +1,31 @@
+{
+  "original-real-capture": {
+    "accepted": false,
+    "error_class": "ValueError",
+    "message": "The proposed guest edit lacks current-turn authorization."
+  },
+  "aggregate-target-only": {
+    "accepted": false,
+    "error_class": "ValueError",
+    "message": "Guest edits require the current turn to be classified as an edit."
+  },
+  "9a-valid-aggregate-budget": {
+    "accepted": true
+  },
+  "canonical_set_room_requirements_target": [
+    "room_requirements"
+  ],
+  "model_added_unsupported_max_rooms": 1,
+  "model_missing_guest_edit": true,
+  "source_tree_sha256": {},
+  "preserved_snapshot_235_hashes_match": true,
+  "run_state_sanitized": {
+    "run_id": "s7-room-advice-20261026-batch1",
+    "status": "halted",
+    "guest_turns": 1,
+    "codex_requests": 1,
+    "max_guest_turns": 9,
+    "max_codex_requests": 18
+  },
+  "run_state_file_mode": "0o600"
+}

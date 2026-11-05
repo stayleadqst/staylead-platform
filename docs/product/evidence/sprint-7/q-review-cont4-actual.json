@@ -1,0 +1,78 @@
+{
+  "verdict": "FAIL actual continuation: case6 constraintrecovery incomplete; case7 protocolrejection",
+  "candidate": "59362f6cd43d2a598d71eb63a2095ea3d5d38f98cba49548f4f2298de05eea77",
+  "browser_directory": "/private/tmp/staylead-s7-browser-s7-room-advice-20261026-batch2-cont4-r1",
+  "source_hash_observation": {
+    "count": 237,
+    "mismatches": []
+  },
+  "recovery": {
+    "case_id": "beach-4",
+    "exact_completed_request_replayed": true,
+    "result_id_sha256": "8b9f286092a4e0dfef5d2f5b351b06a4a00af382f912fde6890f3d681032a3c2",
+    "provider_calls": 0,
+    "global_counters_unchanged": {
+      "guest_turns": 5,
+      "codex_requests": 9
+    },
+    "classification": "recovery only; not a new case-4 semantic pass"
+  },
+  "case6": {
+    "status": 200,
+    "useful_partial_passes": [
+      "StablechildID age12/separatehardbed fact retained; dates2n/adults2 preserved; max1room explicitly authorized.",
+      "BEACH-GDN onequeen adults + childseparatesofa, occupancy and separatebed checks pass.",
+      "Correctknownbase5.2mVND; age12adult-rate fee unknown, totalnull/incomplete; minor remainsnotcertifiedguardianfit; no inbudget orliveavailability claim."
+    ],
+    "AC1_failure": "Explicit current Iremainparent/guardian omitted from M2; guardian_relationshipunknown, noguardianclarification. Priorlostadultqueenconsent also remainsunknown, not recovered by this actualturn.",
+    "budget_limitation": "budget_strength emittednull and absentpersistedstate; hardbudgetcodeguard therefore notentered. Thisactualturn doesnotprovehardbudgetvalidation, even though knownGDNbasebelow6m and unknownfees preventtotalcertification."
+  },
+  "case7": {
+    "status": 502,
+    "error_code": "invalid_model_output",
+    "stage": "preparation metadata",
+    "first_cause": "6authorizationitems for3ops; repeatedoperationindexes0and1 insteadexactlyoneitem/op with aggregatedtargetarray.",
+    "secondary_proven_failure": "After groupedmetadata counterfactual passes, M2rejects guardianadult1 because no set_adults was emitted on freshsession.",
+    "direct_probe": "q-review-cont4-case7-protocol-probe.json",
+    "actual_M2_result": "Retreatstate0/briefnone/messages0/receipts0/sourceutterances0/results0; only requesterror persisted.",
+    "counterfactual_limit": "Completeoffline4op counterfactual representsdates/adult1/child7guardian+share/hardaccess and passes, not actualmodelPASS."
+  },
+  "new_provider_calls": [
+    {
+      "turn": 6,
+      "call": 1,
+      "output_tokens": 594,
+      "latency_ms": 9670.5
+    },
+    {
+      "turn": 6,
+      "call": 2,
+      "output_tokens": 305,
+      "latency_ms": 5101.1
+    },
+    {
+      "turn": 7,
+      "call": 1,
+      "output_tokens": 620,
+      "latency_ms": 6744.1
+    }
+  ],
+  "bounds": "3newrequests: case6two/case7one; each<=700tokens/25s, turns15.003s/6.861s<45s. No automaticretry/call2after7rejection.",
+  "linked_state": {
+    "status": "halted",
+    "guest_turns": 7,
+    "codex_requests": 12,
+    "max_guest_turns": 9,
+    "max_codex_requests": 18
+  },
+  "state_sha256": "73375c5c34e1d839d2f2bcc671974cb40f013a77298757828d304ed63b663b43",
+  "physical_reserved_model_calls_including_batch1": 13,
+  "readonly_db": {
+    "transaction_read_only": "on",
+    "evidence": "q-review-cont4-actual-db-readonly.json",
+    "notable": "Beachstate2/brief2,2results2receipts4messages; Cityunchangedstate3; Retreatonlyerrorrequest/state0."
+  },
+  "remaining_context_risk": "Original8reconfirmdates/child referencesfailed7; actualbackendhasnoRetreatuserhistory/sourceutterancefrom7. Anyfuturecontinuationmusttruthfullyresolve/preserveoriginalguestcontextwithcurrentconfirmation ratherthaninventdatesorclaimexistingM2. No manualDBpatch/modelretrybyQ.",
+  "remaining_actual": "Cases8/9unattempted inclFrench/selection/trustedbooking. OriginalfailedCity2/3/Beach4/case5 and current6/7 gaps remain; no fullactualACPASS.",
+  "reviewer_effects": "No model/provider calls, DBwrites or productedits. EnforcedreadonlyDB, savedcaptureinspection and in-memory protocolprobesonly."
+}

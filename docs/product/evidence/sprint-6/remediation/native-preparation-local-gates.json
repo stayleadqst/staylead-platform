@@ -1,0 +1,30 @@
+{
+  "candidate": "b666454970829c56ae52d3cfe184b7414c4d8cd4",
+  "product_fingerprint": "c33812807c537ffed561564528e72e70d219acc8a8eaca1929aefe2b1a24411a",
+  "builder_focused_contracts": 95,
+  "coordinator_final_schema_tests": 4,
+  "affected_S6_PG_API": 4,
+  "coordinator_prior_native_preparation_contracts_architecture": 112,
+  "harness_python": 39,
+  "routing": 7,
+  "namespace10_runtime": 17,
+  "ruff_compile_diff": "PASS",
+  "review": "gpt-6.1-sol/high READY; no remaining scoped finding; see native-preparation-review.json",
+  "live_calls_during_fix": 0,
+  "cumulative_live_requests": 97,
+  "NS9_used": 1,
+  "NS9_unused_reserved": 17,
+  "NS9_allowance_transferred": false,
+  "full_nine_turn_actual_acceptance": "NOT_VERIFIED",
+  "reused_gates": {
+    "af4_candidate": "current-turn-local-gates.json",
+    "web_contracts": 36,
+    "web_state": 15,
+    "production_build_layout_copy": "previous unchanged evidence"
+  },
+  "limitations": [
+    "Counts refer to distinct check scopes; do not sum overlapping tests.",
+    "Offline and mocked transport checks do not establish actual model behavior.",
+    "No live allowance increase or transfer has occurred."
+  ]
+}

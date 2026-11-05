@@ -1,0 +1,16 @@
+{
+  "authoring_origin": "S6 author-authored synthetic acceptance source; not from a real property or model",
+  "guest_approved": true,
+  "hotel_id": "HTL-CITY01",
+  "languages": ["vi", "en"],
+  "media_type": "text",
+  "path": "sources/guest/sprint6-acceptance.txt",
+  "scope": "hotel-specific",
+  "section": "S6 acceptance-only sample link",
+  "source_id": "SRC-HTL-CITY01-S6-URL",
+  "synthetic": true,
+  "title": "Synthetic S6 acceptance-only information link — Harbor City Demo",
+  "valid_from": "2026-10-01",
+  "valid_to": "2027-09-30",
+  "version": "1.0"
+}

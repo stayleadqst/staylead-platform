@@ -1,0 +1,30 @@
+[
+  {
+    "source_id": "S8-GUIDE-PRIMARY",
+    "version": "2.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-01-01",
+    "valid_to": "2027-03-31",
+    "checked_at": "2026-10-28",
+    "title": "Synthetic local guide primary revision",
+    "url": "https://example.invalid/synthetic/s8-guide-primary",
+    "provenance": {
+      "label": "synthetic technical-pilot source; not a real hotel approval; server-selected revision with a visible synthetic update"
+    }
+  },
+  {
+    "source_id": "S8-GUIDE-SECONDARY",
+    "version": "1.0",
+    "scope": "hotel-specific",
+    "guest_approved": false,
+    "valid_from": "2026-01-01",
+    "valid_to": "2027-03-31",
+    "checked_at": "2026-10-28",
+    "title": "Synthetic conflicting hours record",
+    "url": "https://example.invalid/synthetic/s8-guide-secondary",
+    "provenance": {
+      "label": "synthetic technical-pilot source; conflicting hours deliberately require verification"
+    }
+  }
+]

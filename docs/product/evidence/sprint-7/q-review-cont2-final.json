@@ -1,0 +1,47 @@
+{
+  "verdict": "PASS targeted product/harness readiness for previously unattempted cases4–9 only; no actual fullAC PASS",
+  "pin": {
+    "candidate": "8055d6b8a108b1e5f09366442c751a05f60a1cc78fde30732f3f2ef544d4854c",
+    "files": 236,
+    "mismatches": [],
+    "sealed_parent_counters": [
+      3,
+      6
+    ],
+    "parent_hash_unchanged": true
+  },
+  "resolved": [
+    "Q-C1: rejected overbudget alternative no longer adds false survivor question/conflict; rejection identity/factrefs retained in explanation_inputs.rejected_alternatives.",
+    "Q-C2: native/Pydantic canonical hardbed types agree; separate-surface constraint taught as explicit member no-sharing, unsupported hard type remains pending.",
+    "Q-C3: unknown-soft prompt now preserves preferred/avoided wording instead of hard clarification."
+  ],
+  "independent_verification": {
+    "initial_targeted": "24passed (budget survivor/canonical separation/hardpending/localization branches)",
+    "soft_fix": "1passed54deselected",
+    "real_http": {
+      "case_id": "beach-4",
+      "database_scope": "staylead_sprint7_continuation_offline only",
+      "global_counters": {
+        "codex_requests": 8,
+        "guest_turns": 4
+      },
+      "message_status": 200,
+      "mode": "in-process FastAPI TestClient; offline fake provider; no model/service",
+      "persisted_request_rows": 1,
+      "persisted_result_rows": 1,
+      "provider_calls": 2,
+      "response_sha256": "8279249ff6512a814d493444ea85ce64a535958b369efb67ad1c5e030fbaf7df",
+      "result_id_sha256": "9a87d9a7425ec36a007f6dbaccc8c6d6a5ad92916ec16ad2d630720a7f22929e",
+      "room_advice_status": "needs_clarification",
+      "session_status": 201
+    },
+    "real_http_evidence": "/private/tmp/staylead-s7-cont2-http-fake-jdbavubq.json",
+    "source_guards": "Previously verified helper negative owner/version/hash/generation/fact guards unchanged. Runtime source/case/oracle verification on each reservation, exact halted parent3/6 hash, persistent prelaunch counters, samecaps and stop remain enforced.",
+    "initial_http_attempt": "During B import cleanup expected source-pin guard rejected mutable source hash before fake-provider work; preserved as timing/guard observation, not product failure. Retried only after root final-v3 freeze."
+  },
+  "harness_scope": "Browser only beach4–6 andretreat7–9; new legitimate sessions, no City2/3 retry and no recovery/replay special endpoint. Same max9guestturns18requests, seed3/6, atmost6newturns12newrequests. No actual namespace initialized by Q.",
+  "legacy_city3": "Existing invalid raw hard_bed_types separate beds is historical failure and remains unchanged. No-sharing-only future patch does not clear it; explicit clear/correct guest instruction or fresh session required. Independent in-memory explicit-clear+no-sharing gives valid5.85m. No migration/actualDBfix performed.",
+  "actual_observation_limits": "City2/3 original actual failures preserved. Fixes have offline code/regression proof, not fresh actual inference. Actual cases4–9 incl guardian/budget/accessrelaxation/French8/Englishtrustedbooking9 remain pending.",
+  "reviewer_effects": "No actual provider calls, no actual acceptanceDB writes. Only authorized isolated scratchDB fakeHTTP added its own session/request/result. Product/source read-only; q-review evidence files only.",
+  "findings": []
+}

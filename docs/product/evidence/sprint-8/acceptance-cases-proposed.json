@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "run_id": "s8-local-guide-20261028-proposed",
+  "authorized_for_live_calls": false,
+  "classification": "synthetic technical pilot; no real hotel approval",
+  "property": {
+    "hotel_id": "HTL-S8-DEMO",
+    "slug": "lotus-pilot-demo"
+  },
+  "candidate_pins": "pending local validation and independent review",
+  "limits": {
+    "guest_turns": 4,
+    "requests": 8,
+    "model": "gpt-6.1-sol",
+    "effort": "low",
+    "calls_per_turn": 2,
+    "provider_timeout_seconds": 25,
+    "turn_timeout_seconds": 45,
+    "max_output_tokens": 700,
+    "automatic_retry": false,
+    "fallback": false,
+    "stop_at_first_blocking_failure": true
+  },
+  "cases": [
+    {
+      "id": "s8-01",
+      "session": "fresh-A",
+      "language": "zh",
+      "input": "请用中文推荐酒店附近的餐厅和景点短名单。我更喜欢安静、自然和轻松的节奏，每个地点每人最多150000越南盾。请解释适合的原因、取舍和需要核实的信息，不需要订房或完整行程。",
+      "expected": {
+        "preference": "quiet/nature/relaxed; hard per-venue per-person150000VND",
+        "preferred_venue_ids": [
+          "DIN-01",
+          "ATT-02"
+        ],
+        "excluded": [
+          "DIN-03",
+          "ATT-03"
+        ],
+        "other_hard_excluded": [
+          "DIN-02"
+        ],
+        "tradeoffs": [
+          "ATT-02 hours unknown; route direction gaps remain unknown",
+          "No booking, availability or suitability guarantee"
+        ]
+      }
+    },
+    {
+      "id": "s8-02",
+      "session": "fresh-B",
+      "language": "fr",
+      "input": "Répondez en français. Je souhaite une courte sélection de restaurants et de visites près de l'hôtel. Mes priorités sont la culture, un lieu convivial et une visite intérieure; je peux payer 300000 VND par personne et par lieu. Expliquez les avantages, les compromis, le sponsoring et les informations à vérifier. Je ne veux ni réservation ni itinéraire complet.",
+      "expected": {
+        "preference": "culture/social/indoor; budget300000VND perperson pervenue",
+        "preferred_venue_ids": [
+          "DIN-02",
+          "ATT-01"
+        ],
+        "excluded": [
+          "DIN-03",
+          "ATT-03"
+        ],
+        "tradeoffs": [
+          "DIN-02 sponsored disclosed; conflicting hours unresolved/verify",
+          "ATT-01 90minutes/120000VND",
+          "No inference from sponsor to suitability"
+        ]
+      }
+    },
+    {
+      "id": "s8-03",
+      "session": "fresh-C",
+      "language": "ar",
+      "mobile_rtl": true,
+      "input": "أجب بالعربية. I need a dining shortlist near the hotel. Peanut allergy safety and step-free wheelchair access are hard requirements. I prefer quiet places. If the evidence is missing, say exactly what must be verified; do not assume it is safe.",
+      "expected": {
+        "hard_needs": [
+          "peanut allergy safety",
+          "step-free wheelchair access"
+        ],
+        "no_certified_dining_fit_without_positive_evidence": true,
+        "unknowns": [
+          "allergy evidence missing",
+          "specific verification with venue/hotel before relying on a venue"
+        ],
+        "no_room_or_full_trip_prerequisite": true
+      }
+    },
+    {
+      "id": "s8-04",
+      "session": "same-C",
+      "language": "fr",
+      "mobile_rtl_transition": true,
+      "input": "Passez au français et changez seulement ma préférence d'ambiance: je préfère maintenant un lieu convivial plutôt que calme. Mes exigences strictes sur l'allergie aux arachides et l'accès sans marches restent inchangées. Donnez la courte sélection avec les vérifications encore nécessaires.",
+      "expected": {
+        "preserved_hard_needs": [
+          "peanut allergy safety",
+          "step-free wheelchair access"
+        ],
+        "changed": [
+          "language fr",
+          "quiet→social preference"
+        ],
+        "no_certified_dining_fit_without_positive_evidence": true,
+        "no_history_or_direct_db_repair": true
+      }
+    }
+  ],
+  "independent_expected_review": "Q must verify actual catalog and pin independent expected fits/tradeoffs before authorization request.",
+  "startup_and_default_tests": "disabled/fake model only; no live initialization authorized",
+  "observation": "Mobile/RTL and names/numbers/approved URLs/source/status are inspected within these turns; no extra model calls."
+}

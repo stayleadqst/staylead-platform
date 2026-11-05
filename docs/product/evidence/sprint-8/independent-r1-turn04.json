@@ -1,0 +1,21 @@
+{
+  "turn": 4,
+  "verdict": "PASS",
+  "response_sha256": "56b7d131a6618da895ce0676ff2ee1f496d3eb24baf1027c0ac4301a11fbc6a3",
+  "evidence_sha256": "8e657ebb1176a4c45fdf006856bea3f015564f1b37a74b76551999289c4dfbf9",
+  "counters": {
+    "guest_turns": 4,
+    "approved_case_turn": 4,
+    "requests": 8
+  },
+  "session_binding": "aad02bde-897e-4b4b-a34d-98351b533122",
+  "checks": [
+    "Actual same-C DB session and quoted original input verified in READ ONLY transaction; M2v1→v2 delta ONLY interests quiet→social",
+    "Exact peanut + step_free + wheelchair_access hard-needs sets and dining kind retained; no pending or new profile requirements",
+    "French lang/dirltr/preference revision2/corefallbackfalse, current exact French-question guideDOM verified; retained Arabic transcript is history",
+    "DIN02 now preferred for social but both dining UNKNOWN; exact access/allergy/hours checks, sponsor/prices/bases/durations/sourcegen3 hashes remain correct",
+    "Actual390 screenshot viewed, French header/send with retained Arabic history; no full-scrolled-guide screenshot claim"
+  ],
+  "root_agreement": "Explicit root PASS received before receipt",
+  "DB_review": "/private/tmp/staylead-s8-q-r1-final-db-summary.json"
+}

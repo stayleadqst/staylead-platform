@@ -1,0 +1,30 @@
+
+> @staylead/platform-web@0.1.0 build
+> next build
+
+▲ Next.js 16.4.2 (Turbopack)
+✓ Running next.config.ts took 134ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 551ms
+  Running TypeScript ...
+  Finished TypeScript in 1422ms ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/4) ...
+  Generating static pages using 7 workers (1/4)
+  Generating static pages using 7 workers (2/4)
+  Generating static pages using 7 workers (3/4)
+✓ Generating static pages using 7 workers (4/4) in 147ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/guest/[...path]
+├ ƒ /api/operator/[...path]
+├ ƒ /hotels/[hotelSlug]/chat
+└ ○ /operator
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

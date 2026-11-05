@@ -1,0 +1,57 @@
+{
+  "candidate_sha256": "bc54280dbed1536aecd05fc418cf5dcfff44eca4556b680e48cf6ed7825788fe",
+  "manifest": "candidate-manifest-final-review.json",
+  "235_source_hashes_before_after": "all matched",
+  "matrix_oracle_hashes": "matched",
+  "review_verdict": "No remaining evidenced AC-critical defect in reviewed integrated candidate. Suitable for the already-authorized first bounded actual acceptance batch after coordinator finishes its running local PostgreSQL validation. This is not full Sprint7 Done or actual-model PASS.",
+  "resolved_B_findings": {
+    "Q-B1": "Generic truthful constraint/rule conflict wording in4reviewedlanguages; verified helper+consumer use",
+    "Q-B2": "Knownnightlybase displayed with reference/base and unknownstay/fee caveats; total only if complete",
+    "Q-B3": "Neutralstale/freshnessError/selectionDisabledprops,post-turnoldanswerrecheck,failclosederrors,authoritativerecovery,busyactionguard; fixedproductionbrowser oldbanner+disable/newcurrent+enabled",
+    "Q-B4": "Freshnessendpoint checks persisted EXACTroomresultID; original pureprobe nowstale/exactread1; PGfocused tests coverconfig/source/supersededresult"
+  },
+  "reused_A_H_proofs": [
+    "Q-A1..Q-A6 prior originalinputcorrection evidence",
+    "Q-A7 selectedsource eligibility/pre/postread proof alreadyPASS andcurrenthashpin includesfix",
+    "Relocalizationpurepresentation math/assignment/version/sourcepreservation",
+    "H runtime hardcap/prelaunchpersistentfailedattemptcounters/flock/privatecaptures/sourcecaseoraclefreeze proofs",
+    "H actual48source loader smoke and prior12harness tests; formatcleanup inspected as no policy change"
+  ],
+  "checks": [
+    {
+      "command": "Original Q-B4 mocked-reader probe against fixedcode",
+      "result": "stale, room_advice_currentnessstale, exactsavedresultread1; saved q-review-final-b-probe-results.json"
+    },
+    {
+      "command": "Independent low-overlap unauthorizedpatch preparation probe",
+      "result": "onefakecall; ValueErrorclassifiedinvalid_model_output;authorizationguardstillrejects; q-review-final-metadata-probe.json"
+    },
+    {
+      "command": "pytest tests/contracts/test_grounded_qa.py -k 'preparation_metadata_requires or patch_authorizations_bind'",
+      "result": "2passed89deselected"
+    },
+    {
+      "command": "node --experimental-strip-types --test tests/room-advice-presentation.test.mjs",
+      "result": "2passed"
+    }
+  ],
+  "browser_evidence": {
+    "report": "/private/tmp/staylead-s7-mock-preflight-1793066053568/report.json",
+    "status": "passed",
+    "type": "actualproductionbrowser/API/PostgreSQL with controlledfakeprovider; no realmodel",
+    "observed": "UIselectionpersists; editednewresult; oldstale+disabled/newcurrent+enabled; exactresultfreshness; approvedbookinganchor;mobileoverflowpass"
+  },
+  "driver_delta_review": "City1–3requirepositiveoptions;City2selectionmandatory;City3oldselectedcardstale+disabled/newenabled;PlaywrightResponsemethodsused;purebooking9allowsnoadviceandchecksbookinglinkwithinturn;unchanged9turn18request2call700model/timebounds",
+  "coordinator_validation_reported_not_independently_rerun": [
+    "212offline testsPASS and compilePASS",
+    "CanonicalfullRuff17I001 exactlybaseline17/new0; production/newS7filesclean; fullrepo lint notclean",
+    "Final42PostgreSQLsuite running when review completed; root owns result"
+  ],
+  "limitations": [
+    "Actualmodel/browsersemanticbatch not run in this review; no live namespace initialized byQ",
+    "No DB reads/writes byQ; running coordinatorPGsuite not rerun",
+    "No arbitrarysemanticentailmentproof from sourceIDs: mixedFAQ free-dinner adversarialobservation remains disclosed; actualbatchneeds humanindependentclaimreview, no newmodeljudge",
+    "No product/harness edits,commit,CI,deploy"
+  ],
+  "evidence_provenance": "During finalrecheck originalBprobe wrote its prior outputfilename once. Q immediately restored original failing observation from recorded initial execution and saved corrected result separately as q-review-final-b-probe-results.json. Original report and all original detailed failure artifacts otherwise retained; product unchanged."
+}

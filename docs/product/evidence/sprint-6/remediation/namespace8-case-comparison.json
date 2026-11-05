@@ -1,0 +1,327 @@
+{
+  "namespace": "remediation-8",
+  "product_fingerprint": "bb25884839fd596de63c27df3a8e99df2ed4f545357d8c8b91a2b127f2f3b0b9",
+  "provider_requests": 18,
+  "cumulative_provider_requests": 96,
+  "full_matrix_pass": false,
+  "baseline_method": "Original-query lexical candidate coverage is not answer correctness; actual semantic verdict is independent",
+  "cases": [
+    {
+      "turn": 1,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "Vietnamese; buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cites 040. Canonical 2026-12-10 to 2026-12-13, 3 nights, 2 adults.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        16411.0,
+        11062.5
+      ],
+      "http_status": 200,
+      "http_latency_ms": 28985.9,
+      "reported_output_tokens": [
+        75,
+        444
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 2,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "presentation_label_meaning": "FAIL",
+      "detail": "English/brief 2 preserves dates/adults, adds one child with null age/pending, and explicitly asks age. The synthetic-content banner instead says Example link; not functional although the turn contains no link; this is label meaning drift.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [
+        "What is the child's age?"
+      ],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        13462.4,
+        6272.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 20603.1,
+      "reported_output_tokens": [
+        39,
+        285
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 3,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "PASS",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "French/brief 3; same child hash 4cdb919c4b3c5006 now age 7; checkout 2026-12-14, 4 nights, original check-in/adults preserved, pending cleared.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4587.6,
+        5906.0
+      ],
+      "http_status": 200,
+      "http_latency_ms": 11073.7,
+      "reported_output_tokens": [
+        82,
+        365
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 4,
+      "scope": "browser/API/copy/local screenshot",
+      "answer_semantics": "PASS",
+      "state": "FAIL_SPURIOUS_MUTATION",
+      "current_render_and_exact_copy": "PASS",
+      "layout_and_script": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040 correctly. Pure FAQ preparation wrongly emits clarify party.children.member, adding an unrelated pending field and changing brief 3 to 4. Its own reason says no age/presence modification was requested. Driver correctly stops on state mismatch.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5261.0,
+        6256.6
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12651.8,
+      "reported_output_tokens": [
+        76,
+        247
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 5,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS",
+      "observed_state_preservation": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Chinese free guest-area Wi-Fi and desk credentials cite 021. Unexpected member pending and brief 4 remain; expected clean brief 3 is not achieved.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        8431.8,
+        6701.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 15224.8,
+      "reported_output_tokens": [
+        42,
+        286
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 6,
+      "scope": "API diagnostic failure only",
+      "answer_semantics": "FAIL_NO_DELIVERED_ANSWER",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "HTTP 502 unsupported_output. Captured Arabic parking values are correct and the URL has its own citation, but a following Arabic comma is captured as part of the URL and falsely rejected. Raw prose says nonfunctional but omits explicit synthetic/sample qualification; that qualifier appears only in the global notice label, so the complete link-specific requirement was not demonstrated.",
+      "lexical_expected_fact_coverage": 0.5,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": 0.0,
+      "usefulness": "No delivered answer; guard misidentified punctuation after exact URL",
+      "false_rejection_for_URL_guard": true,
+      "unknowns": null,
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5113.5,
+        6917.9
+      ],
+      "http_status": 502,
+      "http_latency_ms": 12120.9,
+      "reported_output_tokens": [
+        32,
+        311
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 7,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS",
+      "current_turn_state_effect": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Hindi asks 12 or 13 December 2026, preserves checkout 14 and same child age 7, and correctly adds checkout pending. Actual brief 5 also retains unrelated member pending; expected brief 4 with only checkout pending is not achieved.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [
+        "आप 12 दिसंबर 2026 या 13 दिसंबर 2026 में से किस तारीख़ को चेक-आउट करना चाहते हैं?"
+      ],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5128.0,
+        11447.9
+      ],
+      "http_status": 200,
+      "http_latency_ms": 16665.7,
+      "reported_output_tokens": [
+        85,
+        463
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 8,
+      "scope": "API diagnostic only",
+      "core_date_resolution": "PASS",
+      "answer_semantics": "DEGRADED_IRRELEVANT_UNKNOWN",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Korean correctly commits checkout 2026-12-15 and 5 nights, preserving original check-in/adults/child age 7 and clearing checkout pending. Actual brief 6 still has member pending. The answer then adds an unsolicited misleading statement that accommodation information has no checkout date despite the canonical date just stated.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [
+        "숙소 정보에 체크아웃 날짜가 없습니다."
+      ],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4706.5,
+        7289.4
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12061.1,
+      "reported_output_tokens": [
+        45,
+        395
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS_FOR_COURTESY",
+      "observed_state_preservation": "PASS",
+      "pinned_state_target": "NOT_MET_INHERITED_FROM_T4",
+      "ui_copy_layout": "NOT_CHECKED",
+      "detail": "Korean courtesy preserves explicit Korean revision 8 and actual brief 6, checkout 15/nights 5/same child age 7, with inherited member pending unchanged. This does not meet the clean final brief 5 target.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "See independent semantic/state/label findings; API-only cases do not establish UI/copy",
+      "false_rejection_for_URL_guard": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict quality measurement beyond retained answer",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5799.1,
+        4656.9
+      ],
+      "http_status": 200,
+      "http_latency_ms": 10504.3,
+      "reported_output_tokens": [
+        16,
+        73
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    }
+  ],
+  "limitations": [
+    "No browser/copy/layout evidence for turns 5-9.",
+    "T6 generic error returns no state snapshot; null state is not a state pass.",
+    "Correct later date resolution does not remove unrelated inherited member pending or restore expected version sequence.",
+    "Fully_validated is a guard result, not proof of correct mutation intent, label translation, or relevance.",
+    "Historical namespace7 failure remains unchanged.",
+    "No future live allowance is implied."
+  ]
+}

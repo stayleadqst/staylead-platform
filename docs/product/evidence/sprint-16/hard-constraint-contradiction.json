@@ -1,0 +1,295 @@
+{
+  "candidate": "3e7359afb2435341641d8a09295f5d2ef9c0230e9c3d02aa2757a62575b709f5",
+  "kind": "ONE Q-owned independent offline schema/auth→M2-validator→M4 contract probe with controlled semantic proposal; no actual model/provider,DB,API,UI",
+  "scope": "Generic B04-AC3 supported hard-bed contradiction; exact B C4 breakfast include/exclude UNEXECUTED, not substituted or claimed as exact case",
+  "expected_before_observation": {
+    "current_quote_authorization": "exact current-turn quote, granular clarification intent",
+    "preserve_confirmed": "All prior confirmed dates/party/budget/currency/basis/inclusions/hard bed requirements unchanged; no selected interpretation",
+    "M2_delta": {},
+    "M2_pending_fields": [
+      "room_requirements.hard_bed_types"
+    ],
+    "M4": "needs_clarification, no options, question tied to blocked room requirement; record exact question field/text without asserting exact leaf phrasing",
+    "resolution": "explicit follow-up queen requirement clears leaf pending, no other fields/deltas change"
+  },
+  "checks": {
+    "auth_granular_current_quote": true,
+    "confirmed_unchanged": true,
+    "delta_empty": true,
+    "only_disputed_leaf_pending": true,
+    "M4_blocked_before_apply": true,
+    "question_joinable_to_only_disputed_room_requirement": true,
+    "explicit_resolution_clears_pending_without_other_delta": true,
+    "resolved_processor_no_longer_pending": true
+  },
+  "all_pass": true,
+  "initial": {
+    "question": "Every bed must be king, and no bed may be king. Please recommend a room.",
+    "controlled_model_proposal": {
+      "op": "clarify",
+      "field": "room_requirements.hard_bed_types",
+      "reason": "King beds are both required and forbidden; which bed requirement should I use?",
+      "current_turn_quote": "Every bed must be king, and no bed may be king. Please recommend a room."
+    },
+    "authorizations": [
+      {
+        "operation_index": 0,
+        "op": "clarify",
+        "target_fields": [
+          "room_requirements.hard_bed_types"
+        ],
+        "intent": "clarification",
+        "current_turn_quote": "Every bed must be king, and no bed may be king. Please recommend a room."
+      }
+    ],
+    "M2": {
+      "data": {
+        "dates": {
+          "check_in": "2026-11-04",
+          "check_out": "2026-11-06",
+          "nights": 2
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "room_requirements": {
+          "budget_amount": 500,
+          "budget_currency": "VND",
+          "budget_basis": "stay_total",
+          "budget_strength": "hard",
+          "budget_inclusions": [
+            "breakfast",
+            "taxes"
+          ],
+          "hard_bed_types": [
+            "queen"
+          ]
+        }
+      },
+      "pending_fields": [
+        "room_requirements.hard_bed_types"
+      ],
+      "applied_delta": {},
+      "status": "clarification",
+      "source_fields": [
+        "room_requirements.hard_bed_types"
+      ]
+    },
+    "M4": {
+      "status": "needs_clarification",
+      "brief_version": 4,
+      "source_generation": 7,
+      "source_refs": [
+        {
+          "source_id": "SRC-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "synthetic-budget-contract",
+          "source_generation": 7,
+          "fact_id": "F-ROOM"
+        },
+        {
+          "source_id": "SRC-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "synthetic-budget-contract",
+          "source_generation": 7,
+          "fact_id": "F-RATE"
+        }
+      ],
+      "options": [],
+      "questions": [
+        {
+          "field": "room_advice",
+          "reason": "Which room requirement should I use?",
+          "locale": "en",
+          "locale_fallback": false,
+          "presentation_key": "question.room"
+        }
+      ],
+      "explanation_inputs": {
+        "unknowns": [
+          "room requirements"
+        ]
+      },
+      "availability": "unknown",
+      "hotel_answer": null,
+      "presentation_labels": {},
+      "presentation_locale": null
+    }
+  },
+  "explicit_resolution": {
+    "question": "Use queen beds only; remove the king-bed requirement.",
+    "proposal": {
+      "op": "set_room_requirements",
+      "hard_bed_types": [
+        "queen"
+      ],
+      "current_turn_quote": "Use queen beds only; remove the king-bed requirement."
+    },
+    "authorizations": [
+      {
+        "operation_index": 0,
+        "op": "set_room_requirements",
+        "target_fields": [
+          "room_requirements.hard_bed_types"
+        ],
+        "intent": "explicit_request",
+        "current_turn_quote": "Use queen beds only; remove the king-bed requirement."
+      }
+    ],
+    "M2": {
+      "data": {
+        "dates": {
+          "check_in": "2026-11-04",
+          "check_out": "2026-11-06",
+          "nights": 2
+        },
+        "party": {
+          "adults": 2,
+          "children": []
+        },
+        "room_requirements": {
+          "budget_amount": 500,
+          "budget_currency": "VND",
+          "budget_basis": "stay_total",
+          "budget_strength": "hard",
+          "budget_inclusions": [
+            "breakfast",
+            "taxes"
+          ],
+          "hard_bed_types": [
+            "queen"
+          ]
+        }
+      },
+      "pending_fields": [],
+      "applied_delta": {},
+      "status": "applied",
+      "source_fields": [
+        "room_requirements"
+      ]
+    },
+    "M4": {
+      "status": "partial",
+      "brief_version": 5,
+      "source_generation": 7,
+      "source_refs": [
+        {
+          "source_id": "SRC-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "synthetic-budget-contract",
+          "source_generation": 7,
+          "fact_id": "F-RATE"
+        },
+        {
+          "source_id": "SRC-CATALOG",
+          "source_version": "1.0",
+          "source_hash": "synthetic-budget-contract",
+          "source_generation": 7,
+          "fact_id": "F-ROOM"
+        }
+      ],
+      "options": [
+        {
+          "option_id": "A",
+          "rooms": [
+            {
+              "room_index": 0,
+              "room_type_id": "FAM"
+            }
+          ],
+          "assignments": [
+            {
+              "member_id": "adult-1",
+              "room_index": 0,
+              "bed_index": 0,
+              "bed_type": "queen",
+              "bed_position": null
+            },
+            {
+              "member_id": "adult-2",
+              "room_index": 0,
+              "bed_index": 0,
+              "bed_type": "queen",
+              "bed_position": null
+            }
+          ],
+          "checks": [
+            {
+              "code": "occupancy",
+              "status": "pass",
+              "fact_ids": [
+                "F-ROOM"
+              ]
+            },
+            {
+              "code": "bed_sharing_consent",
+              "status": "unknown",
+              "fact_ids": [
+                "F-ROOM"
+              ]
+            },
+            {
+              "code": "budget",
+              "status": "unknown",
+              "fact_ids": [
+                "F-RATE"
+              ]
+            }
+          ],
+          "rationale": [
+            {
+              "claim_code": "reference_price",
+              "text": "Reference room-rate estimate for the stay: 200 VND.",
+              "locale": "en",
+              "locale_fallback": false,
+              "fact_ids": [
+                "F-RATE"
+              ],
+              "presentation_key": "claim.reference_price"
+            }
+          ],
+          "cost": {
+            "currency": "VND",
+            "nightly_subtotal": 100,
+            "total": 200,
+            "status": "complete",
+            "breakdown": [
+              {
+                "label": "Family room reference rate",
+                "amount": 200,
+                "currency": "VND",
+                "status": "known",
+                "basis": "1 room × 2 night(s)",
+                "fact_ids": [
+                  "F-RATE"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "questions": [],
+      "explanation_inputs": {
+        "supported_fact_ids": [
+          "F-RATE",
+          "F-ROOM"
+        ],
+        "unknowns": [
+          "bed_sharing_consent",
+          "budget"
+        ],
+        "conflicts": [],
+        "rejected_alternatives": [],
+        "tradeoffs": [],
+        "availability": "unknown",
+        "rationale_locale": "en"
+      },
+      "availability": "unknown",
+      "hotel_answer": null,
+      "presentation_labels": {},
+      "presentation_locale": null
+    }
+  },
+  "wording_limit": "M4 asks aggregate existing room_advice question Which room requirement should I use?, not king-specific wording. Causal link is the sole granular pending hard_bed_types field; no claim of targeted UI text or live semantic understanding."
+}

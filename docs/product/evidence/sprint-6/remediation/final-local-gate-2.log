@@ -1,0 +1,5 @@
+$ python3 docs/product/evidence/sprint-6/remediation/test_resumed_acceptance_runtime.py -q
+----------------------------------------------------------------------
+Ran 14 tests in 0.013s
+
+OK

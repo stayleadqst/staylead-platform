@@ -1,0 +1,314 @@
+{
+  "namespace": "remediation-7",
+  "candidate_product_sha256": "27e0806342f3cfda2cc5e1862f971bcb0a543b891e7280a4eb93ab9acaa06589",
+  "baseline_method": "original-query lexical candidate coverage; not answer correctness",
+  "provider_requests": 18,
+  "cumulative_provider_requests": 78,
+  "full_matrix_pass": false,
+  "cases": [
+    {
+      "turn": 1,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Vietnamese; canonical 2026-12-10 to 2026-12-13, 3 nights, 2 adults. Buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cited to 040.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        8287.0,
+        6326.9
+      ],
+      "http_status": 200,
+      "http_latency_ms": 14801.1,
+      "reported_output_tokens": [
+        75,
+        357
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 2,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "English revision 2/brief 2 retain dates/adults; one new child has null age and age pending. Delivered answer explicitly asks the child age without inventing an age or charges.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [
+        "What is the child’s age?"
+      ],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5007.9,
+        12276.2
+      ],
+      "http_status": 200,
+      "http_latency_ms": 17351.9,
+      "reported_output_tokens": [
+        39,
+        263
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 3,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "French revision 3/brief 3; same child d1fb38f0c6baee2c becomes age 7; checkout 2026-12-14 and 4 nights; original check-in/adults retained and age pending cleared.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5929.3,
+        11513.4
+      ],
+      "http_status": 200,
+      "http_latency_ms": 18117.9,
+      "reported_output_tokens": [
+        85,
+        378
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 4,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040; brief 3 unchanged.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        9346.3,
+        7420.3
+      ],
+      "http_status": 200,
+      "http_latency_ms": 16997.8,
+      "reported_output_tokens": [
+        37,
+        248
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 5,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Chinese free guest-area Wi-Fi and front-desk credentials answer cites 021; brief unchanged.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6445.9,
+        7449.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 13985.2,
+      "reported_output_tokens": [
+        42,
+        225
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 6,
+      "state": "PASS",
+      "answer_semantics": "FAIL_CONDITIONAL_URL_QUALIFICATION",
+      "core_facts_and_bindings": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Arabic/RTL; 40 reference covered spaces, 100000 VND per vehicle/night, no advance reservation cite 046; one-vehicle policy agrees with 077. Exact requested URL has its own URL-001 citation and no internal URL appears. However, the label describes it as an acceptance-information link without synthetic/nonfunctional/sample qualification required when contextualized by the pinned matrix.",
+      "lexical_expected_fact_coverage": 0.5,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-077",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful but source qualifier incomplete",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4351.4,
+        12259.4
+      ],
+      "http_status": 200,
+      "http_latency_ms": 16686.2,
+      "reported_output_tokens": [
+        42,
+        340
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 7,
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "ui_copy": "PASS",
+      "detail": "Hindi asks whether checkout is 12 or 13 December 2026. Canonical checkout remains 2026-12-14, brief becomes 4, checkout is pending; same child age 7 preserved.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [
+        "आपका चेक-आउट 12 दिसंबर 2026 को होगा या 13 दिसंबर 2026 को?"
+      ],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5386.0,
+        12969.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 18420.9,
+      "reported_output_tokens": [
+        107,
+        409
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 8,
+      "state": "FAIL",
+      "language_preference": "PASS",
+      "answer_semantics": "FAIL",
+      "ui_copy": "NO_DELIVERED_ANSWER",
+      "detail": "HTTP 502 unsupported_output. Preparation wrongly treats explicit checkout 2026-12-15 as conflicting and proposes clarification. Final output asserts localized 15 December bound only to check-in and is correctly rejected by the numeric/own-ref guard. Independent exact-request PostgreSQL observation shows brief remains 4, checkout 2026-12-14, 4 nights, checkout still pending; Korean explicit revision 8 persists. Expected checkout 15/nights 5/brief 5 was not committed.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "no delivered answer",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5222.4,
+        8120.4
+      ],
+      "http_status": 502,
+      "http_latency_ms": 13406.2,
+      "reported_output_tokens": [
+        81,
+        266
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": false
+      }
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "answer_semantics": "PASS_FOR_CURRENT_COURTESY",
+      "observed_state_preservation": "PASS",
+      "pinned_end_to_end_state_target": "NOT_MET_INHERITED_FROM_T8",
+      "ui_copy": "NOT_CHECKED",
+      "detail": "Korean courtesy reply retains explicit Korean revision 8 and preserves observed brief 4/checkout 14/pending checkout/same child age 7. This is not a pass for the matrix expectation of brief 5/checkout 15/pending cleared.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for current request; see per-case constraints",
+      "false_rejection": false,
+      "unknowns": [],
+      "conflicts": "No separate conflict assessment beyond retained answer; unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6563.0,
+        7230.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 13929.7,
+      "reported_output_tokens": [
+        22,
+        201
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    }
+  ],
+  "limitations": [
+    "T9 API diagnostic only",
+    "T6 qualifier and T8 mutation/answer fail",
+    "No served-model identity/billing/total tokens",
+    "No native-speaker fluency certification",
+    "Screenshots local only"
+  ]
+}

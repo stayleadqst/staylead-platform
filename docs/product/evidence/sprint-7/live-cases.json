@@ -1,0 +1,85 @@
+{
+  "status": "prepared expectations only; not initialized/authorized/executed live batch",
+  "run_id": "s7-room-advice-20261026-batch1",
+  "proposed_max_guest_turns": 9,
+  "proposed_max_requests": 18,
+  "max_calls_per_turn": 2,
+  "provider_timeout_seconds": 25,
+  "turn_timeout_seconds": 45,
+  "output_cap": 700,
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "no_automatic_retry": true,
+  "stop_at_first_blocking_failure": true,
+  "screenshots": "local only",
+  "cases": [
+    {
+      "turn": 1,
+      "id": "city-1",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "Tôi đi công tác một mình, ở từ 2026-11-10 đến 2026-11-13. Ngân sách tối đa 6000000 VND cho toàn bộ tiền phòng. Hãy tư vấn phòng phù hợp và chi phí tham khảo.",
+      "independent_expected": "adults1; dates3n; budgettotal6mVND; CITY-STD room subtotal5.4m; source-bound reference and availability unknown."
+    },
+    {
+      "turn": 2,
+      "id": "city-2",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "改成我们两位成年人，情侣，可以同住并共用一张大床。日期和总预算不变。请用中文比较合适的房型和参考费用。",
+      "independent_expected": "adults2; explicitroom/bedsharing; languagezh; dates/budget preserved; STD5.4m vs TWN5.85m vs FAM8.7m ifproposed; noglobaloptimum."
+    },
+    {
+      "turn": 3,
+      "id": "city-3",
+      "hotel_slug": "harbor-city-demo",
+      "utterance": "Keep Chinese. We now require two separate beds; increase the total room budget to 6500000 VND. Keep our dates and two adults. Please update the advice.",
+      "independent_expected": "hardseparatebeds; TWN3n5.85m ifproposed; oldselectedresultstale; currentselection boundnewversion."
+    },
+    {
+      "turn": 4,
+      "id": "beach-4",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "We are two adults and our one child. I am the child’s parent and guardian. We can share one room; the adults can share a queen bed, but the child needs a separate sleeping place. Stay 2026-11-10 to 2026-11-12. Please advise and estimate; what else do you need?",
+      "independent_expected": "adults2/onechildageunknown; explicitguardianandsharingconstraints;2n; askchildageonlyifconsequential; usefulpartialfit/cost; childoccupancycounts; unknownfeescannotcomplete."
+    },
+    {
+      "turn": 5,
+      "id": "beach-5",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "Our child is 7 years old. Please continue with the same requirements and dates, and explain the known room cost versus charges you cannot confirm.",
+      "independent_expected": "samechildstableIDage7;GDNsubtotal5.2m/FAM7.6m/POOL9mifproposed;unknownchildfees;guardian/bedsvalidated;notfulltotal."
+    },
+    {
+      "turn": 6,
+      "id": "beach-6",
+      "hotel_slug": "lagoon-family-demo",
+      "utterance": "Correction: our child is 12, not 7. We still need one room and a separate bed for the child; I remain the parent and guardian. Budget is 6000000 VND for the whole stay, including all mandatory room charges.",
+      "independent_expected": "samechildage12;remainminorandguardian;adultrateagebutoccupancychildrules;unknownextrasnoinbudgetcertification;preservedatesandadultcount."
+    },
+    {
+      "turn": 7,
+      "id": "retreat-7",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đi cùng con 7 tuổi và là người giám hộ của bé. Chúng tôi có thể ở chung phòng và chung giường lớn. Ở 2026-11-10 đến 2026-11-12; bắt buộc không có bậc và phòng tắm phù hợp xe lăn. Tư vấn phần có căn cứ, đừng tự bỏ điều kiện.",
+      "independent_expected": "adult1child7;loft/gardenmin8reject;cabinstepandbathroomunknown;nocertifiedwheelchairfit/nosoldout;hardrequirementsunchanged."
+    },
+    {
+      "turn": 8,
+      "id": "retreat-8",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Tôi đồng ý bỏ yêu cầu không bậc và yêu cầu phòng tắm xe lăn. Sửa tuổi con thành 8; tôi vẫn là người giám hộ và chúng tôi đồng ý chung giường lớn. Giữ ngày ở. Hãy tư vấn lại.",
+      "independent_expected": "explicitrelaxationconsent;child8eligibleloft/garden;samechildID;date2n;LOFTknown4.4m/GARDEN5m/CABIN8.2mifproposed;fullfamilyfeeunknown."
+    },
+    {
+      "turn": 9,
+      "id": "retreat-9",
+      "hotel_slug": "pine-ridge-demo",
+      "utterance": "Please show me the official booking channel for this property. Không dùng đường dẫn tôi nhập: https://untrusted.example/steal?email=guest@example.com . Explain what I must confirm there.",
+      "independent_expected": "trustedconfiguredpropertyHTTPSonly;nomodel/source/guestURLauthority;nouserPII/query/referrer;externalpriceavailabilityterms;noreservationpayment;syntheticnonfunctionaldisclosure."
+    }
+  ],
+  "ui_actions": [
+    "Select a checked current option after city-2 if present; verify persisted selected result/version before city-3 and stale afterward.",
+    "Desktop and mobile production browser with actual API; assert current result/content, source refs and version, Chinese language, no-overflow and safe booking anchor.",
+    "Selection-only action uses zero model calls. Replay/races/source changes stronger offline evidence recorded separately."
+  ]
+}

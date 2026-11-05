@@ -1,0 +1,40 @@
+{
+  "recorded_at": "2026-10-29T03:26:15.050226+00:00",
+  "candidate_fingerprint": "8ec664f8f849b7883d6f30eef97cc6be8fdb0c047d3bebf730b239c1070763af",
+  "source_files": 213,
+  "all_source_pins_verified": true,
+  "backend": {
+    "result": "208 passed, 1 Starlette httpx deprecation warning",
+    "duration_seconds": 43.65,
+    "exit_code": 0,
+    "evidence": "root-backend-gates-delivery.log"
+  },
+  "web": {
+    "contracts": 54,
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "configured_production_build": "PASS",
+    "source_files_unchanged": 8,
+    "evidence": "web-validation-final.json"
+  },
+  "focused_B11_postgres": {
+    "tests": 9,
+    "exit_code": 0
+  },
+  "compileall": "PASS",
+  "diff_check": "PASS",
+  "ruff": {
+    "exit_code": 1,
+    "baseline_I001_files": [
+      "settings.py",
+      "guest_chat.py",
+      "store.py"
+    ],
+    "new_findings": 0,
+    "evidence": "ruff-baseline-comparison.json"
+  },
+  "independent_Q": "PASS full AC1–3 and technical DoD; original3finding reproducers closed",
+  "new_live_inference_calls": 0,
+  "deployment": "not performed",
+  "stakeholder_acceptance": "not inferred; asynchronous feedback requested"
+}

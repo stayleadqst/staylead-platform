@@ -1,0 +1,27 @@
+{
+  "candidate_sha256": "0a7411831fd809dd79bc18d473d8d89cab4db9f5ce4118e4a287226e62667a39",
+  "changed_controls": 3,
+  "root_gate": {
+    "tests": "23 passed: harness + API skeleton",
+    "ruff": "PASS full src/tests + runtime",
+    "compile": "PASS src/runtime",
+    "warnings": "3 existing FastAPI/Starlette deprecations"
+  },
+  "builder_gate": {
+    "focused_tests": "21 PASS",
+    "node_syntax": "PASS",
+    "offline_smoke": "PASS no_api_or_model:true",
+    "diff_check": "PASS"
+  },
+  "reused_product_evidence": {
+    "candidate": "1435c5fc0a58cc5e3133497416aa3eb39d4a8f51685c398b53d9a8c344284e5d",
+    "backend_tests": 280,
+    "isolated_pg_tests": 16,
+    "frontend_tests": 40,
+    "frontend_pins_unchanged": 53,
+    "frontend_lint_typecheck_build": "PASS reused"
+  },
+  "live_requests": 0,
+  "limitations": "Offline gates do not establish Pine actual model semantic success.",
+  "superseded_by": "reacceptance5-sol-bootstrap2-local-gates.json"
+}

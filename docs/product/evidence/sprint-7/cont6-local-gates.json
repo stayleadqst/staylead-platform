@@ -1,0 +1,19 @@
+{
+  "candidate_sha256": "b91ea362974beea443a8051d8ce313bc9af89aeb25a73c8c7a6b16ff36287f6b",
+  "backend": {
+    "passed": 255,
+    "log_sha256": "1d292975f661b5edbdbe989f321789f30722e454f62d902524d7cc17e0c530ae",
+    "last_delta": "only browser session ID guard and its fixture assertion; focused20harness/actualproducerprobe passed"
+  },
+  "postgres": {
+    "passed": 31,
+    "database": "staylead_sprint7",
+    "log_sha256": "3f8c5a99eb565409e8444cea4cb582038b8b81144dd3d077c03204e2eee5faac"
+  },
+  "canonical_ruff": "PASS",
+  "compile": "PASS",
+  "diff": "PASS",
+  "node_syntax": "PASS",
+  "frontend": "unchanged53pins; reuse40contracts/lint/typecheck/buildPASS",
+  "provider_calls": 0
+}

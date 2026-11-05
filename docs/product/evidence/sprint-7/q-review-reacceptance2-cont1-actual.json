@@ -1,0 +1,143 @@
+{
+  "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+  "candidate_sha256": "4797d219e4fed676574419d3d57d8135b1951da0762c483e8af799439ae521f4",
+  "seed": [
+    2,
+    4
+  ],
+  "overall": "HALTED_AT_FIRST_BLOCKING_FAILURE_IN_CONTINUATION; Family3–5actualPASS, Pine6FAIL/7dependencyBlocked; fullC01/SprintDoDBLOCKED",
+  "turns": [
+    {
+      "turn": 3,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "d9b1e59d170fbd2263130944990bd3d52b4619df5fb5d85b11a9c03508786d29",
+      "counters": [
+        3,
+        6
+      ],
+      "output_tokens": [
+        430,
+        55
+      ],
+      "verified": [
+        "Exactcurrentquotes;2adults/1age-null stablechild51c3a286-64ff-4b50-8c3e-7c8ed1cd6fc3; explicitguardianadult1; childseparatebedtrue; explicitadultpairsharingtrue; dates2n; no inventedage/exacttype/roomlimit",
+        "Currentchecked nooptions consequentialagequestion; UIasksage andavailabilityunknown, no unverifiedfit/feeclaims",
+        "ReadonlyDBbrief/state1,1completedrequest/result,2messages,noselection; all10refsapproved/currenthotel/hash/version/gen matched"
+      ],
+      "note": "Sameconsequentialagequestionrenderedtwice, no newsemanticblocker.",
+      "db_evidence": "q-review-reacceptance2-cont1-turn-03-db-readonly.json"
+    },
+    {
+      "turn": 4,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "c9ced175eca2f7d3ff1f28c9300b1f09180fc125a1f327f10bf5fe0c5ea9f4e8",
+      "counters": [
+        4,
+        8
+      ],
+      "output_tokens": [
+        265,
+        397
+      ],
+      "verified": [
+        "Age7onlypatch,samechildUUID/guardian/adultpairsharing/childownbed/dates/count",
+        "GDNqueenadults+separatesofachild,all3once;checkedoccupancy/beds/guardian/separatebed/agePASS",
+        "Knownbase2.6m×2=5.2m;childfeeunknown,incomplete/nulltotal;UIknownbase/unknowncharge distinction",
+        "ActualmixedFAQexactnumericliteral2600000,breakfastsourceincludesregisteredguests;unsupportedcharges/availabilityremainunknown",
+        "ReadonlyDBstate/brief2,2completedrequests/results,4messages,noselection;currentrefscope/hash/version/genchecked"
+      ],
+      "db_evidence": "q-review-reacceptance2-cont1-turn-04-db-readonly.json"
+    },
+    {
+      "turn": 5,
+      "verdict": "PASS_FOR_ADVANCE",
+      "response_sha256": "5d6abb1b829829ec9fbb69a5149c0499799802ac63df6fb2a77552a34c9c613a",
+      "counters": [
+        5,
+        10
+      ],
+      "output_tokens": [
+        440,
+        303
+      ],
+      "verified": [
+        "SamechildUUID age12 not7; guardian/minor/separatebed/adultconsent/dates intact;explicitmaxrooms1",
+        "Wholemandatory6mVNDstaytotalamount saved; strengthunknownpending andusefulhard-v-targetquestion, no hardclassificationinvented",
+        "FAMknownbase3.8m×2=7.6m; extraADULTchargesunknown dueage12billing; totalincomplete/null, notcertifiedwithin6m",
+        "All3once,adultsqueen+childownsofa; occupancy/beds/separatebed/age/guardianpass;partialUIknownbase/unknownextraadultfee visible",
+        "ReadonlyDBstate/brief3,3completedrequests/results,6messages,noselection; currentcorrectrefs/hash/version/gen"
+      ],
+      "notes": [
+        "7.6m knownbase exceeds6m amount but unresolvedstrength is explicit, nottreatedhard/inbudget; nofalsecompleteclaim.",
+        "Repeatedbudgetstrengthquestion ispresentationduplication, notnewsemanticblocker."
+      ],
+      "db_evidence": "q-review-reacceptance2-cont1-turn-05-db-readonly.json"
+    },
+    {
+      "turn": 6,
+      "verdict": "FAIL_PREPARATION_PROTOCOL_AND_ERROR_CLASSIFICATION",
+      "severity": "P1",
+      "HTTP": 500,
+      "error_code": "internal_error",
+      "response_sha256": "db6abf82b82b5fd8c358a0fbadc2592bbaac901d2bda46e227c8426fc96841e2",
+      "counters": [
+        6,
+        11
+      ],
+      "output_tokens": [
+        444
+      ],
+      "cause": "Native add_child has share_bed_with_guardian null; subsequent set_bed_sharing invents child-1 rather than current stableUUID. Native/Pydantic parse/currentquote/intentauthorization pass; canonical validator rejects unknown member.",
+      "exact_exception": "ValueError: Bed-sharing preference must name distinct current party members.",
+      "source_path": "domains/hospitality/schemas/guest_brief.py548–549; composition/dependencies/guest_chat.py929 invokes validation; genericexceptionhandler1397–1398 recordsinternal_error/HTTP500.",
+      "verified": [
+        "No call2; one reserved/completed provider attempt counted despitefailedturn",
+        "Readonly exactrequesthashbinding confirms Pine sessionstate0, no brief/sourceutterance/receipt/result/messages/selection; inferredlanguagepreference1row persists",
+        "Purecounterfactual replaces inventedpair with supported add_child share_bed_with_guardian true and contiguouswholecurrentquote; validator createsrealUUID/guardian/pair/dates/hardneeds withoutaliases",
+        "No rootreceipt6/no original7request; correctdriverstop"
+      ],
+      "evidence": [
+        "q-review-reacceptance2-cont1-pine6-protocol.py",
+        "q-review-reacceptance2-cont1-pine6-protocol.json",
+        "q-review-reacceptance2-cont1-pine6-db-readonly.json"
+      ],
+      "limitations": [
+        "No actualPinefit/accessverification/French evidence from thisattempt; originalcapturefailurekept.",
+        "Initial Qprobe overassertedlanguagecount0 andfailed; correctedread-onlyproof recordslanguage1separately. No previous no-M2 assertion changed."
+      ]
+    },
+    {
+      "turn": 7,
+      "verdict": "BLOCKED_DEPENDENCY_NOT_ATTEMPTED",
+      "reason": "Originalsame-child/date/guardian/access-relaxation utterance depends on Pine6M2, whichdoesnotexist. Languagepreferencealone cannotresolve missingfacts.",
+      "scope": "Do not amend/replay/fakehistory or spendremaining1guest/3requests underthismatrix."
+    }
+  ],
+  "sealed_state": {
+    "run_id": "s7-room-advice-20261027-reacceptance2-cont1",
+    "status": "halted",
+    "guest_turns": 6,
+    "codex_requests": 11,
+    "sha256": "9a7b3777fded731ab57292b2c315dac06fd757ba5f875b44e8a2d6568a5362c5",
+    "lifetime_requests": 36,
+    "remaining_guest_slots": 1,
+    "remaining_request_slots": 3,
+    "unused_scope": "No useful independent approvedcase remains; no spend/retry/amendment byQ."
+  },
+  "root_semantic_receipts_verified": {
+    "3": "d9b1e59d170fbd2263130944990bd3d52b4619df5fb5d85b11a9c03508786d29",
+    "4": "c9ced175eca2f7d3ff1f28c9300b1f09180fc125a1f327f10bf5fe0c5ea9f4e8",
+    "5": "5d6abb1b829829ec9fbb69a5149c0499799802ac63df6fb2a77552a34c9c613a"
+  },
+  "AC_matrix": {
+    "AC1": "Family3–5PASS: exactunknown→7→12samechild,guardian/adultconsent/separatebed/dates/budget/one-room. OverallFAIL: priorCity2inventedtype andPine6inventedID.",
+    "AC2": "Familyconsequentialagequestion/currentapprovedsourcesPASS; Pineknownneeds-hotelverifyactualnotreached, priorPine6FAILremains.",
+    "AC3": "Family4GDN+5FAMcapacity/age/guardian/distinctchildsurface/adultsharing/all3oncePASS; no sourceunsupportedfullfit. Pinehardaccess/age7→8couplingmissing; City2requestedarrangementnotreturned.",
+    "AC4": "Family4known5.2m+unknownchildfees;5known7.6m+unknownextraADULTfees/strengthquestion/nulltotalPASS. City1actual5.4mPASSreused. NoPineFrenchknownbaseactualPASSfromthisrun.",
+    "AC5": "City1currentselection/fit/pricePASSsubset; no multioptioncomparisoninferred. Familyusefulpartialfit/bed/costexplanationPASS. CorrectedCityeditselection/staleUI andFrenchPineselectionmissing.",
+    "AC6": "Familyageclarification/feeunknown/strengthquestion/unknownavailabilityPASS. Pineusefulknownneedsverificationnotreached. City2genericconflictrootedininventedconstraintFAIL.",
+    "AC7": "FamilyM2commitsbeforedependentresults,stablechild/unchangedfields/request-resultversionsPASS. PinebadIDatomicnoM2PASSsafetybutgenericHTTP500errorclassificationwrong; CitystaleUI/reselection/Frenchage-accesseditnotcompleted.",
+    "AC8": "ActualFamilyENandmixedFAQ+roomjourneyPASSsubset, City1ZHreused; PineVIverification/Frenchopenlocaleandcurrentselectionmissing. B07prioractualpilotPASSreused."
+  },
+  "effects": "Q inspectedsyntheticcaptures; enforcedREADONLY SELECT/SHOW only+rollback; pure in-memory counterfactuals. No provider/API/model/actualDBwrites or semanticreceiptwrites byQ."
+}

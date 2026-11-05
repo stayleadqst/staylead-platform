@@ -1,0 +1,46 @@
+{
+  "story": "B15 #26",
+  "sprint": "#123",
+  "candidate": "36f55d5876d9e2dee67aab031673c0537aed20e328c0e33d819d5c2d75fc949b",
+  "base": "5c163da09894a358ece74ea6daf69e43cff62abf",
+  "source_and_test_sha256": {
+    "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py": "abbafa53176a4282fb61eee8d82709c7bdef21a48305631fd8024a1048090ad8",
+    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py": "b197351a9ff8abc9c0452c28737a20a566117d3b51ffe138da6adb42a8e816b4",
+    "apps/api/src/staylead_platform/domains/hospitality/claim_consistency.py": "afd86ca4e0c453a1354997edd1ffa584eec68fb58d80b26f1eba0d73d8457670",
+    "apps/api/src/staylead_platform/domains/hospitality/claim_consistency_policy.py": "fc6cb8b85ed0b37d733765dd6cb9900ac1ab3d2dbf89d53360104a68d4c9149d",
+    "apps/api/src/staylead_platform/platform/contracts/claim_consistency.py": "13a31714fa109785981d85009291fe3bf800b91a8840eba725c859435271306d",
+    "tests/contracts/test_b15_claim_consistency.py": "ecfb36338ef6ab5e806ffec5c062581e44f62938d7135d8c7f8a6f4a4a1cf9a6",
+    "tests/contracts/test_b15_orchestrator.py": "8aa2402b7262e06f3ea7873d0b3bf87efae2b1f604c0b08c7b14226f9d4a916e",
+    "tests/integration/test_b15_consumer_postgres.py": "4dd85534a34cd9d32ccc23aa4695a36da5ec1b5e6883ba16ff174884e42731a3"
+  },
+  "independent_verdict": "Ready YES",
+  "component_cases": {
+    "pass": 19,
+    "total": 19,
+    "wrong_amount_channels": 6,
+    "native_exit": 0
+  },
+  "guest_chat": "actual browser/Next/API/PostgreSQL with offline provider; confirmation, same-card stale after version and revoke, fresh answer zero evidence",
+  "local_configured_ruff": "both exact groups passed, compile passed",
+  "evidence_receipt_sha256": {
+    "q/REPAIR7_INDEPENDENT_REVIEW.md": "44bd4b8d6352272bb8daa95ef70941babdd195b9f1c6ab0c6542cabd77acf9aa",
+    "q/repair7-execution5.raw.log": "2ca14031b7e041b533845ff7d10f6163931399c8c44281bb15bf1a637bc81874",
+    "b/round7-browser5-report.md": "b720a97a0bc0b0cd273817ae6856635b8fd12035c3917c34690b4e3baf9515d5",
+    "b/round7-browser5-freshness-responses.jsonl": "90540ffcf5d8ff4fd80fb50a5203e8cc9c9980c5ae6b4e44ce56e26d7248c9f8",
+    "a/repair7-final-ruff.raw.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "a/repair7-final-compile.raw.txt": "c0c86ec89ce18aae04117d2da15be8fa636346f2a24815495e97d148991379e0",
+    "C-B-testfile-static-gate-execution6.json": "02cac0107ce71c7919c0a20001ad54d3ba8191089e5c5835043e05c9067cb9a4"
+  },
+  "operations": {
+    "product_repairs": "7/7",
+    "Q_component": "5/5",
+    "browser": "5/5",
+    "source_Ruff": "6/6",
+    "test_Ruff": "6/6",
+    "API_pytest": "4/4 from prior pin; not rerun",
+    "A_P0": "7/7 unchanged",
+    "B_helper": "4/4 unchanged",
+    "legacy_orchestrator": "4/4 from prior pin"
+  },
+  "evidence_scope": "labeled synthetic sources and offline provider; no live inference/deploy"
+}

@@ -1,0 +1,40 @@
+{
+  "at_utc": "2026-11-04T09:14:51.045028+00:00",
+  "candidate": "3e7359afb2435341641d8a09295f5d2ef9c0230e9c3d02aa2757a62575b709f5",
+  "ready_to_merge": "YES_TECHNICAL_SCOPE_WITH_VERIFIED_BASELINE_QUALIFICATIONS",
+  "full_AC1_3_technical_coverage": "SUFFICIENT",
+  "open_product_acceptance_findings": [],
+  "closed_findings": [
+    "Q16-1",
+    "Q16-2",
+    "Q16-3"
+  ],
+  "focused_tests": {
+    "passed": 112,
+    "deselected": 1,
+    "deselected_exact_inherited_baseline": "test_rate_validity_covers_charged_nights_not_checkout_day"
+  },
+  "configured_ruff": {
+    "exit_code": 1,
+    "sole_finding": "I001 schemas/room_advice.py3-10",
+    "independent_exact_baseline_verified": true
+  },
+  "compile_six_C_evidence": "PASS",
+  "actual_consumer": "B_FROZEN_OPERATOR_EVIDENCE_C3_DESKTOP_TWO_TURNS_C1_DESKTOP_RESPONSIVE_MOBILE_WIDTH",
+  "Q_browser_or_DB_operation": false,
+  "exact_C4_breakfast_include_exclude": "UNEXECUTED_NO_PASS_CLAIM",
+  "generic_AC3_hard_bed_contradiction_independent_contract_probe": "8_CHECKS_PASS",
+  "initial_failed_stub_calls": 2,
+  "fixed1_stub_calls": 6,
+  "cumulative_stub_calls": 8,
+  "live_model_evidence": false,
+  "actual_runtime_model_effort_usage": "unavailable",
+  "resources_readonly_need_released": true,
+  "formal_acceptance_publication_review_retro_cleanup_owner": "C/B",
+  "reviewer": "fresh independent Q; never builder",
+  "requested_model_effort": "gpt-6.1-sol/high",
+  "formal_acceptance": "C accepted full technical AC1-3 with baseline qualifications",
+  "report_sha256": "50a2e11d66788ece6ef0370affa2f34dc340922f7d30bd66f77f4f8cec03ac74",
+  "actual_consumer_artifact_sha256": "0d7a4c019dd0bbc78da119875938201c2517f88cb271b7fab994025c07a174af",
+  "evidence_limitation": "B operated browser; Q read frozen sanitized UI/DB-semantic artifacts, independently checked source/pins/contracts; no Q browser/rawDB/screenshot claim."
+}

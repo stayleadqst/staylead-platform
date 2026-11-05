@@ -1,0 +1,17 @@
+{
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "candidate_sha256": "ff917ce60b3e2bf93a409cb8e6fe0cd6543c953914e88fa7af5a052fc7b3b5d5",
+  "status": "halted",
+  "guest_turns": 2,
+  "codex_requests": 4,
+  "state_sha256": "9441449d9e272ac1ec15ea6ed05092dc2c34d49a90ace187e3876779d53936ee",
+  "lifetime_requests": 50,
+  "unused_guest_slots": 0,
+  "unused_request_slots": 0,
+  "actual_outcome": {
+    "pine1": "PASS",
+    "pine2": "FAIL room_count_mismatch; no positive option/current selection; French question fallback EN"
+  },
+  "runners": "API43586 SIGTERM/browser76255 exited1; no marker02/retry",
+  "bootstrap1_consumption": "0/0; sealed preserved"
+}

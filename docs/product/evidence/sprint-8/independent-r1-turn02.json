@@ -1,0 +1,19 @@
+{
+  "turn": 2,
+  "verdict": "PASS",
+  "response_sha256": "224f523495c9fdbd28b470f6c77d9d0a51226adfce0eaf2c4febb263ab2c119b",
+  "evidence_sha256": "d0c4f99afd445698adc44aae6e4653b26d92986037c5f72f27cd51bbe6d50c69",
+  "counters": {
+    "guest_turns": 2,
+    "approved_case_turn": 2,
+    "requests": 4
+  },
+  "checks": [
+    "French culture/social/indoor300k VND/person bothkinds saved; ambiguous hard/target strength correctly not invented, only that pending",
+    "Same catalog/sourcegen3 and exactprimary/secondary hashes as A; top fits change to Museum/RiverTable, sponsor disclosed, unresolved hours/conflict and verification remain",
+    "Museum120000VND/person duration_minutes90, River300000/person duration_minutes75, Garden0/person45 preserved",
+    "French core20 fallback=false and domain card/verification text rendered; no room/booking action or hard prerequisite",
+    "Screenshot viewed, optional baseline booking English fallback disclosed; pending brief notice does not block completed shortlist"
+  ],
+  "root_agreement": "Explicit root PASS received before receipt"
+}

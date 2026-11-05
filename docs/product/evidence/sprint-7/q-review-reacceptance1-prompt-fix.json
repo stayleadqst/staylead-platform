@@ -1,0 +1,19 @@
+{
+  "verdict": "PASS scopedgenericpromptdelta/offlinecounterfactual; actualCityfailure remainsunrepaired-model/unverified",
+  "hashes": {
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "a4f78c5caf4732e9f1a26af544d8d2e6b1a7fb37d476c90abfee00245db53da3",
+    "tests/contracts/test_grounded_qa.py": "2604ed84467f50f69a032f652d216d6e5dda27e0df0c718189ff639bf8fbd2d9"
+  },
+  "unchanged_validators_and_orchestrator": [
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/fact_selection.py",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/preparation_output.py",
+    "apps/api/src/staylead_platform/platform/conversation/orchestrator/grounded_qa.py"
+  ],
+  "originalcapture": "stillrejects exactsame currentquote mismatch",
+  "correctedproposal": "Passes actualFactSelection→_proposal→validate_preparation_metadata→validate_guest_brief_proposal; currentquotesexact, 2adults, dates3n, explicitpartysharingtrue, hardstay6mVND, no inventedhardbedtype/preference",
+  "prompt_review": "Contiguousspan/wholequestionorsplitops; permissionseparatefrompreference; broadlargebednotcanonicalhardking/queen. No parser/guardweakening/newcalls.",
+  "publication": "Minimized authoredreproducer onlyfact_ids[]; originalprivatecapture unmodified/unpublished",
+  "future_scope": "OnlyunattemptedapprovedFamily/Pine3-7technicalcontinuationseed1/1; City1noretry/City2dependencyBlocked; fullDoDnotPASS",
+  "effects": "No provider/DB/APIcalls; canonicalpurevalidatorprobeonly"
+}

@@ -1,0 +1,11 @@
+{
+  "timeout_http": 502,
+  "error": "brief_apply_outcome_unknown",
+  "partial_returned": true,
+  "receipt_returned": true,
+  "children_after_timeout": 1,
+  "same_id_replay_http": 200,
+  "same_id_extra_calls": 0,
+  "answer_only_resume_http": 200,
+  "children_after_resume": 1
+}

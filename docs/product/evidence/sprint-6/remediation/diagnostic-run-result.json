@@ -1,0 +1,21 @@
+{
+  "run_id": "s6-codex-20261026-remediation-1",
+  "classification": "mixed-candidate diagnosis and explicit receipt recovery; not final9turnacceptance",
+  "actual_semantic_turns": 1,
+  "provider_requests": 4,
+  "operator_answer_only_resumes": 1,
+  "automatic_retries": 0,
+  "initial_t1": "HTTP502 unsupported_output date-format literal mismatch",
+  "recovered_t1": "HTTP200 completed, VI/rev1,briefv1, exactclipboard",
+  "next_turn": "not submitted: composer disabled; driver uncaught filltimeout then closedChrome",
+  "run_result_origin": "coordinator recovery record; original driver did not emit run-result after uncaught exception",
+  "candidates": [
+    "70b4641356d1ffb60673a3462c216713bdd709e8",
+    "7ed3fc6"
+  ],
+  "remaining_provider_slots": 14,
+  "remaining_semantic_slots": 8,
+  "fixed_candidate_matrix_pass": false,
+  "non_provider_external_network_calls": "not measured by original driver",
+  "at_utc": "2026-10-26T03:25:26.859036+00:00"
+}

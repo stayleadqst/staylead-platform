@@ -1,0 +1,169 @@
+{
+  "session_id": "23f9be53-634c-4861-bc6c-74491fc41b3c",
+  "brief": {
+    "session_id": "23f9be53-634c-4861-bc6c-74491fc41b3c",
+    "hotel_id": "HTL-CITY01",
+    "brief_version": 2,
+    "data": {
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-13",
+        "nights": 3
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "member_id": "46006249-3410-439e-8da8-1fa629e3cee9",
+            "age": null
+          }
+        ]
+      }
+    },
+    "pending_fields": [
+      "party.children.46006249-3410-439e-8da8-1fa629e3cee9.age"
+    ],
+    "updated_at": "2026-10-23 19:20:10.501309+07:00"
+  },
+  "receipts": [
+    {
+      "request_id": "bd93bf26-3992-42c2-a824-4b0a6bb8aced",
+      "session_id": "23f9be53-634c-4861-bc6c-74491fc41b3c",
+      "hotel_id": "HTL-CITY01",
+      "expected_brief_version": 0,
+      "payload_hash": "dacd4fea41158dba295220c772a020924e0775a8e3310f5e4357da039a891f95",
+      "status": "applied",
+      "brief_version_before": 0,
+      "brief_version_after": 1,
+      "applied_delta": {
+        "dates": {
+          "check_in": "2026-12-10",
+          "check_out": "2026-12-13",
+          "nights": 3
+        },
+        "party": {
+          "adults": 2
+        }
+      },
+      "source_utterance_id": "d5d155f4-fa23-4c3b-af7c-fdb10b94f620",
+      "source_fields": [
+        "dates.check_in",
+        "dates.check_out",
+        "party.adults"
+      ],
+      "answer_status": "completed",
+      "brief_version_used": 1,
+      "brief_dependent": true,
+      "answer_payload": {
+        "answer": "B\u1eefa s\u00e1ng t\u1ef1 ch\u1ecdn t\u1ea1i B\u1ebfn Gi\u00f3, t\u1ea7ng 1, ph\u1ee5c v\u1ee5 t\u1eeb 06:30-09:30 theo m\u00fai gi\u1edd Asia/Ho_Chi_Minh. [F-HTL-CITY01-040]\nKh\u00f4ng \u0111\u00f3ng c\u1eeda ng\u00e0y n\u00e0o. [F-HTL-CITY01-040]\nFrom your saved stay details: 2 ng\u01b0\u1eddi l\u1edbn.\nFrom your saved stay details: Nh\u1eadn ph\u00f2ng ng\u00e0y 2026-12-10.\nFrom your saved stay details: Tr\u1ea3 ph\u00f2ng ng\u00e0y 2026-12-13.\nFrom your saved stay details: 3 \u0111\u00eam."
+      },
+      "created_at": "2026-10-23 19:19:27.224956+07:00"
+    },
+    {
+      "request_id": "87479712-332a-4084-9c64-03ac61834b6a",
+      "session_id": "23f9be53-634c-4861-bc6c-74491fc41b3c",
+      "hotel_id": "HTL-CITY01",
+      "expected_brief_version": 1,
+      "payload_hash": "b409b4f5a9c969e6ff2ee4cb1c093241230ce760f54cea8337620c64f751516f",
+      "status": "partial_success",
+      "brief_version_before": 1,
+      "brief_version_after": 2,
+      "applied_delta": {
+        "party": {
+          "children_added": [
+            {
+              "member_id": "46006249-3410-439e-8da8-1fa629e3cee9",
+              "age": null
+            }
+          ]
+        }
+      },
+      "source_utterance_id": "8d5c8b1d-474f-490d-8521-8e0c87f56352",
+      "source_fields": [
+        "party.children.46006249-3410-439e-8da8-1fa629e3cee9"
+      ],
+      "answer_status": "failed",
+      "brief_version_used": 2,
+      "brief_dependent": true,
+      "answer_payload": {
+        "request_id": "87479712-332a-4084-9c64-03ac61834b6a",
+        "status": "partial_success",
+        "error": {
+          "code": "provider_timeout",
+          "message": "The model request timed out."
+        },
+        "guest_brief": {
+          "brief_version": 2,
+          "dates": {
+            "check_in": "2026-12-10",
+            "check_out": "2026-12-13",
+            "nights": 3
+          },
+          "party": {
+            "adults": 2,
+            "children": [
+              {
+                "member_id": "46006249-3410-439e-8da8-1fa629e3cee9",
+                "age": null
+              }
+            ]
+          },
+          "pending_fields": [
+            "party.children.46006249-3410-439e-8da8-1fa629e3cee9.age"
+          ]
+        },
+        "brief_receipt": {
+          "request_id": "87479712-332a-4084-9c64-03ac61834b6a",
+          "status": "partial_success",
+          "brief_version_before": 1,
+          "brief_version_after": 2,
+          "applied_delta": {
+            "party": {
+              "children_added": [
+                {
+                  "member_id": "46006249-3410-439e-8da8-1fa629e3cee9",
+                  "age": null
+                }
+              ]
+            }
+          },
+          "source_refs": [
+            {
+              "source_utterance_id": "8d5c8b1d-474f-490d-8521-8e0c87f56352",
+              "request_id": "87479712-332a-4084-9c64-03ac61834b6a",
+              "fields": [
+                "party.children.46006249-3410-439e-8da8-1fa629e3cee9"
+              ]
+            }
+          ],
+          "answer_status": "failed",
+          "brief_version_used": 2
+        },
+        "applied_delta": {
+          "party": {
+            "children_added": [
+              {
+                "member_id": "46006249-3410-439e-8da8-1fa629e3cee9",
+                "age": null
+              }
+            ]
+          }
+        },
+        "answer_status": "failed"
+      },
+      "created_at": "2026-10-23 19:20:10.501309+07:00"
+    }
+  ],
+  "requests": [
+    {
+      "request_id": "bd93bf26-3992-42c2-a824-4b0a6bb8aced",
+      "status": "completed",
+      "error_code": null
+    },
+    {
+      "request_id": "87479712-332a-4084-9c64-03ac61834b6a",
+      "status": "completed",
+      "error_code": null
+    }
+  ]
+}

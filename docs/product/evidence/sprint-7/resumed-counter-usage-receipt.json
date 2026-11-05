@@ -1,0 +1,92 @@
+{
+  "resumed_allocation": {
+    "guest_turns": 9,
+    "guest_turn_cap": 9,
+    "requests": 16,
+    "request_cap": 18,
+    "status": "closed; guestcapexhausted; unusedrequestslotsnotavailablefornewturns",
+    "sealed_state_sha256": "7067736dec93d298942e5ca52a87df36e3f4b1d3ec5b7f4e9ad8a007c1ee92bd"
+  },
+  "sprint7_lifetime_requests_including_failed_attempts": 17,
+  "completed_provider_responses": 16,
+  "reported_model_input_tokens": 189767,
+  "reported_model_output_tokens": 6114,
+  "unreported_failure_usage": "unavailable; failed attempt still counted",
+  "agent_tokens": "unavailable",
+  "money": "unavailable",
+  "receipts": [
+    {
+      "event_file": "staylead-s7-batch1-events.jsonl",
+      "event_sha256": "0b05a017756224f0b7340a3279b9729b3e34a336cd69e4c47a8992bbc1ea8389",
+      "requests_reserved": 1,
+      "provider_completed": 1,
+      "reported_input_tokens": 10979,
+      "reported_output_tokens": 396
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont1-events.jsonl",
+      "event_sha256": "701ca995f1e739fd95ce5c4c4e6bd08be82a3d448e2e8eae0ad1404d604ca40d",
+      "requests_reserved": 4,
+      "provider_completed": 4,
+      "reported_input_tokens": 45956,
+      "reported_output_tokens": 1716
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont2-events.jsonl",
+      "event_sha256": "2f516530ac10cbb4288d4a5f567d0efb3485e64e4432b3a3b363c7986a0c0664",
+      "requests_reserved": 2,
+      "provider_completed": 2,
+      "reported_input_tokens": 23330,
+      "reported_output_tokens": 445
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont3-events.jsonl",
+      "event_sha256": "24db5742c3b3967f514434664567c392d0cc355ebb51ffbbb043e6ca099b40d5",
+      "requests_reserved": 0,
+      "provider_completed": 0,
+      "reported_input_tokens": 0,
+      "reported_output_tokens": 0
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont3-r2-events.jsonl",
+      "event_sha256": "2f5be2ae347db9396c5ab9415490a02846ccc5502c40a40eccd3693742b16eb1",
+      "requests_reserved": 1,
+      "provider_completed": 0,
+      "reported_input_tokens": 0,
+      "reported_output_tokens": 0
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont4-events.jsonl",
+      "event_sha256": "a3d0c7ada37a1a79f5297069b86113c9eb6251978830ad8dba2a702b21a4728e",
+      "requests_reserved": 3,
+      "provider_completed": 3,
+      "reported_input_tokens": 35958,
+      "reported_output_tokens": 1519
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont5-events.jsonl",
+      "event_sha256": "73365a30d1cb964f7db38409231e90dc4d2ff020aba0667146fa4924ca5456a5",
+      "requests_reserved": 2,
+      "provider_completed": 2,
+      "reported_input_tokens": 31278,
+      "reported_output_tokens": 991
+    },
+    {
+      "event_file": "staylead-s7-batch2-cont6-events.jsonl",
+      "event_sha256": "ccda778f499849d722dc90c862ab78a6bb52f2cc32b8414e9f748a646ff5905c",
+      "requests_reserved": 2,
+      "provider_completed": 2,
+      "reported_input_tokens": 19456,
+      "reported_output_tokens": 357
+    },
+    {
+      "event_file": "staylead-s7-batch2-events.jsonl",
+      "event_sha256": "90d3ef90437849316dd42984614ace78266b7cb8399e1ec061a799a4f0b3e5e2",
+      "requests_reserved": 2,
+      "provider_completed": 2,
+      "reported_input_tokens": 22810,
+      "reported_output_tokens": 690
+    }
+  ],
+  "privacy": "Hashes and aggregate counts only; no native output, signingsecret, controlfile or screenshot."
+}

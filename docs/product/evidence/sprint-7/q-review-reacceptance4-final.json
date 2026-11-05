@@ -1,0 +1,36 @@
+{
+  "verdict": "PASS_READY_FOR_SINGLE_APPROVED_MANUAL_PINE_2_TURN_4_REQUEST_BATCH",
+  "candidate_sha256": "221027b1a44ce2bcffd136d4bfa2dd9a5c6a2fa3ba4220e53945172613e85c14",
+  "run_id": "s7-room-advice-20261027-reacceptance4",
+  "pins": "q-review-reacceptance4-final-pins.json",
+  "source_delta": "Exactly4 runtime/browser/helpers/harness-test files; product0eb86e8c unchanged,237 repo and snapshot pins plus digest match before/after",
+  "inputs": "q-review-reacceptance4-cases.json; actual cases dd7119bd77b717d22a15b1a3d381ee3351ae4e00678944bfcaa526577222832a, oracle4adda91a89c0cfffb2696bfb0600e7791ef9e8b9df7b55cac6cd7362a34e1c84, exact private authority and sealed prior4/8 e43430da31b74f840f82bcedf2b45c0fdeafc6643d12646c2e17c15561dd6d9b/lifetime44; newfresh0/0caps2/4, continuationnull",
+  "scope": "Only two exact published original Pine utterances, one fresh Pine session; current hardneeds age7→samechildage8/explicitbothclear/French/current UI selection. Reuse accepted City/Family/B07.",
+  "independent_execution": [
+    {
+      "evidence": "q-review-reacceptance4-runtime-provisional.json",
+      "outcome": "Frozen runtime actual private authority/case/parent identity andfreshstate positive/negative checks PASS"
+    },
+    {
+      "evidence": "q-review-reacceptance4-producer-results.json",
+      "outcome": "Actual canonicalM2+M4→current driver checkBrief/checkRoom/postHTTP branches PASS validneedsclarification andFrenchpartialLOFT; negative inventedbudget/genericrestatement/lostsharing/retainedaccess/wrongchild/ENfallback/nooptions/unknownfeecomplete/wrongbase/wrongsourcegen all reject"
+    },
+    {
+      "evidence": "q-review-reacceptance4-bootstrap-results.json",
+      "outcome": "Actual emitted bootstrap with actual private inputs passes; wrongparent/run/hash/lifetime/counts/matrix/continuation/actualpriorbytes reject"
+    },
+    {
+      "evidence": "q-review-reacceptance4-semantic-gate-results.json",
+      "outcome": "Actual fs receipt gate passes correctregular0600 exactAPIbodyhash; wrongidentity/body/fail/symlink0644/missing reject. Gate aftercapture+machine/UI/selection before nextguest; no provider/reserve whilewaiting."
+    },
+    {
+      "command": "pytest selected actualTestClient ingress arbitrarytext, initializer matrix/overwrite, 2call/700cap tests",
+      "outcome": "3 passed,3 known deprecation warnings; only fakeprovider/tempprivate files, no actual API/provider/DB writes"
+    }
+  ],
+  "prior_harness_finding": "Restored prior no-invented-budget assertion on BOTH Pine turns; actual checkBrief branch regression executed byB and positive+negative current producer checked independently",
+  "root_gates_receipt": "reacceptance4-local-gates.json:23 focused harness/API PASS; canonicalwholeRuff/compilePASS. Unchanged product275backend/16PG and53frontendpins/40tests+lint/typecheck/build reused; do not sum overlaps.",
+  "activation": "Parent soleactivator/markerwriter; no liveconfig/state/model initialized byQ",
+  "actual_acceptance_status": "NOT_YET_PASS; C01/Sprint7 remains blocked until actualPine both turns, required French checked UI/currentselection and readonlyDB evidence pass. Historical R3failedPine4/lifetime44 immutable.",
+  "remaining_limits": "Approved max2guest/4requests,Luna low,max2calls25sprovider45sturn700output,noauto retries,stopfirstblockingfailure. No extra repairturn."
+}

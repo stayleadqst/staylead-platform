@@ -1,0 +1,71 @@
+{
+  "classification": "DIAGNOSTIC realAPI/PG/Codex",
+  "run_id": "s6-codex-20261026-remediation-6",
+  "run_namespace": "remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "turn": 4,
+  "request_id_sha256": "fc2d4951291cc9e4",
+  "question_sha256": "ee42d64afef7d1d76c1b44c0b129b80156160a6aa9968f9642fab61245db9b43",
+  "automatic_retry": false,
+  "ui_or_clipboard_checked": false,
+  "full_matrix_pass": false,
+  "http_status": 200,
+  "response": {
+    "status": "completed",
+    "answer": "朝食はビュッフェ形式で、ベン・ジオ（1階）で提供されます。提供時間は06:30-09:30です（Asia/Ho_Chi_Minh）。 [F-HTL-CITY01-040]",
+    "answer_eligibility": "current",
+    "unknowns": [],
+    "evidence": [
+      {
+        "fact_id": "F-HTL-CITY01-040",
+        "hotel_id": "HTL-CITY01",
+        "source_id": "SRC-HTL-CITY01-FOOD",
+        "source_version": "1.0",
+        "section": "Ăn uống và dị ứng"
+      }
+    ],
+    "language_preference": {
+      "language_tag": "ja",
+      "source": "explicit",
+      "revision": 4
+    },
+    "presentation": {
+      "language_tag": "ja",
+      "direction": "ltr",
+      "preference_revision": 4,
+      "freshness": "current",
+      "labels_fallback": false
+    },
+    "trace": {
+      "answer_validation": "fully_validated",
+      "guest_claims_rejected": 0
+    },
+    "guest_brief": {
+      "brief_version": 3,
+      "dates": {
+        "check_in": "2026-12-10",
+        "check_out": "2026-12-14",
+        "nights": 4
+      },
+      "party": {
+        "adults": 2,
+        "children": [
+          {
+            "age": 7,
+            "member_id_sha256": "c1b76c837825a446"
+          }
+        ]
+      },
+      "pending_fields": []
+    }
+  },
+  "transport_error": null,
+  "counter_state_after": {
+    "run_id": "s6-codex-20261026-remediation-6",
+    "codex_requests": 8,
+    "guest_turns": 4,
+    "max_codex_requests": 18,
+    "max_guest_turns": 9
+  },
+  "status": "completed"
+}

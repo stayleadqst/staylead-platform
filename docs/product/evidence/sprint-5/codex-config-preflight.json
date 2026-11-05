@@ -1,0 +1,51 @@
+{
+  "operation": "exact adapter config/features validated with local features list; no inference",
+  "exit_code": 0,
+  "profile": {
+    "model": "gpt-6-luna",
+    "reasoning_effort": "low",
+    "timeout_seconds": 25.0,
+    "native_output_token_limit": false,
+    "response_byte_limit": 65536,
+    "disabled_features": [
+      "shell_tool",
+      "apps",
+      "plugins",
+      "hooks",
+      "multi_agent",
+      "computer_use",
+      "browser_use",
+      "view_image",
+      "image_generation",
+      "code_mode_host",
+      "goals",
+      "workspace_dependencies",
+      "skill_search",
+      "unbounded_connection_retries"
+    ]
+  },
+  "effective_disabled_features": {
+    "apps": "false",
+    "browser_use": "false",
+    "code_mode_host": "false",
+    "computer_use": "false",
+    "goals": "false",
+    "hooks": "false",
+    "image_generation": "false",
+    "multi_agent": "false",
+    "plugins": "false",
+    "shell_tool": "false",
+    "skill_search": "false",
+    "unbounded_connection_retries": "false",
+    "view_image": "false",
+    "workspace_dependencies": "false"
+  },
+  "all_requested_features_reported_disabled": true,
+  "model_requests": 0,
+  "limitation": "features list has no --ignore-user-config flag; actual exec uses the supported exec-only flag. No inference-readiness claim.",
+  "initial_failures_preserved": [
+    "exec-only ignore-user-config flag rejected at CLI root",
+    "reserved openai provider override rejected before inference; fixed with supported custom alias and native ChatGPT auth routing"
+  ],
+  "credentials_copied_or_printed": false
+}

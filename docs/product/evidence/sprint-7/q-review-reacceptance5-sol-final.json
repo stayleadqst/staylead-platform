@@ -1,0 +1,47 @@
+{
+  "verdict": "PASS_READY_FOR_SINGLE_HUMAN_APPROVED_SOL_LOW_PINE2_4_BATCH",
+  "candidate_sha256": "0a7411831fd809dd79bc18d473d8d89cab4db9f5ce4118e4a287226e62667a39",
+  "run_id": "s7-room-advice-20261028-reacceptance5-sol",
+  "scope": "Exactly two unchanged published Pine caseobjects, fresh onePinesession0/0,2guest/max4requests,gpt-6.1-sol/low,2calls25s45s700,no retries/fallbacks; oldR4sealed1/2/lifetime46unusedslotsclosed",
+  "source_pins": {
+    "count": 237,
+    "digest_match": true,
+    "repo_snapshot_match_before_after": true,
+    "exact_three_control_delta": [
+      "tests/contracts/test_sprint7_acceptance_harness.py",
+      "tools/evals/sprint7_browser.mjs",
+      "tools/evals/sprint7_runtime.py"
+    ],
+    "evidence": "q-review-reacceptance5-sol-pins.json",
+    "product1435_unchanged": true
+  },
+  "inputs": "q-review-reacceptance5-sol-cases.json; actual private607a92 cases/f75dfe authority, oracle4adda, exact full sealedprior16e5 receipt all matched",
+  "control_review": [
+    "Runtime model constant, validstate/approval checks and Settings codex_cli_model bind exactlygpt-6.1-sol/low; no fallback profile introduced",
+    "Browser bootstrap binds actualapprovedSolmatrix and exactR4parent1/2bytes/caps/lifetime46; fresh counters0/0 ratherthan continuation",
+    "Provider count/output/deadline guards and per-turn semantic APIbodyhash receipt gate unchanged",
+    "Actual UI selection required onlyPine2, exact currentresultID/version persisted GET; no forcedPine1options/selection or history repair"
+  ],
+  "independent_checks": [
+    {
+      "evidence": "q-review-reacceptance5-sol-bootstrap-results.json",
+      "result": "Actual emittedbootstrap passes actualprivateinputs; wrongparentrun/hash/lifetime/counters/matrix/continuation/actualpriorbytes reject"
+    },
+    {
+      "evidence": "q-review-reacceptance5-sol-semantic-gate-results.json",
+      "result": "Actual fs gate correctregular0600pass+APIbodyhash advances; wrongidentity/body/fail/symlink0644/missing reject; no nextguest/provider whilewaiting"
+    },
+    {
+      "evidence": "q-review-reacceptance5-sol-producer-results.json",
+      "result": "Actual canonicalM2/M4→currentdriver validVIknownaccess/Pine2FrenchpartialLOFT pass;13 negative hardtypepending/value/budget/genericrestatement/lostconsent/accessretention/childID/ENfallback/nooptions/cost/source mutations reject"
+    },
+    {
+      "tests": "Selected approvedprivatecase+parent binding, realTestClient unapprovedingress, max2calls700output guard",
+      "result": "3 passed,3 known deprecation warnings; only fake provider/temp files, no actualAPI/model/DB writes"
+    }
+  ],
+  "root_gates_receipt": "reacceptance5-sol-local-gates.json:23 harness/APItestsPASS, Ruff/compilePASS; B21/NodeSyntaxSmoke/diffPASS. Unchanged product280backend/16PG and53frontendpins/40tests+lint/typecheck/build reuse; do not sum overlap.",
+  "activation": "Root sole activator and semantic-marker writer; Q has not initialized actualconfig/state or made provider/API/actualDB writes",
+  "actual_status": "NOT YET PASS. C01/Sprint7 blocked until both actual linked Pine turns/VIverification/Frenchcheckedadvice/math/currentselection/source/readonlypersistence pass; old failures immutable",
+  "risk": "No prior Sol live access/latency/semantic-quality success claimed. Approval authorizes this bounded trial, not automatic retries or cap changes."
+}

@@ -1,0 +1,45 @@
+{
+  "candidate": "af4b42fb991b9425bcf320a85c604e33e9debbde",
+  "product_fingerprint": "eca37eaf3d3969049e89559a050099e795dc367559df6463b2ee3114b1b7ed75",
+  "coordinator": {
+    "contracts_architecture_before_last_domain_guard_delta": 118,
+    "final_grounded_language_contracts": 95,
+    "PG_API": 15,
+    "harness_python": 39,
+    "routing": 7,
+    "ruff_AST_compile_diff": "PASS"
+  },
+  "builder": {
+    "final_contracts": 95,
+    "S5_PG": 10,
+    "S6_PG": 4,
+    "ruff_compile_diff": "PASS"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "changed_edge_contracts": 5,
+    "label_contracts": 6,
+    "namespace_mapping_tests": 2,
+    "schema_runtime_positive_negative_probes": "PASS",
+    "blocking_findings": 0,
+    "closed_findings": [
+      "courtesy early-return bypass",
+      "empty missing-state schema branch",
+      "both incomplete date endpoint questions",
+      "required question native/runtime parity incl mixed intent and age",
+      "high-overlap metadata error mapping",
+      "consumed provisional answer channel validation",
+      "trusted URL query punctuation preservation"
+    ]
+  },
+  "scope": "Same-call M3 intents/op authorization; existing M2 receipt JSON metadata; no migration/new AI call; M1-M6 boundaries preserved",
+  "limitations": [
+    "Exact current quotes/positive intent are same-model assertions; not formal semantic proof",
+    "Actual fixed-product UI/copy matrix still required",
+    "Foundry flat compatibility verified offline, no Grok run",
+    "Resume may use existing selection+answer up to2calls; no patch reapplication"
+  ],
+  "live_requests_used_during_fixes": 0,
+  "cumulative_live_requests": 96
+}

@@ -1,0 +1,314 @@
+{
+  "namespace": "remediation-6",
+  "candidate_product_sha256": "70498d890019fcf62ac6580e545b7c8e16360357500a725149c49a984997512a",
+  "baseline_method": "original-query lexical retrieval; expected fact coverage is candidate presence, not answer quality",
+  "provider_requests": 18,
+  "cumulative_provider_requests": 60,
+  "full_matrix_pass": false,
+  "cases": [
+    {
+      "turn": 1,
+      "scope": "browser/API/copy evidence",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Vietnamese; canonical ISO dates, 3 nights and 2 adults; buffet at Ben Gio/floor 1, 06:30-09:30 Asia/Ho_Chi_Minh cited to 040. Current rendered answer and exact clipboard equality recorded.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6606.6,
+        5710.8
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12495.0,
+      "reported_output_tokens": [
+        75,
+        361
+      ],
+      "clipboard": {
+        "result": "copied",
+        "equals_rendered_text": true
+      }
+    },
+    {
+      "turn": 2,
+      "scope": "browser/API failure evidence; no delivered answer/copy",
+      "state": "PASS",
+      "answer_semantics": "FAIL",
+      "detail": "English revision 2 and brief 2 retain dates/adults and add one child with null age/pending. Nonempty schema-valid model output illegally cites the null child-age field in own refs and declared refs; runtime rejects it. The raw content also fails to ask the required child-age question.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "no delivered answer",
+      "false_rejection": false,
+      "rejection_reason": "null child-age refs; no targeted age question in generated content",
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        3636.0,
+        7362.1
+      ],
+      "http_status": 502,
+      "http_latency_ms": 11056.3,
+      "reported_output_tokens": [
+        39,
+        325
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": false
+      }
+    },
+    {
+      "turn": 3,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "French; checkout 2026-12-14, 4 nights, same child now age 7; check-in/adults preserved, pending cleared, no unrelated unknowns.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6281.7,
+        7054.3
+      ],
+      "http_status": 200,
+      "http_latency_ms": 13574.2,
+      "reported_output_tokens": [
+        83,
+        360
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 4,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Japanese buffet/location/floor/time/timezone answer cites 040 and preserves brief 3.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-040"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        7017.3,
+        5758.8
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12909.3,
+      "reported_output_tokens": [
+        32,
+        249
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 5,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Chinese free guest-area Wi-Fi and desk credentials answer cites 021; brief unchanged.",
+      "lexical_expected_fact_coverage": 1.0,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-021"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5370.2,
+        5425.6
+      ],
+      "http_status": 200,
+      "http_latency_ms": 10887.3,
+      "reported_output_tokens": [
+        42,
+        213
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 6,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Arabic with RTL metadata; 40 reference covered spaces, 100000 VND per vehicle/night, no advance reservation; 046 citation. Additional one-vehicle policy matches 077. Exact requested synthetic URL has its own URL-001 citation; no internal URL or functional-availability claim. Brief unchanged.",
+      "lexical_expected_fact_coverage": 0.5,
+      "expected_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_fact_ids": [
+        "F-HTL-CITY01-046",
+        "F-HTL-CITY01-077",
+        "F-HTL-CITY01-S6-URL-001"
+      ],
+      "delivered_expected_fact_coverage": 1.0,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5859.6,
+        6419.5
+      ],
+      "http_status": 200,
+      "http_latency_ms": 12385.0,
+      "reported_output_tokens": [
+        42,
+        343
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 7,
+      "scope": "API diagnostic failure only",
+      "state": "PASS",
+      "answer_semantics": "FAIL",
+      "detail": "Hindi revision 7/brief 4 preserve checkout 2026-12-14, same child age 7, and pending checkout. Captured Hindi clarification asks 12 or 13 December but typed options add translated month text, violating exact-source options and causing rejection. Known 2026 context makes the no-year wording meaningful; no answer was delivered.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "no delivered answer",
+      "false_rejection": false,
+      "rejection_reason": "translated options violate exact source components",
+      "unknowns": null,
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        5993.2,
+        7670.8
+      ],
+      "http_status": 502,
+      "http_latency_ms": 13742.4,
+      "reported_output_tokens": [
+        71,
+        421
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 8,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Korean revision 8/brief 5; checkout 2026-12-15, 5 nights, original check-in/adults/same child age 7; pending cleared. No unrelated prior-FAQ unknowns.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        4687.7,
+        11938.7
+      ],
+      "http_status": 200,
+      "http_latency_ms": 16729.7,
+      "reported_output_tokens": [
+        45,
+        374
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    },
+    {
+      "turn": 9,
+      "scope": "API diagnostic only",
+      "state": "PASS",
+      "answer_semantics": "PASS",
+      "detail": "Korean courtesy acknowledgment retains explicit Korean revision 8 and unchanged brief 5; no invented facts or unrelated unknowns.",
+      "lexical_expected_fact_coverage": null,
+      "expected_fact_ids": [],
+      "delivered_fact_ids": [],
+      "delivered_expected_fact_coverage": null,
+      "usefulness": "useful for pinned request",
+      "false_rejection": false,
+      "rejection_reason": null,
+      "unknowns": [],
+      "conflicts": "no conflict surfaced in retained answer; separate conflict quality unmeasured",
+      "provider_calls": 2,
+      "provider_latency_ms": [
+        6326.3,
+        4822.4
+      ],
+      "http_status": 200,
+      "http_latency_ms": 11220.4,
+      "reported_output_tokens": [
+        22,
+        73
+      ],
+      "clipboard": {
+        "result": "not_checked",
+        "equals_rendered_text": null
+      }
+    }
+  ],
+  "limitations": [
+    "T3-T9 API diagnostic only",
+    "No native-speaker fluency certification",
+    "No billing or served-model identity; token totals unavailable",
+    "No screenshots published"
+  ]
+}

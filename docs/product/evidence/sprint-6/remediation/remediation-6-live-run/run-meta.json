@@ -1,0 +1,10 @@
+{
+  "run_id": "s6-codex-20261026-remediation-6",
+  "run_namespace": "remediation-6",
+  "matrix_id": "staylead-s6-nine-turn-multilingual-20261026-v1",
+  "started_at_utc": "2026-10-26T05:28:44.832Z",
+  "base_url": "http://127.0.0.1:13016",
+  "mock_api": false,
+  "browser_submissions_per_turn": 1,
+  "note": "The browser submits each pinned turn once; the configured application/provider performs approved calls under the persistent runtime caps."
+}

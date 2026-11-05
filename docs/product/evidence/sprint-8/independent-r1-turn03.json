@@ -1,0 +1,20 @@
+{
+  "turn": 3,
+  "verdict": "PASS",
+  "response_sha256": "b5b201c43378c9b0eb177d5b6e4ebe6d832e029732377606d090413d6019f2fa",
+  "evidence_sha256": "33b4687432de916382addebd7e20a94e7cfd8532f2dea47a08e0c71ecdcfa471",
+  "counters": {
+    "guest_turns": 3,
+    "approved_case_turn": 3,
+    "requests": 6
+  },
+  "session_binding": "aad02bde-897e-4b4b-a34d-98351b533122",
+  "checks": [
+    "Exact peanut plus step_free and wheelchair_access HARD needs/quiet/dining saved, no pending or invented profile requirements",
+    "Both dining fitUNKNOWN; entry step-free evidence does not certify full wheelchair suitability; specific access feature and ingredients/cross-contact verification rendered in Arabic",
+    "River sponsor and unresolved hours/source conflict disclosed; names/prices/bases/durations/source hashes/gen3 preserved; no safety or availability guarantee",
+    "Arabic core20 labels fallback=false, current guide DOM langar/dirrtl with complete expected unknown text",
+    "Actual screenshot390px wide viewed; current guide below viewport in scrollable transcript, no evidenced overflow/block; no full scrolled-card screenshot claim or extra-call requirement"
+  ],
+  "root_agreement": "Explicit root PASS received before receipt"
+}

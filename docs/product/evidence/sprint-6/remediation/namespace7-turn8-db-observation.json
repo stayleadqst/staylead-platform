@@ -1,0 +1,43 @@
+{
+  "classification": "read-only local PostgreSQL observation after failed namespace7 T8 and before T9",
+  "scope": "synthetic HTL-CITY01; unique exact T8 request fingerprint; session-scoped SELECT queries only",
+  "request_id_sha256": "0e77d76f80afd71e",
+  "session_id_sha256": "c8da0b773161ff03",
+  "request_status": "error",
+  "request_error_code": "unsupported_output",
+  "brief_version": 4,
+  "dates": {
+    "check_in": "2026-12-10",
+    "check_out": "2026-12-14",
+    "nights": 4
+  },
+  "party": {
+    "adults": 2,
+    "children": [
+      {
+        "member_id_sha256": "d1fb38f0c6baee2c",
+        "age": 7
+      }
+    ]
+  },
+  "pending_fields": [
+    "dates.check_out"
+  ],
+  "language_preference": {
+    "language_tag": "ko",
+    "source": "explicit",
+    "revision": 8
+  },
+  "receipt": {
+    "status": "no_change",
+    "brief_version_before": 4,
+    "brief_version_after": 4,
+    "answer_status": "pending",
+    "brief_version_used": null
+  },
+  "scoped_session_request_count": 8,
+  "synthetic_hotel_verified": true,
+  "provider_calls": 0,
+  "mutations": 0,
+  "interpretation": "T8 failed the pinned state target: checkout 15/nights 5/pending clearance were not committed; Korean preference did persist. Generic HTTP error response alone did not expose this state."
+}

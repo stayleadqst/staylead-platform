@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 import httpx
 from pydantic import SecretStr
+
 from staylead_platform.platform.contracts.ai_provider import (
     GenerationRequest,
     GenerationResult,
@@ -11,13 +15,24 @@ from staylead_platform.platform.contracts.ai_provider import (
     Usage,
 )
 
+TraceCallback = Callable[[str, dict[str, Any]], Awaitable[None]]
+
 
 class FoundryGrokConfig:
-    def __init__(self, *, base_url: str, api_key: SecretStr, deployment: str, timeout_seconds: float = 25.0) -> None:
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        api_key: SecretStr,
+        deployment: str,
+        timeout_seconds: float = 25.0,
+        trace_callback: TraceCallback | None = None,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.deployment = deployment
         self.timeout_seconds = min(max(timeout_seconds, 1.0), 60.0)
+        self.trace_callback = trace_callback
 
     def __repr__(self) -> str:
         return f"FoundryGrokConfig(base_url={self.base_url!r}, deployment={self.deployment!r})"
@@ -35,20 +50,22 @@ class FoundryGrokProvider:
                 {"role": "system", "content": request.instructions},
                 {"role": "user", "content": request.input_text},
             ],
-            "max_tokens": request.max_output_tokens,
+            "max_completion_tokens": request.max_output_tokens,
             "temperature": 0.1,
             "response_format": {"type": "json_object"},
         }
         try:
             async with httpx.AsyncClient(timeout=self._config.timeout_seconds) as client:
-                response = await client.post(
-                    url,
-                    json=payload,
-                    headers={
+                post_kwargs: dict[str, Any] = {
+                    "json": payload,
+                    "headers": {
                         "Authorization": f"Bearer {self._config.api_key.get_secret_value()}",
                         "Content-Type": "application/json",
                     },
-                )
+                }
+                if self._config.trace_callback is not None:
+                    post_kwargs["extensions"] = {"trace": self._config.trace_callback}
+                response = await client.post(url, **post_kwargs)
         except httpx.TimeoutException as exc:
             raise ProviderError("provider_timeout", "The model request timed out.", retryable=True) from exc
         except httpx.RequestError as exc:

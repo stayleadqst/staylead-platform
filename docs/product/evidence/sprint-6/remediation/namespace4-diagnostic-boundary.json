@@ -1,0 +1,29 @@
+{
+  "at_utc": "2026-10-26T04:17:14.458514+00:00",
+  "candidate_commit": "0227b9b4e56fbd599ca1c3a5154c7ae314b615d0",
+  "tree": "d62789acc400e8b082844aa399f516406b406923",
+  "product_fingerprint": "03820fa0e113f481d0bd68e09fcb0987012b1881037230b9458132fa3cf4e517",
+  "prior_candidate": "f52e74c96593130a8e2541b977daa014e9a3bd8e",
+  "prior_product_fingerprint": "c2eebe245608c34261f3cdb805997f6819cc4c7a80518195d23c7dccc7a61f31",
+  "classification": "DIAGNOSTIC realAPI/PG/Codex only; mixed candidate namespace4, not full acceptance",
+  "remaining_authorized_provider_requests": 6,
+  "counter_before": {
+    "provider_requests": 12,
+    "guest_turns": 6
+  },
+  "target_turns": [
+    7,
+    8,
+    9
+  ],
+  "automatic_retries": false,
+  "new_budget": 0,
+  "helper_sha256": "e7c6ced67db7e34456082fbc1c916ad5406357a3e69dcc86c7538913e396825e",
+  "matrix_sha256": "97adddf2d277cfbc1be2f9dd6fcbb80d96ca6129ce92cb8c62ad0df80433df07",
+  "local_checks": {
+    "backend_contracts_passed": 68,
+    "helper_tests_passed": 14,
+    "ruff": "PASS"
+  },
+  "preflight_integration": "Read-only PG resolved exact T6 fingerprint to synthetic scoped session and6requestrecords; counters12requests/6turns unchanged; no HTTP or providercall on initial ImportError."
+}

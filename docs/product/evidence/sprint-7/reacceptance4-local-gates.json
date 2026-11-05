@@ -1,0 +1,17 @@
+{
+  "candidate_sha256": "221027b1a44ce2bcffd136d4bfa2dd9a5c6a2fa3ba4220e53945172613e85c14",
+  "root_focused_harness_and_api_tests": 23,
+  "builder_harness_tests": 21,
+  "known_warnings": 3,
+  "ruff": "PASS",
+  "compile": "PASS",
+  "diff_check": "PASS",
+  "node_syntax_smoke": "PASS builder; no browser/API/model",
+  "reused_product_candidate": "0eb86e8c747e5674c45867fd358c007e767f91586ac1dc51761dd90c30d1c6cd",
+  "reused_backend": 275,
+  "reused_postgres": 16,
+  "reused_frontend_tests": 40,
+  "unchanged_frontend_pins": 53,
+  "reuse_reason": "Only4controls changed; product/M2/M4/persistence/frontend unchanged; do notsumoverlappingruns",
+  "new_config_state_or_model_calls": false
+}

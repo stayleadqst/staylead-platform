@@ -1,0 +1,17 @@
+{
+  "run_id": "s6-codex-20261026-remediation-3",
+  "result": "stopped_with_preserved_partial_evidence_browser_held_open",
+  "turns_observed": 4,
+  "stop_reason": "turn 4 returned HTTP 502",
+  "automatic_retry_or_resume_used": false,
+  "non_provider_external_network_calls": "unmeasured_by_browser_driver",
+  "external_browser_requests": {
+    "scope": "browser-context-only",
+    "count": 0,
+    "origin_and_url_hashes": []
+  },
+  "provider_network_activity": "handled by the approved Codex CLI runtime; not measured by the browser script",
+  "semantic_verdict": "not_assigned_by_browser_script",
+  "reviewer_decision_required": true,
+  "completed_at_utc": "2026-10-26T03:55:32.939Z"
+}
