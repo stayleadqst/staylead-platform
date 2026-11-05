@@ -118,6 +118,7 @@ class OperatorGuideApplication:
 def create_operator_guide_application(
     settings: Settings, *, engine: Engine | None = None,
 ) -> OperatorGuideApplication | None:
-    if settings.environment.lower() not in {"development", "test"} or not settings.dev_operator_credentials:
+    if (settings.environment.lower() not in {"development", "test"}
+            or not (settings.dev_operator_credentials or settings.operator_oidc_enabled)):
         return None
     return OperatorGuideApplication(settings, engine=engine)

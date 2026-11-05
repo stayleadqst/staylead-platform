@@ -45,3 +45,20 @@ def resolve_dev_operator(token: str, credentials: Iterable[DevOperatorCredential
         if equal:
             matched = credential.principal()
     return matched
+
+
+class OidcOperatorMapping(BaseModel):
+    """Server-owned mapping from one verified issuer/subject pair to local scope."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    operator_id: str = Field(min_length=1, max_length=120, pattern=r"^[A-Za-z0-9._:-]+$")
+    property_id: str = Field(min_length=1, max_length=120, pattern=r"^[A-Za-z0-9._:-]+$")
+    permissions: frozenset[str]
+
+    @field_validator("permissions")
+    @classmethod
+    def supported_permissions_only(cls, value: frozenset[str]) -> frozenset[str]:
+        if not value or not value <= {"guide:read", "guide:write"}:
+            raise ValueError("OIDC mappings require supported guide permissions.")
+        return value

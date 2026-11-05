@@ -21,8 +21,10 @@ from staylead_platform.composition.dependencies.operator_guide import (
     create_operator_guide_application,
 )
 from staylead_platform.composition.startup.domain_profile import select_domain_profile
+from staylead_platform.entrypoints.operator.router import auth_router as operator_auth_router
 from staylead_platform.entrypoints.operator.router import router as operator_router
 from staylead_platform.infrastructure.database import create_database_engine
+from staylead_platform.infrastructure.identity.oidc_operator import OidcOperatorAuth
 from staylead_platform.infrastructure.persistence.store import (
     next_session_expiry,
     purge_expired_sessions,
@@ -176,7 +178,9 @@ def create_app(
     app.state.guest_chat = guest_chat
     app.state.settings = selected_settings
     app.state.operator_guide = selected_operator_guide
+    app.state.operator_auth = OidcOperatorAuth(selected_settings) if selected_settings.operator_oidc_enabled else None
     app.include_router(operator_router)
+    app.include_router(operator_auth_router)
 
     @app.exception_handler(HTTPException)
     async def structured_http_error(_request: Any, exc: HTTPException) -> JSONResponse:
