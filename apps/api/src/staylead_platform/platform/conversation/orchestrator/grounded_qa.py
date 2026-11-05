@@ -16,12 +16,17 @@ from types import SimpleNamespace
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel, ValidationError
+
 from staylead_platform.platform.contracts.ai_provider import (
     AIProvider,
     GenerationRequest,
     GenerationResult,
     ProviderError,
     Usage,
+)
+from staylead_platform.platform.contracts.claim_consistency import (
+    ClaimConsistencyStatus,
+    ClaimConsistencyValidator,
 )
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
@@ -224,14 +229,56 @@ def _question_url_fact_ids(
     return matched
 
 
-def _validate_untrusted_field(text: str, facts_by_id: dict[str, dict[str, Any]]) -> None:
+def _validate_untrusted_field(
+    text: str, facts_by_id: dict[str, dict[str, Any]], *, allow_profiled_number: bool = False,
+) -> None:
     """Check model-authored unknown/conflict prose before it reaches the guest."""
     references = _FACT_REFERENCE.findall(text)
     tokens = _FACT_TOKEN.findall(text)
     if tokens != references or any(fact_id not in facts_by_id for fact_id in references):
         raise ConversationFailure("invalid_model_output", "The model referenced evidence outside this hotel context.")
     cited_facts = [facts_by_id[fact_id] for fact_id in dict.fromkeys(references)]
-    _validate_supported_literals(text, cited_facts)
+    try:
+        _validate_supported_literals(text, cited_facts)
+    except ConversationFailure as exc:
+        if not allow_profiled_number or exc.reason != "unsupported_number":
+            raise
+
+
+_GENERIC_FACT_TYPE_TOKENS = frozenset({
+    "access", "availability", "available", "confirmed", "confirmation", "current", "detail",
+    "fact", "hotel", "room", "status", "unknown",
+})
+
+
+def _typed_fact_applies_to_claim(text: str, fact: dict[str, Any]) -> bool:
+    """Match an unreferenced uncertainty only to its typed subject in the claim text."""
+    def tokens(value: object) -> set[str]:
+        result = set()
+        for token in re.findall(r"[^\W_]+", str(value).casefold(), flags=re.UNICODE):
+            normalized = token[:-1] if token.endswith("s") and len(token) > 4 else token
+            if normalized and normalized not in _GENERIC_FACT_TYPE_TOKENS:
+                result.add(normalized)
+        return result
+
+    fact_tokens = set().union(*(tokens(fact.get(key, "")) for key in ("field", "topic", "subject")))
+    claim_tokens = tokens(text)
+    return bool(fact_tokens & claim_tokens)
+
+
+def _unconfirmed_facts_for_claim(
+    text: str, facts: list[dict[str, Any]], *, fact_scope_is_explicit: bool = False,
+) -> list[dict[str, Any]]:
+    unconfirmed = [fact for fact in facts if fact.get("status") in {"unknown", "needs_confirmation"}]
+    if fact_scope_is_explicit:
+        return unconfirmed
+    references = set(_FACT_REFERENCE.findall(text))
+    if references:
+        return [
+            fact for fact in unconfirmed
+            if str(fact.get("fact_id", "")) in references and _typed_fact_applies_to_claim(text, fact)
+        ]
+    return [fact for fact in unconfirmed if _typed_fact_applies_to_claim(text, fact)]
 
 
 def _validate_conversational_acknowledgement(text: str, *, question: str) -> str:
@@ -290,6 +337,8 @@ class GroundedQAOrchestrator:
         selection_schema: type[BaseModel],
         claim_formatter: Callable[[str, list[dict[str, Any]]], str] | None = None,
         safe_fact_projector: Callable[[dict[str, Any]], str | None] | None = None,
+        claim_consistency_validator: ClaimConsistencyValidator | None = None,
+        claim_consistency_applicability: Callable[[str, list[dict[str, Any]]], bool] | None = None,
         clarification_validator: Callable[
             [Any, str, dict[str, Any] | None, tuple[str, ...], tuple[str, ...]],
             tuple[str, tuple[str, ...]] | None,
@@ -327,6 +376,8 @@ class GroundedQAOrchestrator:
         self._selection_schema = selection_schema
         self._claim_formatter = claim_formatter
         self._safe_fact_projector = safe_fact_projector
+        self._claim_consistency_validator = claim_consistency_validator
+        self._claim_consistency_applicability = claim_consistency_applicability
         self._clarification_validator = clarification_validator
         self._committed_output_schema_factory = committed_output_schema_factory
         self._preparation_selection_schema_factory = preparation_selection_schema_factory
@@ -338,6 +389,111 @@ class GroundedQAOrchestrator:
         self._max_output_tokens = min(max(max_output_tokens, 100), 1200)
         self._room_advice = room_advice
         self._local_guide = local_guide
+
+    def _checked_claim_segments(
+        self, text: str, cited_facts: list[dict[str, Any]], *, channel: str,
+        fact_scope_is_explicit: bool = False,
+    ) -> tuple[list[tuple[str, tuple[str, ...]]], list[str], tuple[dict[str, Any], ...], tuple[str, ...]]:
+        """Keep only fully verified assertion spans; project unsafe spans from current facts."""
+        unconfirmed = _unconfirmed_facts_for_claim(
+            text, cited_facts, fact_scope_is_explicit=fact_scope_is_explicit,
+        )
+        if unconfirmed:
+            projected: list[str] = []
+            for fact in unconfirmed:
+                safe = self._safe_fact_projector(fact) if self._safe_fact_projector else None
+                if safe:
+                    fact_id = str(fact.get("fact_id", ""))
+                    projected.append(f"{safe} [{fact_id}]" if fact_id else safe)
+            if not projected:
+                projected.append("The current approved hotel record does not confirm that detail; please verify it with the hotel.")
+            return [], projected, tuple(unconfirmed), tuple(
+                str(fact["fact_id"]) for fact in unconfirmed if fact.get("fact_id")
+            )
+        if not self._claim_consistency_applies(text, cited_facts):
+            _validate_supported_literals(text, cited_facts)
+            formatted = self._claim_formatter(text, cited_facts) if self._claim_formatter else text
+            if not isinstance(formatted, str):
+                raise ConversationFailure("invalid_model_output", "The claim formatter returned invalid text.")
+            before = _FACT_REFERENCE.findall(text)
+            after = _FACT_REFERENCE.findall(formatted)
+            if _FACT_TOKEN.findall(formatted) != after or after != before:
+                raise ConversationFailure("invalid_model_output", "The claim formatter changed evidence references.")
+            _validate_supported_literals(formatted, cited_facts)
+            labels = " ".join(f"[{fact['fact_id']}]" for fact in cited_facts)
+            rendered = f"{formatted} {labels}" if labels and not _FACT_REFERENCE.search(formatted) else formatted
+            ids = tuple(str(fact["fact_id"]) for fact in cited_facts if fact.get("fact_id"))
+            return [(rendered, ids)], [], tuple(cited_facts), ()
+        findings = self._claim_consistency_validator(text, cited_facts, channel)
+        by_text: dict[str, list[Any]] = {}
+        for item in findings.assertions:
+            by_text.setdefault(item.text, []).append(item)
+        kept: list[tuple[str, tuple[str, ...]]] = []
+        unknowns: list[str] = []
+        used_facts: dict[str, dict[str, Any]] = {}
+        projected_fact_ids: set[str] = set()
+        facts_by_id = {str(fact.get("fact_id")): fact for fact in cited_facts}
+        for span, outcomes in by_text.items():
+            if not any(item.assertive for item in outcomes):
+                continue
+            ids = tuple(dict.fromkeys(
+                fact_id for item in outcomes for fact_id in item.fact_ids if fact_id in facts_by_id
+            ))
+            bound_facts = [facts_by_id[fact_id] for fact_id in ids]
+            if all(item.status is ClaimConsistencyStatus.VERIFIED for item in outcomes):
+                allow_emission = True
+                try:
+                    _validate_supported_literals(span, bound_facts)
+                except ConversationFailure as exc:
+                    if exc.reason != "unsupported_number":
+                        raise
+                    allow_emission = False
+                if allow_emission:
+                    formatted = self._claim_formatter(span, bound_facts) if self._claim_formatter else span
+                    if not isinstance(formatted, str):
+                        raise ConversationFailure("invalid_model_output", "The claim formatter returned invalid text.")
+                    # Formatter output is always strict; only unsupported raw model numbers
+                    # can be downgraded to a safe projection for an active profile.
+                    _validate_supported_literals(formatted, bound_facts)
+                    post = self._claim_consistency_validator(formatted, bound_facts, "formatted_claim")
+                    if post.assertions and all(
+                        not item.assertive or item.status is ClaimConsistencyStatus.VERIFIED
+                        for item in post.assertions
+                    ):
+                        labels = " ".join(f"[{fact['fact_id']}]" for fact in bound_facts)
+                        rendered = f"{formatted} {labels}" if labels and not _FACT_REFERENCE.search(formatted) else formatted
+                        kept.append((rendered, tuple(str(fact["fact_id"]) for fact in bound_facts)))
+                        used_facts.update((str(fact["fact_id"]), fact) for fact in bound_facts)
+                        continue
+                    outcomes = list(outcomes) + list(post.assertions)
+            # Unknown or contradicted model prose is replaced with bounded source projection.
+            for fact in bound_facts:
+                projected = self._safe_fact_projector(fact) if self._safe_fact_projector else None
+                if projected:
+                    fact_id = str(fact.get("fact_id", ""))
+                    line = f"{projected} [{fact_id}]" if fact_id else projected
+                    if line not in unknowns:
+                        unknowns.append(line)
+                    if fact_id:
+                        used_facts[fact_id] = fact
+                        projected_fact_ids.add(fact_id)
+            if not bound_facts and "I couldn't verify that detail from the current approved hotel records." not in unknowns:
+                unknowns.append("I couldn't verify that detail from the current approved hotel records.")
+        return kept, unknowns, tuple(used_facts.values()), tuple(sorted(projected_fact_ids))
+
+    def _validate_claim_literals(self, text: str, cited_facts: list[dict[str, Any]]) -> None:
+        try:
+            _validate_supported_literals(text, cited_facts)
+        except ConversationFailure as exc:
+            if exc.reason != "unsupported_number" or not self._claim_consistency_applies(text, cited_facts):
+                raise
+
+    def _claim_consistency_applies(self, text: str, cited_facts: list[dict[str, Any]]) -> bool:
+        if self._claim_consistency_validator is None:
+            return False
+        if self._claim_consistency_applicability is None:
+            return True
+        return self._claim_consistency_applicability(text, cited_facts)
 
     @contextmanager
     def provider_scope(self, provider: AIProvider, trace: Any | None = None) -> Iterator[None]:
@@ -627,6 +783,7 @@ class GroundedQAOrchestrator:
         cited: list[str] = []
         rendered_claims: list[str] = []
         projected_unknowns: list[str] = []
+        consistency_unknowns: list[str] = []
         if transport_bearing:
             if "hotel_information" in turn_intents:
                 conflicted_ids = {
@@ -661,7 +818,15 @@ class GroundedQAOrchestrator:
                 if tokens != references or (references and set(references) != set(claim_ids)):
                     raise ConversationFailure("invalid_model_output", "A supported claim includes invalid evidence references.")
                 cited_claim_facts = [facts_by_id[item] for item in claim_ids]
-                _validate_supported_literals(claim.text, cited_claim_facts)
+                self._validate_claim_literals(claim.text, cited_claim_facts)
+                if self._claim_consistency_validator is not None:
+                    safe_parts, safe_unknowns, used_facts, _projection_ids = self._checked_claim_segments(
+                        claim.text, cited_claim_facts, channel="supported_claim", fact_scope_is_explicit=True,
+                    )
+                    rendered_claims.extend(text for text, _fact_ids in safe_parts)
+                    consistency_unknowns.extend(safe_unknowns)
+                    cited.extend(str(fact["fact_id"]) for fact in used_facts)
+                    continue
                 formatted_text = (
                     self._claim_formatter(claim.text, cited_claim_facts)
                     if self._claim_formatter is not None else claim.text
@@ -677,7 +842,51 @@ class GroundedQAOrchestrator:
                 labels = " ".join(f"[{fact_id}]" for fact_id in claim_ids)
                 rendered_claims.append(formatted_text if references else f"{formatted_text} {labels}")
         for text in (*payload.unknowns, *payload.conflicts):
-            _validate_untrusted_field(text, facts_by_id)
+            validation_facts = [
+                fact for fact in relevant_facts
+                if not str(fact.get("topic", "")).startswith("local_guide.")
+            ]
+            allow_profiled_number = (
+                self._claim_consistency_validator is not None
+                and self._claim_consistency_applies(text, validation_facts)
+            )
+            _validate_untrusted_field(
+                text, facts_by_id, allow_profiled_number=allow_profiled_number,
+            )
+        checked_unknowns = tuple(payload.unknowns)
+        checked_conflicts = tuple(payload.conflicts)
+        if self._claim_consistency_validator is not None and not transport_bearing:
+            checked_unknowns_list: list[str] = []
+            checked_conflicts_list: list[str] = []
+            for source_text, destination in (
+                *((text, checked_unknowns_list) for text in payload.unknowns),
+                *((text, checked_conflicts_list) for text in payload.conflicts),
+            ):
+                validation_facts = [
+                    fact for fact in relevant_facts
+                    if not str(fact.get("topic", "")).startswith("local_guide.")
+                ]
+                refs = set(_FACT_REFERENCE.findall(source_text))
+                referenced_unconfirmed = [
+                    fact for fact in validation_facts
+                    if fact.get("status") in {"unknown", "needs_confirmation"}
+                    and str(fact.get("fact_id", "")) in refs
+                ]
+                has_relevant_unconfirmed = bool(_unconfirmed_facts_for_claim(source_text, validation_facts))
+                if referenced_unconfirmed and not has_relevant_unconfirmed:
+                    destination.append("I couldn't verify that detail from the current approved hotel records.")
+                    continue
+                if not self._claim_consistency_applies(source_text, validation_facts) and not has_relevant_unconfirmed:
+                    destination.append(source_text)
+                    continue
+                safe_parts, safe_unknowns, used_facts, _projection_ids = self._checked_claim_segments(
+                    source_text, validation_facts, channel="unknown_or_conflict",
+                )
+                rendered_claims.extend(text for text, _fact_ids in safe_parts)
+                destination.extend(safe_unknowns)
+                cited.extend(str(fact["fact_id"]) for fact in used_facts)
+            checked_unknowns = tuple(dict.fromkeys((*consistency_unknowns, *checked_unknowns_list)))
+            checked_conflicts = tuple(dict.fromkeys(checked_conflicts_list))
         raw_guest_clarification = getattr(payload, "guest_clarification", None)
         if raw_guest_clarification is not None and extract_guest_patch:
             raise ConversationFailure("invalid_model_output", "Guest clarifications belong to committed answers only.")
@@ -719,7 +928,7 @@ class GroundedQAOrchestrator:
         acknowledgement = None
         if raw_acknowledgement is not None:
             if (
-                extract_guest_patch or rendered_claims or payload.unknowns or payload.conflicts
+                extract_guest_patch or rendered_claims or checked_unknowns or checked_conflicts
                 or raw_guest_clarification is not None or raw_guest_claims or raw_brief_refs
                 or getattr(payload, "guest_patch", None) is not None
             ):
@@ -739,7 +948,7 @@ class GroundedQAOrchestrator:
             acknowledgement = None
         has_meaningful_text = any(
             _FACT_REFERENCE.sub("", part).strip() for part in (
-                *rendered_claims, *rendered_guest_claims, *payload.unknowns, *payload.conflicts,
+                *rendered_claims, *rendered_guest_claims, *checked_unknowns, *checked_conflicts,
                 *([guest_clarification] if guest_clarification is not None else []),
                 *([acknowledgement] if acknowledgement is not None else []),
             )
@@ -757,10 +966,10 @@ class GroundedQAOrchestrator:
                 raise ConversationFailure("invalid_model_output", "A response without supporting facts must state unknowns or conflicts.")
         cited_facts = [facts_by_id[fact_id] for fact_id in cited]
         answer_unknowns = tuple(dict.fromkeys(projected_unknowns)) if transport_bearing else (
-            *payload.unknowns,
+            *checked_unknowns,
             *((guest_clarification,) if guest_clarification is not None else ()),
         )
-        answer_parts = [*rendered_claims, *rendered_guest_claims, *answer_unknowns, *payload.conflicts]
+        answer_parts = [*rendered_claims, *rendered_guest_claims, *answer_unknowns, *checked_conflicts]
         if acknowledgement is not None:
             answer_parts.append(acknowledgement)
         answer_text = "\n".join(answer_parts)
@@ -1007,7 +1216,7 @@ class GroundedQAOrchestrator:
                 "invalid_room_advice", "The model returned an invalid room-advice candidate.",
                 validation_diagnostics=diagnostics,
             ) from exc
-        hotel_answer = self._validate_room_advice_hotel_answer(
+        hotel_answer, hotel_projection_fact_ids = self._validate_room_advice_hotel_answer(
             draft.hotel_answer, context=context,
             hotel_information_facts=tuple(eligible_after[fact_id] for fact_id in context.hotel_information_fact_ids)
             if mixed_hotel_request else (),
@@ -1017,18 +1226,37 @@ class GroundedQAOrchestrator:
         recommended = await self._observe("capability", self._room_advice.recommend(
             context=selected_context, draft=draft, deadline=remaining,
         ))
+        if hotel_projection_fact_ids:
+            source_refs = list(recommended.source_refs)
+            existing = {ref.get("fact_id") for ref in source_refs if isinstance(ref, dict)}
+            for fact_id in hotel_projection_fact_ids:
+                fact = eligible_after.get(fact_id)
+                provenance = fact.get("provenance") if fact else None
+                if not isinstance(provenance, dict) or not provenance.get("source_id") or not provenance.get("source_version"):
+                    raise ConversationFailure(
+                        "room_advice_unavailable", "A projected hotel fact has no current source binding.",
+                    )
+                if fact_id not in existing:
+                    source_refs.append({
+                        "source_id": provenance["source_id"],
+                        "source_version": provenance["source_version"],
+                        "source_hash": provenance.get("source_hash", ""),
+                        "source_generation": context.source_generation,
+                        "fact_id": fact_id,
+                    })
+            recommended = replace(recommended, source_refs=tuple(source_refs))
         return recommended, generated
 
     def _validate_room_advice_hotel_answer(
         self, answer: RoomAdviceHotelAnswer | None, *, context: RoomAdviceContext,
         hotel_information_facts: tuple[dict[str, Any], ...], mixed_hotel_request: bool,
-    ) -> RoomAdviceHotelAnswer | None:
+    ) -> tuple[RoomAdviceHotelAnswer | None, tuple[str, ...]]:
         if not mixed_hotel_request:
             if answer is not None:
                 raise ConversationFailure(
                     "invalid_room_advice", "The model returned an FAQ answer outside a mixed hotel-information turn.",
                 )
-            return None
+            return None, ()
         if answer is None:
             raise ConversationFailure(
                 "invalid_room_advice", "The mixed hotel-information answer is missing from call two.",
@@ -1057,6 +1285,9 @@ class GroundedQAOrchestrator:
                     "invalid_room_advice", "The mixed FAQ answer is outside the prepared turn scope.",
                 ) from exc
         checked_claims = []
+        projection_fact_ids: set[str] = set()
+        checked_unknowns = [] if self._claim_consistency_validator is not None else list(answer.unknowns)
+        checked_conflicts = [] if self._claim_consistency_validator is not None else list(answer.conflicts)
         for claim in answer.supported_claims:
             claim_ids = tuple(dict.fromkeys(claim.fact_ids))
             if not claim_ids or any(fact_id not in allowed_ids or fact_id not in facts_by_id for fact_id in claim_ids):
@@ -1070,7 +1301,18 @@ class GroundedQAOrchestrator:
                     "invalid_room_advice", "The mixed FAQ answer contains invalid evidence references.",
                 )
             cited_facts = [facts_by_id[fact_id] for fact_id in claim_ids]
-            _validate_supported_literals(claim.text, cited_facts)
+            self._validate_claim_literals(claim.text, cited_facts)
+            if self._claim_consistency_validator is not None:
+                safe_parts, safe_unknowns, _used_facts, projected_ids = self._checked_claim_segments(
+                    claim.text, cited_facts, channel="mixed_faq_supported_claim", fact_scope_is_explicit=True,
+                )
+                projection_fact_ids.update(projected_ids)
+                checked_claims.extend(
+                    RoomAdviceHotelClaim(text=part, fact_ids=part_ids)
+                    for part, part_ids in safe_parts
+                )
+                checked_unknowns.extend(safe_unknowns)
+                continue
             formatted = self._claim_formatter(claim.text, cited_facts) if self._claim_formatter else claim.text
             if not isinstance(formatted, str):
                 raise ConversationFailure("invalid_room_advice", "The FAQ claim formatter returned invalid text.")
@@ -1080,13 +1322,51 @@ class GroundedQAOrchestrator:
                 raise ConversationFailure("invalid_room_advice", "The FAQ claim formatter changed evidence references.")
             _validate_supported_literals(formatted, cited_facts)
             checked_claims.append(RoomAdviceHotelClaim(text=formatted, fact_ids=claim_ids))
+        validation_facts = [facts_by_id[fact_id] for fact_id in allowed_ids]
         for text in (*answer.unknowns, *answer.conflicts):
-            _validate_untrusted_field(text, facts_by_id)
-        if not checked_claims and not answer.unknowns and not answer.conflicts:
+            allow_profiled_number = (
+                self._claim_consistency_validator is not None
+                and self._claim_consistency_applies(text, validation_facts)
+            )
+            _validate_untrusted_field(
+                text, facts_by_id, allow_profiled_number=allow_profiled_number,
+            )
+        if self._claim_consistency_validator is not None:
+            for source_text, destination in (
+                *((text, checked_unknowns) for text in answer.unknowns),
+                *((text, checked_conflicts) for text in answer.conflicts),
+            ):
+                refs = set(_FACT_REFERENCE.findall(source_text))
+                referenced_unconfirmed = [
+                    fact for fact in validation_facts
+                    if fact.get("status") in {"unknown", "needs_confirmation"}
+                    and str(fact.get("fact_id", "")) in refs
+                ]
+                has_relevant_unconfirmed = bool(_unconfirmed_facts_for_claim(source_text, validation_facts))
+                if referenced_unconfirmed and not has_relevant_unconfirmed:
+                    destination.append("I couldn't verify that detail from the current approved hotel records.")
+                    continue
+                if not self._claim_consistency_applies(source_text, validation_facts) and not has_relevant_unconfirmed:
+                    destination.append(source_text)
+                    continue
+                safe_parts, safe_unknowns, _used_facts, projected_ids = self._checked_claim_segments(
+                    source_text, validation_facts, channel="mixed_faq_unknown_or_conflict",
+                )
+                projection_fact_ids.update(projected_ids)
+                checked_claims.extend(
+                    RoomAdviceHotelClaim(
+                        text=part,
+                        fact_ids=part_ids,
+                    ) for part, part_ids in safe_parts
+                )
+                destination.extend(safe_unknowns)
+            checked_unknowns = list(dict.fromkeys(checked_unknowns))
+            checked_conflicts = list(dict.fromkeys(checked_conflicts))
+        if not checked_claims and not checked_unknowns and not checked_conflicts:
             raise ConversationFailure("invalid_room_advice", "The mixed FAQ answer has no substantive response.")
         return RoomAdviceHotelAnswer(
-            supported_claims=tuple(checked_claims), unknowns=answer.unknowns, conflicts=answer.conflicts,
-        )
+            supported_claims=tuple(checked_claims), unknowns=tuple(checked_unknowns), conflicts=tuple(checked_conflicts),
+        ), tuple(sorted(projection_fact_ids))
 
     async def _current_facts_by_ids(
         self, hotel_id: str, fact_ids: set[str], *, deadline: float | None,
