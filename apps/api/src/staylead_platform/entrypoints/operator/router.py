@@ -6,10 +6,12 @@ from dataclasses import asdict, is_dataclass
 from typing import Any, Literal, Protocol
 
 from fastapi import APIRouter, Header, HTTPException, Request
+from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from staylead_platform.composition.configuration.settings import Settings
 from staylead_platform.composition.dependencies.operator_guide import OperatorGuideError
+from staylead_platform.infrastructure.identity.oidc_operator import FLOW_COOKIE, OidcOperatorAuth
 from staylead_platform.infrastructure.identity.operator import (
     OperatorPrincipal,
     resolve_dev_operator,
@@ -51,6 +53,20 @@ def _principal(
         raise HTTPException(status_code=404, detail={
             "error": {"code": "operator_unavailable", "message": "The operator interface is unavailable.", "retryable": False},
         })
+    if settings.operator_oidc_enabled:
+        auth: OidcOperatorAuth = request.app.state.operator_auth
+        if permission == "guide:write":
+            auth.require_origin(request)
+        principal = auth.principal(request)
+        if principal.property_id != property_id:
+            raise HTTPException(status_code=403, detail={
+                "error": {"code": "operator_property_forbidden", "message": "The operator is not authorized for this property.", "retryable": False},
+            })
+        if permission not in principal.permissions:
+            raise HTTPException(status_code=403, detail={
+                "error": {"code": "operator_permission_required", "message": "The operator is not authorized for this action.", "retryable": False},
+            })
+        return principal
     if not authorization or not authorization.startswith("Bearer ") or not authorization[7:]:
         raise HTTPException(status_code=401, detail={
             "error": {"code": "operator_auth_required", "message": "A valid operator credential is required.", "retryable": False},
@@ -90,6 +106,54 @@ def _call(callback: Any) -> Any:
 
 
 router = APIRouter(prefix="/v1/operator/properties/{property_id}/guide", tags=["local guide operator"])
+
+
+auth_router = APIRouter(prefix="/v1/operator/auth", tags=["local operator authentication"])
+
+
+@auth_router.get("/login")
+def operator_login(request: Request) -> Response:
+    if not request.app.state.settings.operator_oidc_enabled:
+        raise HTTPException(404, detail={"error": {"code": "operator_oidc_disabled", "message": "OIDC sign-in is unavailable.", "retryable": False}})
+    return request.app.state.operator_auth.start()
+
+
+@auth_router.post("/callback")
+async def operator_callback(request: Request) -> Response:
+    if not request.app.state.settings.operator_oidc_enabled:
+        raise HTTPException(404, detail={"error": {"code": "operator_oidc_disabled", "message": "OIDC sign-in is unavailable.", "retryable": False}})
+    from urllib.parse import parse_qs
+    values = parse_qs((await request.body()).decode("utf-8"), keep_blank_values=True)
+    try:
+        return await request.app.state.operator_auth.callback(
+            values.get("code", [None])[0], values.get("state", [None])[0], values.get("error", [None])[0],
+            request.cookies.get(FLOW_COOKIE),
+        )
+    except HTTPException as exc:
+        if exc.status_code != 401:
+            raise
+        return Response(status_code=303, headers={
+            "Location": f"{request.app.state.settings.operator_oidc_browser_origin}/operator?auth=error",
+            "Cache-Control": "no-store", "Referrer-Policy": "no-referrer",
+        })
+
+
+@auth_router.get("/session")
+def operator_session(request: Request) -> dict[str, str]:
+    if not request.app.state.settings.operator_oidc_enabled:
+        raise HTTPException(404, detail={"error": {"code": "operator_oidc_disabled", "message": "OIDC sign-in is unavailable.", "retryable": False}})
+    auth: OidcOperatorAuth = request.app.state.operator_auth
+    principal = auth.principal(request)
+    return {"operator_id": principal.operator_id, "property_id": principal.property_id}
+
+
+@auth_router.post("/logout", status_code=204)
+def operator_logout(request: Request) -> Response:
+    if not request.app.state.settings.operator_oidc_enabled:
+        raise HTTPException(404, detail={"error": {"code": "operator_oidc_disabled", "message": "OIDC sign-in is unavailable.", "retryable": False}})
+    auth: OidcOperatorAuth = request.app.state.operator_auth
+    auth.require_origin(request)
+    return auth.logout(request)
 
 
 @router.get("/preview")
