@@ -19,6 +19,10 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from staylead_platform.composition.configuration.settings import Settings
+from staylead_platform.domains.hospitality.claim_consistency import validate_hospitality_claim
+from staylead_platform.domains.hospitality.claim_consistency_policy import (
+    hospitality_claim_consistency_applies,
+)
 from staylead_platform.domains.hospitality.grounded_claim_format import (
     format_grounded_claim,
     project_grounded_fact,
@@ -342,6 +346,8 @@ def create_guest_chat_application(
             selection_schema=FactSelection,
             claim_formatter=format_grounded_claim,
             safe_fact_projector=project_grounded_fact,
+            claim_consistency_validator=validate_hospitality_claim,
+            claim_consistency_applicability=hospitality_claim_consistency_applies,
             clarification_validator=validate_pending_guest_clarification,
             committed_output_schema_factory=committed_answer_output_schema,
             preparation_selection_schema_factory=fact_selection_output_schema,
@@ -437,6 +443,64 @@ def _evidence_bindings(
         source=value["source"], fact_ids=tuple(sorted(set(value["fact_ids"]))),
         media_ids=tuple(sorted(set(value["media_ids"]))), media_sha256=value["media_sha256"],
     ) for value in grouped.values()]
+
+
+def _bindings_cover_displayed_evidence(
+    bindings: object, evidence: object, media: object, *, hotel_id: str,
+) -> bool:
+    """Require saved private bindings to cover each displayed fact and media item."""
+    if not isinstance(bindings, list) or not isinstance(evidence, list) or not isinstance(media, list):
+        return False
+    bound_facts: set[tuple[str, str, str, str, int]] = set()
+    bound_media: set[tuple[str, str, str, str, int, str]] = set()
+    for binding in bindings:
+        if not isinstance(binding, dict) or not isinstance(binding.get("source"), dict):
+            return False
+        source = binding["source"]
+        source_id = source.get("source_id")
+        source_version = source.get("source_version")
+        source_hash = source.get("source_hash")
+        source_generation = source.get("hotel_generation")
+        if (source.get("hotel_id") != hotel_id or not isinstance(source_id, str)
+                or not isinstance(source_version, str) or not isinstance(source_hash, str)
+                or not isinstance(source_generation, int)):
+            return False
+        for fact_id in binding.get("fact_ids", []):
+            if not isinstance(fact_id, str):
+                return False
+            bound_facts.add((source_id, fact_id, source_version, source_hash, source_generation))
+        media_sha256 = binding.get("media_sha256", {})
+        if not isinstance(media_sha256, dict):
+            return False
+        for media_id in binding.get("media_ids", []):
+            digest = media_sha256.get(media_id)
+            if not isinstance(media_id, str) or not isinstance(digest, str):
+                return False
+            bound_media.add((source_id, media_id, source_version, source_hash, source_generation, digest))
+    for item in evidence:
+        if not isinstance(item, dict):
+            return False
+        key = (
+            item.get("source_id"), item.get("fact_id"), item.get("source_version"),
+            item.get("source_hash"), item.get("source_generation"),
+        )
+        if not all(isinstance(value, str) for value in key[:4]) or not isinstance(key[4], int):
+            return False
+        if key not in bound_facts:
+            return False
+    for item in media:
+        if not isinstance(item, dict):
+            return False
+        key = (
+            item.get("source_id"), item.get("media_id"), item.get("source_version"),
+            item.get("source_hash"), item.get("source_generation"), item.get("sha256"),
+        )
+        if (not all(isinstance(value, str) for value in key[:4])
+                or not isinstance(key[4], int) or not isinstance(key[5], str)):
+            return False
+        if key not in bound_media:
+            return False
+    return True
 
 
 def _local_guide_payload_and_bindings(
@@ -746,6 +810,38 @@ class GuestChatApplication:
             if stored is None:
                 raise GuestChatError(404, "response_unavailable", "The saved answer is not available.")
             freshness = stored.get("freshness", {})
+            receipt = stored.get("brief_receipt")
+            if (
+                stored.get("status") == "completed"
+                and stored.get("request_id") == request_id
+                and isinstance(receipt, dict) and receipt.get("request_id") == request_id
+                and receipt.get("answer_status") == "completed"
+                and stored.get("answer_eligibility") != "pending"
+                and not stored.get("evidence_bindings")
+                and (stored.get("evidence") or stored.get("media"))
+            ):
+                child_request_id = str(uuid.uuid5(
+                    uuid.NAMESPACE_URL, f"staylead-brief-confirmation-answer:{session_id}:{request_id}",
+                ))
+                child = get_completed_response(
+                    self._engine, session_id=session_id, hotel_id=claims.hotel_id,
+                    request_id=child_request_id, now=datetime.now(UTC),
+                )
+                child_bindings = child.get("evidence_bindings") if isinstance(child, dict) else None
+                child_is_authoritative = bool(
+                    isinstance(child, dict)
+                    and child.get("status") == "completed"
+                    and child.get("request_id") == child_request_id
+                    and child.get("evidence") == stored.get("evidence")
+                    and child.get("media") == stored.get("media")
+                    and child_bindings
+                    and _bindings_cover_displayed_evidence(
+                        child_bindings, child.get("evidence"), child.get("media"), hotel_id=claims.hotel_id,
+                    )
+                )
+                freshness = (
+                    child.get("freshness", {}) if child_is_authoritative else {"eligible": False}
+                )
             brief_stale = False
             if stored.get("brief_dependent"):
                 current_brief = get_guest_brief(
@@ -1002,7 +1098,8 @@ class GuestChatApplication:
                 raise GuestChatError(503, "freshness_unavailable", "Answer freshness could not be checked.", retryable=True) from exc
             if not decision.eligible and cached.get("status") != "partial_success":
                 raise GuestChatError(409, "stale_source", "The saved answer is no longer current. Ask again in a new turn.")
-            cached.pop("evidence_bindings", None)
+            if admission_parent is None:
+                cached.pop("evidence_bindings", None)
             cached.pop("freshness", None)
             presentation = cached.get("presentation") or {
                 "language_tag": current_language["language_tag"],
@@ -1559,17 +1656,47 @@ class GuestChatApplication:
                                    or any(fact_id not in facts_by_id for fact_id in claim.get("fact_ids", ()))
                                    for claim in hotel_claims):
                                 raise GuestChatError(503, "room_advice_unavailable", "The hotel answer could not be tied to the selected records.", retryable=True)
-                            citations = tuple(facts_by_id[fact_id] for claim in hotel_claims for fact_id in claim.get("fact_ids", ()))
+                            final_claims: list[str] = []
+                            final_fact_ids: list[str] = []
+                            final_unknowns = list(raw_hotel_answer.get("unknowns", ()))
+                            final_unknowns.extend(raw_hotel_answer.get("conflicts", ()))
+                            for claim in hotel_claims:
+                                claim_fact_ids = tuple(claim.get("fact_ids", ()))
+                                cited_claim_facts = [facts_by_id[fact_id] for fact_id in claim_fact_ids]
+                                formatted_claim = format_grounded_claim(claim["text"], cited_claim_facts)
+                                if not hospitality_claim_consistency_applies(formatted_claim, cited_claim_facts):
+                                    final_claims.append(formatted_claim)
+                                    final_fact_ids.extend(claim_fact_ids)
+                                    continue
+                                final_findings = validate_hospitality_claim(
+                                    formatted_claim, cited_claim_facts, "final_composition",
+                                )
+                                if final_findings.assertions and all(
+                                    not item.assertive or item.status.value == "verified"
+                                    for item in final_findings.assertions
+                                ):
+                                    final_claims.append(formatted_claim)
+                                    final_fact_ids.extend(claim_fact_ids)
+                                else:
+                                    projected_any = False
+                                    for fact in cited_claim_facts:
+                                        projected = project_grounded_fact(fact)
+                                        if projected:
+                                            final_unknowns.append(f"{projected} [{fact['fact_id']}]")
+                                            final_fact_ids.append(fact["fact_id"])
+                                            projected_any = True
+                                    if not projected_any:
+                                        final_unknowns.append(
+                                            "I couldn't verify that detail from the current approved hotel records."
+                                        )
+                            citations = tuple(facts_by_id[fact_id] for fact_id in final_fact_ids)
                             unique_citations = tuple({fact["fact_id"]: fact for fact in citations}.values())
-                            answer_text = "\n".join(format_grounded_claim(
-                                claim["text"], [facts_by_id[fact_id] for fact_id in claim.get("fact_ids", ())],
-                            ) for claim in hotel_claims)
+                            answer_text = "\n".join(final_claims)
                             answer = replace(
                                 answer, answer=answer_text, citations=unique_citations,
                                 # This response contract has one uncertainty channel;
                                 # preserve checked conflicts there rather than dropping them.
-                                unknowns=tuple(raw_hotel_answer.get("unknowns", ()))
-                                + tuple(raw_hotel_answer.get("conflicts", ())),
+                                unknowns=tuple(dict.fromkeys(final_unknowns)),
                             )
                 # The orchestrator sets this only when its structured output cites
                 # validated canonical brief fields. A supplied brief alone does not
@@ -1742,7 +1869,8 @@ class GuestChatApplication:
                     raise
                 turn_trace.record("response", "ok")
                 turn_trace.close(outcome="ok")
-                result.pop("evidence_bindings", None)
+                if admission_parent is None:
+                    result.pop("evidence_bindings", None)
                 return result
         except GuestChatError as exc:
             if not any(item.get("status") in {"error", "cancelled", "denied"} for item in turn_trace.events):
@@ -2060,9 +2188,12 @@ class GuestChatApplication:
                         payload_hash=admission_hash, lease_owner=admission_owner, limits=admission_limits,
                     ),
                 )
-                return _merge_confirmation_trace(
+                response = _merge_confirmation_trace(
                     {**refreshed, "request_id": request_id}, original.get("trace"),
                 )
+                response.pop("evidence_bindings", None)
+                return response
+            cached.pop("evidence_bindings", None)
             return cached
 
         mutation_result = None
@@ -2153,12 +2284,14 @@ class GuestChatApplication:
                 ) from exc
             response = {**response, "request_id": request_id}
             response = _merge_confirmation_trace(response, original.get("trace"))
-            return await asyncio.to_thread(
+            response = await asyncio.to_thread(
                 complete_request_with_response_only, self._engine,
                 session_id=session_id, hotel_id=confirmation.hotel_id,
                 request_id=request_id, question=reservation_question, response=response,
                 timeout_seconds=_remaining_seconds(deadline),
             )
+            response.pop("evidence_bindings", None)
+            return response
         except GuestChatError as exc:
             if mutation_result is None:
                 await self._fail_request(session_id, request_id, exc.code)
