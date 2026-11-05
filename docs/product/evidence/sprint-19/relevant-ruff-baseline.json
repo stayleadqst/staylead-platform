@@ -1,0 +1,46 @@
+{
+  "candidate": "7a4c46b3472ed139e6c6d12e3ceefad8341afd56",
+  "tree": "3548641d08a6e251b3edc02f230a2ef11259244d",
+  "correct_invocation": {
+    "cwd": "/private/tmp/staylead-s19-canonical/apps/api",
+    "config": "pyproject.toml",
+    "version": "ruff 0.17.1",
+    "scope": "7 B03-relevant Python source/test files",
+    "exit": 1,
+    "diagnostic_count": 1,
+    "diagnostic": "I001 in src/staylead_platform/domains/hospitality/schemas/guest_brief.py",
+    "git_diff_quiet_head_exit": 0,
+    "file_sha256": "c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529",
+    "interpretation": "The sole diagnostic is present in the exact unchanged candidate source. No auto-fix performed; targeted configured Ruff is not all-green.",
+    "log": "LOCAL-ONLY /Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/configured-ruff-relevant.log; SHA-256 825741661701a1cfc8de3278b71a54b2e82b43fd0c876abad2a4aa0f309cb096; no publish."
+  },
+  "authorized_format_repair_and_postfix": {
+    "authorization": "C authorized exactly one blank line for B03-configured-lint-format1; no semantic change",
+    "target_artifact_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+    "ast_sha256_before_after": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7",
+    "diff": "one blank line only",
+    "postfix_configured_ruff_scope": "same seven B03-relevant files, from apps/api with pyproject.toml",
+    "postfix_exit": 0,
+    "postfix_log": "validation/sprint-19-20261105/a/postfix-verification.log",
+    "postfix_contracts": "8 passed, 0 skipped on exact target SHA before restore; target was reinstated byte-identically; no post-reapplication test invocation.",
+    "postfix_compile": "Changed schema compiled in memory on exact target SHA before restore; same target reinstated; no post-reapplication compile invocation.",
+    "artifact_history": "Applied target, restored exact base once following interim C instruction, then reinstated same target after C correction; 3 source writes total, product counter 1/3.",
+    "postfix_reuse": "Existing configured Ruff pass was executed on exact target hash before restore; final reapplication has identical SHA/AST; no post-reapplication lint invocation. Q may assess hash-bound reuse; do not report fresh execution.",
+    "postfix_log_local_only": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/postfix-verification.log SHA-256 2335b88288e9846e9acc714fdbc1c06ccc1c1c029bb8c459388a011198eefab7; do not publish raw log.",
+    "source_write_history": [
+      "add base c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529 → target 2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+      "restore exact base SHA c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529",
+      "reapply exact target SHA 2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398 after C correction"
+    ]
+  },
+  "incorrect_first_lane_preserved": {
+    "cwd": "/private/tmp/staylead-s19-canonical",
+    "config_argument": "apps/api/pyproject.toml",
+    "exit": 1,
+    "diagnostics": 43,
+    "scope": "Full apps/api/src and tests",
+    "log": "LOCAL-ONLY /Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/configured-ruff.log; SHA-256 909317414151ef1c72bd8118d4960a96566bf99caebb9a26ae5ae416f4e85464; no publish.",
+    "status": "Wrong cwd/project-root resolution; preserved as failed attempt, not accepted as configured baseline."
+  },
+  "candidate_final_product_artifact_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398"
+}

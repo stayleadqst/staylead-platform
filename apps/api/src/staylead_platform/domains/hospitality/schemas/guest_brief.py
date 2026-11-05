@@ -14,6 +14,7 @@ from pydantic import (
     ValidationError,
     model_validator,
 )
+
 from staylead_platform.platform.contracts.guest_brief import (
     GuestBriefProposal,
     GuestBriefSnapshot,
