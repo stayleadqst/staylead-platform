@@ -1,0 +1,180 @@
+{
+  "story": "B03 #20 full AC1-3",
+  "candidate": {
+    "git_sha": "7a4c46b3472ed139e6c6d12e3ceefad8341afd56",
+    "tree": "3548641d08a6e251b3edc02f230a2ef11259244d",
+    "branch": "sprint-19-b03-full-acceptance",
+    "product_source_mutations": 1,
+    "product_source_change": "one blank line in guest_brief.py import grouping; final artifact is target SHA 2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398; AST unchanged",
+    "fixtures_added_or_changed": 0,
+    "final_product_file_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+    "final_product_diff": "one blank line vs HEAD; AST unchanged; source was added, restored, then reinstated after C correction",
+    "transient_source_edit_history": {
+      "target_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+      "change": "one blank line only in guest_brief.py",
+      "ast_sha256_before_after": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7",
+      "authorization": "C-authorized formatting scope before source mutation",
+      "restoration": "restored briefly, then exact preflighted target reapplied under corrective C reservation; no further source changes"
+    },
+    "source_write_history": [
+      "add exact preflighted blank line: c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529 -> 2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+      "remove same blank line, restoring exact preimage c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529",
+      "reapply same preflighted line after C correction, returning exact target SHA 2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398"
+    ],
+    "ast_sha256": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7"
+  },
+  "current_runtime": {
+    "evidence": "source-import-origin.json; import-origin read was before format edit; paths resolve within candidate checkout",
+    "cwd": "/private/tmp/staylead-s19-canonical",
+    "python": "3.14.7",
+    "import_origins": "staylead_platform and guest_brief/guest_chat/store resolved from this candidate's apps/api/src, despite using the original workspace venv",
+    "database": "fresh PostgreSQL 18 test-only staylead_s19_b03_test; private Unix socket; no TCP listener; DSN contains no password",
+    "provider": "deterministic offline test doubles; no live model call"
+  },
+  "focused_checks": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<candidate>/apps/api/src STAYLEAD_TEST_DATABASE_URL=<private Unix-socket DSN redacted> <existing Python 3.14.7 venv>/bin/python -m pytest tests/contracts/test_guest_brief.py tests/integration/test_sprint5_brief_postgres.py tests/integration/test_sprint5_consumer_postgres.py -q",
+    "exit": 0,
+    "passed": 26,
+    "failed": 0,
+    "skipped": 0,
+    "warning": "StarletteDeprecationWarning: using httpx with starlette.testclient is deprecated",
+    "log": "LOCAL-ONLY /Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/focused-pytest.log; SHA-256 9024242740523deb245488f3cfb7e7b86b2ae9ae2498c84dcf1bfed437232cbe",
+    "postfix_contracts": {
+      "test": "tests/contracts/test_guest_brief.py",
+      "passed": 8,
+      "skipped": 0,
+      "artifact_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+      "ast_sha256": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7",
+      "state": "exact artifact proof executed before restore and reused after reapplication by matching target SHA; no fresh post-reapply test invocation",
+      "local_log": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/postfix-verification.log",
+      "local_log_sha256": "2335b88288e9846e9acc714fdbc1c06ccc1c1c029bb8c459388a011198eefab7"
+    },
+    "in_memory_compile": {
+      "exit": 0,
+      "files": 7,
+      "state": "pre-format compile on base plus changed-schema compile during exact target artifact run; no fresh run after reapplication",
+      "local_log": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/inmemory-compile.log",
+      "log": "LOCAL-ONLY /Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/inmemory-compile.log"
+    },
+    "configured_ruff": {
+      "tool": "ruff 0.17.1",
+      "cwd": "/private/tmp/staylead-s19-canonical/apps/api",
+      "config": "pyproject.toml",
+      "scope": "4 relevant API source files and 3 focused tests",
+      "pre_format_base": {
+        "exit": 1,
+        "finding": "one I001 in guest_brief.py; other six clean",
+        "file_sha256": "c8fa7a849848bba48fd738c7851ca82002c104ffe95190d005f48c4f14104529",
+        "log_local_only": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/configured-ruff-relevant.log",
+        "log_sha256": "825741661701a1cfc8de3278b71a54b2e82b43fd0c876abad2a4aa0f309cb096"
+      },
+      "transient_format_artifact": {
+        "exit": 0,
+        "finding": "All checks passed on seven relevant files",
+        "artifact_sha256": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+        "ast_sha256": "765f18494d92b3c09853f93f4a807bcd855ff3f21cd9735ffbb9134e63142ee7",
+        "log_local_only": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/postfix-verification.log",
+        "log_sha256": "2335b88288e9846e9acc714fdbc1c06ccc1c1c029bb8c459388a011198eefab7",
+        "reuse_qualification": "same exact artifact re-applied; no post-reapplication Ruff call; Q to assess reuse, do not assert fresh PASS"
+      },
+      "wrong_cwd_invocation": {
+        "exit": 1,
+        "diagnostics": 43,
+        "status": "wrong cwd/config; not configured baseline",
+        "log_local_only": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/configured-ruff.log",
+        "log_sha256": "909317414151ef1c72bd8118d4960a96566bf99caebb9a26ae5ae416f4e85464"
+      }
+    },
+    "log_local_only": {
+      "path": "/Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/a/focused-pytest.log",
+      "sha256": "9024242740523deb245488f3cfb7e7b86b2ae9ae2498c84dcf1bfed437232cbe",
+      "note": "Raw DSN-bearing command log stays in local validation workspace; do not publish."
+    }
+  },
+  "current_candidate_pins": {
+    "apps/api/src/staylead_platform/platform/contracts/guest_brief.py": "a8f3f0b8dcd1460c870ea29e435c61f058534dc3254da49ef7e48eaab83ec6a9",
+    "apps/api/src/staylead_platform/domains/hospitality/schemas/guest_brief.py": "2549e19d3b9855f2f16d56dff6cc389041519c659ae1c8dc8656c772f6a8a398",
+    "apps/api/src/staylead_platform/composition/dependencies/guest_chat.py": "51526e16ee1cce22f77502ed913ee3c7fe2129b82508f60099a15492d6d7bf3b",
+    "apps/api/src/staylead_platform/infrastructure/persistence/store.py": "9eebea331e138a6f2a1c1bc934910b5b7473da3a0683d7b6d7b9ae4b7bbac085",
+    "apps/api/src/staylead_platform/domains/hospitality/prompts/grounded_qa.py": "ab690ee0b4b3c14eace8b993a2cefc2e3bbbfc95031a2b76dd746e522f3522fe",
+    "apps/api/pyproject.toml": "85268e368d8bfdefe923fb34de900ccb8d9689f59eba0401763ff295e3d182d4",
+    "tests/contracts/test_guest_brief.py": "f9f2f49d86e2003e0ad12120123bcb8e8de10915861311c054fb1996919ac83b",
+    "tests/integration/test_sprint5_brief_postgres.py": "5bdfaf4d6fe6baf0a9a033b080df9779a2a613f8a0aec83f74a971051dd55d6f",
+    "tests/integration/test_sprint5_consumer_postgres.py": "061dd96496d207fea4fc14abfac24c93c22d6d6a595f9b764d8ff4abf9761ccb",
+    "fixtures/hospitality/knowledge-v1/manifest.json": "268b90bb53547e7d7ad054c37fc5173083a12a29865bfe39e79f551de062f9e2",
+    "fixtures/hospitality/knowledge-v1/facts.json": "6e3dea0ecb9691d321ed7d6a7fee0664087c72346b436f37dbdc08ce5ff080e0",
+    "fixtures/hospitality/knowledge-v1/properties.json": "627dd25e733d7ec59be02619eeb813d8c2b037e02d51fd11680eb9a6e88a868e",
+    "fixtures/hospitality/knowledge-v1/sources.json": "7e96c0b7adc2b85eb12dae03dc1e2bd722628ca02a905f8b9d621910ba0f9a1f"
+  },
+  "per_case": [
+    {
+      "case": "AC1: two adults, later child age 7, exact member reference and no invention",
+      "current_expected": "Stable child ID, age 7 only after guest supplies it; retain adults/dates; typed patch and source references.",
+      "current_observed": "Current contract tests cover missing age/pending, exact age-7 member resolution/removal, preserved dates/adults and source fields; current PG consumer test runs a confirmed 2-adult + child edit through API/processor/PG/answer using deterministic provider.",
+      "current_artifacts": [
+        "tests/contracts/test_guest_brief.py::test_missing_child_age_persists_stable_member_and_pending_field",
+        "tests/contracts/test_guest_brief.py::test_precise_child_age_and_removal_resolve_member_pending_only",
+        "tests/contracts/test_guest_brief.py::test_child_edit_requires_known_stable_member_id",
+        "tests/integration/test_sprint5_consumer_postgres.py::test_mixed_edit_commits_before_answer_and_brief_remains_available_after_history_window"
+      ],
+      "historical_model_evidence": "S5 actual real Codex UI/API/PG sequence, fingerprint 511babeb7c0a3312ab24350d18381a087eaf8d4ec3153ba794b65bc946d2b5b4: child age unknown, then age 7 with checkout change, same child ID retained. S6 actual nine-turn multilingual sequence independently repeats unknown→7. Both are historical pins, not fresh model evidence on S19."
+    },
+    {
+      "case": "AC2: ambiguous/conflicting dates and missing age; preserve confirmed state; scoped expected-version write",
+      "current_expected": "Ask the disputed/missing field; do not replace confirmed values; validate before durable commit; tie mutation and source refs to session/property and expected version.",
+      "current_observed": "Current contracts exercise ambiguous/conflicting date clarification, partial dates, pending age, negation/no-op and exact age resolution. Current PostgreSQL tests exercise durable source utterance refs, CAS/scope, rollback and concurrent single-winner behavior. All included in this batch's 26 passing current-candidate tests.",
+      "current_artifacts": [
+        "tests/contracts/test_guest_brief.py::test_ambiguous_dates_preserve_confirmed_values_and_negation_is_noop",
+        "tests/contracts/test_guest_brief.py::test_conflicting_explicit_date_preserves_confirmed_endpoint_and_marks_only_disputed",
+        "tests/contracts/test_guest_brief.py::test_partial_date_capture_persists_either_endpoint_across_turns",
+        "tests/integration/test_sprint5_brief_postgres.py::test_brief_receipt_source_utterance_partial_failure_and_same_id_replay",
+        "tests/integration/test_sprint5_brief_postgres.py::test_brief_cas_scope_and_atomic_rollback_on_duplicate_source_id",
+        "tests/integration/test_sprint5_brief_postgres.py::test_concurrent_brief_writes_have_one_cas_winner"
+      ]
+    },
+    {
+      "case": "AC3: persisted brief reaches following reasoning/tool; paraphrase/negation/missing age; two sessions; no sensitive identifiers",
+      "current_expected": "Committed brief and same stable member reach the next answer; later FAQ/history-window behavior retains state; isolation and no-op semantics prevent cross-session or accidental changes.",
+      "current_observed": "Current API/PG integration confirms explicit guest confirmation, version-1 commit and answer consumption of the same child ID; after five FAQs the later nights answer uses persisted brief version 1. Current tests also cover source-scoped storage/CAS and no-op/negation. Historical S5 restart consumer rejected foreign-session receipt with 404 and zero provider calls; S5 actual later-turn edits/negation and S6 unknown→7 remain version-qualified history.",
+      "current_artifacts": [
+        "tests/integration/test_sprint5_consumer_postgres.py::test_mixed_edit_commits_before_answer_and_brief_remains_available_after_history_window",
+        "tests/integration/test_sprint5_consumer_postgres.py::test_preparation_rejects_unscoped_patch_before_m2_or_brief_mutation",
+        "docs/product/evidence/sprint-5/review-probes/restart-consumer.json"
+      ],
+      "sensitive_fields": "B03 brief schema contains no full-name or passport fields; no new sensitive guest data was collected."
+    }
+  ],
+  "S17_current_ui_processor_compatibility": {
+    "published_postfix_evidence": "../sprint-17/consumer-evidence.json",
+    "sha256": "70ed4d8600fd9a83aba511ba594c4c14107b161185705dc0ca8e2b29a3bb0a4a",
+    "candidate_fingerprint": "1b9717bb977274467d8329f7c502e3daa6ebccd4cae6a2e0ae2e20776a937416",
+    "published_q_verdict": "../sprint-17/independent-verdict.json",
+    "q_verdict_sha256": "cdde948c886d738dc879c0113cd58e447bf8d640789ba77a51bc51528395cb18",
+    "q_result": "YES_FULL_B05_TECHNICAL_AC1_3_DOD; offline provider only",
+    "pre_fix_failure": "Included in published consumer evidence; not credited as postfix PASS.",
+    "local_source_compatibility_readback": "LOCAL-ONLY /Users/ccvn/Documents/project/Staylead/validation/sprint-19-20261105/source-compatibility-readback.json",
+    "local_source_compatibility_sha256": "f7b545d34db4f283083bfce8cff0ecc712f2bce3d3d157ab2f5fd2fb5f45b6ff",
+    "compatibility_result": "Final artifact differs from S17 in guest_brief.py only by the one blank line; 155/156 files byte-identical and the changed file has the same AST SHA. No new UI/model/build run."
+  },
+  "dependency_boundary": {
+    "formal_dependencies": [
+      "B01 #17",
+      "F02 #11",
+      "F04 #13",
+      "F05 #10"
+    ],
+    "F02_F04_F05": "Required interfaces/consumer evidence are present in current focused contract/PG/API run; #11/#13/#10 recorded Closed in planning readback.",
+    "B01_17": "Remains Open for its published-property/operator obligation. Its scoped server-bound session/API seam is sufficient for B03; no real hotel/source gate is added.",
+    "B02_19": "Not a formal #20 dependency. Its separate actual-Q&A obligations remain Open; historical scoped actual model cases inform B03 without closing #19.",
+    "D4_D5": "No new B03 decision identified. Existing session/scope/version bounds apply. S5/S6 actual model evidence is historical; no new paid/live calls authorized or needed by the B03 acceptance text."
+  },
+  "limits": [
+    "One B03-authorized formatting line was added, removed, then re-added after C clarified the authoritative instruction. Three source writes total; final file is the exact target SHA and AST is unchanged. Product counter remains 1/3; no reset.",
+    "26 focused integrated tests passed on the exact base bytes; 8 brief contracts and Ruff all-checks-passed were later executed on the exact target artifact now present, but no fresh invocation followed final reapplication. Q must decide whether the exact artifact hashes are sufficient; do not report these as newly run after restore.",
+    "The S19 database/provider tests use deterministic offline provider doubles; they are not live model evidence.",
+    "S5/S6 actual model results remain historical candidate evidence with served-model identity not inferred.",
+    "S17 postfix is actual UI/API/processor evidence with deterministic offline provider, not model quality evidence.",
+    "Initial configured Ruff on base bytes exited 1 for inherited I001; transient target artifact Ruff passed. Preserve both results; no new Ruff call after final reapplication.",
+    "No GitHub status transition, child/parent closure, deployment, real hotel, booking, or product-completion claim."
+  ]
+}
